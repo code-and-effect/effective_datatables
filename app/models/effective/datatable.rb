@@ -1,0 +1,126 @@
+module Effective
+  class Datatable
+    cattr_accessor :view
+    attr_accessor :total_records, :display_records
+
+    delegate :params, :link_to, :to => :@view
+
+    class << self
+      def all
+        EffectiveDatatables.datatables.map { |klass| klass.new() }
+      end
+
+      def find(obj)
+        obj = obj.respond_to?(:to_param) ? obj.to_param : obj
+        EffectiveDatatables.datatables.find { |klass| klass.name.underscore.parameterize == obj }.try(:new)
+      end
+
+      def table_column(name, options = nil)
+        (@table_columns ||= {})[name.to_s.downcase] = (options || default_options)
+      end
+
+      private
+
+      def default_options
+        {}
+      end
+    end
+
+    def view=(view)
+      @view = view
+      extend_datatable_finders()
+    end
+
+    def to_param
+      self.class.name.underscore.parameterize
+    end
+
+    def collection
+      raise 'You must define a collection. Something like User.scoped'
+    end
+
+    def finalize(collection) # Override me if you like
+      collection
+    end
+
+    def table_columns
+      self.class.instance_variable_get(:@table_columns)
+    end
+
+    def table_filters
+      # 'null', 'number', 'select', 'number-range', 'date-range', 'checkbox'
+      table_columns.values.map { |options, _| options[:filter] || {:type => 'null'} }
+    end
+
+    def to_json(options = {})
+      {
+        :sEcho => params[:sEcho].to_i,
+        :aaData => table_data || [],
+        :iTotalRecords => total_records.to_i,
+        :iTotalDisplayRecords => display_records.to_i,
+      }
+    end
+
+    protected
+
+    def table_data
+      c = collection
+      self.total_records = (c.select('*').count rescue c.count)
+
+      c = order(c)
+      c = search(c)
+      self.display_records = search_terms.any? { |k, v| v.present? } ? (c.select('*').count rescue c.count) : total_records
+
+      c = paginate(c)
+      c = finalize(c)
+      c = arrayize(c)
+    end
+
+    def order_column
+      params[:iSortCol_0].to_i
+    end
+
+    def order_direction
+      params[:sSortDir_0].try(:downcase) == 'desc' ? 'DESC' : 'ASC'
+    end
+
+    def search_terms
+      @search_terms ||= {}.tap do |terms|
+        table_columns.keys.each_with_index { |col, x| terms[col] = params["sSearch_#{x}"] }
+      end
+    end
+
+    def per_page
+      length = params[:iDisplayLength].to_i
+
+      if length == -1
+        9999999
+      elsif length > 0
+        length
+      else
+        10
+      end
+    end
+
+    def page
+      params[:iDisplayStart].to_i / per_page + 1
+    end
+
+    private
+
+    def extend_datatable_finders
+      if active_record_collection?
+        extend ActiveRecordDatatable
+      elsif collection.kind_of?(Array)
+        extend ArrayDatatable
+      else
+        raise 'Unsupported collection type. Should be ActiveRecord class, ActiveRecord relation, or Array'
+      end
+    end
+
+    def active_record_collection?
+     collection.ancestors.include?(ActiveRecord::Base) rescue false
+    end
+
+  end
+end

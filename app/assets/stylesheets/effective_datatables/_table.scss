@@ -1,0 +1,17 @@
+table.effective-datatables {
+  thead {
+    select { width: 95%; }
+    input { width: 95%; }
+    span.filter_column {
+      width: 100%;
+      margin-left: -8px;
+    }
+
+  }
+}
+
+div.DTTT_print_info {
+  h6 { color: black; }
+  p { color: black; }
+}
+
