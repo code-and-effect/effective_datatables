@@ -15,14 +15,12 @@ module Effective
         EffectiveDatatables.datatables.find { |klass| klass.name.underscore.parameterize == obj }.try(:new)
       end
 
-      def table_column(name, options = nil)
-        (@table_columns ||= {})[name.to_s.downcase] = (options || default_options)
+      def table_column(name, options = {})
+        (@table_columns ||= {})[name.to_s.downcase] = options
       end
 
-      private
-
-      def default_options
-        {}
+      def table_columns(*names)
+        names.each { |name| table_column(name) }
       end
     end
 
@@ -44,11 +42,10 @@ module Effective
     end
 
     def table_columns
-      self.class.instance_variable_get(:@table_columns)
+      table_columns_with_defaults()
     end
 
     def table_filters
-      # 'null', 'number', 'select', 'number-range', 'date-range', 'checkbox'
       table_columns.values.map { |options, _| options[:filter] || {:type => 'null'} }
     end
 
@@ -119,8 +116,35 @@ module Effective
     end
 
     def active_record_collection?
-     collection.ancestors.include?(ActiveRecord::Base) rescue false
+     @active_record_collection ||= (collection.ancestors.include?(ActiveRecord::Base) rescue false)
     end
 
+    def table_columns_with_defaults
+      unless self.class.instance_variable_get(:@table_columns_initialized)
+        self.class.instance_variable_set(:@table_columns_initialized, true)
+        initalize_table_columns(self.class.instance_variable_get(:@table_columns))
+      end
+      self.class.instance_variable_get(:@table_columns)
+    end
+
+    def initalize_table_columns(cols)
+      return unless active_record_collection?
+
+      sql_table = (collection.table rescue nil)
+
+      cols.each do |name, _|
+        sql_column = (collection.columns rescue []).find { |column| column.name == name.to_s }
+
+        cols[name][:label] ||= name.titleize
+        cols[name][:column] ||= (sql_table && sql_column) ? "\"#{sql_table.name}\".\"#{sql_column.name}\"" : name
+        cols[name][:type] ||= sql_column.try(:type) || :string
+        cols[name][:filter] ||= 
+          case cols[name][:type] # null, number, select, number-range, date-range, checkbox, text(default)
+            when :integer   ; {:type => :number}
+            when :boolean   ; {:type => :select, :values => [true, false]}
+            else            ; {:type => :text}
+          end
+      end
+    end
   end
 end
