@@ -41,10 +41,10 @@ module Effective
 
     def arrayize(collection)
       # We want to use the render :collection for each column that renders partials
-      partialized = {}
+      rendered = {}
       table_columns.each do |name, opts|
         if opts[:partial]
-          partialized[name] = render(
+          rendered[name] = render(
             :partial => opts[:partial], 
             :as => opts[:partial_local], 
             :collection => collection, 
@@ -58,7 +58,7 @@ module Effective
       collection.each_with_index.map do |obj, index|
         table_columns.map do |name, opts|
           if opts[:partial]
-            partialized[name][index]
+            rendered[name][index]
           else
             obj.send(name) rescue ''
           end
