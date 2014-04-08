@@ -8,8 +8,6 @@ initializeDataTables = ->
         bProcessing: true
         bSaveState: true
         sAjaxSource: datatable.data('source')
-        #sDom: "<'row'<'span4'l><'span4'T><'span4'f>r>t<'row'<'span6'i><'span6'p>>" boostrap2
-        sDom: "<'row'<'col-xs-4'l><'col-xs-4'T><'col-xs-4'f>r>t<'row'<'col-xs-6'i><'col-xs-6'p>>"
         sPaginationType: "bootstrap"
         aLengthMenu: [[10, 25, 50, 100, 250, 1000, -1], [10, 25, 50, 100, 250, 1000, 'All']]
         aoColumnDefs: 

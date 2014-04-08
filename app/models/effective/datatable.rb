@@ -134,8 +134,8 @@ module Effective
         cols[name][:label] ||= name.titleize
         cols[name][:column] ||= (sql_table && sql_column) ? "\"#{sql_table.name}\".\"#{sql_column.name}\"" : name
         cols[name][:type] ||= sql_column.try(:type) || :string
-        cols[name][:filter] ||= 
         cols[name][:sortable] = true if cols[name][:sortable] == nil
+        cols[name][:filter] ||= 
           case cols[name][:type] # null, number, select, number-range, date-range, checkbox, text(default)
             when :integer   ; {:type => :number}
             when :boolean   ; {:type => :select, :values => [true, false]}

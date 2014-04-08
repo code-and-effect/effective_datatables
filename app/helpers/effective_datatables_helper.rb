@@ -4,7 +4,11 @@ module EffectiveDatatablesHelper
   end
 
   def datatable_filter(datatable)
-    datatable.table_columns.values.map { |options, _| options[:filter] || {:type => 'null'} }.to_json()
+    if datatable.respond_to?(:table_filters)
+      datatable.table_filters
+    else
+      datatable.table_columns.values.map { |options, _| options[:filter] || {:type => 'null'} }
+    end.to_json()
   end
 
   def datatable_non_sortable(datatable)
