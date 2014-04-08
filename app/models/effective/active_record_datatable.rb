@@ -40,11 +40,28 @@ module Effective
     end
 
     def arrayize(collection)
-      cols = table_columns
+      # We want to use the render :collection for each column that renders partials
+      partialized = {}
+      table_columns.each do |name, opts|
+        if opts[:partial]
+          partialized[name] = render(
+            :partial => opts[:partial], 
+            :as => opts[:partial_local], 
+            :collection => collection, 
+            :formats => :html, 
+            :locals => {:datatable => self},
+            :spacer_template => '/effective/datatables/spacer_template',
+          ).split('EFFECTIVEDATATABLESSPACER')
+        end
+      end
 
-      collection.map do |obj|
-        cols.map do |name, opts|
-          (opts[:partial] ? render(:partial => opts[:partial], :formats => :html, :locals => {:datatable => self, opts[:partial_local] => obj}) : obj.send(name)) rescue ''
+      collection.each_with_index.map do |obj, index|
+        table_columns.map do |name, opts|
+          if opts[:partial]
+            partialized[name][index]
+          else
+            obj.send(name) rescue ''
+          end
         end
       end
     end
