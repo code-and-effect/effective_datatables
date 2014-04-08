@@ -40,9 +40,14 @@ module Effective
     end
 
     def arrayize(collection)
-      cols = table_columns.keys
-      collection.map { |obj| cols.map { |col| obj.send(col) rescue '' } }
-    end
-  end
+      cols = table_columns
 
+      collection.map do |obj|
+        cols.map do |name, opts|
+          (opts[:partial] ? render(:partial => opts[:partial], :formats => :html, :locals => {:datatable => self, opts[:partial_local] => obj}) : obj.send(name)) rescue ''
+        end
+      end
+    end
+
+  end
 end

@@ -3,7 +3,7 @@ module Effective
     cattr_accessor :view
     attr_accessor :total_records, :display_records
 
-    delegate :params, :link_to, :to => :@view
+    delegate :params, :render, :link_to, :to => :@view
 
     class << self
       def all
@@ -43,10 +43,6 @@ module Effective
 
     def table_columns
       table_columns_with_defaults()
-    end
-
-    def table_filters
-      table_columns.values.map { |options, _| options[:filter] || {:type => 'null'} }
     end
 
     def to_json(options = {})
@@ -139,11 +135,17 @@ module Effective
         cols[name][:column] ||= (sql_table && sql_column) ? "\"#{sql_table.name}\".\"#{sql_column.name}\"" : name
         cols[name][:type] ||= sql_column.try(:type) || :string
         cols[name][:filter] ||= 
+        cols[name][:sortable] = true if cols[name][:sortable] == nil
           case cols[name][:type] # null, number, select, number-range, date-range, checkbox, text(default)
             when :integer   ; {:type => :number}
             when :boolean   ; {:type => :select, :values => [true, false]}
             else            ; {:type => :text}
           end
+
+        if cols[name][:partial]
+          cols[name][:partial_local] ||= (sql_table.try(:name) || cols[name][:partial].split('/').last(2).first.presence || 'obj').singularize.to_sym
+        end
+
       end
     end
   end

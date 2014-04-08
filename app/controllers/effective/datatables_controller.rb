@@ -9,7 +9,13 @@ module Effective
 
       respond_to do |format|
         format.html
-        format.json { render :json => (@datatable.to_json rescue error_json) }
+        format.json { 
+          if Rails.env.production?
+            render :json => (@datatable.to_json rescue error_json) 
+          else
+            render :json => @datatable.to_json
+          end
+        }
       end
 
     end
