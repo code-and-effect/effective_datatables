@@ -16,7 +16,7 @@ module Effective
       end
 
       def table_column(name, options = {})
-        (@table_columns ||= {})[name.to_s.downcase] = options
+        (@table_columns ||= HashWithIndifferentAccess.new())[name] = options
       end
 
       def table_columns(*names)
@@ -78,9 +78,14 @@ module Effective
     end
 
     def search_terms
-      @search_terms ||= {}.tap do |terms|
+      @search_terms ||= HashWithIndifferentAccess.new().tap do |terms|
         table_columns.keys.each_with_index { |col, x| terms[col] = params["sSearch_#{x}"] }
       end
+    end
+
+    # This is here so I can override the specific where clauses on a search column
+    def search_column(collection, table_column, search_term)
+      search_column_with_defaults(collection, table_column, search_term)
     end
 
     def per_page
@@ -131,10 +136,20 @@ module Effective
       cols.each do |name, _|
         sql_column = (collection.columns rescue []).find { |column| column.name == name.to_s }
 
+        cols[name][:name] ||= name
         cols[name][:label] ||= name.titleize
         cols[name][:column] ||= (sql_table && sql_column) ? "\"#{sql_table.name}\".\"#{sql_column.name}\"" : name
         cols[name][:type] ||= sql_column.try(:type) || :string
         cols[name][:sortable] = true if cols[name][:sortable] == nil
+
+        if cols[name][:filter].kind_of?(Symbol) || cols[name][:filter].kind_of?(String)
+          cols[name][:filter] = {:type => cols[name][:filter]} 
+        elsif cols[name][:filter] == false
+          cols[name][:filter] = {:type => :null} 
+        elsif cols[name][:filter] == true
+          cols[name][:filter] = nil
+        end
+
         cols[name][:filter] ||= 
           case cols[name][:type] # null, number, select, number-range, date-range, checkbox, text(default)
             when :integer   ; {:type => :number}

@@ -22,13 +22,15 @@ initializeDataTables = ->
             }
           ]
         oTableTools:
-          sSwfPath: '/assets/effective_datatables/copy_csv_xls_pdf.swf'
+          sSwfPath: '/assets/effective_datatables/copy_csv_xls_pdf.swf',
+          aButtons: ['copy', 'csv', 'pdf', 'print']
+
       .columnFilter
         sPlaceHolder: 'head:after'
         aoColumns : datatable.data('filter')
 
   $('.dataTables_filter').each ->
-    $(this).html("<input type='button' class='btn' value='Clear Filters' data-effective-datatables-clear-filters='true'></input>")
+    $(this).html("<input type='button' class='btn btn-default' value='Clear Filters' data-effective-datatables-clear-filters='true'></input>")
 
 $ -> initializeDataTables()
 $(document).on 'page:change', -> initializeDataTables()

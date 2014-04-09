@@ -8,31 +8,35 @@ module Effective
 
     def search(collection)
       search_terms.each do |name, search_term|
-        next unless search_term.present?
-
-        column = table_columns[name][:column]
-
-        collection = collection.where(
-          case table_columns[name][:type]
-          when :string
-            if (table_columns[name][:filter][:type].to_s == 'select' rescue false)
-              "#{column} = '#{search_term}'"
-            else
-              "#{column} ILIKE '%#{search_term}%'"
-            end
-          when :integer
-            "#{column} = '#{search_term}'"
-          when :year
-            "EXTRACT(YEAR FROM #{column}) = '#{search_term}'"
-          when :boolean
-            "#{column} = #{search_term}"
-          else
-            "#{column} = '#{search_term}'"
-          end
-        )
+        if search_term.present?
+          column_search = search_column(collection, table_columns[name], search_term)
+          collection = column_search unless column_search.nil?
+        end
       end
-
       collection
+    end
+
+    def search_column_with_defaults(collection, table_column, search_term)
+      column = table_column[:column]
+
+      collection.where(
+        case table_column[:type]
+        when :string
+          if table_column[:filter][:type].to_s == 'select'
+            "#{column} = '#{search_term}'"
+          else
+            "#{column} ILIKE '%#{search_term}%'"
+          end
+        when :integer
+          "#{column} = '#{search_term}'"
+        when :year
+          "EXTRACT(YEAR FROM #{column}) = '#{search_term}'"
+        when :boolean
+          "#{column} = #{search_term}"
+        else
+          "#{column} = '#{search_term}'"
+        end
+      )
     end
 
     def paginate(collection)
@@ -44,14 +48,14 @@ module Effective
       rendered = {}
       table_columns.each do |name, opts|
         if opts[:partial]
-          rendered[name] = render(
+          rendered[name] = (render(
             :partial => opts[:partial], 
             :as => opts[:partial_local], 
             :collection => collection, 
             :formats => :html, 
             :locals => {:datatable => self},
             :spacer_template => '/effective/datatables/spacer_template',
-          ).split('EFFECTIVEDATATABLESSPACER')
+          ) || '').split('EFFECTIVEDATATABLESSPACER')
         end
       end
 
