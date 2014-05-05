@@ -15,7 +15,14 @@ module Effective
         EffectiveDatatables.datatables.find { |klass| klass.name.underscore.parameterize == obj }.try(:new)
       end
 
-      def table_column(name, options = {})
+      def table_column(name, options = {}, proc = nil, &block)
+        if block_given?
+          raise "You cannot use :partial => '' with the block syntax" if options[:partial]
+          raise "You cannot use :proc => ... with the block syntax" if options[:proc]
+          options[:block] = block
+        end
+        raise "You cannot use both :partial => '' and proc => ..." if options[:partial] && options[:proc]
+
         (@table_columns ||= HashWithIndifferentAccess.new())[name] = options
       end
 

@@ -63,6 +63,10 @@ module Effective
         table_columns.map do |name, opts|
           if opts[:partial]
             rendered[name][index]
+          elsif opts[:block]
+            @view.instance_exec(obj, collection, self, &opts[:block])
+          elsif opts[:proc]
+            @view.instance_exec(obj, collection, self, &opts[:proc])
           else
             obj.send(name) rescue ''
           end
