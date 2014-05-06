@@ -5,7 +5,7 @@ namespace :effective_datatables do
     for file in Dir['public/assets/dataTables/*.*', 'public/assets/effective_datatables/*.*']
       next unless file =~ fingerprint
       nondigest = file.sub fingerprint, '.' # contents-0d8ffa186a00f5063461bc0ba0d96087.css => contents.css
-      FileUtils.mv file, nondigest, verbose: true
+      FileUtils.cp file, nondigest, verbose: true
     end
   end
 end
