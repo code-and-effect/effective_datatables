@@ -56,8 +56,18 @@ module Effective
       {
         :sEcho => params[:sEcho].to_i,
         :aaData => table_data || [],
-        :iTotalRecords => total_records.to_i,
-        :iTotalDisplayRecords => display_records.to_i,
+        :iTotalRecords => (
+          unless total_records.kind_of?(Hash)
+            total_records.to_i
+          else
+            (total_records.keys.map(&:first).uniq.count rescue 1)
+          end),
+        :iTotalDisplayRecords => (
+          unless display_records.kind_of?(Hash)
+            display_records.to_i
+          else
+            (display_records.keys.map(&:first).uniq.count rescue 1)
+          end)
       }
     end
 
@@ -65,11 +75,11 @@ module Effective
 
     def table_data
       c = collection
-      self.total_records = (c.select('*').count rescue c.count)
+      self.total_records = (c.select('*').reorder(nil).count rescue 1)
 
       c = order(c)
       c = search(c)
-      self.display_records = search_terms.any? { |k, v| v.present? } ? (c.select('*').count rescue c.count) : total_records
+      self.display_records = search_terms.any? { |k, v| v.present? } ? (c.select('*').reorder(nil).count rescue 1): total_records
 
       c = paginate(c)
       c = finalize(c)

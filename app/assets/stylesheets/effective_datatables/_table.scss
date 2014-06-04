@@ -10,6 +10,12 @@
 //   }
 // }
 
+table.dataTable {
+  border-collapse: collapse;
+
+  .form-inline, .form-control { width: 98%; }
+}
+
 div.DTTT_print_info {
   h6 { color: black; }
   p { color: black; }
