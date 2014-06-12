@@ -27,6 +27,8 @@ module Effective
           else
             "#{column} ILIKE '%#{search_term}%'"
           end
+        when :datetime
+          "to_char(#{column} AT TIME ZONE 'GMT', 'DD-Mon-YYYY HH24:MI') ILIKE '%#{search_term}%'"
         when :integer
           "#{column} = '#{search_term}'"
         when :year
@@ -68,7 +70,20 @@ module Effective
           elsif opts[:proc]
             @view.instance_exec(obj, collection, self, &opts[:proc])
           else
-            obj.send(name) rescue ''
+            value = obj.send(name) rescue ''
+
+            # Last minute formatting of dates
+            case value
+            when Date
+              value.strftime("%d-%b-%Y")
+            when Time
+              value.strftime("%d-%b-%Y %H:%M")
+            when DateTime
+              value.strftime("%d-%b-%Y %H:%M")
+            else
+              value
+            end
+
           end
         end
       end
