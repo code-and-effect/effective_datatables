@@ -1,8 +1,9 @@
 /*
   *= require dataTables/jquery.dataTables
-  *= require dataTables/jquery.dataTables.bootstrap
+  *= require dataTables/bootstrap/2/jquery.dataTables.bootstrap
   *= require dataTables/extras/dataTables.tableTools
+  *= require dataTables/extras/dataTables.colVis
   *= require dataTables/extras/TableTools_JUI
 */
 
-@import 'effective_datatables/table';
+@import 'effective_datatables/overrides';

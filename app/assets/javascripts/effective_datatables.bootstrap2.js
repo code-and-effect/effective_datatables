@@ -1,7 +1,8 @@
 //= require dataTables/jquery.dataTables
-//= require dataTables/jquery.dataTables.bootstrap
+//= require dataTables/bootstrap/2/jquery.dataTables.bootstrap
 //= require dataTables/extras/ZeroClipboard
 //= require dataTables/extras/dataTables.tableTools
+//= require dataTables/extras/dataTables.colVis
 //= require vendor/jquery.dataTables.columnFilter
 
 //= require_tree ./effective_datatables

@@ -17,5 +17,11 @@ module EffectiveDatatablesHelper
     end.to_json()
   end
 
+  def datatable_non_visible(datatable)
+    [].tap do |nonvisible|
+      datatable.table_columns.values.each_with_index { |options, x| nonvisible << x if options[:visible] == false }
+    end.to_json()
+  end
+
 
 end
