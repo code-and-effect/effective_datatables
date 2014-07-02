@@ -158,21 +158,7 @@ module Effective
         cols[name][:column] ||= (sql_table && sql_column) ? "\"#{sql_table.name}\".\"#{sql_column.name}\"" : name
         cols[name][:type] ||= sql_column.try(:type) || :string
         cols[name][:sortable] = true if cols[name][:sortable] == nil
-
-        if cols[name][:filter].kind_of?(Symbol) || cols[name][:filter].kind_of?(String)
-          cols[name][:filter] = {:type => cols[name][:filter]} 
-        elsif cols[name][:filter] == false
-          cols[name][:filter] = {:type => :null} 
-        elsif cols[name][:filter] == true
-          cols[name][:filter] = nil
-        end
-
-        cols[name][:filter] ||= 
-          case cols[name][:type] # null, number, select, number-range, date-range, checkbox, text(default)
-            when :integer   ; {:type => :number}
-            when :boolean   ; {:type => :select, :values => [true, false]}
-            else            ; {:type => :text}
-          end
+        cols[name][:filter] = initialize_table_column_filter(cols[name][:filter], cols[name][:type])
 
         if cols[name][:partial]
           cols[name][:partial_local] ||= (sql_table.try(:name) || cols[name][:partial].split('/').last(2).first.presence || 'obj').singularize.to_sym
@@ -180,5 +166,25 @@ module Effective
 
       end
     end
+
+    def initialize_table_column_filter(filter, col_type)
+      return {'type' => :null} if filter == false
+
+      if filter.kind_of?(Symbol) || filter.kind_of?(String)
+        filter = {:type => filter}
+      elsif filter.kind_of?(Hash) == false
+        filter = {}
+      end
+
+      case col_type # null, number, select, number-range, date-range, checkbox, text(default)
+      when :integer
+        {'type' => :number}.merge(filter)
+      when :boolean
+        {'type' => :select, 'values' => [true, false]}.merge(filter)
+      else
+        {'type' => :text}.merge(filter)
+      end
+    end
+
   end
 end
