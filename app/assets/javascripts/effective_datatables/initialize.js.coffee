@@ -10,6 +10,10 @@ initializeDataTables = ->
         sAjaxSource: datatable.data('source')
         sPaginationType: "bootstrap"
         aLengthMenu: [[10, 25, 50, 100, 250, 1000, -1], [10, 25, 50, 100, 250, 1000, 'All']]
+        fnServerParams: (aoData, a, b) ->
+          table = this.DataTable()
+          table.columns().flatten().each (index) -> 
+            aoData.push({'name': "sVisible_#{index}", 'value': table.column(index).visible()})
         aoColumnDefs: 
           [
             {

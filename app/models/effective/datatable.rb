@@ -96,7 +96,7 @@ module Effective
 
     def search_terms
       @search_terms ||= HashWithIndifferentAccess.new().tap do |terms|
-        table_columns.keys.each_with_index { |col, x| terms[col] = params["sSearch_#{x}"] }
+        table_columns.keys.each_with_index { |col, x| terms[col] = params["sSearch_#{x}"] unless params["sVisible_#{x}"] == 'false' }
       end
     end
 
