@@ -1,9 +1,8 @@
 module Effective
   class Datatable
-    cattr_accessor :view
     attr_accessor :total_records, :display_records
 
-    delegate :params, :render, :link_to, :to => :@view
+    delegate :render, :link_to, :mail_to, :to => :@view
 
     class << self
       def all
@@ -96,7 +95,11 @@ module Effective
 
     def search_terms
       @search_terms ||= HashWithIndifferentAccess.new().tap do |terms|
-        table_columns.keys.each_with_index { |col, x| terms[col] = params["sSearch_#{x}"] unless params["sVisible_#{x}"] == 'false' }
+        table_columns.keys.each_with_index do |col, x| 
+          unless (params["sVisible_#{x}"] == 'false' && table_columns[col][:filter][:when_hidden] != true)
+            terms[col] = params["sSearch_#{x}"] 
+          end
+        end
       end
     end
 
@@ -119,6 +122,10 @@ module Effective
 
     def page
       params[:iDisplayStart].to_i / per_page + 1
+    end
+
+    def params
+      @view.try(:params) || HashWithIndifferentAccess.new()
     end
 
     private
@@ -168,21 +175,23 @@ module Effective
     end
 
     def initialize_table_column_filter(filter, col_type)
-      return {'type' => :null} if filter == false
+      return {:type => :null, :when_hidden => false} if filter == false
 
-      if filter.kind_of?(Symbol) || filter.kind_of?(String)
+      if filter.kind_of?(Symbol)
         filter = {:type => filter}
+      elsif filter.kind_of?(String)
+        filter = {:type => filter.to_sym}
       elsif filter.kind_of?(Hash) == false
         filter = {}
       end
 
       case col_type # null, number, select, number-range, date-range, checkbox, text(default)
       when :integer
-        {'type' => :number}.merge(filter)
+        {:type => :number, :when_hidden => false}.merge(filter)
       when :boolean
-        {'type' => :select, 'values' => [true, false]}.merge(filter)
+        {:type => :select, :when_hidden => false, :values => [true, false]}.merge(filter)
       else
-        {'type' => :text}.merge(filter)
+        {:type => :text, :when_hidden => false}.merge(filter)
       end
     end
 

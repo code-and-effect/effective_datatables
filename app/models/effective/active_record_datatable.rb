@@ -22,7 +22,7 @@ module Effective
       collection.where(
         case table_column[:type]
         when :string, :text
-          if table_column[:filter][:type].to_s == 'select'
+          if table_column[:filter][:type] == :select
             "#{column} = '#{search_term}'"
           else
             "#{column} ILIKE '%#{search_term}%'"
