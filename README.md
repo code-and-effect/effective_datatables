@@ -42,3 +42,48 @@ module Effective
 end
 ```
 
+Options for table_column
+
+```ruby
+table_column :id   # The name of the table column as per the database (or a .select('something' AS 'blah'))
+table_column :name => :id  # The same thing as above
+```
+
+Additional options:
+
+```ruby
+:label => 'Nice Label' # override the default column header label
+:column => 'users.id'  # derived from name by default, used for .order() and .where() clauses
+:type => :string       # derived from db table by default, used for searching.  Valid options include :string, :text, :datetime, :integer, :year, :boolean
+:sortable => true|false  # allow sorting on this column. default true
+:visible => true|false # hide this column at startup
+```
+
+Rendering options:
+
+There are a few different ways to render each column cell.
+This will be called once for each row
+
+```ruby
+table_column :created_at do |user|
+  my_fancy_format_helper(user.created_at) # or whatever
+end
+
+table_column :created_at, :proc => Proc.new { |user| my_fancy_format_helper(user.created_at) }
+
+table_column :created_at, :partial => '/admin/users/actions'  # render this partial for each row of the table
+table_column :created_at, :partial_local => 'obj' # The name of the local object in the partial.  Defaults to 'user' or 'actions' or 'obj'
+```
+
+Filtering options:
+
+```ruby
+table_column :created_at, :filter => false  # Disable filtering on this column entirely
+table_column :created_at, :filter => {...}
+
+:filter => {:type => :number|:text}
+:filter => {:type => :select, :values => ['One', 'Two'], :selected => 'Two'}
+
+:filter => {:when_hidden => true}  # By default a hidden column's search filter will be ignored, unless this is true
+
+```
