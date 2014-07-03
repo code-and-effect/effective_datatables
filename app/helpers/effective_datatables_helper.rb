@@ -1,5 +1,6 @@
 module EffectiveDatatablesHelper
   def render_datatable(datatable)
+    datatable.view = self 
     render :partial => 'effective/datatables/datatable', :locals => {:datatable => datatable}
   end
 
