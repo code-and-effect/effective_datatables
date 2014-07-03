@@ -34,6 +34,7 @@ initializeDataTables = ->
           aButtons: ['copy', 'csv', 'pdf', 'print']
         colVis:
           showAll: 'Show all'
+          restore: 'Restore default visible'
           activate: 'mouseover'
           fnStateChange: (iCol, bVisible) ->
             table = $(this.dom.button).closest('.dataTables_wrapper').children('table').first().DataTable()

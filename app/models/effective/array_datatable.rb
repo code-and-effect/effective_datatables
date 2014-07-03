@@ -1,7 +1,7 @@
 module Effective
   # The collection is an Array of Arrays
   module ArrayDatatable
-    def order(collection)
+    def array_order(collection)
       if order_direction == 'ASC'
         collection.sort { |x, y| x[order_column] <=> y[order_column] }
       else
@@ -9,15 +9,15 @@ module Effective
       end
     end
 
-    def search(collection)
+    def array_search(collection)
       collection.select { |row| row.any? { |value| value.to_s.include?(search_term) } }
     end
 
-    def paginate(collection)
+    def array_paginate(collection)
       Kaminari.paginate_array(collection).page(page).per(per_page)
     end
 
-    def arrayize(collection)
+    def array_arrayize(collection)
       collection
     end
   end

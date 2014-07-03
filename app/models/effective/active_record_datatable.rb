@@ -1,5 +1,12 @@
 module Effective
-  module ActiveRecordDatatable
+  class ActiveRecordDatatable
+    delegate :table_columns, :search_terms, :search_column, :view, :render, :to => :@datatable
+    delegate :order_column, :order_direction, :page, :per_page, :to => :@datatable
+
+    def initialize(datatable)
+      @datatable = datatable
+    end
+
     def order(collection)
       col = table_columns[table_columns.keys[order_column]]
 
@@ -10,7 +17,8 @@ module Effective
       search_terms.each do |name, search_term|
         if search_term.present?
           column_search = search_column(collection, table_columns[name], search_term)
-          collection = column_search unless column_search.nil?
+          raise 'search_column must return an ActiveRecord::Relation object' unless column_search.kind_of?(ActiveRecord::Relation)
+          collection = column_search
         end
       end
       collection
@@ -66,9 +74,9 @@ module Effective
           if opts[:partial]
             rendered[name][index]
           elsif opts[:block]
-            @view.instance_exec(obj, collection, self, &opts[:block])
+            view.instance_exec(obj, collection, self, &opts[:block])
           elsif opts[:proc]
-            @view.instance_exec(obj, collection, self, &opts[:proc])
+            view.instance_exec(obj, collection, self, &opts[:proc])
           else
             value = obj.send(name) rescue ''
 

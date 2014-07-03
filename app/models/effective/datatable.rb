@@ -1,6 +1,6 @@
 module Effective
   class Datatable
-    attr_accessor :total_records, :display_records
+    attr_accessor :total_records, :display_records, :view
 
     delegate :render, :link_to, :mail_to, :to => :@view
 
@@ -25,14 +25,19 @@ module Effective
         (@table_columns ||= HashWithIndifferentAccess.new())[name] = options
       end
 
+      def array_column(name, options = {}, proc = nil, &block)
+        table_column(name, options.merge({:array_column => true}), proc, &block)
+      end
+
       def table_columns(*names)
         names.each { |name| table_column(name) }
       end
     end
 
-    def view=(view)
-      @view = view
-      extend_datatable_finders()
+    def initialize
+      unless active_record_collection? || collect.kind_of?(Array)
+        raise 'Unsupported collection type. Should be ActiveRecord class, ActiveRecord relation, or Array'
+      end
     end
 
     def to_param
@@ -70,20 +75,7 @@ module Effective
       }
     end
 
-    protected
-
-    def table_data
-      c = collection
-      self.total_records = (c.select('*').reorder(nil).count rescue 1)
-
-      c = order(c)
-      c = search(c)
-      self.display_records = search_terms.any? { |k, v| v.present? } ? (c.select('*').reorder(nil).count rescue 1): total_records
-
-      c = paginate(c)
-      c = finalize(c)
-      c = arrayize(c)
-    end
+    # Wish these were protected
 
     def order_column
       params[:iSortCol_0].to_i
@@ -103,9 +95,9 @@ module Effective
       end
     end
 
-    # This is here so I can override the specific where clauses on a search column
+    # This is here so classes that inherit from Datatables can can override the specific where clauses on a search column
     def search_column(collection, table_column, search_term)
-      search_column_with_defaults(collection, table_column, search_term)
+      table_tool.search_column_with_defaults(collection, table_column, search_term)
     end
 
     def per_page
@@ -124,24 +116,37 @@ module Effective
       params[:iDisplayStart].to_i / per_page + 1
     end
 
+    protected
+
+    def table_data
+      c = collection
+      self.total_records = (c.select('*').reorder(nil).count rescue 1)
+
+      c = table_tool.order(c)
+      c = table_tool.search(c)
+      self.display_records = search_terms.any? { |k, v| v.present? } ? (c.select('*').reorder(nil).count rescue 1): total_records
+
+      c = table_tool.paginate(c)
+      c = table_tool.arrayize(c)
+      c = self.finalize(c)
+    end
+
     def params
       @view.try(:params) || HashWithIndifferentAccess.new()
     end
 
     private
 
-    def extend_datatable_finders
-      if active_record_collection?
-        extend ActiveRecordDatatable
-      elsif collection.kind_of?(Array)
-        extend ArrayDatatable
-      else
-        raise 'Unsupported collection type. Should be ActiveRecord class, ActiveRecord relation, or Array'
-      end
+    def table_tool
+      @table_tool ||= ActiveRecordDatatable.new(self)
+    end
+
+    def array_tool
+      @array_tool
     end
 
     def active_record_collection?
-     @active_record_collection ||= (collection.ancestors.include?(ActiveRecord::Base) rescue false)
+      @active_record_collection ||= (collection.ancestors.include?(ActiveRecord::Base) rescue false)
     end
 
     def table_columns_with_defaults
