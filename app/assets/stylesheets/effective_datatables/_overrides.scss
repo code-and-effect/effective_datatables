@@ -1,26 +1,21 @@
-// table.effective-datatable {
-//   thead {
-//     select { width: 95%; }
-//     input { width: 95%; }
-//     span.filter_column {
-//       width: 100%;
-//       margin-left: -8px;
-//     }
-
-//   }
-// }
-
 .dataTables_wrapper {   // This is the Header
+  table.dataTable {
+    border-collapse: collapse;
+    .form-inline, .form-control { width: 98%; }
+  }
+
+  .dataTables_processing {
+    height: 60px;
+  }
+
+  .pagination {
+    margin: 0px;
+    padding: 0px;
+  }
 }
 
 ul.ColVis_collection {
   width: 240px;
-}
-
-table.dataTable {
-  border-collapse: collapse;
-
-  .form-inline, .form-control { width: 98%; }
 }
 
 div.DTTT_print_info {

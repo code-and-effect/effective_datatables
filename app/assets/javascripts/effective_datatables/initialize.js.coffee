@@ -34,6 +34,10 @@ initializeDataTables = ->
           aButtons: ['copy', 'csv', 'pdf', 'print']
         colVis:
           showAll: 'Show all'
+          activate: 'mouseover'
+          fnStateChange: (iCol, bVisible) ->
+            table = $(this.dom.button).closest('.dataTables_wrapper').children('table').first().DataTable()
+            table.draw()
 
       .columnFilter
         sPlaceHolder: 'head:after'
