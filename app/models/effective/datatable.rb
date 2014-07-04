@@ -35,7 +35,7 @@ module Effective
     end
 
     def initialize
-      unless active_record_collection? || collect.kind_of?(Array)
+      unless active_record_collection? || collection.kind_of?(Array)
         raise 'Unsupported collection type. Should be ActiveRecord class, ActiveRecord relation, or Array'
       end
     end
@@ -77,7 +77,7 @@ module Effective
 
     # Wish these were protected
 
-    def order_column
+    def order_column_index
       params[:iSortCol_0].to_i
     end
 
@@ -89,7 +89,7 @@ module Effective
       @search_terms ||= HashWithIndifferentAccess.new().tap do |terms|
         table_columns.keys.each_with_index do |col, x| 
           unless (params["sVisible_#{x}"] == 'false' && table_columns[col][:filter][:when_hidden] != true)
-            terms[col] = params["sSearch_#{x}"] 
+            terms[col] = params["sSearch_#{x}"] if params["sSearch_#{x}"].present?
           end
         end
       end
@@ -97,7 +97,11 @@ module Effective
 
     # This is here so classes that inherit from Datatables can can override the specific where clauses on a search column
     def search_column(collection, table_column, search_term)
-      table_tool.search_column_with_defaults(collection, table_column, search_term)
+      if table_column[:array_column]
+        array_tool.search_column_with_defaults(collection, table_column, search_term)
+      else
+        table_tool.search_column_with_defaults(collection, table_column, search_term)
+      end
     end
 
     def per_page
@@ -118,31 +122,106 @@ module Effective
 
     protected
 
+    # So the idea here is that we want to do as much as possible on the database in ActiveRecord
+    # And then run any array_columns through in post-processed results
     def table_data
       c = collection
-      self.total_records = (c.select('*').reorder(nil).count rescue 1)
 
-      c = table_tool.order(c)
-      c = table_tool.search(c)
-      self.display_records = search_terms.any? { |k, v| v.present? } ? (c.select('*').reorder(nil).count rescue 1): total_records
+      if active_record_collection?
+        self.total_records = (c.select('*').reorder(nil).count rescue 1)
 
-      c = table_tool.paginate(c)
-      c = table_tool.arrayize(c)
+        c = table_tool.order(c)
+        c = table_tool.search(c)
+
+        if table_tool.search_terms.present? && array_tool.search_terms.blank?
+          self.display_records = (c.select('*').reorder(nil).count rescue 1)
+        end
+      else
+        self.total_records = c.size
+      end
+
+      if array_tool.search_terms.present?
+        c = self.arrayize(c)
+        c = array_tool.search(c)
+        self.display_records = c.size
+      end
+
+      if array_tool.order_column.present?
+        c = self.arrayize(c)
+        c = array_tool.order(c)
+      end
+
+      self.display_records ||= total_records
+
+      if c.kind_of?(Array)
+        c = array_tool.paginate(c)
+      else
+        c = table_tool.paginate(c)
+        c = self.arrayize(c)
+      end
+
       c = self.finalize(c)
     end
 
-    def params
-      @view.try(:params) || HashWithIndifferentAccess.new()
+    def arrayize(collection)
+      return collection if @arrayized  # Prevent the collection from being arrayized more than once
+      @arrayized = true
+
+      # We want to use the render :collection for each column that renders partials
+      rendered = {}
+      table_columns.each do |name, opts|
+        if opts[:partial]
+          rendered[name] = (render(
+            :partial => opts[:partial], 
+            :as => opts[:partial_local], 
+            :collection => collection, 
+            :formats => :html, 
+            :locals => {:datatable => self},
+            :spacer_template => '/effective/datatables/spacer_template',
+          ) || '').split('EFFECTIVEDATATABLESSPACER')
+        end
+      end
+
+      collection.each_with_index.map do |obj, index|
+        table_columns.map do |name, opts|
+          if opts[:partial]
+            rendered[name][index]
+          elsif opts[:block]
+            view.instance_exec(obj, collection, self, &opts[:block])
+          elsif opts[:proc]
+            view.instance_exec(obj, collection, self, &opts[:proc])
+          else
+            value = obj.send(name) rescue ''
+
+            # Last minute formatting of dates
+            case value
+            when Date
+              value.strftime("%d-%b-%Y")
+            when Time
+              value.strftime("%d-%b-%Y %H:%M")
+            when DateTime
+              value.strftime("%d-%b-%Y %H:%M")
+            else
+              value
+            end
+
+          end
+        end
+      end
     end
 
     private
 
+    def params
+      view.try(:params) || HashWithIndifferentAccess.new()
+    end
+
     def table_tool
-      @table_tool ||= ActiveRecordDatatable.new(self)
+      @table_tool ||= ActiveRecordDatatableTool.new(self, table_columns.select { |_, col| col[:array_column] == false })
     end
 
     def array_tool
-      @array_tool
+      @array_tool ||= ArrayDatatableTool.new(self, table_columns.select { |_, col| col[:array_column] == true })
     end
 
     def active_record_collection?
@@ -158,12 +237,14 @@ module Effective
     end
 
     def initalize_table_columns(cols)
-      return unless active_record_collection?
-
       sql_table = (collection.table rescue nil)
+      index = -1
 
       cols.each do |name, _|
         sql_column = (collection.columns rescue []).find { |column| column.name == name.to_s }
+
+        cols[name][:index] = (index += 1)  # So first one is assigned 0
+        cols[name][:array_column] ||= false
 
         cols[name][:name] ||= name
         cols[name][:label] ||= name.titleize
@@ -175,8 +256,8 @@ module Effective
         if cols[name][:partial]
           cols[name][:partial_local] ||= (sql_table.try(:name) || cols[name][:partial].split('/').last(2).first.presence || 'obj').singularize.to_sym
         end
-
       end
+
     end
 
     def initialize_table_column_filter(filter, col_type)

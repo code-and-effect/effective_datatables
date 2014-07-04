@@ -17,10 +17,6 @@ initializeDataTables = ->
         aoColumnDefs: 
           [
             {
-              sDefaultContent: '-',
-              aTargets: ['_all']
-            },
-            {
              bSortable: false,
              aTargets: datatable.data('non-sortable')
             },
@@ -51,6 +47,4 @@ initializeDataTables = ->
 $ -> initializeDataTables()
 $(document).on 'page:change', -> initializeDataTables()
 
-$(document).on 'click', '[data-effective-datatables-reset-filters]', (event) -> 
-  #dataTable = $(this).closest('dataTables_wrapper').find('table').dataTable()
-  window.location.reload()
+$(document).on 'click', '[data-effective-datatables-reset-filters]', (event) -> window.location.reload()
