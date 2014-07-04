@@ -34,6 +34,9 @@
 
         var oFunctionTimeout = null;
 
+        var filterTimerId = null;
+        var filterDelay = 250;
+
         var fnOnFiltered = function () { };
 
         function _fnGetColumnValues(oSettings, iColumn, bUnique, bFiltered, bIgnoreEmpty) {
@@ -134,29 +137,13 @@
                 });
             } else {
                 input.keyup(function () {
-                    if (oTable.fnSettings().oFeatures.bServerSide && iFilterLength != 0) {
-                        //If filter length is set in the server-side processing mode
-                        //Check has the user entered at least iFilterLength new characters
+                    var value = this.value;
 
-                        var currentFilter = oTable.fnSettings().aoPreSearchCols[index].sSearch;
-                        var iLastFilterLength = $(this).data("dt-iLastFilterLength");
-                        if (typeof iLastFilterLength == "undefined")
-                            iLastFilterLength = 0;
-                        var iCurrentFilterLength = this.value.length;
-                        if (Math.abs(iCurrentFilterLength - iLastFilterLength) < iFilterLength
-                        //&& currentFilter.length == 0 //Why this?
-                                                ) {
-                            //Cancel the filtering
-                            return;
-                        }
-                        else {
-                            //Remember the current filter length
-                            $(this).data("dt-iLastFilterLength", iCurrentFilterLength);
-                        }
-                    }
-                    /* Filter on the column (the index) of this element */
-                    oTable.fnFilter(this.value, _fnColumnIndex(index), regex, smart); //Issue 37
-                    fnOnFiltered();
+                    window.clearTimeout(filterTimerId);
+                    filterTimerId = window.setTimeout(function() {
+                        oTable.fnFilter(value, _fnColumnIndex(index), regex, smart); //Issue 37
+                        fnOnFiltered();
+                    }, filterDelay);
                 });
             }
 
