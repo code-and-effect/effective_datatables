@@ -43,7 +43,7 @@ module Effective
       search_term = search_term.downcase
 
       collection.select! do |row|
-        value = row[table_column[:index]].downcase
+        value = row[table_column[:index]].to_s.downcase
 
         if table_column[:filter][:type] == :select && table_column[:filter][:fuzzy] != true
           value == search_term
