@@ -1,4 +1,6 @@
 .dataTables_wrapper {   // This is the Header
+  overflow-x: scroll;
+
   table.dataTable {
     border-collapse: collapse;
     .form-inline, .form-control { width: 98%; }
