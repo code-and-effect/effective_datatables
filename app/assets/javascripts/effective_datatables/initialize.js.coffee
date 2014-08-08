@@ -7,14 +7,15 @@ initializeDataTables = ->
         bServerSide: true
         bProcessing: true
         bSaveState: true
+        bAutoWidth: false
         sAjaxSource: datatable.data('source')
-        sPaginationType: "bootstrap"
+        pagingType: 'simple_numbers'
         aLengthMenu: [[10, 25, 50, 100, 250, 1000, -1], [10, 25, 50, 100, 250, 1000, 'All']]
         fnServerParams: (aoData, a, b) ->
           table = this.DataTable()
-          table.columns().flatten().each (index) -> 
+          table.columns().flatten().each (index) ->
             aoData.push({'name': "sVisible_#{index}", 'value': table.column(index).visible()})
-        aoColumnDefs: 
+        aoColumnDefs:
           [
             {
              bSortable: false,

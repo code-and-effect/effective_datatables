@@ -7,6 +7,6 @@
 //= require_tree ./effective_datatables
 
 $.extend( $.fn.dataTable.defaults, {
-  'sDom': "<'row'<'col-xs-4'l><'col-xs-4'T><'col-xs-4'fC>r>t<'row'<'col-xs-6'i><'col-xs-6'p>>"
+  'dom': "<'row'<'col-xs-4'l><'col-xs-4'T><'col-xs-4'fC>r>t<'row'<'col-xs-6'i><'col-xs-6'p>>"
 });
 

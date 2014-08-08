@@ -1,8 +1,15 @@
 .dataTables_wrapper {   // This is the Header
-  overflow-x: scroll;
+  overflow-x: auto;
+
+  .row {
+    margin-left: 0px;
+    margin-right: 0px;
+  }
 
   table.dataTable {
     border-collapse: collapse;
+    box-sizing: border-box;
+
     .form-inline, .form-control { width: 98%; }
   }
 
@@ -10,9 +17,28 @@
     height: 60px;
   }
 
-  .pagination {
-    margin: 0px;
-    padding: 0px;
+  .dataTables_paginate {
+    overflow: hidden;
+
+    .pagination {
+      padding: 0px;
+    }
+
+
+    .paginate_button {
+      padding: 0px;
+
+      &:hover {
+        background: none;
+        border: 1px solid transparent;
+      }
+
+      &:active {
+        background: none;
+        box-shadow: none;
+        outline: none;
+      }
+    }
   }
 
   .DTTT_container {
