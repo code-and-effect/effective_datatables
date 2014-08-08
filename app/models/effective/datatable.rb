@@ -25,12 +25,16 @@ module Effective
         (@table_columns ||= HashWithIndifferentAccess.new())[name] = options
       end
 
+      def table_columns(*names)
+        names.each { |name| table_column(name) }
+      end
+
       def array_column(name, options = {}, proc = nil, &block)
         table_column(name, options.merge({:array_column => true}), proc, &block)
       end
 
-      def table_columns(*names)
-        names.each { |name| table_column(name) }
+      def array_columns(*names)
+        names.each { |name| array_column(name) }
       end
     end
 
@@ -87,7 +91,7 @@ module Effective
 
     def search_terms
       @search_terms ||= HashWithIndifferentAccess.new().tap do |terms|
-        table_columns.keys.each_with_index do |col, x| 
+        table_columns.keys.each_with_index do |col, x|
           unless (params["sVisible_#{x}"] == 'false' && table_columns[col][:filter][:when_hidden] != true)
             terms[col] = params["sSearch_#{x}"] if params["sSearch_#{x}"].present?
           end
@@ -172,10 +176,10 @@ module Effective
       table_columns.each do |name, opts|
         if opts[:partial]
           rendered[name] = (render(
-            :partial => opts[:partial], 
-            :as => opts[:partial_local], 
-            :collection => collection, 
-            :formats => :html, 
+            :partial => opts[:partial],
+            :as => opts[:partial_local],
+            :collection => collection,
+            :formats => :html,
             :locals => {:datatable => self},
             :spacer_template => '/effective/datatables/spacer_template',
           ) || '').split('EFFECTIVEDATATABLESSPACER')
@@ -196,11 +200,11 @@ module Effective
             # Last minute formatting of dates
             case value
             when Date
-              value.strftime("%d-%b-%Y")
+              value.strftime("%Y-%m-%d")
             when Time
-              value.strftime("%d-%b-%Y %H:%M")
+              value.strftime("%Y-%m-%d %H:%M")
             when DateTime
-              value.strftime("%d-%b-%Y %H:%M")
+              value.strftime("%Y-%m-%d %H:%M")
             else
               value
             end
