@@ -9,10 +9,6 @@ module EffectiveDatatables
         template "effective_datatables.rb", "config/initializers/effective_datatables.rb"
       end
 
-      def setup_routes
-        inject_into_file "config/routes.rb", "\n  mount EffectiveDatatables::Engine => '/', :as => 'effective_datatables'", :after => /root (:?)to.*/
-      end
-
       def show_readme
         readme "README" if behavior == :invoke
       end

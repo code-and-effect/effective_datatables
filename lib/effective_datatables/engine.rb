@@ -1,7 +1,6 @@
 module EffectiveDatatables
   class Engine < ::Rails::Engine
     engine_name 'effective_datatables'
-    isolate_namespace EffectiveDatatables
 
     config.autoload_paths += Dir["#{config.root}/app/models/concerns"]
 
