@@ -1,4 +1,4 @@
-%table.effective-datatable.table-striped.table-bordered{:id => "#{datatable.to_param}-table", :data => {'effective-datatables-table' => true, 'source' => datatable_path(datatable, :format => 'json'), 'filter' => datatable_filter(datatable), 'non-sortable' => datatable_non_sortable(datatable), 'non-visible' => datatable_non_visible(datatable)}}
+%table.effective-datatable.table-striped.table-bordered{:id => "#{datatable.to_param}-table", :data => {'effective-datatables-table' => true, 'source' => effective_datatables.datatable_path(datatable, :format => 'json'), 'filter' => datatable_filter(datatable), 'non-sortable' => datatable_non_sortable(datatable), 'non-visible' => datatable_non_visible(datatable)}}
   %thead
     - max_depth = datatable.table_columns.map { |_, opts| opts[:th][:depth].to_i rescue 0 }.max
     - [*0..max_depth].each do |depth|

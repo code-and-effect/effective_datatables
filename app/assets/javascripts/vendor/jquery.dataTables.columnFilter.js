@@ -69,7 +69,7 @@
             // use all rows
             else aiRows = oSettings.aiDisplayMaster; // all row numbers
 
-            // set up data array        
+            // set up data array
             var asResultData = new Array();
 
             for (var i = 0, c = aiRows.length; i < c; i++) {
@@ -116,7 +116,8 @@
                 search_init = '';
             }
 
-            var input = $('<input type="text" class="' + search_init + sCSSClass + '" value="' + inputvalue + '" rel="' + i + '"/>');
+
+            var input = $('<input type="text" class="' + search_init + sCSSClass + '" placeholder="' + inputvalue + '" value="' + inputvalue + '" rel="' + i + '"/>');
             if (iMaxLenght != undefined && iMaxLenght != -1) {
                 input.attr('maxlength', iMaxLenght);
             }
@@ -262,7 +263,7 @@
                         th.append(aoFragments[ti]);
                     }
                 }
-               
+
 
             }
 
@@ -338,6 +339,7 @@
             var j = 0;
             var iLen = aData.length;
             for (j = 0; j < iLen; j++) {
+
                 if (typeof (aData[j]) != 'object') {
                     var selected = '';
                     if (escape(aData[j]) == currentFilter
@@ -350,11 +352,11 @@
                     var selected = '';
                     if (bRegex) {
                         //Do not escape values if they are explicitely set to avoid escaping special characters in the regexp
-                        if (aData[j].value == currentFilter) selected = 'selected ';
-                        r += '<option ' + selected + 'value="' + aData[j].value + '">' + aData[j].label + '</option>';
+                        if (aData[j][0] == currentFilter) selected = 'selected ';
+                        r += '<option ' + selected + 'value="' + aData[j][0] + '">' + aData[j][1] + '</option>';
                     } else {
-                        if (escape(aData[j].value) == currentFilter) selected = 'selected ';
-                        r += '<option ' + selected + 'value="' + escape(aData[j].value) + '">' + aData[j].label + '</option>';
+                        if (escape(aData[j][0]) == currentFilter) selected = 'selected ';
+                        r += '<option ' + selected + 'value="' + escape(aData[j][0]) + '">' + aData[j][1] + '</option>';
                     }
                 }
             }
@@ -367,7 +369,7 @@
                 e.preventDefault();
                 return false;
             });
-                       
+
                         if(bMultiselect) {
                                 select.change(function () {
                                         if ($(this).val() != "") {
@@ -385,7 +387,7 @@
                                                 } );
                                                 var re = '^(' + asEscapedFilters.join('|') + ')$';
                                         }
-                                         
+
                                         oTable.fnFilter( re, index, true, false );
                                 });
                         } else {
@@ -430,7 +432,7 @@
             fnCreateColumnSelect(oTable, typeof(aData) == 'function' ? null: aData, _fnColumnIndex(i), th, label, bRegex, oSelected, bMultiselect); //Issue 37
 
         }
-                 
+
                 function fnRegExpEscape( sText ) {
                         return sText.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
                 };
@@ -449,8 +451,8 @@
                                 oTable.fnFilter($(this).data('value'), index);
                         });
                 }
-               
-               
+
+
         function fnCreateCheckbox(oTable, aData) {
 
             if (aData == null)
@@ -707,7 +709,7 @@
 
                 oHost = oTable.fnSettings().nTHead;
 
-               
+
             }
 
             //$(sFilterRow + " th", oHost).each(function (index) {//bug with ColVis

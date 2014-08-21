@@ -1,15 +1,24 @@
 module EffectiveDatatablesHelper
   def render_datatable(datatable)
-    datatable.view = self 
+    datatable.view = self
     render :partial => 'effective/datatables/datatable', :locals => {:datatable => datatable}
   end
 
   def datatable_filter(datatable)
-    if datatable.respond_to?(:table_filters)
-      datatable.table_filters
-    else
-      datatable.table_columns.values.map { |options, _| options[:filter] || {:type => 'null'} }
-    end.to_json()
+    filters = datatable.table_columns.values.map { |options, _| options[:filter] || {:type => 'null'} }
+
+    # Process any Procs
+    filters.each do |filter|
+      if filter[:values].respond_to?(:call)
+        filter[:values] = filter[:values].call()
+
+        if filter[:values].kind_of?(ActiveRecord::Relation) || (filter[:values].kind_of?(Array) && filter[:values].first.kind_of?(ActiveRecord::Base))
+          filter[:values] = filter[:values].map { |obj| [obj.id, obj.to_s] }
+        end
+      end
+    end
+
+    filters.to_json()
   end
 
   def datatable_non_sortable(datatable)
