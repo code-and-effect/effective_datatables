@@ -36,6 +36,10 @@ module Effective
       def array_columns(*names)
         names.each { |name| array_column(name) }
       end
+
+      def default_order(name, direction = :asc)
+        @default_order = {name => direction}
+      end
     end
 
     def initialize(*args)
@@ -97,6 +101,10 @@ module Effective
 
     def order_direction
       params[:sSortDir_0].try(:downcase) == 'desc' ? 'DESC' : 'ASC'
+    end
+
+    def default_order
+      self.class.instance_variable_get(:@default_order)
     end
 
     def search_terms

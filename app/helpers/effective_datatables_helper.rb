@@ -33,6 +33,13 @@ module EffectiveDatatablesHelper
     end.to_json()
   end
 
+  def datatable_default_order(datatable)
+    if datatable.default_order.present?
+      index = (datatable.table_columns.values.find { |options| options[:name] == datatable.default_order.keys.first.to_s }[:index] rescue nil)
+      [index, datatable.default_order.values.first] if index.present?
+    end.to_json()
+  end
+
   def datatable_widths(datatable)
     datatable.table_columns.values.map { |options| {'sWidth' => options[:width]} if options[:width] }.to_json()
   end

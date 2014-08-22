@@ -3,7 +3,7 @@ initializeDataTables = ->
     unless $.fn.DataTable.fnIsDataTable(this)
       datatable = $(this)
 
-      datatable.dataTable
+      oTable = datatable.dataTable
         bServerSide: true
         bProcessing: true
         bSaveState: true
@@ -38,10 +38,13 @@ initializeDataTables = ->
             table = $(this.dom.button).closest('.dataTables_wrapper').children('table').first().DataTable()
             table.draw()
 
-      .columnFilter
+      oTable.columnFilter
         sPlaceHolder: 'head:after'
         aoColumns : datatable.data('filter')
         bUseColVis: true
+
+      if datatable.data('default-order')
+        oTable.fnSort([datatable.data('default-order')])
 
   $('.dataTables_filter').each ->
     $(this).html("<button class='btn-reset-filters ColVis_Button' data-effective-datatables-reset-filters='true'><span>Reset Filters</span></button>")

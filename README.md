@@ -20,6 +20,7 @@ Just create a file in /app/models/effective/datatables/news.rb
 module Effective
   module Datatables
     class News < Effective::Datatable
+      default_order :created_at, :desc
 
       table_column :id
 
