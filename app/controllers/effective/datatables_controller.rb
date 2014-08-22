@@ -2,16 +2,16 @@ module Effective
   class DatatablesController < ApplicationController
 
     def show
-      @datatable = Effective::Datatable.find(params[:id])
-      @datatable.view = view_context
+      @datatable = Effective::Datatable.find(params[:id], params[:attributes])
+      @datatable.view = view_context if @datatable.present?
 
-      EffectiveDatatables.authorized?(self, :read, @datatable)
+      EffectiveDatatables.authorized?(self, :read, @datatable || Effective::Datatable)
 
       respond_to do |format|
         format.html
-        format.json { 
+        format.json {
           if Rails.env.production?
-            render :json => (@datatable.to_json rescue error_json) 
+            render :json => (@datatable.to_json rescue error_json)
           else
             render :json => @datatable.to_json
           end

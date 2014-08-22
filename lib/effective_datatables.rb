@@ -3,7 +3,7 @@ require "effective_datatables/version"
 
 module EffectiveDatatables
   mattr_accessor :authorization_method
-  
+
   def self.setup
     yield self
   end
@@ -21,7 +21,7 @@ module EffectiveDatatables
 
   def self.read_datatables
     Rails.application.eager_load! unless Rails.configuration.cache_classes
-    Effective::Datatable.descendants.map { |klass| klass if (klass.new() rescue false) }.compact
+    Effective::Datatable.descendants.map { |klass| klass }.compact
   end
 
 end

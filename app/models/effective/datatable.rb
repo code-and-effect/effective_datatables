@@ -1,6 +1,6 @@
 module Effective
   class Datatable
-    attr_accessor :total_records, :display_records, :view
+    attr_accessor :total_records, :display_records, :view, :attributes
 
     delegate :render, :link_to, :mail_to, :to => :@view
 
@@ -9,9 +9,9 @@ module Effective
         EffectiveDatatables.datatables.map { |klass| klass.new() }
       end
 
-      def find(obj)
+      def find(obj, attributes = nil)
         obj = obj.respond_to?(:to_param) ? obj.to_param : obj
-        EffectiveDatatables.datatables.find { |klass| klass.name.underscore.parameterize == obj }.try(:new)
+        EffectiveDatatables.datatables.find { |klass| klass.name.underscore.parameterize == obj }.try(:new, attributes || {})
       end
 
       def table_column(name, options = {}, proc = nil, &block)
@@ -38,10 +38,20 @@ module Effective
       end
     end
 
-    def initialize
+    def initialize(*args)
+      if args.present?
+        raise 'Effective::Datatable.new() can only be called with a Hash like arguments' unless args.first.kind_of?(Hash)
+        args.first.each { |k, v| self.attributes[k] = v }
+      end
+
       unless active_record_collection? || collection.kind_of?(Array)
         raise 'Unsupported collection type. Should be ActiveRecord class, ActiveRecord relation, or Array'
       end
+    end
+
+    # Any attributes set on initialize will be echoed back and available to the class
+    def attributes
+      @attributes ||= HashWithIndifferentAccess.new()
     end
 
     def to_param
