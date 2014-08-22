@@ -7,7 +7,7 @@ WIP
 to install
 
 gemfile include
-and 
+and
 gem 'jquery-datatables-rails', github: 'rweng/jquery-datatables-rails'
 gem 'kaminari'
 
@@ -23,8 +23,8 @@ module Effective
 
       table_column :id
 
-      table_column :created_at do |news| 
-        nicetime(news.created_at) 
+      table_column :created_at do |news|
+        nicetime(news.created_at)
       end
 
       table_column :updated_at, :proc => Proc.new { |news| nicetime(news.updated_at) }
@@ -57,6 +57,7 @@ Additional options:
 :type => :string       # derived from db table by default, used for searching.  Valid options include :string, :text, :datetime, :integer, :year, :boolean
 :sortable => true|false  # allow sorting on this column. default true
 :visible => true|false # hide this column at startup
+:width => '100%'|'100px'  # set the width of this column.  Can be set on one, all or some of the columns.  Should never add up to more than 100%
 ```
 
 Rendering options:

@@ -26,6 +26,7 @@ initializeDataTables = ->
              aTargets: datatable.data('non-visible')
             }
           ]
+        aoColumns: datatable.data('widths')
         oTableTools:
           sSwfPath: '/assets/effective_datatables/copy_csv_xls_pdf.swf',
           aButtons: ['copy', 'csv', 'pdf', 'print']

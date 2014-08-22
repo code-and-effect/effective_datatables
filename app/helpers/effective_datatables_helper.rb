@@ -33,5 +33,9 @@ module EffectiveDatatablesHelper
     end.to_json()
   end
 
+  def datatable_widths(datatable)
+    datatable.table_columns.values.map { |options| {'sWidth' => options[:width]} if options[:width] }.to_json()
+  end
+
 
 end

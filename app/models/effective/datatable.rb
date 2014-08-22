@@ -264,6 +264,7 @@ module Effective
         cols[name][:label] ||= name.titleize
         cols[name][:column] ||= (sql_table && sql_column) ? "\"#{sql_table.name}\".\"#{sql_column.name}\"" : name
         cols[name][:type] ||= sql_column.try(:type) || :string
+        cols[name][:width] ||= nil
         cols[name][:sortable] = true if cols[name][:sortable] == nil
         cols[name][:filter] = initialize_table_column_filter(cols[name][:filter], cols[name][:type])
 
