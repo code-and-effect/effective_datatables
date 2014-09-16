@@ -8,6 +8,7 @@ initializeDataTables = ->
         bProcessing: true
         bSaveState: true
         bAutoWidth: false
+        deferRender: true
         order: datatable.data('default-order')
         sAjaxSource: datatable.data('source')
         pagingType: 'simple_numbers'
