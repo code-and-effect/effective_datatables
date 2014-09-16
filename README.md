@@ -88,5 +88,4 @@ table_column :created_at, :filter => {...}
 
 :filter => {:when_hidden => true}  # By default a hidden column's search filter will be ignored, unless this is true
 :filter => {:fuzzy => true} # will use an ILIKE/includes rather than = (for selects basically)
-
 ```
