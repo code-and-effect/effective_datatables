@@ -46,7 +46,7 @@ module Effective
             "#{column} ILIKE '%#{search_term}%'"
           end
         when :datetime
-          "to_char(#{column} AT TIME ZONE 'GMT', 'DD-Mon-YYYY HH24:MI') ILIKE '%#{search_term}%'"
+          "to_char(#{column} AT TIME ZONE 'GMT', 'YYYY-MM-DD HH24:MI') ILIKE '%#{search_term}%'"
         when :integer
           "#{column} = '#{search_term.to_i}'"
         when :year
