@@ -7,7 +7,7 @@ module Effective
       @datatable = Effective::Datatable.find(params[:id], params[:attributes])
       @datatable.view = view_context if @datatable.present?
 
-      EffectiveDatatables.authorized?(self, :read, @datatable || Effective::Datatable)
+      EffectiveDatatables.authorized?(self, :show, @datatable || Effective::Datatable)
 
       respond_to do |format|
         format.html
