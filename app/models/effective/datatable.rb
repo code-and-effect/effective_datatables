@@ -71,7 +71,9 @@ module Effective
     end
 
     def table_columns
-      table_columns_with_defaults()
+      @table_columns ||= table_columns_with_defaults().select do |_, col|
+        col[:if] == nil || (col[:if].respond_to?(:call) ? instance_exec(&col[:if]) : col[:if])
+      end
     end
 
     def to_json(options = {})
