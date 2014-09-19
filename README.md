@@ -227,12 +227,20 @@ All table_columns are :visible => true, :sortable => true by default.
 
 ### General Options
 
-The following general options control the display behaviour of the column:
+The following options control the general behaviour of the column:
+
+```ruby
+:column => 'users.id'     # Set this if you're doing something tricky with the database.  Used internally for .order() and .where() clauses
+:type => :string          # Derived from the ActiveRecord attribute default datatype.  Controls searching behaviour.  Valid options include :string, :text, :datetime, :integer, :boolean, :year
+:if => Proc.new { attributes[:user_id].blank? }  # Excludes this table_column entirely if false. See "Initialize with attributes" section of this README below
+```
+
+### Display Options
+
+The following options control the display behaviour of the column:
 
 ```ruby
 :label => 'Nice Label'    # Override the default column header label
-:column => 'users.id'     # Set this if you're doing something tricky with the database.  Used internally for .order() and .where() clauses
-:type => :string          # Derived from the ActiveRecord attribute default datatype.  Controls searching behaviour.  Valid options include :string, :text, :datetime, :integer, :boolean, :year
 :sortable => true|false   # Allow sorting of this column.  Otherwise the up/down arrows on the frontend will be disabled.
 :visible => true|false    # Hide this column at startup.  Column visbility can be changed on the frontend.  By default, hidden columns filter terms are ignored.
 :width => '100%'|'100px'  # Set the width of this column.  Can be set on one, all or some of the columns.  If using percentages, should never add upto more than 100%
@@ -370,12 +378,14 @@ Additional attributes may be passed to .new() that will be persisted through the
 
 You can use this to easily scope the datatable collection or create even more advanced search behaviour.
 
+Let's hide the Users column and scope the Post collection to a user, when the Posts table is initialized with a specific user.
+
 In your controller:
 
 ```ruby
 class PostsController < ApplicationController
   def index
-    @datatable = Effective::Datatables::Posts.new(:user_id => current_user.id)
+    @datatable = Effective::Datatables::Posts.new(:user_id => current_user.try(:id))
   end
 end
 ```
@@ -390,6 +400,12 @@ def collection
     Post.all
   end
 end
+```
+
+and/or your table_column definition:
+
+```ruby
+table_column :user, :if => Proc.new { attributes[:user_id].blank? }
 ```
 
 ## Get access to the raw results
@@ -427,8 +443,8 @@ Resource will the appropriate Effective::Something ActiveRecord object or class
 The authorization method is defined in the initializer file:
 
 ```ruby
-# As a Proc
-config.authorization_method = Proc.new { |controller, action, resource| can?(action, resource) }
+# As a Proc (with CanCan)
+config.authorization_method = Proc.new { |controller, action, resource| authorize!(action, resource) }
 ```
 
 ```ruby

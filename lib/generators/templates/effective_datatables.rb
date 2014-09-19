@@ -5,7 +5,7 @@ EffectiveDatatables.setup do |config|
   # If the method returns false, an Effective::AccessDenied Error will be raised (see README.md for complete info)
   #
   # Use via Proc (and with CanCan):
-  # config.authorization_method = Proc.new { |controller, action, resource| can?(action, resource) }
+  # config.authorization_method = Proc.new { |controller, action, resource| authorize!(action, resource) }
   #
   # Use via custom method:
   # config.authorization_method = :my_authorization_method
