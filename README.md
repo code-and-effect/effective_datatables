@@ -13,13 +13,6 @@ Packages the jQuery DataTables assets for use in a Rails 3.2.x & Rails 4.x appli
 gem 'effective_datatables', :git => 'https://github.com/code-and-effect/effective_datatables'
 ```
 
-If you run into any bundler errors, please add the following gems as well:
-
-```ruby
-gem 'jquery-datatables-rails', github: 'rweng/jquery-datatables-rails'
-gem 'kaminari'
-```
-
 Run the bundle command to install it:
 
 ```console
