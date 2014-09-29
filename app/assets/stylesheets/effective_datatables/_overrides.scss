@@ -22,21 +22,20 @@
 
     .pagination {
       padding: 0px;
-    }
 
+      .paginate_button {
+        padding: 0px;
 
-    .paginate_button {
-      padding: 0px;
+        &:hover {
+          background: none;
+          border: 1px solid transparent;
+        }
 
-      &:hover {
-        background: none;
-        border: 1px solid transparent;
-      }
-
-      &:active {
-        background: none;
-        box-shadow: none;
-        outline: none;
+        &:active {
+          background: none;
+          box-shadow: none;
+          outline: none;
+        }
       }
     }
   }
