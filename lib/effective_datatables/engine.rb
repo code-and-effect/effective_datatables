@@ -1,3 +1,5 @@
+require 'jquery-datatables-rails'
+
 module EffectiveDatatables
   class Engine < ::Rails::Engine
     engine_name 'effective_datatables'
