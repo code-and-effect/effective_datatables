@@ -1,3 +1,6 @@
+require 'jquery-datatables-rails'
+require 'kaminari'
+
 require "effective_datatables/engine"
 require "effective_datatables/version"
 
