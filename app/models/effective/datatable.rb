@@ -48,8 +48,8 @@ module Effective
         args.first.each { |k, v| self.attributes[k] = v }
       end
 
-      unless active_record_collection? || collection.kind_of?(Array)
-        raise 'Unsupported collection type. Should be ActiveRecord class, ActiveRecord relation, or Array'
+      unless active_record_collection? || (collection.kind_of?(Array) && collection.first.kind_of?(Array))
+        raise "Unsupported collection type. Should be ActiveRecord class, ActiveRecord relation, or an Array of Arrays [[1, 'something'], [2, 'something else']]"
       end
     end
 
@@ -63,7 +63,7 @@ module Effective
     end
 
     def collection
-      raise 'You must define a collection. Something like User.scoped'
+      raise "You must define a collection. Something like an ActiveRecord User.scoped or an Array of Arrays [[1, 'something'], [2, 'something else']]"
     end
 
     def finalize(collection) # Override me if you like
@@ -149,42 +149,42 @@ module Effective
     # So the idea here is that we want to do as much as possible on the database in ActiveRecord
     # And then run any array_columns through in post-processed results
     def table_data
-      c = collection
+      col = collection
 
       if active_record_collection?
-        self.total_records = (c.select('*').reorder(nil).count rescue 1)
+        self.total_records = (col.select('*').reorder(nil).count rescue 1)
 
-        c = table_tool.order(c)
-        c = table_tool.search(c)
+        col = table_tool.order(col)
+        col = table_tool.search(col)
 
         if table_tool.search_terms.present? && array_tool.search_terms.blank?
-          self.display_records = (c.select('*').reorder(nil).count rescue 1)
+          self.display_records = (col.select('*').reorder(nil).count rescue 1)
         end
       else
-        self.total_records = c.size
+        self.total_records = col.size
       end
 
       if array_tool.search_terms.present?
-        c = self.arrayize(c)
-        c = array_tool.search(c)
-        self.display_records = c.size
+        col = self.arrayize(col)
+        col = array_tool.search(col)
+        self.display_records = col.size
       end
 
       if array_tool.order_column.present?
-        c = self.arrayize(c)
-        c = array_tool.order(c)
+        col = self.arrayize(col)
+        col = array_tool.order(col)
       end
 
       self.display_records ||= total_records
 
-      if c.kind_of?(Array)
-        c = array_tool.paginate(c)
+      if col.kind_of?(Array)
+        col = array_tool.paginate(col)
       else
-        c = table_tool.paginate(c)
-        c = self.arrayize(c)
+        col = table_tool.paginate(col)
+        col = self.arrayize(col)
       end
 
-      c = self.finalize(c)
+      col = self.finalize(col)
     end
 
     def arrayize(collection)
@@ -215,7 +215,9 @@ module Effective
           elsif opts[:proc]
             view.instance_exec(obj, collection, self, &opts[:proc])
           else
-            value = obj.send(name) rescue ''
+            value = (obj.send(name) rescue nil)
+            value ||= (obj[opts[:index]] rescue nil) # This handles the Array of Arrays collection case
+            value ||= ''
 
             # Last minute formatting of dates
             case value
@@ -228,7 +230,6 @@ module Effective
             else
               value
             end
-
           end
         end
       end

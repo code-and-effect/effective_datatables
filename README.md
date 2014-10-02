@@ -401,6 +401,37 @@ and/or your table_column definition:
 table_column :user, :if => Proc.new { attributes[:user_id].blank? }
 ```
 
+## Array Backed collection
+
+Don't want to use ActiveRecord? Not a problem.
+
+Define your collection as an Array of Arrays, and only array_columns, everything works as expected.
+
+```ruby
+module Effective
+  module Datatables
+    class ArrayBackedDataTable < Effective::Datatable
+      array_column :id
+      array_column :first_name
+      array_column :last_name
+      array_column :email
+
+      def collection
+        [
+          [1, 'Matthew', 'Riemer', 'matthew@agilestyle.com'],
+          [2, 'Dallas', 'Meidinger', 'dallas@agilestyle.com'],
+          [3, 'Warren', 'Uhrich', 'warren@agilestyle.com'],
+          [4, 'Stephen', 'Brown', 'stephen@agilestyle.com'],
+          [5, 'Dana', 'Janssen', 'dana@agilestyle.com'],
+          [6, 'Ashley', 'Janssen', 'ashley@agilestyle.com'],
+        ]
+      end
+
+    end
+  end
+end
+```
+
 ## Get access to the raw results
 
 After all the searching, sorting and rendering of final results is complete, the server sends back an Array of Arrays to the front end jQuery DataTable
