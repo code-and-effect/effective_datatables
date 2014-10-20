@@ -191,6 +191,10 @@ module Effective
       return collection if @arrayized  # Prevent the collection from being arrayized more than once
       @arrayized = true
 
+      # This lets us call 'attributes' inside a table_column blocck and have it just works
+      view.class.send(:attr_accessor, :attributes)
+      view.attributes = self.attributes
+
       # We want to use the render :collection for each column that renders partials
       rendered = {}
       table_columns.each do |name, opts|
