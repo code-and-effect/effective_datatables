@@ -11,7 +11,7 @@ module Effective
 
       def find(obj, attributes = nil)
         obj = obj.respond_to?(:to_param) ? obj.to_param : obj
-        EffectiveDatatables.datatables.find { |klass| klass.name.underscore.parameterize == obj }.try(:new, attributes || {})
+        EffectiveDatatables.datatables.find { |klass| klass.name.underscore.parameterize == obj }.try(:new, attributes.presence || {})
       end
 
       def table_column(name, options = {}, proc = nil, &block)
