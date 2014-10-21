@@ -41,21 +41,25 @@ module Effective
         case table_column[:type]
         when :string, :text
           if table_column[:filter][:type] == :select && table_column[:filter][:fuzzy] != true
-            "#{column} = '#{search_term}'"
+            "#{column} = :search_term"
           else
-            "#{column} ILIKE '%#{search_term}%'"
+            search_term = "%#{search_term}%"
+            "#{column} ILIKE :search_term"
           end
         when :datetime
-          "to_char(#{column} AT TIME ZONE 'GMT', 'YYYY-MM-DD HH24:MI') ILIKE '%#{search_term}%'"
+          search_term = "%#{search_term}%"
+          "to_char(#{column} AT TIME ZONE 'GMT', 'YYYY-MM-DD HH24:MI:SS') ILIKE :search_term"
         when :integer
-          "#{column} = '#{search_term.to_i}'"
+          search_term = search_term.to_i
+          "#{column} = :search_term"
         when :year
-          "EXTRACT(YEAR FROM #{column}) = '#{search_term}'"
+          "EXTRACT(YEAR FROM #{column}) = :search_term"
         when :boolean
-          "#{column} = #{search_term}"
+          "#{column} = :search_term"
         else
-          "#{column} = '#{search_term}'"
-        end
+          "#{column} = :search_term"
+        end,
+        {:search_term => search_term}
       )
     end
 
