@@ -63,7 +63,7 @@ module Effective
     end
 
     def collection
-      raise "You must define a collection. Something like an ActiveRecord User.scoped or an Array of Arrays [[1, 'something'], [2, 'something else']]"
+      raise "You must define a collection. Something like an ActiveRecord User.all or an Array of Arrays [[1, 'something'], [2, 'something else']]"
     end
 
     def finalize(collection) # Override me if you like
@@ -71,9 +71,7 @@ module Effective
     end
 
     def table_columns
-      @table_columns ||= table_columns_with_defaults().select do |_, col|
-        col[:if] == nil || (col[:if].respond_to?(:call) ? instance_exec(&col[:if]) : col[:if])
-      end
+      @table_columns ||= table_columns_with_defaults()
     end
 
     def to_json(options = {})
@@ -212,29 +210,28 @@ module Effective
 
       collection.each_with_index.map do |obj, index|
         table_columns.map do |name, opts|
-          if opts[:partial]
+          value = if opts[:partial]
             rendered[name][index]
           elsif opts[:block]
             view.instance_exec(obj, collection, self, &opts[:block])
           elsif opts[:proc]
             view.instance_exec(obj, collection, self, &opts[:proc])
           else
-            value = (obj.send(name) rescue nil)
-            value ||= (obj[opts[:index]] rescue nil) # This handles the Array of Arrays collection case
-            value ||= ''
-
-            # Last minute formatting of dates
-            case value
-            when Date
-              value.strftime("%Y-%m-%d")
-            when Time
-              value.strftime("%Y-%m-%d %H:%M")
-            when DateTime
-              value.strftime("%Y-%m-%d %H:%M")
-            else
-              value
-            end
+            (obj.send(name) rescue nil) || (obj[opts[:index]] rescue nil) || ''
           end
+
+          # Last minute formatting of dates
+          case value
+          when Date
+            value.strftime("%Y-%m-%d")
+          when Time
+            value.strftime("%Y-%m-%d %H:%M:%S")
+          when DateTime
+            value.strftime("%Y-%m-%d %H:%M:%S")
+          else
+            value
+          end
+
         end
       end
     end
@@ -262,7 +259,8 @@ module Effective
         self.class.instance_variable_set(:@table_columns_initialized, true)
         initalize_table_columns(self.class.instance_variable_get(:@table_columns))
       end
-      self.class.instance_variable_get(:@table_columns)
+
+      self.class.instance_variable_get(:@table_columns).select { |_, col| col[:index].present? }
     end
 
     def initalize_table_columns(cols)
@@ -270,6 +268,14 @@ module Effective
       index = -1
 
       cols.each do |name, _|
+        # If an :if => ... option is passed, evaluate it now.
+        # if the value is false, skip setting up this table_column and ensure col[name][:index] is nil
+        # in table_column_with_defaults, we will select only table columns with an index
+        unless cols[name][:if].nil? || (cols[name][:if].respond_to?(:call) ? instance_exec(&cols[name][:if]) : cols[name][:if])
+          cols[name][:index] = nil
+          next
+        end
+
         sql_column = (collection.columns rescue []).find { |column| column.name == name.to_s }
 
         cols[name][:index] = (index += 1)  # So first one is assigned 0
