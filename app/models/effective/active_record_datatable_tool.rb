@@ -34,33 +34,49 @@ module Effective
       collection
     end
 
-    def search_column_with_defaults(collection, table_column, search_term)
+    def search_column_with_defaults(collection, table_column, term)
       column = table_column[:column]
 
-      collection.where(
-        case table_column[:type]
-        when :string, :text
-          if table_column[:filter][:type] == :select && table_column[:filter][:fuzzy] != true
-            "#{column} = :search_term"
-          else
-            search_term = "%#{search_term}%"
-            "#{column} ILIKE :search_term"
-          end
-        when :datetime
-          search_term = "%#{search_term}%"
-          "to_char(#{column} AT TIME ZONE 'GMT', 'YYYY-MM-DD HH24:MI:SS') ILIKE :search_term"
-        when :integer
-          search_term = search_term.to_i
-          "#{column} = :search_term"
-        when :year
-          "EXTRACT(YEAR FROM #{column}) = :search_term"
-        when :boolean
-          "#{column} = :search_term"
+      case table_column[:type]
+      when :string, :text
+        if table_column[:filter][:type] == :select && table_column[:filter][:fuzzy] != true
+          collection.where("#{column} = :term", :term => term)
         else
-          "#{column} = :search_term"
-        end,
-        {:search_term => search_term}
-      )
+          collection.where("#{column} ILIKE :term", :term => "%#{term}%")
+        end
+      when :datetime
+        begin
+          pieces = term.scan(/(\d+)/).flatten.map(&:to_i)
+          start_at = Time.zone.local(*pieces)
+
+          case pieces.length
+          when 1  # Year
+            end_at = start_at.end_of_year
+          when 2 # Year-Month
+            end_at = start_at.end_of_month
+          when 3 # Year-Month-Day
+            end_at = start_at.end_of_day
+          when 4 # Year-Month-Day Hour
+            end_at = start_at.end_of_hour
+          when 5 # Year-Month-Day Hour-Minute
+            end_at = start_at.end_of_minute
+          when 6
+            end_at = start_at + 1.second
+          else
+            end_at = start_at
+          end
+
+          collection.where("#{column} >= :start_at AND #{column} <= :end_at", :start_at => start_at, :end_at => end_at)
+        rescue => e
+          collection
+        end
+      when :integer
+        collection.where("#{column} = :term", :term => term.to_i)
+      when :year
+        collection.where("EXTRACT(YEAR FROM #{column}) = :term", :term => term.to_i)
+      else
+        collection.where("#{column} = :term", :term => term)
+      end
     end
 
     def paginate(collection)
