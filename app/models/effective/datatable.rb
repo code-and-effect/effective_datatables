@@ -216,6 +216,8 @@ module Effective
             view.instance_exec(obj, collection, self, &opts[:block])
           elsif opts[:proc]
             view.instance_exec(obj, collection, self, &opts[:proc])
+          elsif opts[:type] == :belongs_to
+            val = (obj.send(name) rescue nil).to_s
           else
             val = (obj.send(name) rescue nil)
             val = (obj[opts[:index]] rescue nil) if val == nil
@@ -266,9 +268,27 @@ module Effective
 
     def initalize_table_columns(cols)
       sql_table = (collection.table rescue nil)
+
+      # Here we identify all belongs_to associations and build up a Hash like:
+      # {:user => {:foreign_key => 'user_id', :klass => User}, :order => {:foreign_key => 'order_id', :klass => Effective::Order}}
+      belong_tos = (collection.ancestors.first.reflect_on_all_associations(:belongs_to) rescue []).inject(HashWithIndifferentAccess.new()) do |retval, bt|
+        klass = bt.klass || (bt.foreign_type.gsub('_type', '').classify.safe_constantize rescue nil)
+
+        if bt.foreign_key.present? && klass.present?
+          retval[bt.name] = {:foreign_key => bt.foreign_key, :klass => klass} # Set the value into our Hash
+        end
+
+        retval
+      end
+
       index = -1
 
       cols.each do |name, _|
+        # If this is a belongs_to, add an :if clause specifying a collection scope if
+        if belong_tos.key?(name)
+          cols[name][:if] ||= Proc.new { attributes[belong_tos[name][:foreign_key]].blank? } # :if => Proc.new { attributes[:user_id].blank? }
+        end
+
         # If an :if => ... option is passed, evaluate it now.
         # if the value is false, skip setting up this table_column and ensure col[name][:index] is nil
         # in table_column_with_defaults, we will select only table columns with an index
@@ -277,7 +297,9 @@ module Effective
           next
         end
 
-        sql_column = (collection.columns rescue []).find { |column| column.name == name.to_s }
+        sql_column = (collection.columns rescue []).find do |column|
+          column.name == name.to_s || (belong_tos.key?(name) && column.name == belong_tos[name][:foreign_key])
+        end
 
         cols[name][:index] = (index += 1)  # So first one is assigned 0
         cols[name][:array_column] ||= false
@@ -285,19 +307,18 @@ module Effective
         cols[name][:name] ||= name
         cols[name][:label] ||= name.titleize
         cols[name][:column] ||= (sql_table && sql_column) ? "\"#{sql_table.name}\".\"#{sql_column.name}\"" : name
-        cols[name][:type] ||= sql_column.try(:type) || :string
+        cols[name][:type] ||= (belong_tos.key?(name) ? :belongs_to : sql_column.try(:type)).presence || :string
         cols[name][:width] ||= nil
         cols[name][:sortable] = true if cols[name][:sortable] == nil
-        cols[name][:filter] = initialize_table_column_filter(cols[name][:filter], cols[name][:type])
+        cols[name][:filter] = initialize_table_column_filter(cols[name][:filter], cols[name][:type], belong_tos[name])
 
         if cols[name][:partial]
           cols[name][:partial_local] ||= (sql_table.try(:name) || cols[name][:partial].split('/').last(2).first.presence || 'obj').singularize.to_sym
         end
       end
-
     end
 
-    def initialize_table_column_filter(filter, col_type)
+    def initialize_table_column_filter(filter, col_type, belongs_to)
       return {:type => :null, :when_hidden => false} if filter == false
 
       if filter.kind_of?(Symbol)
@@ -309,6 +330,12 @@ module Effective
       end
 
       case col_type # null, number, select, number-range, date-range, checkbox, text(default)
+      when :belongs_to
+        {
+          :type => :select,
+          :when_hidden => false,
+          :values => Proc.new { belongs_to[:klass].all.map { |obj| [obj.id, obj.to_s] }.sort { |x, y| x[1] <=> y[1] } }
+        }.merge(filter)
       when :integer
         {:type => :number, :when_hidden => false}.merge(filter)
       when :boolean

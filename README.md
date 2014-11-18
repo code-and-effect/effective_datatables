@@ -140,6 +140,8 @@ module Effective
 
       table_column :updated_at, :proc => Proc.new { |post| nicetime(post.updated_at) } # just a standard helper as defined in helpers/application_helper.rb
 
+      table_column :user
+
       table_column :post_category_id, :filter => {:type => :select, :values => Proc.new { PostCategory.all } } do |post|
         post.post_category.name.titleize
       end
@@ -214,6 +216,16 @@ table_column :stripe_customer_id, :column => 'customers.stripe_customer_id'
 # Any SQL used to search this field will take the form of
 # "to_char(#{column} AT TIME ZONE 'GMT', 'YYYY-MM-DD HH24:MI') ILIKE '%?%'"
 table_column :created_at
+
+# If the name of the table column matches a belongs_to in our collection's main class
+# This column will be detected as a belongs_to and some predefined filters will be set up
+# So declaring the following
+table_column :user
+
+# Will have the same behaviour as declaring
+table_column :user_id, :if => Proc.new { attributes[:user_id].blank? }, :filter => {:type => :select, :values => Proc.new { User.all.map { |user| [user.id, user.to_s] }.sort { |x, y| x[1] <=> y[1] } } } do |post|
+  post.user.to_s
+end
 ```
 
 All table_columns are :visible => true, :sortable => true by default.
@@ -398,14 +410,16 @@ end
 and/or your table_column definition:
 
 ```ruby
-table_column :user, :if => Proc.new { attributes[:user_id].blank? }
+table_column :user_id, :if => Proc.new { attributes[:user_id].blank? } do |post|
+  post.user.email
+end
 ```
 
 ## Array Backed collection
 
 Don't want to use ActiveRecord? Not a problem.
 
-Define your collection as an Array of Arrays, and only array_columns, everything works as expected.
+Define your collection as an Array of Arrays, declare only array_columns, and everything works as expected.
 
 ```ruby
 module Effective
@@ -440,13 +454,13 @@ The finalize method provides a hook to process the final collection as an Array 
 
 This final collection is available after searching, sorting and pagination.
 
-I can't think of any reason you would actually need or want this:
+As you have full control over the table_column presentation, I can't think of any reason you would actually need or want this:
 
 ```ruby
 def finalize(collection)
   collection.each do |row|
-    row.each do |col|
-      col.gsub!('horse', 'force') if col.kind_of?(String)
+    row.each do |column|
+      column.gsub!('horse', 'force') if column.kind_of?(String)
     end
   end
 end
