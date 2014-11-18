@@ -217,7 +217,9 @@ module Effective
           elsif opts[:proc]
             view.instance_exec(obj, collection, self, &opts[:proc])
           else
-            (obj.send(name) rescue nil) || (obj[opts[:index]] rescue nil) || ''
+            val = (obj.send(name) rescue nil)
+            val = (obj[opts[:index]] rescue nil) if val == nil
+            val
           end
 
           # Last minute formatting of dates
@@ -231,7 +233,6 @@ module Effective
           else
             value
           end
-
         end
       end
     end

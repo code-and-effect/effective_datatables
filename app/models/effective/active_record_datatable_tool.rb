@@ -46,10 +46,10 @@ module Effective
         end
       when :datetime
         begin
-          pieces = term.scan(/(\d+)/).flatten.map(&:to_i)
-          start_at = Time.zone.local(*pieces)
+          digits = term.scan(/(\d+)/).flatten.map(&:to_i)
+          start_at = Time.zone.local(*digits)
 
-          case pieces.length
+          case digits.length
           when 1  # Year
             end_at = start_at.end_of_year
           when 2 # Year-Month
