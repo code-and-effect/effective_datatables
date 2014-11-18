@@ -272,10 +272,14 @@ module Effective
       # Here we identify all belongs_to associations and build up a Hash like:
       # {:user => {:foreign_key => 'user_id', :klass => User}, :order => {:foreign_key => 'order_id', :klass => Effective::Order}}
       belong_tos = (collection.ancestors.first.reflect_on_all_associations(:belongs_to) rescue []).inject(HashWithIndifferentAccess.new()) do |retval, bt|
-        klass = bt.klass || (bt.foreign_type.gsub('_type', '').classify.safe_constantize rescue nil)
+        unless bt.options[:polymorphic]
+          begin
+            klass = bt.klass || bt.foreign_type.gsub('_type', '').classify.constantize
+          rescue => e
+            klass = nil
+          end
 
-        if bt.foreign_key.present? && klass.present?
-          retval[bt.name] = {:foreign_key => bt.foreign_key, :klass => klass} # Set the value into our Hash
+          retval[bt.name] = {:foreign_key => bt.foreign_key, :klass => klass} if bt.foreign_key.present? && klass.present?
         end
 
         retval
