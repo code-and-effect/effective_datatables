@@ -6,11 +6,25 @@
     margin-right: 0px;
   }
 
+  table.dataTable.sorting-hidden {
+    thead {
+      .sorting_asc { background: none; cursor: default; }
+      .sorting_desc { background: none; cursor: default; }
+      .sorting { cursor: default; }
+
+      tr, th {
+        padding-left: 8px;
+        padding-right: 8px;
+      }
+    }
+  }
+
   table.dataTable {
     border-collapse: collapse;
     box-sizing: border-box;
 
     .form-inline, .form-control { width: 100%; }
+    thead, tr, th { padding-left: 6px; }
   }
 
   .dataTables_processing {

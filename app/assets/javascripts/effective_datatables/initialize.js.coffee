@@ -3,7 +3,7 @@ initializeDataTables = ->
     unless $.fn.DataTable.fnIsDataTable(this)
       datatable = $(this)
 
-      datatable.dataTable
+      init_options =
         bServerSide: true
         bProcessing: true
         bSaveState: true
@@ -12,7 +12,7 @@ initializeDataTables = ->
         order: datatable.data('default-order')
         sAjaxSource: datatable.data('source')
         pagingType: 'simple_numbers'
-        aLengthMenu: [[10, 25, 50, 100, 250, 1000, -1], [10, 25, 50, 100, 250, 1000, 'All']]
+        lengthMenu: [[10, 25, 50, 100, 250, 1000, -1], [10, 25, 50, 100, 250, 1000, 'All']]
         fnServerParams: (aoData, a, b) ->
           table = this.DataTable()
           table.columns().flatten().each (index) ->
@@ -39,10 +39,22 @@ initializeDataTables = ->
           fnStateChange: (iCol, bVisible) ->
             table = $(this.dom.button).closest('.dataTables_wrapper').children('table').first().DataTable()
             table.draw()
-      .columnFilter
-        sPlaceHolder: 'head:after'
-        aoColumns : datatable.data('filter')
-        bUseColVis: true
+
+      simple = datatable.data('effective-datatables-table') == 'simple'
+      filter = datatable.data('filter')
+
+      if simple
+        init_options['lengthMenu'] = [-1] # Show all results
+        init_options['dom'] = "<'row'r>t" # Just show the table
+
+      # Actually initialize it
+      datatable = datatable.dataTable(init_options)
+
+      if filter
+        datatable.columnFilter
+          sPlaceHolder: 'head:after'
+          aoColumns : datatable.data('filter')
+          bUseColVis: true
 
   $('.dataTables_filter').each ->
     $(this).html("<button class='btn-reset-filters ColVis_Button' data-effective-datatables-reset-filters='true'><span>Reset Filters</span></button>")

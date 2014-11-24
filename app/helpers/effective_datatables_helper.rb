@@ -1,10 +1,23 @@
 module EffectiveDatatablesHelper
-  def render_datatable(datatable)
+  def render_datatable(datatable, opts = {})
     datatable.view = self
-    render :partial => 'effective/datatables/datatable', :locals => {:datatable => datatable}
+    locals = {:style => :full, :filterable => true, :sortable => true, :table_class => 'table-bordered table-striped'}.merge(opts)
+    locals[:table_class] = 'sorting-hidden ' + locals[:table_class].to_s if locals[:sortable] == false
+
+    render :partial => 'effective/datatables/datatable', :locals => locals.merge(:datatable => datatable)
   end
 
-  def datatable_filter(datatable)
+  def render_simple_datatable(datatable, opts = {})
+    datatable.view = self
+    locals = {:style => :simple, :filterable => false, :sortable => false, :table_class => ''}.merge(opts)
+    locals[:table_class] = 'sorting-hidden ' + locals[:table_class].to_s if locals[:sortable] == false
+
+    render :partial => 'effective/datatables/datatable', :locals => locals.merge(:datatable => datatable)
+  end
+
+  def datatable_filter(datatable, filterable = true)
+    return false unless filterable
+
     filters = datatable.table_columns.values.map { |options, _| options[:filter] || {:type => 'null'} }
 
     # Process any Procs
@@ -21,9 +34,9 @@ module EffectiveDatatablesHelper
     filters.to_json()
   end
 
-  def datatable_non_sortable(datatable)
+  def datatable_non_sortable(datatable, sortable = true)
     [].tap do |nonsortable|
-      datatable.table_columns.values.each_with_index { |options, x| nonsortable << x if options[:sortable] == false }
+      datatable.table_columns.values.each_with_index { |options, x| nonsortable << x if options[:sortable] == false || sortable == false }
     end.to_json()
   end
 
