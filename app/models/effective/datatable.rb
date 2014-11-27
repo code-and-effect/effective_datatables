@@ -74,8 +74,11 @@ module Effective
       collection
     end
 
+    # Select only col[:if] == true columns, and then set the col[:index] accordingly
     def table_columns
-      @table_columns ||= table_columns_with_defaults()
+      @table_columns ||= table_columns_with_defaults().select do |_, col|
+        col[:if] == nil || (col[:if].respond_to?(:call) ? (view || self).instance_exec(&col[:if]) : col[:if])
+      end.each_with_index { |(_, col), index| col[:index] = index }
     end
 
     def to_json(options = {})
@@ -146,6 +149,13 @@ module Effective
       params[:iDisplayStart].to_i / per_page + 1
     end
 
+    def view=(view_context)
+      @view = view_context
+      @view.formats = [:html]
+      @view.class.send(:attr_accessor, :attributes)
+      @view.attributes = self.attributes
+    end
+
     protected
 
     # So the idea here is that we want to do as much as possible on the database in ActiveRecord
@@ -193,11 +203,6 @@ module Effective
       return collection if @arrayized  # Prevent the collection from being arrayized more than once
       @arrayized = true
 
-      # This lets us call 'attributes' inside a table_column blocck and have it just works
-      view.formats = [:html]
-      view.class.send(:attr_accessor, :attributes)
-      view.attributes = self.attributes
-
       # We want to use the render :collection for each column that renders partials
       rendered = {}
       table_columns.each do |name, opts|
@@ -225,7 +230,7 @@ module Effective
             val = (obj.send(name) rescue nil).to_s
           else
             val = (obj.send(name) rescue nil)
-            val = (obj[opts[:index]] rescue nil) if val == nil
+            val = (obj[opts[:array_index]] rescue nil) if val == nil
             val
           end
 
@@ -268,7 +273,7 @@ module Effective
         initalize_table_columns(self.class.instance_variable_get(:@table_columns))
       end
 
-      self.class.instance_variable_get(:@table_columns).select { |_, col| col[:index].present? }
+      self.class.instance_variable_get(:@table_columns)
     end
 
     def initalize_table_columns(cols)
@@ -290,29 +295,18 @@ module Effective
         retval
       end
 
-      index = -1
-
-      cols.each do |name, _|
+      cols.each_with_index do |(name, _), index|
         # If this is a belongs_to, add an :if clause specifying a collection scope if
         if belong_tos.key?(name)
           cols[name][:if] ||= Proc.new { attributes[belong_tos[name][:foreign_key]].blank? } # :if => Proc.new { attributes[:user_id].blank? }
-        end
-
-        # If an :if => ... option is passed, evaluate it now.
-        # if the value is false, skip setting up this table_column and ensure col[name][:index] is nil
-        # in table_column_with_defaults, we will select only table columns with an index
-        unless cols[name][:if].nil? || (cols[name][:if].respond_to?(:call) ? instance_exec(&cols[name][:if]) : cols[name][:if])
-          cols[name][:index] = nil
-          next
         end
 
         sql_column = (collection.columns rescue []).find do |column|
           column.name == name.to_s || (belong_tos.key?(name) && column.name == belong_tos[name][:foreign_key])
         end
 
-        cols[name][:index] = (index += 1)  # So first one is assigned 0
         cols[name][:array_column] ||= false
-
+        cols[name][:array_index] = index # The index of this column in the collection, regardless of hidden table_columns
         cols[name][:name] ||= name
         cols[name][:label] ||= name.titleize
         cols[name][:column] ||= (sql_table && sql_column) ? "\"#{sql_table.name}\".\"#{sql_column.name}\"" : name
