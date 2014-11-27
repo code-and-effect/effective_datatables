@@ -62,5 +62,13 @@ module EffectiveDatatablesHelper
     datatable.table_columns.values.map { |options| {'sWidth' => options[:width]} if options[:width] }.to_json()
   end
 
+  def datatables_admin_path?
+    (attributes[:admin_path] || request.referer.downcase.include?('/admin/')) rescue false
+  end
+
+  # TODO: Improve on this
+  def datatables_active_admin_path?
+    attributes[:active_admin_path] rescue false
+  end
 
 end
