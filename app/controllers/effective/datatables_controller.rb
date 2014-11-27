@@ -1,13 +1,12 @@
 module Effective
   class DatatablesController < ApplicationController
-
     skip_log_page_views if defined?(EffectiveLogging)
 
     def show
       @datatable = Effective::Datatable.find(params[:id], params[:attributes])
       @datatable.view = view_context if @datatable.present?
 
-      EffectiveDatatables.authorized?(self, :show, @datatable || Effective::Datatable)
+      EffectiveDatatables.authorized?(self, :index, @datatable.collection_class)
 
       respond_to do |format|
         format.html

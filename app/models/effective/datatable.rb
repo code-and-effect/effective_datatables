@@ -66,6 +66,10 @@ module Effective
       raise "You must define a collection. Something like an ActiveRecord User.all or an Array of Arrays [[1, 'something'], [2, 'something else']]"
     end
 
+    def collection_class
+      collection.respond_to?(:klass) ? collection.klass : self.class
+    end
+
     def finalize(collection) # Override me if you like
       collection
     end
@@ -190,9 +194,9 @@ module Effective
       @arrayized = true
 
       # This lets us call 'attributes' inside a table_column blocck and have it just works
+      view.formats = [:html]
       view.class.send(:attr_accessor, :attributes)
       view.attributes = self.attributes
-      view.formats = [:html]
 
       # We want to use the render :collection for each column that renders partials
       rendered = {}
