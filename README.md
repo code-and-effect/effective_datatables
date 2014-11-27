@@ -322,6 +322,18 @@ The local object name will either match the database table singular name 'post',
 table_column :actions, :partial => '/posts/actions', :partial_local => 'the_post'
 ```
 
+There are also a built in helper, `datatables_admin_path?` to considering if the current screen is in the `/admin` namespace:
+
+```ruby
+table_column :created_at do |post|
+  if datatables_admin_path?
+    link_to admin_posts_path(post)
+  else
+    link_to posts_path(post)
+  end
+end
+
+
 ## table_columns
 
 Quickly create multiple table_columns all with default options:
