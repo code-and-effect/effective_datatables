@@ -228,7 +228,7 @@ table_column :user_id, :if => Proc.new { attributes[:user_id].blank? }, :filter 
 end
 ```
 
-All table_columns are :visible => true, :sortable => true by default.
+All table_columns are `:visible => true`, `:sortable => true` by default.
 
 ### General Options
 
@@ -281,7 +281,7 @@ Some additional, lesser used options include:
 
 There are a few different ways to render values.
 
-Any standard view helpers like link_to() or simple_format() and any custom helpers available to ApplicationController will "just work".
+Any standard view helpers like `link_to` or `simple_format` and any custom helpers available to ApplicationController will "just work".
 
 All of the following rendering options can be used interchangeably:
 
@@ -309,14 +309,14 @@ Partial format:
 table_column :actions, :partial => '/posts/actions'  # render this partial for each row of the table
 ```
 
-then in your /app/views/posts/_actions.html.erb file:
+then in your `/app/views/posts/_actions.html.erb` file:
 
 ```erb
 <p><%= link_to('View', post_path(post)) %></p>
 <p><%= link_to('Edit', edit_post_path(post)) %></p>
 ```
 
-The local object name will either match the database table singular name 'post', the name of the partial 'actions', or 'obj' unless overridden with:
+The local object name will either match the database table singular name `post`, the name of the partial `actions`, or `obj` unless overridden with:
 
 ```ruby
 table_column :actions, :partial => '/posts/actions', :partial_local => 'the_post'
@@ -332,6 +332,7 @@ table_column :created_at do |post|
     link_to posts_path(post)
   end
 end
+```
 
 The request object is available to the table_column, so you could just as easily call
 
@@ -350,15 +351,15 @@ table_columns :id, :created_at, :updated_at, :category, :title
 
 ## array_column
 
-array_column accepts the same options as table_column and behaves the exact same on the frontend.
+`array_column` accepts the same options as `table_column` and behaves identically on the frontend.
 
 The difference occurs with sorting and filtering:
 
-With a table_column, the frontend sends some search terms to the server, the raw database table is searched & sorted using standard ActiveRecord .where(), the appropriate rows returned, and then each row is rendered as per the rendering options.
+With a `table_column`, the frontend sends some search terms to the server, the raw database table is searched & sorted using standard ActiveRecord .where(), the appropriate rows returned, and then each row is rendered as per the rendering options.
 
-With an array_column, the front end sends some search terms to the server, all rows are returned and rendered, and then the rendered output is searched & sorted.
+With an `array_column`, the front end sends some search terms to the server, all rows are returned and rendered, and then the rendered output is searched & sorted.
 
-This allows the output of an array_column to be anything complex that cannot be easily computed from the database.
+This allows the output of an `array_column` to be anything complex that cannot be easily computed from the database.
 
 When searching & sorting with a mix of table_columns and array_columns, all the table_columns are processed first so the most work is put on the database, the least on rails.
 
@@ -381,7 +382,7 @@ This gem does its best to provide "just works" filtering of both raw SQL (table_
 
 It's also very easy to override the filter behaviour on a per-column basis.
 
-Keep in mind, columns that are hidden will not be considered by the filter results unless :filter => {:when_hidden => true} is passed to table_column
+Keep in mind, columns that are hidden will not be considered by the filter results unless `:filter => {:when_hidden => true}` is passed to table_column
 
 For custom filter behaviour, specify a `def search_column` method in the datatables model file:
 
@@ -405,7 +406,7 @@ end
 
 ## Initialize with attributes
 
-Any attributes passed to .new() will be persisted through the lifecycle of the datatable.
+Any attributes passed to `.new()` will be persisted through the lifecycle of the datatable.
 
 You can use this to scope the datatable collection or create even more advanced search behaviour.
 
@@ -494,7 +495,7 @@ end
 
 # Authorization
 
-All authorization checks are handled via the config.authorization_method found in the config/initializers/ file.
+All authorization checks are handled via the config.authorization_method found in the `config/initializers/effective_datatables.rb` file.
 
 It is intended for flow through to CanCan or Pundit, but neither of those gems are required.
 
@@ -536,7 +537,7 @@ or disabled entirely:
 config.authorization_method = false
 ```
 
-If the method or proc returns false (user is not authorized) an Effective::AccessDenied exception will be raised
+If the method or proc returns false (user is not authorized) an `Effective::AccessDenied` exception will be raised
 
 You can rescue from this exception by adding the following to your application_controller.rb:
 
