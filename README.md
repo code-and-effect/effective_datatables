@@ -1,8 +1,8 @@
 # Effective DataTables
 
-Use just one file and a simple DSL to implement seamless server-side search sort and filtering of any ActiveRecord or Array collection in a frontend jQuery DataTable
+Use a simple DSL in just one ruby file to implement server-side search sort and filtering of any ActiveRecord or Array collection in a frontend jQuery DataTable
 
-Search database tables and computed results (arrays) at the same time
+Search raw database tables and ruby-processed results at the same time
 
 Packages the jQuery DataTables assets for use in a Rails 3.2.x & Rails 4.x application using Twitter Bootstrap 2 or 3
 
@@ -31,24 +31,24 @@ The generator will install an initializer which describes all configuration opti
 Require the javascript on the asset pipeline by adding the following to your application.js:
 
 ```ruby
-# For use with Bootstrap3 (not included in this gem):
+# For use with Bootstrap3 (which is not included in this gem):
 //= require effective_datatables
 
-# For use with Bootstrap2 (not includled in this gem):
+# For use with Bootstrap2 (which is not includled in this gem):
 //= require effective_datatables.bootstrap2
 ```
 
 Require the stylesheet on the asset pipeline by adding the following to your application.css:
 
 ```ruby
-# For use with Bootstrap3 (not included in this gem):
+# For use with Bootstrap3 (which is not included in this gem):
 *= require effective_datatables
 
-# For use with Bootstrap2 (not included in this gem):
+# For use with Bootstrap2 (which is not not included in this gem):
 *= require effective_datatables.bootstrap2
 ```
 
-# Create and Display an Effective Datatable
+# Usage
 
 We create a model, initialize it within our controller, then render it from a view
 
@@ -56,11 +56,11 @@ We create a model, initialize it within our controller, then render it from a vi
 
 Start by creating a model in the /app/models/effective/datatables/ directory.
 
-Any Effective::Datatable models that exist in this directory will be automatically detected and "just work".
+Any Effective::Datatable models that exist in this directory will be automatically detected and 'just work'.
 
 Below is a very simple example file, which we will expand upon later.
 
-This model exists at /app/models/effective/datatables/posts.rb
+This model exists at `/app/models/effective/datatables/posts.rb`
 
 ```ruby
 module Effective
@@ -109,22 +109,22 @@ Here we just render the datatable:
 
 When the jQuery DataTable is first initialized on the front-end, it makes an AJAX request back to the server asking for data.
 
-The effective_datatables gem intercepts this result and returns the appropriate results.
+The effective_datatables gem intercepts this request and returns the appropriate results.
 
 Whenever a search, sort, filter or pagination is initiated on the front end, that request is interpretted by the server and the appropriate results returned.
 
-Due to the unique search/filter ability of this gem, a mix of raw database tables and computed results may be worked with at the same time.
+Due to the unique search/filter ability of this gem, a mix of raw database tables and processed results may be worked with at the same time.
 
 
 # Effective::Datatable Model & DSL
 
-Once your controller and view are set up to render a Datatable, this model is the single file you need to configure all behaviour.
+Once your controller and view are set up to render a Datatable, the model is the central point to configure all behaviour.
 
-This single model contains just 1 required method and responds to only 4 DSL commands.
+This single model file contains just 1 required method and responds to only 3 DSL commands.
 
 Each Effective::Datatable model must be defined in the /app/models/effective/datatables/ directory.
 
-For example: /app/models/effective/datatables/posts.rb
+For example: `/app/models/effective/datatables/posts.rb`
 
 ```ruby
 module Effective
@@ -168,7 +168,7 @@ end
 
 ## The collection
 
-A required method "collection" must be defined that returns the base ActiveRecord collection.
+A required method `def collection` must be defined to return the base ActiveRecord collection.
 
 It can be as simple or as complex as you'd like:
 
@@ -192,7 +192,7 @@ end
 
 ## table_column
 
-This is the main DSL method that you will need to interact with.
+This is the main DSL method that you will interact with.
 
 table_column defines a 1:1 mapping between a SQL database table column and a frontend jQuery Datatables table column.  It creates a column.
 
@@ -247,7 +247,7 @@ The following options control the display behaviour of the column:
 ```ruby
 :label => 'Nice Label'    # Override the default column header label
 :sortable => true|false   # Allow sorting of this column.  Otherwise the up/down arrows on the frontend will be disabled.
-:visible => true|false    # Hide this column at startup.  Column visbility can be changed on the frontend.  By default, hidden columns filter terms are ignored.
+:visible => true|false    # Hide this column at startup.  Column visbility can be changed on the frontend.  By default, hidden column filter terms are ignored.
 :width => '100%'|'100px'  # Set the width of this column.  Can be set on one, all or some of the columns.  If using percentages, should never add upto more than 100%
 ```
 
@@ -279,11 +279,11 @@ Some additional, lesser used options include:
 
 ### Rendering Options
 
-There are a few different ways to render each column cell.  This will be called once for each row.
+There are a few different ways to render values.
 
 Any standard view helpers like link_to() or simple_format() and any custom helpers available to ApplicationController will "just work".
 
-All of the following rendering options can be used interchangeably.
+All of the following rendering options can be used interchangeably:
 
 Block format (really, this is your cleanest option):
 
@@ -333,6 +333,12 @@ table_column :created_at do |post|
   end
 end
 
+The request object is available to the table_column, so you could just as easily call
+
+```ruby
+request.referer.include?('/admin/')
+```
+
 
 ## table_columns
 
@@ -346,9 +352,9 @@ table_columns :id, :created_at, :updated_at, :category, :title
 
 array_column accepts the same options as table_column and behaves the exact same on the frontend.
 
-The difference occurs when sorting and filtering:
+The difference occurs with sorting and filtering:
 
-With a table_column, the frontend sends some search terms to the server, the raw database table is searched & sorted, the appropriate rows returned, and then each row is rendered as per the rendering options.
+With a table_column, the frontend sends some search terms to the server, the raw database table is searched & sorted using standard ActiveRecord .where(), the appropriate rows returned, and then each row is rendered as per the rendering options.
 
 With an array_column, the front end sends some search terms to the server, all rows are returned and rendered, and then the rendered output is searched & sorted.
 
@@ -367,19 +373,27 @@ default_order :created_at, :asc|:desc
 
 # Additional Functionality
 
-There are a few other things effective_datatables can do
+There are a few other ways to customize the behaviour of effective_datatables
 
-## Customize Search Behaviour
+## Customize Filter Behaviour
 
-This gem does its best to provide "just works" searching both raw SQL (table_column) and final Results (array_column) out-of-the-box.
+This gem does its best to provide "just works" filtering of both raw SQL (table_column) and processed results (array_column) out-of-the-box.
 
-It's also very easy to customize the search behaviour on a per-column basis.
+It's also very easy to override the filter behaviour on a per-column basis.
 
-Keep in mind, columns that are hidden will not have search_terms present unless :filter => {:when_hidden => true} is passed to table_column
+Keep in mind, columns that are hidden will not be considered by the filter results unless :filter => {:when_hidden => true} is passed to table_column
 
-For custom search behaviour, overload the search_column method of the datatables model file:
+For custom filter behaviour, specify a `def search_column` method in the datatables model file:
 
 ```ruby
+def collection
+  User.unscoped.uniq
+    .joins('LEFT JOIN customers ON customers.user_id = users.id')
+    .select('users.*')
+    .select('customers.stripe_customer_id AS stripe_customer_id')
+    .includes(:addresses)
+end
+
 def search_column(collection, table_column, search_term)
   if table_column[:name] == 'subscription_types'
     collection.where('subscriptions.stripe_plan_id ILIKE ?', "%#{search_term}%")
@@ -391,11 +405,11 @@ end
 
 ## Initialize with attributes
 
-Additional attributes may be passed to .new() that will be persisted through the lifecycle of the datatable.
+Any attributes passed to .new() will be persisted through the lifecycle of the datatable.
 
-You can use this to easily scope the datatable collection or create even more advanced search behaviour.
+You can use this to scope the datatable collection or create even more advanced search behaviour.
 
-Let's hide the Users column and scope the Post collection to a user, when the Posts table is initialized with a specific user.
+In the following example we will hide the User column and scope the collection to a specific user.
 
 In your controller:
 
@@ -407,11 +421,11 @@ class PostsController < ApplicationController
 end
 ```
 
-And in your collection method:
+Scope the query to the passed user in in your collection method:
 
 ```ruby
 def collection
-  if attributes[:user_id].present?
+  if attributes[:user_id]
     Post.where(:user_id => attributes[:user_id])
   else
     Post.all
@@ -419,7 +433,7 @@ def collection
 end
 ```
 
-and/or your table_column definition:
+and remove the table_column when a user_id is present:
 
 ```ruby
 table_column :user_id, :if => Proc.new { attributes[:user_id].blank? } do |post|
@@ -482,13 +496,19 @@ end
 
 All authorization checks are handled via the config.authorization_method found in the config/initializers/ file.
 
-It is intended for flow through to CanCan or Pundit, but that is not required.
+It is intended for flow through to CanCan or Pundit, but neither of those gems are required.
 
-This method is called by all controller actions with the appropriate action and resource
+This method is called by the controller action with the appropriate action and resource
 
-Action will be one of [:index, :show, :new, :create, :edit, :update, :destroy]
+Action will be `:index`
 
-Resource will the appropriate Effective::Something ActiveRecord object or class
+The resource will be the collection base class, such as `Post`.  This can be overridden:
+
+```ruby
+def collection_class
+  NotPost
+end
+```
 
 The authorization method is defined in the initializer file:
 
@@ -546,3 +566,11 @@ Run tests by:
 ```ruby
 rake spec
 ```
+
+# Contributing
+
+1. Fork it
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create new Pull Request
