@@ -1,16 +1,17 @@
 # Effective DataTables
 
-Use a simple DSL in just one ruby file to implement server-side search sort and filtering of any ActiveRecord or Array collection in a frontend jQuery DataTable
+Uniquely powerful server-side searching, sorting and filtering of any ActiveRecord or Array collection as well as post-rendered content displayed as a frontend jQuery Datatable.
 
-Search raw database tables and ruby-processed results at the same time
+Use a simple DSL in just one ruby file to implement all features
+
+Search raw database tables and ruby post-rendered results at the same time
 
 Packages the jQuery DataTables assets for use in a Rails 3.2.x & Rails 4.x application using Twitter Bootstrap 2 or 3
 
-
-# Getting Started
+## Getting Started
 
 ```ruby
-gem 'effective_datatables', :git => 'https://github.com/code-and-effect/effective_datatables'
+gem 'effective_datatables'
 ```
 
 Run the bundle command to install it:
@@ -48,25 +49,26 @@ Require the stylesheet on the asset pipeline by adding the following to your app
 *= require effective_datatables.bootstrap2
 ```
 
-# Usage
+## Usage
 
 We create a model, initialize it within our controller, then render it from a view
 
-## The Model
+### The Model
 
-Start by creating a model in the /app/models/effective/datatables/ directory.
+Start by creating a model in the `/app/models/effective/datatables/` directory.
 
-Any Effective::Datatable models that exist in this directory will be automatically detected and 'just work'.
+Any `Effective::Datatable` models that exist in this directory will be automatically detected and 'just work'.
 
 Below is a very simple example file, which we will expand upon later.
 
-This model exists at `/app/models/effective/datatables/posts.rb`
+This model exists at `/app/models/effective/datatables/posts.rb`:
 
 ```ruby
 module Effective
   module Datatables
     class Posts < Effective::Datatable
       table_column :id
+      table_column :user    # if Post belongs_to :user
       table_column :title
       table_column :created_at
 
@@ -79,7 +81,7 @@ module Effective
 end
 ```
 
-## The Controller
+### The Controller
 
 We're going to display this DataTable on the posts#index action
 
@@ -91,7 +93,7 @@ class PostsController < ApplicationController
 end
 ```
 
-## The View
+### The View
 
 Here we just render the datatable:
 
@@ -105,7 +107,7 @@ Here we just render the datatable:
 <% end %>
 ```
 
-# How It Works
+## How It Works
 
 When the jQuery DataTable is first initialized on the front-end, it makes an AJAX request back to the server asking for data.
 
@@ -116,15 +118,15 @@ Whenever a search, sort, filter or pagination is initiated on the front end, tha
 Due to the unique search/filter ability of this gem, a mix of raw database tables and processed results may be worked with at the same time.
 
 
-# Effective::Datatable Model & DSL
+### Effective::Datatable Model & DSL
 
 Once your controller and view are set up to render a Datatable, the model is the central point to configure all behaviour.
 
 This single model file contains just 1 required method and responds to only 3 DSL commands.
 
-Each Effective::Datatable model must be defined in the /app/models/effective/datatables/ directory.
+Each `Effective::Datatable` model must be defined in the `/app/models/effective/datatables/` directory.
 
-For example: `/app/models/effective/datatables/posts.rb`
+For example: `/app/models/effective/datatables/posts.rb`:
 
 ```ruby
 module Effective
@@ -166,7 +168,7 @@ module Effective
 end
 ```
 
-## The collection
+### The collection
 
 A required method `def collection` must be defined to return the base ActiveRecord collection.
 
@@ -279,9 +281,9 @@ Some additional, lesser used options include:
 
 ### Rendering Options
 
-There are a few different ways to render values.
+There are a few different ways to render each column's output.
 
-Any standard view helpers like `link_to` or `simple_format` and any custom helpers available to ApplicationController will "just work".
+Any standard view helpers like `link_to` or `simple_format` and any custom helpers available to your views will be available.
 
 All of the following rendering options can be used interchangeably:
 
@@ -334,7 +336,7 @@ table_column :created_at do |post|
 end
 ```
 
-The request object is available to the table_column, so you could just as easily call
+The request object is available to the table_column, so you could just as easily call:
 
 ```ruby
 request.referer.include?('/admin/')
@@ -372,11 +374,11 @@ Sort the table by this field and direction on start up
 default_order :created_at, :asc|:desc
 ```
 
-# Additional Functionality
+## Additional Functionality
 
 There are a few other ways to customize the behaviour of effective_datatables
 
-## Customize Filter Behaviour
+### Customize Filter Behaviour
 
 This gem does its best to provide "just works" filtering of both raw SQL (table_column) and processed results (array_column) out-of-the-box.
 
@@ -404,7 +406,7 @@ def search_column(collection, table_column, search_term)
 end
 ```
 
-## Initialize with attributes
+### Initialize with attributes
 
 Any attributes passed to `.new()` will be persisted through the lifecycle of the datatable.
 
@@ -493,7 +495,7 @@ def finalize(collection)
 end
 ```
 
-# Authorization
+## Authorization
 
 All authorization checks are handled via the config.authorization_method found in the `config/initializers/effective_datatables.rb` file.
 
@@ -551,14 +553,14 @@ end
 ```
 
 
-# License
+## License
 
 MIT License.  Copyright Code and Effect Inc. http://www.codeandeffect.com
 
 You are not granted rights or licenses to the trademarks of Code and Effect
 
 
-# Testing
+## Testing
 
 The test suite for this gem is unfortunately not yet complete.
 
@@ -568,10 +570,12 @@ Run tests by:
 rake spec
 ```
 
-# Contributing
+## Contributing
 
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+5. Bonus points for test coverage
+6. Create new Pull Request
+
