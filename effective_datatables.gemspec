@@ -12,18 +12,19 @@ Gem::Specification.new do |s|
   s.homepage    = "https://github.com/code-and-effect/effective_datatables"
   s.summary     = "Uniquely powerful server-side searching, sorting and filtering of any ActiveRecord or Array collection as well as post-rendered content displayed as a frontend jQuery Datatable"
   s.description = "Uniquely powerful server-side searching, sorting and filtering of any ActiveRecord or Array collection as well as post-rendered content displayed as a frontend jQuery Datatable"
+  s.licenses    = ['MIT']
 
   s.files = Dir["{app,config,db,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.md"]
   s.test_files = Dir["spec/**/*"]
 
-  s.add_dependency "rails"
+  s.add_dependency "rails", [">= 3.2.0"]
   s.add_dependency "coffee-rails"
   s.add_dependency 'kaminari'
   s.add_dependency "haml"
   s.add_dependency "jquery-datatables-rails"
 
-  s.add_development_dependency "factory_girl_rails"
-  s.add_development_dependency "rspec-rails"
-  s.add_development_dependency "shoulda-matchers"
-  s.add_development_dependency "sqlite3"
+  # s.add_development_dependency "factory_girl_rails"
+  # s.add_development_dependency "rspec-rails"
+  # s.add_development_dependency "shoulda-matchers"
+  # s.add_development_dependency "sqlite3"
 end
