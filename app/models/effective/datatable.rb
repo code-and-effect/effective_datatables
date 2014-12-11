@@ -48,7 +48,7 @@ module Effective
         args.first.each { |k, v| self.attributes[k] = v }
       end
 
-      unless active_record_collection? || (collection.kind_of?(Array) && collection.first.kind_of?(Array))
+      unless active_record_collection? || (_collection.kind_of?(Array) && _collection.first.kind_of?(Array))
         raise "Unsupported collection type. Should be ActiveRecord class, ActiveRecord relation, or an Array of Arrays [[1, 'something'], [2, 'something else']]"
       end
     end
@@ -66,8 +66,12 @@ module Effective
       raise "You must define a collection. Something like an ActiveRecord User.all or an Array of Arrays [[1, 'something'], [2, 'something else']]"
     end
 
+    def _collection
+      @@collection ||= collection
+    end
+
     def collection_class
-      collection.respond_to?(:klass) ? collection.klass : self.class
+      _collection.respond_to?(:klass) ? _collection.klass : self.class
     end
 
     def finalize(collection) # Override me if you like
@@ -161,7 +165,7 @@ module Effective
     # So the idea here is that we want to do as much as possible on the database in ActiveRecord
     # And then run any array_columns through in post-processed results
     def table_data
-      col = collection
+      col = _collection
 
       if active_record_collection?
         self.total_records = (col.select('*').reorder(nil).count rescue 1)
@@ -264,7 +268,7 @@ module Effective
     end
 
     def active_record_collection?
-      @active_record_collection ||= (collection.ancestors.include?(ActiveRecord::Base) rescue false)
+      @active_record_collection ||= (_collection.ancestors.include?(ActiveRecord::Base) rescue false)
     end
 
     def table_columns_with_defaults
@@ -277,11 +281,11 @@ module Effective
     end
 
     def initalize_table_columns(cols)
-      sql_table = (collection.table rescue nil)
+      sql_table = (_collection.table rescue nil)
 
       # Here we identify all belongs_to associations and build up a Hash like:
       # {:user => {:foreign_key => 'user_id', :klass => User}, :order => {:foreign_key => 'order_id', :klass => Effective::Order}}
-      belong_tos = (collection.ancestors.first.reflect_on_all_associations(:belongs_to) rescue []).inject(HashWithIndifferentAccess.new()) do |retval, bt|
+      belong_tos = (_collection.ancestors.first.reflect_on_all_associations(:belongs_to) rescue []).inject(HashWithIndifferentAccess.new()) do |retval, bt|
         unless bt.options[:polymorphic]
           begin
             klass = bt.klass || bt.foreign_type.gsub('_type', '').classify.constantize
@@ -301,7 +305,7 @@ module Effective
           cols[name][:if] ||= Proc.new { attributes[belong_tos[name][:foreign_key]].blank? } # :if => Proc.new { attributes[:user_id].blank? }
         end
 
-        sql_column = (collection.columns rescue []).find do |column|
+        sql_column = (_collection.columns rescue []).find do |column|
           column.name == name.to_s || (belong_tos.key?(name) && column.name == belong_tos[name][:foreign_key])
         end
 
