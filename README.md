@@ -184,11 +184,25 @@ or (complex example):
 
 ```ruby
 def collection
-  User.unscoped.uniq
-    .joins('LEFT JOIN customers ON customers.user_id = users.id')
-    .select('users.*')
-    .select('customers.stripe_customer_id AS stripe_customer_id')
-    .includes(:addresses)
+  collection = Effective::Order.unscoped.purchased
+    .joins(:user)
+    .joins(:order_items)
+    .group('users.email')
+    .group('orders.id')
+    .select('users.email AS email')
+    .select('orders.*')
+    .select("#{query_total} AS total")
+    .select("string_agg(order_items.title, '!!OI!!') AS order_items")
+
+  if attributes[:user_id].present?
+    collection.where(:user_id => attributes[:user_id])
+  else
+    collection
+  end
+end
+
+def query_total
+  "SUM((order_items.price * order_items.quantity) + (CASE order_items.tax_exempt WHEN true THEN 0 ELSE ((order_items.price * order_items.quantity) * order_items.tax_rate) END))"
 end
 ```
 
