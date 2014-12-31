@@ -70,6 +70,12 @@ module Effective
         rescue => e
           collection
         end
+      when :obfuscated_id
+        if (deobfuscated_id = collection.deobfuscate(term)) == term # We weren't able to deobfuscate it, so this is an Invalid ID
+          collection.where("#{column} = :term", :term => 0)
+        else
+          collection.where("#{column} = :term", :term => deobfuscated_id)
+        end
       when :integer
         collection.where("#{column} = :term", :term => term.to_i)
       when :year

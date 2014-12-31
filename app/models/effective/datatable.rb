@@ -228,6 +228,8 @@ module Effective
             view.instance_exec(obj, collection, self, &opts[:proc])
           elsif opts[:type] == :belongs_to
             val = (obj.send(name) rescue nil).to_s
+          elsif opts[:type] == :obfuscated_id
+            (obj.send(:to_param) rescue nil).to_s
           else
             val = (obj.send(name) rescue nil)
             val = (obj[opts[:array_index]] rescue nil) if val == nil
@@ -310,9 +312,19 @@ module Effective
         cols[name][:name] ||= name
         cols[name][:label] ||= name.titleize
         cols[name][:column] ||= (sql_table && sql_column) ? "\"#{sql_table.name}\".\"#{sql_column.name}\"" : name
-        cols[name][:type] ||= (belong_tos.key?(name) ? :belongs_to : sql_column.try(:type)).presence || :string
         cols[name][:width] ||= nil
         cols[name][:sortable] = true if cols[name][:sortable] == nil
+
+        cols[name][:type] ||= (
+          if belong_tos.key?(name)
+            :belongs_to
+          elsif name == 'id' && collection.respond_to?(:deobfuscate)
+            :obfuscated_id
+          else
+            sql_column.try(:type).presence || :string
+          end
+        )
+
         cols[name][:filter] = initialize_table_column_filter(cols[name][:filter], cols[name][:type], belong_tos[name])
 
         if cols[name][:partial]
