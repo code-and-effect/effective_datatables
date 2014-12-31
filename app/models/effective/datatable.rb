@@ -314,16 +314,12 @@ module Effective
         cols[name][:column] ||= (sql_table && sql_column) ? "\"#{sql_table.name}\".\"#{sql_column.name}\"" : name
         cols[name][:width] ||= nil
         cols[name][:sortable] = true if cols[name][:sortable] == nil
+        cols[name][:type] ||= (belong_tos.key?(name) ? :belongs_to : (sql_column.try(:type).presence || :string))
 
-        cols[name][:type] ||= (
-          if belong_tos.key?(name)
-            :belongs_to
-          elsif name == 'id' && collection.respond_to?(:deobfuscate)
-            :obfuscated_id
-          else
-            sql_column.try(:type).presence || :string
-          end
-        )
+        if name == 'id' && collection.respond_to?(:deobfuscate)
+          cols[name][:sortable] = false
+          cols[name][:type] = :obfuscated_id
+        end
 
         cols[name][:filter] = initialize_table_column_filter(cols[name][:filter], cols[name][:type], belong_tos[name])
 
