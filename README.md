@@ -136,9 +136,7 @@ module Effective
 
       table_column :id, :visible => false
 
-      table_column :created_at, :width => '25%' do |post|
-        post.created_at.strftime("%Y-%m-%d %H:%M:%S")
-      end
+      table_column :created_at, :width => '25%'
 
       table_column :updated_at, :proc => Proc.new { |post| nicetime(post.updated_at) } # just a standard helper as defined in helpers/application_helper.rb
 
@@ -156,7 +154,7 @@ module Effective
         end
       end
 
-      table_column :title, :label => 'Post Title'
+      table_column :title, :label => 'Post Title', :class => 'col-title'
       table_column :actions, :sortable => false, :filter => false, :partial => '/posts/actions'
 
       def collection
@@ -265,6 +263,7 @@ The following options control the display behaviour of the column:
 :sortable => true|false   # Allow sorting of this column.  Otherwise the up/down arrows on the frontend will be disabled.
 :visible => true|false    # Hide this column at startup.  Column visbility can be changed on the frontend.  By default, hidden column filter terms are ignored.
 :width => '100%'|'100px'  # Set the width of this column.  Can be set on one, all or some of the columns.  If using percentages, should never add upto more than 100%
+:class => 'col-example'   # Adds an html class to the column's TH and all TD elements.  Add more than one class with 'example col-example something'
 ```
 
 ### Filtering Options

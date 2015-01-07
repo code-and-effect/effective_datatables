@@ -315,6 +315,8 @@ module Effective
         cols[name][:width] ||= nil
         cols[name][:sortable] = true if cols[name][:sortable] == nil
         cols[name][:type] ||= (belong_tos.key?(name) ? :belongs_to : (sql_column.try(:type).presence || :string))
+        cols[name][:class] = "col-#{cols[name][:type]} #{cols[name][:class]}".strip
+        cols[name][:class] << ' col-actions' if name == 'actions'
 
         if name == 'id' && collection.respond_to?(:deobfuscate)
           cols[name][:sortable] = false

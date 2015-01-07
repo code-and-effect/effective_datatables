@@ -3,6 +3,11 @@ initializeDataTables = ->
     unless $.fn.DataTable.fnIsDataTable(this)
       datatable = $(this)
 
+      aoColumnDefs = [
+        { bSortable: false, aTargets: datatable.data('non-sortable') },
+        { bVisible: false, aTargets: datatable.data('non-visible') }
+      ].concat(datatable.data('column-classes') || [])
+
       init_options =
         bServerSide: true
         bProcessing: true
@@ -17,17 +22,7 @@ initializeDataTables = ->
           table = this.DataTable()
           table.columns().flatten().each (index) ->
             aoData.push({'name': "sVisible_#{index}", 'value': table.column(index).visible()})
-        aoColumnDefs:
-          [
-            {
-             bSortable: false,
-             aTargets: datatable.data('non-sortable')
-            },
-            {
-             bVisible: false,
-             aTargets: datatable.data('non-visible')
-            }
-          ]
+        aoColumnDefs: aoColumnDefs
         aoColumns: datatable.data('widths')
         oTableTools:
           sSwfPath: '/assets/effective_datatables/copy_csv_xls_pdf.swf',

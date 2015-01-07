@@ -62,6 +62,14 @@ module EffectiveDatatablesHelper
     datatable.table_columns.values.map { |options| {'sWidth' => options[:width]} if options[:width] }.to_json()
   end
 
+  def datatable_column_classes(datatable)
+    [].tap do |classes|
+      datatable.table_columns.values.each_with_index do |options, x|
+        classes << {:className => options[:class], :targets => [x]} if options[:class].present?
+      end
+    end.to_json()
+  end
+
   def datatables_admin_path?
     (attributes[:admin_path] || request.referer.downcase.include?('/admin/')) rescue false
   end
