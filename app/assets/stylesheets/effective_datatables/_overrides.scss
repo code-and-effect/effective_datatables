@@ -25,6 +25,8 @@
 
     .form-inline, .form-control { width: 100%; }
     thead, tr, th { padding-left: 6px; }
+
+    .col-datetime { white-space: nowrap; }
   }
 
   .dataTables_processing {
