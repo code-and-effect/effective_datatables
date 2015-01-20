@@ -1,9 +1,48 @@
 .dataTables_wrapper {   // This is the Header
-  overflow-x: auto;
+  overflow: hidden;
 
   .row {
-    margin-left: 0px;
-    margin-right: 0px;
+    margin-left: -15px;
+    margin-right: -15px;
+  }
+
+  .form-control {
+    color: #646464;
+    border: 1px solid #bcbcbc;
+
+    &:focus {
+      box-shadow: none;
+      border-color: #03428d;
+    }
+  }
+
+  .DTTT_button,
+  .ColVis_Button {
+    color: #00a6ff !important;
+    border: 1px solid #e0eeff;
+    background: #fff;
+    box-shadow: none;
+
+    &:hover:not(.ColVis_MasterButton) {
+      color: #fff !important;
+      background: #00a6ff !important;
+      border: 1px solid #e0eeff;
+      background: #fff;
+      box-shadow: none;
+    }
+
+    &.active {
+      color: #fff;
+      background: #03428d !important;
+    }
+  }
+
+  .dataTables_length,
+  .dataTables_filter,
+  .dataTables_info,
+  .dataTables_processing,
+  .dataTables_paginate {
+    color: #646464;
   }
 
   table.dataTable.sorting-hidden {
@@ -26,6 +65,14 @@
     .form-inline, .form-control { width: 100%; }
     thead, tr, th { padding-left: 6px; }
 
+    tbody th, tbody td, thead th, thead td {
+      border-left: none;
+      border-bottom: none;
+    }
+
+    thead th { border-top: none; }
+
+    .col-actions { white-space: nowrap; }
     .col-datetime { white-space: nowrap; }
   }
 
@@ -56,6 +103,12 @@
     }
   }
 
+  ol,
+  ul {
+    list-style-type: none;
+    padding-left: 0;
+  }
+
   .DTTT_container {
     float: none;
     width: 190px;
@@ -71,4 +124,3 @@ div.DTTT_print_info {
   h6 { color: black; }
   p { color: black; }
 }
-
