@@ -20,4 +20,11 @@ EffectiveDatatables.setup do |config|
   # config.authorization_method = false
 
   config.authorization_method = Proc.new { |controller, action, resource| true } # All users can see every screen
+
+  # Date & DateTime Format
+  # By default, format Date and DateTime values with the following
+  config.date_format = "%Y-%m-%d"
+  config.datetime_format = "%Y-%m-%d %H:%M"
+
+
 end

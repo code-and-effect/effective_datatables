@@ -239,11 +239,11 @@ module Effective
           # Last minute formatting of dates
           case value
           when Date
-            value.strftime("%Y-%m-%d")
+            value.strftime(EffectiveDatatables.date_format)
           when Time
-            value.strftime("%Y-%m-%d %H:%M:%S")
+            value.strftime(EffectiveDatatables.datetime_format)
           when DateTime
-            value.strftime("%Y-%m-%d %H:%M:%S")
+            value.strftime(EffectiveDatatables.datetime_format)
           else
             value
           end
