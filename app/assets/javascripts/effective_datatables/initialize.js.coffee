@@ -18,6 +18,7 @@ initializeDataTables = ->
         sAjaxSource: datatable.data('source')
         pagingType: 'simple_numbers'
         lengthMenu: [[10, 25, 50, 100, 250, 1000, -1], [10, 25, 50, 100, 250, 1000, 'All']]
+        iDisplayLength: 25
         fnServerParams: (aoData, a, b) ->
           table = this.DataTable()
           table.columns().flatten().each (index) ->
