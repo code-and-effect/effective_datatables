@@ -40,6 +40,7 @@ module Effective
       def default_order(name, direction = :asc)
         @default_order = {name => direction}
       end
+
     end
 
     def initialize(*args)
@@ -152,8 +153,23 @@ module Effective
     def view=(view_context)
       @view = view_context
       @view.formats = [:html]
+
+      # 'Just work' with attributes
       @view.class.send(:attr_accessor, :attributes)
       @view.attributes = self.attributes
+
+      # "Copy & Paste" any additional methods defined on the datatable into the view_context
+      begin
+        methods_for_view = ''
+
+        (self.class.instance_methods(false) - [:collection, :search_column]).each do |instance_method|
+          methods_for_view << self.class.instance_method(instance_method).source
+        end
+
+        @view.class.module_eval(methods_for_view)
+      rescue => e
+      end
+
     end
 
     protected
