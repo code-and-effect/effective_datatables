@@ -457,6 +457,53 @@ table_column :user_id, :if => Proc.new { attributes[:user_id].blank? } do |post|
 end
 ```
 
+### Helper methods
+
+Any non-private methods defined in the datatable model will be available to your table_columns and evaluated in the view_context.
+
+```ruby
+module Effective
+  module Datatables
+    class Posts < Effective::Datatable
+      table_column :title do |post|
+        format_post_title(post)
+      end
+
+      def collection
+        Post.all
+      end
+
+      def format_post_title(post)
+        if post.title.start_with?('important')
+          link_to(post.title.upcase, post_path(post))
+        else
+          link_to(post.title, post_path(post))
+        end
+      end
+
+    end
+  end
+end
+```
+
+You can also get the same functionality by including a regular Rails helper within the datatable model.
+
+```ruby
+module PostHelper
+end
+```
+
+```ruby
+module Effective
+  module Datatables
+    class Posts < Effective::Datatable
+      include PostsHelper
+
+    end
+  end
+end
+```
+
 ## Array Backed collection
 
 Don't want to use ActiveRecord? Not a problem.
