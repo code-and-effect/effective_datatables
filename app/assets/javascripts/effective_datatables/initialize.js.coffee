@@ -55,9 +55,7 @@ initializeDataTables = ->
         init_options['dom'] = "<'row'r>t" # Just show the table
 
       # Actually initialize it
-      console.log('blah')
       datatable = datatable.dataTable(init_options)
-      console.log('initted')
 
       if filter
         datatable.columnFilter
