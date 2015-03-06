@@ -27,10 +27,10 @@ initializeDataTables = ->
         aoColumns: datatable.data('widths')
         oTableTools:
           sSwfPath: '/assets/effective_datatables/copy_csv_xls_pdf.swf',
-          aButtons: ['copy', 'csv', 'pdf', 'print']
+          aButtons: ['csv', {'sExtends': 'xls', 'sButtonText': 'Excel'}, 'print']
         colVis:
           showAll: 'Show all'
-          restore: 'Restore default visible'
+          restore: 'Show default'
           activate: 'mouseover'
           fnStateChange: (iCol, bVisible) ->
             table = $(this.dom.button).closest('.dataTables_wrapper').children('table').first().DataTable()
@@ -52,10 +52,5 @@ initializeDataTables = ->
           aoColumns : datatable.data('filter')
           bUseColVis: true
 
-  $('.dataTables_filter').each ->
-    $(this).html("<button class='btn-reset-filters ColVis_Button' data-effective-datatables-reset-filters='true'><span>Reset Filters</span></button>")
-
 $ -> initializeDataTables()
 $(document).on 'page:change', -> initializeDataTables()
-
-$(document).on 'click', '[data-effective-datatables-reset-filters]', (event) -> window.location.reload()
