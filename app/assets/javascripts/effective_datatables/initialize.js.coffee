@@ -21,8 +21,19 @@ initializeDataTables = ->
         iDisplayLength: 25
         fnServerParams: (aoData, a, b) ->
           table = this.DataTable()
-          table.columns().flatten().each (index) ->
+          table.columns().flatten().each (index) ->  # Pass which columns are visible back to server
             aoData.push({'name': "sVisible_#{index}", 'value': table.column(index).visible()})
+
+          # If this is the very first request to the server we have to manually set any selected filter options here
+          # So that we can skip an fnFilter call in the dataTables.columnFilter that results in a double AJAX call
+          ((sEcho = data; break) if data.name == 'sEcho') for data in aoData
+          if sEcho && sEcho.value == 1
+            $.each (datatable.data('filter') || []), (index, filter) ->
+              if(filter.selected)
+                sSearch = undefined
+                ((sSearch = data; break) if data.name == "sSearch_#{index}") for data in aoData
+                sSearch.value = filter.selected if sSearch
+
         aoColumnDefs: aoColumnDefs
         aoColumns: datatable.data('widths')
         oTableTools:
@@ -44,7 +55,9 @@ initializeDataTables = ->
         init_options['dom'] = "<'row'r>t" # Just show the table
 
       # Actually initialize it
+      console.log('blah')
       datatable = datatable.dataTable(init_options)
+      console.log('initted')
 
       if filter
         datatable.columnFilter

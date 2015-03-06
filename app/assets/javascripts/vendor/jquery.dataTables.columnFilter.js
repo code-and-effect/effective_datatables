@@ -404,8 +404,11 @@
                                                 oTable.fnFilter(unescape($(this).val()), iColumn); //Issue 25
                                         fnOnFiltered();
                                 });
-                                if (currentFilter != null && currentFilter != "")//Issue 81
-                                        oTable.fnFilter(unescape(currentFilter), iColumn);
+                                // Commented out by Matt.
+                                // Removing this and hackign the fnServerParams for the first request
+                                // Prevents a double AJAX call
+                                // if (currentFilter != null && currentFilter != "")//Issue 81
+                                //         oTable.fnFilter(unescape(currentFilter), iColumn);
                         }
         }
 
