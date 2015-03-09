@@ -133,6 +133,7 @@ module Effective
   module Datatables
     class Posts < Effective::Datatable
       default_order :created_at, :desc
+      default_entries 25
 
       table_column :id, :visible => false
 
@@ -386,6 +387,17 @@ Sort the table by this field and direction on start up
 ```ruby
 default_order :created_at, :asc|:desc
 ```
+
+## default_entries
+
+The number of entries to show per page
+
+```ruby
+default_entries :all
+```
+
+Valid options are `10, 25, 50, 100, 250, 1000, :all`
+
 
 ## Additional Functionality
 

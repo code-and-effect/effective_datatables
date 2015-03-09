@@ -41,6 +41,10 @@ module Effective
         @default_order = {name => direction}
       end
 
+      def default_entries(entries)
+        @default_entries = entries
+      end
+
     end
 
     def initialize(*args)
@@ -113,6 +117,10 @@ module Effective
 
     def default_order
       self.class.instance_variable_get(:@default_order)
+    end
+
+    def default_entries
+      self.class.instance_variable_get(:@default_entries)
     end
 
     def search_terms

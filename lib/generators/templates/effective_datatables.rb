@@ -26,5 +26,7 @@ EffectiveDatatables.setup do |config|
   config.date_format = "%Y-%m-%d"
   config.datetime_format = "%Y-%m-%d %H:%M"
 
-
+  # Default number of entries shown per page
+  # Valid options are: 10, 25, 50, 100, 250, 1000, :all
+  config.default_entries = 25
 end
