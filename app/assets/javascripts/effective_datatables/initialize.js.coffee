@@ -33,6 +33,7 @@ initializeDataTables = ->
                 sSearch = undefined
                 ((sSearch = data; break) if data.name == "sSearch_#{index}") for data in aoData
                 sSearch.value = filter.selected if sSearch
+                datatable.fnSettings().aoPreSearchCols[index].sSearch = filter.selected
 
         aoColumnDefs: aoColumnDefs
         aoColumns: datatable.data('widths')
