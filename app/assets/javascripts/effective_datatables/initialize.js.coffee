@@ -13,6 +13,7 @@ initializeDataTables = ->
         bProcessing: true
         bSaveState: true
         bAutoWidth: false
+        deferLoading: datatable.data('total-entries')
         deferRender: true
         order: datatable.data('default-order')
         sAjaxSource: datatable.data('source')

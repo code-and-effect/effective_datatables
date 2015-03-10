@@ -115,11 +115,23 @@ module Effective
 
     # Wish these were protected
     def order_column_index
-      params[:iSortCol_0].to_i
+      if params[:iSortCol_0].present?
+        params[:iSortCol_0].to_i
+      elsif default_order.present?
+        table_columns[default_order.keys.first].fetch(:index, 0)
+      else
+        0
+      end
     end
 
     def order_direction
-      params[:sSortDir_0].try(:downcase) == 'desc' ? 'DESC' : 'ASC'
+      if params[:sSortDir_0].present?
+        params[:sSortDir_0].try(:downcase) == 'desc' ? 'DESC' : 'ASC'
+      elsif default_order.present?
+        default_order.values.first.to_s.downcase == 'desc' ? 'DESC' : 'ASC'
+      else
+        'ASC'
+      end
     end
 
     def default_order
@@ -136,9 +148,18 @@ module Effective
 
     def search_terms
       @search_terms ||= HashWithIndifferentAccess.new().tap do |terms|
-        table_columns.keys.each_with_index do |col, x|
-          unless (params["sVisible_#{x}"] == 'false' && table_columns[col][:filter][:when_hidden] != true)
-            terms[col] = params["sSearch_#{x}"] if params["sSearch_#{x}"].present?
+        if params[:sEcho].present?
+          table_columns.keys.each_with_index do |col, x|
+            unless (params["sVisible_#{x}"] == 'false' && table_columns[col][:filter][:when_hidden] != true)
+              terms[col] = params["sSearch_#{x}"] if params["sSearch_#{x}"].present?
+            end
+          end
+        else
+          # We are in the initial render and have to apply default search terms only
+          table_columns.each do |name, values|
+            if (values[:filter][:selected].present?) && (values[:visible] || values[:filter][:when_hidden] == true)
+              terms[name] = values[:filter][:selected]
+            end
           end
         end
       end
