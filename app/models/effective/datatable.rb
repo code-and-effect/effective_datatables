@@ -106,11 +106,11 @@ module Effective
     end
 
     def present?
-      collection.present?
+      active_record_collection? == true ? collection.unscope(:includes).present? : collection.present?
     end
 
     def empty?
-      collection.empty?
+      active_record_collection? == true ? collection.unscope(:includes).empty? : collection.empty?
     end
 
     # Wish these were protected
