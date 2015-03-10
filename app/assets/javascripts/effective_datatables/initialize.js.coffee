@@ -28,7 +28,7 @@ initializeDataTables = ->
           # If this is the very first request to the server we have to manually set any selected filter options here
           # So that we can skip an fnFilter call in the dataTables.columnFilter that results in a double AJAX call
           ((sEcho = data; break) if data.name == 'sEcho') for data in aoData
-          if sEcho && sEcho.value == 1
+          if sEcho && sEcho.value == 2
             $.each (datatable.data('filter') || []), (index, filter) ->
               if(filter.selected)
                 sSearch = undefined
