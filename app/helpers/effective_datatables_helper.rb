@@ -58,12 +58,6 @@ module EffectiveDatatablesHelper
     ].to_json()
   end
 
-  def datatable_default_entries(datatable)
-    default_entries = (datatable.default_entries.presence || EffectiveDatatables.default_entries)
-    default_entries = -1 if default_entries.to_s.downcase == 'all'
-    [10, 25, 50, 100, 250, 1000, -1].include?(default_entries) ? default_entries : 25
-  end
-
   def datatable_widths(datatable)
     datatable.table_columns.values.map { |options| {'sWidth' => options[:width]} if options[:width] }.to_json()
   end

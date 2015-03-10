@@ -127,7 +127,11 @@ module Effective
     end
 
     def default_entries
-      self.class.instance_variable_get(:@default_entries)
+      @default_entries ||= begin
+        entries = (self.class.instance_variable_get(:@default_entries).presence || EffectiveDatatables.default_entries)
+        entries = -1 if entries.to_s.downcase == 'all'
+        [10, 25, 50, 100, 250, 1000, -1].include?(entries) ? entries : 25
+      end
     end
 
     def search_terms
@@ -157,7 +161,7 @@ module Effective
       elsif length > 0
         length
       else
-        10
+        default_entries
       end
     end
 
