@@ -105,8 +105,15 @@ module Effective
       }
     end
 
-    # Wish these were protected
+    def present?
+      collection.present?
+    end
 
+    def empty?
+      collection.empty?
+    end
+
+    # Wish these were protected
     def order_column_index
       params[:iSortCol_0].to_i
     end
