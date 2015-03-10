@@ -100,7 +100,7 @@ Here we just render the datatable:
 ```erb
 <h1>All Posts</h1>
 
-<% if @datatable.collection.length == 0 %>
+<% if @datatable.empty? %>
   <p>There are no posts.</p>
 <% else %>
   <%= render_datatable(@datatable) %>
