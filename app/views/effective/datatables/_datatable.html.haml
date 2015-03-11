@@ -1,7 +1,4 @@
-- table_data = datatable.to_json()
-- table_data = {} unless table_data.kind_of?(Hash)
-
-%table.effective-datatable{:id => "#{datatable.to_param}-table", :class => ('table ' + table_class.to_s), :data => {'effective-datatables-table' => style, 'source' => effective_datatables.datatable_path(datatable, {:format => 'json'}.merge(:attributes => datatable.attributes)), 'filter' => datatable_filter(datatable, filterable), 'non-sortable' => datatable_non_sortable(datatable, sortable), 'non-visible' => datatable_non_visible(datatable), 'widths' => datatable_widths(datatable), 'default-order' => datatable_default_order(datatable), 'default-entries' => datatable.default_entries, 'total-entries' => (table_data[:iTotalRecords] || false), 'column-classes' => datatable_column_classes(datatable)}}
+%table.effective-datatable{:id => "#{datatable.to_param}-table", :class => ('table ' + table_class.to_s), :data => {'effective-datatables-table' => style, 'source' => effective_datatables.datatable_path(datatable, {:format => 'json'}.merge(:attributes => datatable.attributes)), 'filter' => datatable_filter(datatable, filterable), 'non-sortable' => datatable_non_sortable(datatable, sortable), 'non-visible' => datatable_non_visible(datatable), 'widths' => datatable_widths(datatable), 'default-order' => datatable_default_order(datatable), 'default-entries' => datatable.default_entries, 'total-entries' => (datatable.to_json[:iTotalRecords] || false), 'column-classes' => datatable_column_classes(datatable)}}
   %thead
     - max_depth = datatable.table_columns.map { |_, opts| opts[:th][:depth].to_i rescue 0 }.max
     - [*0..max_depth].each do |depth|
@@ -12,7 +9,7 @@
           - (opts[:append_th] || []).each do |faux_col|
             %th{(faux_col[:th] || {}).merge({:title => faux_col[:label]})}= faux_col[:label]
   %tbody
-    - (table_data[:aaData] || []).each do |row|
+    - (datatable.to_json[:aaData] || []).each do |row|
       %tr
         - row.each do |col|
           %td= col.to_s.html_safe

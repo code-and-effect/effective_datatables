@@ -44,7 +44,6 @@ module Effective
       def default_entries(entries)
         @default_entries = entries
       end
-
     end
 
     def initialize(*args)
@@ -86,8 +85,10 @@ module Effective
       end.each_with_index { |(_, col), index| col[:index] = index }
     end
 
-    def to_json(options = {})
-      {
+    def to_json
+      raise 'Effective::Datatable to_json called with a nil view.  Please call render_datatable(@datatable) or @datatable.view = view before this method' unless view.present?
+
+      @json ||= {
         :sEcho => params[:sEcho].to_i,
         :aaData => table_data || [],
         :iTotalRecords => (
@@ -105,12 +106,14 @@ module Effective
       }
     end
 
-    def present?
-      active_record_collection? == true ? collection.unscope(:includes).present? : collection.present?
+    def present?(view = nil)
+      self.view = view unless view.nil?
+      to_json[:iTotalDisplayRecords] > 0
     end
 
-    def empty?
-      active_record_collection? == true ? collection.unscope(:includes).empty? : collection.empty?
+    def empty?(view = nil)
+      self.view = view unless view.nil?
+      to_json[:iTotalDisplayRecords] == 0
     end
 
     # Wish these were protected
@@ -157,7 +160,7 @@ module Effective
         else
           # We are in the initial render and have to apply default search terms only
           table_columns.each do |name, values|
-            if (values[:filter][:selected].present?) && (values[:visible] || values[:filter][:when_hidden] == true)
+            if (values[:filter][:selected].present?) && (values[:visible] != false || values[:filter][:when_hidden] == true)
               terms[name] = values[:filter][:selected]
             end
           end
@@ -220,13 +223,13 @@ module Effective
       col = collection
 
       if active_record_collection?
-        self.total_records = (collection_class.connection.execute("SELECT COUNT(*) FROM (#{col.to_sql}) AS datatables_count").first['count'] rescue 1)
+        self.total_records = (collection_class.connection.execute("SELECT COUNT(*) FROM (#{col.to_sql}) AS datatables_total_count").first['count'] rescue 1)
 
         col = table_tool.order(col)
         col = table_tool.search(col)
 
         if table_tool.search_terms.present? && array_tool.search_terms.blank?
-          self.display_records = (collection_class.connection.execute("SELECT COUNT(*) FROM (#{col.to_sql}) AS datatables_count").first['count'] rescue 1)
+          self.display_records = (collection_class.connection.execute("SELECT COUNT(*) FROM (#{col.to_sql}) AS datatables_filtered_count").first['count'] rescue 1)
         end
       else
         self.total_records = col.size
