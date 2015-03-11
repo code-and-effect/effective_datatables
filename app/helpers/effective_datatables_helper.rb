@@ -1,10 +1,23 @@
 module EffectiveDatatablesHelper
-  def render_datatable(datatable, opts = {})
+  def render_datatable(datatable, opts = {}, &block)
     datatable.view = self
-    locals = {:style => :full, :filterable => true, :sortable => true, :table_class => 'table-bordered table-striped'}.merge(opts)
+
+    locals = {:style => :full, :filterable => true, :sortable => true, :table_class => 'table-bordered table-striped'}
+    locals = locals.merge(opts) if opts.kind_of?(Hash)
     locals[:table_class] = 'sorting-hidden ' + locals[:table_class].to_s if locals[:sortable] == false
 
-    render :partial => 'effective/datatables/datatable', :locals => locals.merge(:datatable => datatable)
+    # Do we have to look at empty? behaviour
+    if (block_given? || opts.kind_of?(String) || (opts.kind_of?(Hash) && opts[:empty].present?)) && datatable.empty?
+      if block_given?
+        yield; nil
+      elsif opts.kind_of?(String)
+        opts
+      elsif opts.kind_of?(Hash) && opts[:empty].present?
+        opts[:empty]
+      end
+    else
+      render :partial => 'effective/datatables/datatable', :locals => locals.merge(:datatable => datatable)
+    end
   end
 
   def render_simple_datatable(datatable, opts = {})
