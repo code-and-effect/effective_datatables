@@ -25,17 +25,6 @@ initializeDataTables = ->
           table.columns().flatten().each (index) ->  # Pass which columns are visible back to server
             aoData.push({'name': "sVisible_#{index}", 'value': table.column(index).visible()})
 
-          # If this is the very first request to the server we have to manually set any selected filter options here
-          # So that we can skip an fnFilter call in the dataTables.columnFilter that results in a double AJAX call
-          ((sEcho = data; break) if data.name == 'sEcho') for data in aoData
-          if sEcho && sEcho.value == 2
-            $.each (datatable.data('filter') || []), (index, filter) ->
-              if(filter.selected)
-                sSearch = undefined
-                ((sSearch = data; break) if data.name == "sSearch_#{index}") for data in aoData
-                sSearch.value = filter.selected if sSearch
-                datatable.fnSettings().aoPreSearchCols[index].sSearch = filter.selected
-
         aoColumnDefs: aoColumnDefs
         aoColumns: datatable.data('widths')
         oTableTools:
@@ -64,6 +53,10 @@ initializeDataTables = ->
           sPlaceHolder: 'head:after'
           aoColumns : datatable.data('filter')
           bUseColVis: true
+
+        $.each (datatable.data('filter') || []), (index, filter) ->
+          if(filter.selected)
+            datatable.fnSettings().aoPreSearchCols[index].sSearch = filter.selected
 
 $ -> initializeDataTables()
 $(document).on 'page:change', -> initializeDataTables()
