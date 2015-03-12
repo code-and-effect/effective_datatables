@@ -178,14 +178,14 @@ module Effective
     end
 
     def per_page
-      length = params[:iDisplayLength].to_i
+      length = (params[:iDisplayLength].presence || default_entries).to_i
 
       if length == -1
         9999999
       elsif length > 0
         length
       else
-        default_entries
+        25
       end
     end
 
