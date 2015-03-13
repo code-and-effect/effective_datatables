@@ -121,7 +121,7 @@ module Effective
       if params[:iSortCol_0].present?
         params[:iSortCol_0].to_i
       elsif default_order.present?
-        table_columns[default_order.keys.first].fetch(:index, 0)
+        (table_columns[default_order.keys.first.to_s] || {}).fetch(:index, 0)
       else
         0
       end
