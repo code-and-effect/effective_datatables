@@ -85,8 +85,9 @@ module EffectiveDatatablesHelper
 
   def datatables_admin_path?
     @datatables_admin_path ||= (
+      path = request.path.to_s.downcase.chomp('/') + '/'
       referer = request.referer.to_s.downcase.chomp('/') + '/'
-      (attributes[:admin_path] || referer.include?('/admin/')) rescue false
+      (attributes[:admin_path] || referer.include?('/admin/') || path.include?('/admin/')) rescue false
     )
   end
 
