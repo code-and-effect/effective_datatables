@@ -435,32 +435,8 @@ To skip rendering the datatable and instead render given content:
 
 While the 'what to render when empty' situation is handled by the above syntax, you may still check whether the datatable has records to display by calling `@datatable.empty?` and `@datatable.present?`.
 
-The gotcha with these methods is that the `@datatable.view` must first be assigned (which is done automatically by the `render_datatable` view method).
+Keep in mind, these methods look at the collection's total records, rather than the display/filtered records.
 
-This implementation is a bit awkward but has significant performance tradeoffs.
-
-To check for an empty datatable collection before it's rendered, you must manually assign a view:
-
-```ruby
-class PostsController < ApplicationController
-  def index
-    @datatable = Effective::Datatables::Posts.new()
-    @datatable.view = view_context  # built in Rails controller method refering to the view
-    @datatable.empty?
-  end
-end
-```
-
-or
-
-```ruby
-class PostsController < ApplicationController
-  def index
-    @datatable = Effective::Datatables::Posts.new()
-    @datatable.empty?(view_context)
-  end
-end
-```
 
 ### Customize Filter Behaviour
 
