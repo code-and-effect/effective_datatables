@@ -400,6 +400,9 @@ module Effective
         filter = {}
       end
 
+      # This is a fix for passing filter[:selected] == false, it needs to be 'false'
+      filter[:selected] = filter[:selected].to_s unless filter[:selected].nil?
+
       case col_type # null, number, select, number-range, date-range, checkbox, text(default)
       when :belongs_to
         {
