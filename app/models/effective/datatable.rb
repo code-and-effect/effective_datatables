@@ -91,7 +91,7 @@ module Effective
       @json ||= {
         :sEcho => (params[:sEcho] || 0),
         :aaData => (table_data || []),
-        :iTotalRecords => (total_records || 0)
+        :iTotalRecords => (total_records || 0),
         :iTotalDisplayRecords => (display_records || 0)
       }
     end
