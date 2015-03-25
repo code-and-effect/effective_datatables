@@ -199,16 +199,12 @@ module Effective
       @view.class.send(:attr_accessor, :attributes)
       @view.attributes = self.attributes
 
-      # "Copy & Paste" any additional methods defined on the datatable into the view_context
-      begin
-        methods_for_view = ''
+      # Delegate any methods defined on the datatable directly to our view
+      @view.class.send(:attr_accessor, :effective_datatable)
+      @view.effective_datatable = self
 
-        (self.class.instance_methods(false) - [:collection, :search_column]).each do |instance_method|
-          methods_for_view << self.class.instance_method(instance_method).source
-        end
-
-        @view.class.module_eval(methods_for_view)
-      rescue => e
+      (self.class.instance_methods(false) - [:collection, :search_column]).each do |view_method|
+        @view.class_eval { delegate view_method, :to => :@effective_datatable }
       end
     end
 
