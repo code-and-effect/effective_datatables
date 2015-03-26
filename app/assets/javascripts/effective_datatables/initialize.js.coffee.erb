@@ -28,7 +28,7 @@ initializeDataTables = ->
         aoColumnDefs: aoColumnDefs
         aoColumns: datatable.data('widths')
         oTableTools:
-          sSwfPath: '/assets/effective_datatables/copy_csv_xls_pdf.swf',
+          sSwfPath: "<%= asset_path('effective_datatables/copy_csv_xls_pdf.swf') %>",
           aButtons: ['csv', {'sExtends': 'xls', 'sButtonText': 'Excel'}, 'print']
         colVis:
           showAll: 'Show all'
