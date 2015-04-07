@@ -1,6 +1,6 @@
-@import 'dataTables/jquery.dataTables.css';
+@import 'dataTables/jquery.dataTables';
 @import 'dataTables/bootstrap/2/jquery.dataTables.bootstrap';
-@import 'dataTables/extras/dataTables.tableTools';
-@import 'dataTables/extras/dataTables.colVis';
+@import 'dataTables/dataTables.tableTools';
+@import 'dataTables/dataTables.colVis';
 
 @import 'effective_datatables/overrides';
