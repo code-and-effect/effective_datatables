@@ -89,10 +89,10 @@ module Effective
       raise 'Effective::Datatable to_json called with a nil view.  Please call render_datatable(@datatable) or @datatable.view = view before this method' unless view.present?
 
       @json ||= {
-        :sEcho => (params[:sEcho] || 0),
-        :aaData => (table_data || []),
-        :iTotalRecords => (total_records || 0),
-        :iTotalDisplayRecords => (display_records || 0)
+        :draw => (params[:draw] || 0),
+        :data => (table_data || []),
+        :recordsTotal => (total_records || 0),
+        :recordsFiltered => (display_records || 0)
       }
     end
 
@@ -106,8 +106,8 @@ module Effective
 
     # Wish these were protected
     def order_column_index
-      if params[:iSortCol_0].present?
-        params[:iSortCol_0].to_i
+      if params[:order].present?
+        params[:order].first[1][:column].to_i rescue 0
       elsif default_order.present?
         (table_columns[default_order.keys.first.to_s] || {}).fetch(:index, 0)
       else
@@ -116,8 +116,8 @@ module Effective
     end
 
     def order_direction
-      if params[:sSortDir_0].present?
-        params[:sSortDir_0].try(:downcase) == 'desc' ? 'DESC' : 'ASC'
+      if params[:order].present?
+        params[:order].first[1][:dir] == 'desc' ? 'DESC' : 'ASC'
       elsif default_order.present?
         default_order.values.first.to_s.downcase == 'desc' ? 'DESC' : 'ASC'
       else
@@ -166,7 +166,7 @@ module Effective
     end
 
     def per_page
-      length = (params[:iDisplayLength].presence || default_entries).to_i
+      length = (params[:length].presence || default_entries).to_i
 
       if length == -1
         9999999
@@ -178,7 +178,7 @@ module Effective
     end
 
     def page
-      params[:iDisplayStart].to_i / per_page + 1
+      params[:start].to_i / per_page + 1
     end
 
     def total_records
@@ -379,7 +379,7 @@ module Effective
     end
 
     def initialize_table_column_filter(filter, col_type, belongs_to)
-      return {:type => :null, :when_hidden => false} if filter == false
+      return {:type => :null} if filter == false
 
       if filter.kind_of?(Symbol)
         filter = {:type => filter}
@@ -396,15 +396,14 @@ module Effective
       when :belongs_to
         {
           :type => :select,
-          :when_hidden => false,
           :values => Proc.new { belongs_to[:klass].all.map { |obj| [obj.id, obj.to_s] }.sort { |x, y| x[1] <=> y[1] } }
         }.merge(filter)
       when :integer
-        {:type => :number, :when_hidden => false}.merge(filter)
+        {:type => :number}.merge(filter)
       when :boolean
-        {:type => :select, :when_hidden => false, :values => [true, false]}.merge(filter)
+        {:type => :select, :values => [true, false]}.merge(filter)
       else
-        {:type => :text, :when_hidden => false}.merge(filter)
+        {:type => :text}.merge(filter)
       end
     end
 

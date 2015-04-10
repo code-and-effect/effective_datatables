@@ -285,7 +285,6 @@ table_column :created_at, :filter => {...}    # Enable filtering with these opti
 Some additional, lesser used options include:
 
 ```ruby
-:filter => {:when_hidden => true}  # By default a hidden column's search filter will be ignored, unless this is true.  Can be used for scoping.
 :filter => {:fuzzy => true} # Will use an ILIKE/includes rather than = when filtering.  Use this for selects.
 ```
 
@@ -444,7 +443,7 @@ This gem does its best to provide "just works" filtering of both raw SQL (table_
 
 It's also very easy to override the filter behaviour on a per-column basis.
 
-Keep in mind, columns that are hidden will not be considered by the filter results unless `:filter => {:when_hidden => true}` is passed to table_column
+Keep in mind, the filter terms on hidden columns will still be considered in filter results.
 
 For custom filter behaviour, specify a `def search_column` method in the datatables model file:
 

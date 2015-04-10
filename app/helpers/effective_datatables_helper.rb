@@ -83,6 +83,10 @@ module EffectiveDatatablesHelper
     end.to_json()
   end
 
+  def datatable_column_names(datatable)
+    datatable.table_columns.values.map { |options| {:name => options[:name], :targets => options[:index] } }.to_json()
+  end
+
   def datatables_admin_path?
     @datatables_admin_path ||= (
       path = request.path.to_s.downcase.chomp('/') + '/'

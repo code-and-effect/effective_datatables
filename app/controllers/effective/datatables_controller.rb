@@ -25,10 +25,10 @@ module Effective
 
     def error_json
       {
-        :sEcho => params[:sEcho].to_i,
-        :aaData => [],
-        :iTotalRecords => 0,
-        :iTotalDisplayRecords => 0,
+        :draw => params[:draw].to_i,
+        :data => [],
+        :recordsTotal => 0,
+        :recordsFiltered => 0,
       }.to_json
     end
 
