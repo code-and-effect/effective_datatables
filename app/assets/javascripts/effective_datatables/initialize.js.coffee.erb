@@ -10,9 +10,10 @@ initializeDataTables = ->
         processing: true
         deferRender: true
         serverSide: true
-        scrollX: '800px'
+        scrollX: true
+        #scrollY: '300px'
         scrollCollapse: true
-        deferLoading: [datatable.data('display-records'), datatable.data('total-records')]
+        #deferLoading: [datatable.data('display-records'), datatable.data('total-records')]
         pagingType: 'simple_numbers'
         lengthMenu: [[10, 25, 50, 100, 250, 1000, -1], [10, 25, 50, 100, 250, 1000, 'All']]
         iDisplayLength: datatable.data('default-entries')
@@ -38,6 +39,39 @@ initializeDataTables = ->
       console.log init_options
 
       table = datatable.dataTable(init_options)
+      fixedColumns = new $.fn.dataTable.FixedColumns(table,
+       leftColumns: 2
+       rightColumns: 1
+      )
+
+#       table.oApi._fnCallbagReg()
+
+
+# dtSettings.oApi._fnCallbackReg( dtSettings, 'aoInitComplete', function () {
+#   //     console.log('calling fnConstruct init from callback');
+#   //     that._fnConstruct( init );
+#   //   }, 'FixedColumns' );
+      # fixedColumns._fnConstruct(
+      #   leftColumns: 2
+      #   drawCallback: -> console.log('drawCallback')
+      # )
+
+      #  leftColumns: 2
+      #  drawCallback: -> console.log('drawCallback')
+      #)
+      #fixedColumns._fnConstruct( init )
+
+      ## Fixed Column
+      #fixedColumns = new $.fn.dataTable.FixedColumns(table,
+      #  leftColumns: 2
+      #  drawCallback: -> console.log('drawCallback')
+      #)
+      #fixedColumns._fnConstruct( init )
+      #fixedColumns._fnConstruct(table)
+
+      #table.api().draw() doing a redraw will do an AJAX request but fixedColumns will totally work
+      #fixedColumns._fnConstruct()
+      #fixedColumns._fnClone()
 
       # aoColumnDefs = [
       #   { bSortable: false, aTargets: datatable.data('non-sortable') },

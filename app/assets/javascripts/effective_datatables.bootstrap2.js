@@ -1,6 +1,7 @@
 //= require dataTables/jquery.dataTables.min
 //= require dataTables/bootstrap/2/jquery.dataTables.bootstrap
 //= require dataTables/dataTables.colVis.min
+//= require dataTables/dataTables.fixedColumns
 //= require dataTables/dataTables.tableTools.min
 //= require dataTables/jquery.dataTables.columnFilter
 
