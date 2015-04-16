@@ -7,13 +7,15 @@ initializeDataTables = ->
         ajax:
           url: datatable.data('source'),
           type: 'GET'
+        autoWidth: false
         processing: true
         deferRender: true
         serverSide: true
-        scrollX: true
+        #scrollX: true
         #scrollY: '300px'
         scrollCollapse: true
-        #deferLoading: [datatable.data('display-records'), datatable.data('total-records')]
+        #fixedColumns won't work with deferLoading
+        deferLoading: [datatable.data('display-records'), datatable.data('total-records')]
         pagingType: 'simple_numbers'
         lengthMenu: [[10, 25, 50, 100, 250, 1000, -1], [10, 25, 50, 100, 250, 1000, 'All']]
         iDisplayLength: datatable.data('default-entries')
@@ -39,10 +41,21 @@ initializeDataTables = ->
       console.log init_options
 
       table = datatable.dataTable(init_options)
-      fixedColumns = new $.fn.dataTable.FixedColumns(table,
-       leftColumns: 2
-       rightColumns: 1
-      )
+      # fixedColumns = new $.fn.dataTable.FixedColumns(table,
+      #  leftColumns: 2
+      #  rightColumns: 1
+      # )
+
+      # # Initialize Filtering
+
+      table.find('thead').find('input').each (index, input) ->
+        $(input).on 'click', (event) -> false # Dont order columns when you click inside the input
+        $(input).on 'change', (event) =>
+          table.DataTable().column(index).search($(this).val()).draw()
+
+
+
+## JuST CRAP BELOW HERE
 
 #       table.oApi._fnCallbagReg()
 

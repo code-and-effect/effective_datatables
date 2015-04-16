@@ -1,18 +1,39 @@
 .dataTables_wrapper {   // This is the Header
   overflow: hidden;
 
-  .row {
-    margin-left: -15px;
-    margin-right: -15px;
+  table.dataTable {
+    border-collapse: collapse;
+    box-sizing: border-box;
+
+    thead th {
+      padding: 6px 18px 6px 6px;
+
+      .form-group { width: 100%; }
+      input { width: 100%; }
+    }
+
+    thead th.sorting_disabled {
+      padding: 6px 6px 6px 6px;
+    }
+
+    tbody th, tbody td, thead th, thead td {
+      border-left: none;
+      border-bottom: none;
+      white-space: nowrap;
+    }
+
+    ol,
+    ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
   }
 
-  .form-control {
-    color: #646464;
-    border: 1px solid #bcbcbc;
-
-    &:focus {
-      box-shadow: none;
-      border-color: #03428d;
+  table.dataTable.sorting-hidden {
+    thead {
+      .sorting_asc { background: none; cursor: default; }
+      .sorting_desc { background: none; cursor: default; }
+      .sorting { cursor: default; }
     }
   }
 
@@ -35,43 +56,6 @@
       color: #fff;
       background: #03428d !important;
     }
-  }
-
-  .dataTables_length,
-  .dataTables_filter,
-  .dataTables_info,
-  .dataTables_processing,
-  .dataTables_paginate {
-    color: #646464;
-  }
-
-  table.dataTable.sorting-hidden {
-    thead {
-      .sorting_asc { background: none; cursor: default; }
-      .sorting_desc { background: none; cursor: default; }
-      .sorting { cursor: default; }
-
-      tr, th {
-        padding-left: 8px;
-        padding-right: 8px;
-      }
-    }
-  }
-
-  table.dataTable {
-    border-collapse: collapse;
-    box-sizing: border-box;
-
-    .form-inline, .form-control { width: 100%; }
-    thead, tr, th { padding-left: 6px; }
-
-    tbody th, tbody td, thead th, thead td {
-      border-left: none;
-      border-bottom: none;
-      white-space: nowrap;
-    }
-
-    thead th { border-top: none; }
   }
 
   .dataTables_processing {
@@ -99,17 +83,6 @@
         }
       }
     }
-  }
-
-  ol,
-  ul {
-    list-style-type: none;
-    padding-left: 0;
-  }
-
-  .DTTT_container {
-    float: right;
-    margin-right: -3px;
   }
 
   table.dataTable thead .sorting { background: url(<%= asset_data_uri('dataTables/sort_both.png') %>) no-repeat center right; }

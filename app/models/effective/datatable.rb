@@ -22,6 +22,7 @@ module Effective
         end
         raise "You cannot use both :partial => '' and proc => ..." if options[:partial] && options[:proc]
 
+        send(:attr_accessor, name)
         (@table_columns ||= HashWithIndifferentAccess.new())[name] = options
       end
 
@@ -44,16 +45,22 @@ module Effective
       def default_entries(entries)
         @default_entries = entries
       end
+
+      def model_name # Searching & Filters
+        ActiveModel::Name.new(Effective::Datatable)
+      end
     end
 
+    def to_key; []; end # Searching & Filters
+
     def initialize(*args)
+      unless active_record_collection? || (collection.kind_of?(Array) && collection.first.kind_of?(Array))
+        raise "Unsupported collection type. Should be ActiveRecord class, ActiveRecord relation, or an Array of Arrays [[1, 'something'], [2, 'something else']]"
+      end
+
       if args.present?
         raise 'Effective::Datatable.new() can only be called with a Hash like arguments' unless args.first.kind_of?(Hash)
         args.first.each { |k, v| self.attributes[k] = v }
-      end
-
-      unless active_record_collection? || (collection.kind_of?(Array) && collection.first.kind_of?(Array))
-        raise "Unsupported collection type. Should be ActiveRecord class, ActiveRecord relation, or an Array of Arrays [[1, 'something'], [2, 'something else']]"
       end
     end
 
@@ -137,20 +144,21 @@ module Effective
       end
     end
 
+    # returns {:name => 'term'}
     def search_terms
       @search_terms ||= HashWithIndifferentAccess.new().tap do |terms|
-        if params[:sEcho].present?
-          table_columns.keys.each_with_index do |col, x|
-            unless (params["sVisible_#{x}"] == 'false' && table_columns[col][:filter][:when_hidden] != true)
-              terms[col] = params["sSearch_#{x}"] if params["sSearch_#{x}"].present?
-            end
+        if params[:draw].present? # This is an AJAX request from the DataTable
+          (params[:columns] || {}).each do |_, column|
+            next if table_columns[column[:name]].blank?
+            next if (column[:search] || {})[:value].blank?
+
+            terms[column[:name]] = column[:search][:value]
           end
-        else
-          # We are in the initial render and have to apply default search terms only
+        else # This is the initial render, and we have to apply default search terms only
           table_columns.each do |name, values|
-            if (values[:filter][:selected].present?) && (values[:visible] != false || values[:filter][:when_hidden] == true)
-              terms[name] = values[:filter][:selected]
-            end
+            next if values[:filter][:selected].blank?
+
+            terms[name] = values[:filter][:selected]
           end
         end
       end
@@ -207,6 +215,7 @@ module Effective
         @view.class_eval { delegate view_method, :to => :@effective_datatable }
       end
     end
+
 
     protected
 
