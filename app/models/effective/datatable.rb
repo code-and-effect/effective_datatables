@@ -341,7 +341,11 @@ module Effective
     end
 
     def active_record_collection?
-      @active_record_collection ||= (collection.ancestors.include?(ActiveRecord::Base) rescue false)
+      if @active_record_collection.nil?
+        @active_record_collection = (collection.ancestors.include?(ActiveRecord::Base) rescue false)
+      else
+        @active_record_collection
+      end
     end
 
     def table_columns_with_defaults
