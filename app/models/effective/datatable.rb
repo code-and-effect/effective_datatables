@@ -413,29 +413,35 @@ module Effective
       return {:type => :null} if filter == false
 
       if filter.kind_of?(Symbol)
-        filter = {:type => filter}
+        filter = HashWithIndifferentAccess.new(:type => filter)
       elsif filter.kind_of?(String)
-        filter = {:type => filter.to_sym}
+        filter = HashWithIndifferentAccess.new(:type => filter.to_sym)
       elsif filter.kind_of?(Hash) == false
-        filter = {}
+        filter = HashWithIndifferentAccess.new()
       end
 
       # This is a fix for passing filter[:selected] == false, it needs to be 'false'
       filter[:selected] = filter[:selected].to_s unless filter[:selected].nil?
 
-      case col_type # null, number, select, number-range, date-range, checkbox, text(default)
+      filter = case col_type
       when :belongs_to
-        {
+        HashWithIndifferentAccess.new(
           :type => :select,
           :values => Proc.new { belongs_to[:klass].all.map { |obj| [obj.to_s, obj.id] }.sort { |x, y| x[1] <=> y[1] } }
-        }.merge(filter)
+        ).merge(filter)
       when :integer
-        {:type => :number}.merge(filter)
+        HashWithIndifferentAccess.new(:type => :number).merge(filter)
       when :boolean
-        {:type => :boolean, :values => [true, false]}.merge(filter)
+        HashWithIndifferentAccess.new(:type => :boolean, :values => [true, false]).merge(filter)
       else
-        {:type => :string}.merge(filter)
+        HashWithIndifferentAccess.new(:type => :string).merge(filter)
       end
+
+      if filter[:type] == :boolean
+        filter = HashWithIndifferentAccess.new(:values => [true, false]).merge(filter)
+      end
+
+      filter
     end
 
   end
