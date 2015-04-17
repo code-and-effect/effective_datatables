@@ -115,19 +115,19 @@ module Effective
       total_records.to_i == 0
     end
 
-    # Wish these were protected
-    def order_column_index
-      if params[:order].present?
-        params[:order].first[1][:column].to_i rescue 0
-      elsif default_order.present?
-        (table_columns[default_order.keys.first.to_s] || {}).fetch(:index, 0)
-      else
-        0
+    def order_name
+      @order_name ||= begin
+        if params[:order] && params[:columns]
+          order_column_index = (params[:order].first[1][:column] rescue '0')
+          (params[:columns][order_column_index] || {})[:name]
+        elsif default_order.present?
+          default_order.keys.first
+        end || table_columns.keys.first
       end
     end
 
     def order_direction
-      if params[:order].present?
+      @order_direction ||= if params[:order].present?
         params[:order].first[1][:dir] == 'desc' ? 'DESC' : 'ASC'
       elsif default_order.present?
         default_order.values.first.to_s.downcase == 'desc' ? 'DESC' : 'ASC'
@@ -217,6 +217,8 @@ module Effective
 
       # Clear the search_terms memoization
       @search_terms = nil
+      @order_name = nil
+      @order_direction = nil
     end
 
 

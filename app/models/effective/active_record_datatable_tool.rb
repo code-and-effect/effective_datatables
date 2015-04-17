@@ -2,19 +2,19 @@ module Effective
   class ActiveRecordDatatableTool
     attr_accessor :table_columns
 
-    delegate :order_column_index, :order_direction, :page, :per_page, :search_column, :to => :@datatable
+    delegate :order_name, :order_direction, :page, :per_page, :search_column, :to => :@datatable
 
     def initialize(datatable, table_columns)
       @datatable = datatable
       @table_columns = table_columns
     end
 
-    def order_column
-      @order_column ||= table_columns.find { |_, values| values[:index] == order_column_index }.try(:second) # This pulls out the values
-    end
-
     def search_terms
       @search_terms ||= @datatable.search_terms.select { |name, search_term| table_columns.key?(name) }
+    end
+
+    def order_column
+      @order_column ||= table_columns.find { |_, values| values[:name] == order_name }.try(:second) # This pulls out the values
     end
 
     def order(collection)
