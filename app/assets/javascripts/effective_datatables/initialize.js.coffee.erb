@@ -4,9 +4,7 @@ initializeDataTables = ->
       datatable = $(this)
 
       init_options =
-        ajax:
-          url: datatable.data('source'),
-          type: 'GET'
+        ajax: { url: datatable.data('source'), type: 'GET' }
         autoWidth: false
         processing: true
         deferRender: true
@@ -28,6 +26,7 @@ initializeDataTables = ->
           showAll: 'Show all'
           restore: 'Show default'
           activate: 'click'
+          label: (index, title, th) -> $(th).prop('title')
         tableTools:
           sSwfPath: "<%= asset_path('effective_datatables/copy_csv_xls_pdf.swf') %>",
           aButtons: ['csv', {'sExtends': 'xls', 'sButtonText': 'Excel'}, 'print']
@@ -37,22 +36,30 @@ initializeDataTables = ->
         init_options['lengthMenu'] = [-1] # Show all results
         init_options['dom'] = "<'row'r>t" # Just show the table
 
+      # Initialize Filtering
+      dataTableSearch = (event) ->
+        obj = $(event.currentTarget)
+        dataTable = obj.closest('table.dataTable').DataTable()
+        dataTable.column(obj.data('index') || 0).search(obj.val()).draw()
+
+      datatable.find('thead').find('input,select').each (index, input) ->
+        $input = $(input)
+        $input.on 'click', (event) -> false # Dont order columns when you click inside the input
+
+        if $input.is('select')
+          $input.on 'change', (event) -> dataTableSearch(event)
+        else if $input.is('input')
+          $input.keyup($.debounce(300, dataTableSearch))
+
+      # Let's actually initialize the table now
       console.log "OPTIONS"
       console.log init_options
-
       table = datatable.dataTable(init_options)
+
       # fixedColumns = new $.fn.dataTable.FixedColumns(table,
       #  leftColumns: 2
       #  rightColumns: 1
       # )
-
-      # # Initialize Filtering
-
-      table.find('thead').find('input').each (index, input) ->
-        $(input).on 'click', (event) -> false # Dont order columns when you click inside the input
-        $(input).on 'change', (event) =>
-          table.DataTable().column(index).search($(this).val()).draw()
-
 
 
 ## JuST CRAP BELOW HERE

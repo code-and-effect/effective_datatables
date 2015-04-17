@@ -3,7 +3,7 @@
 //= require dataTables/dataTables.colVis.min
 //= require dataTables/dataTables.fixedColumns
 //= require dataTables/dataTables.tableTools.min
-//= require dataTables/jquery.dataTables.columnFilter
+//= require vendor/jquery.debounce.min
 
 //= require_tree ./effective_datatables
 

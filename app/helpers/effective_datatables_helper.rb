@@ -28,6 +28,28 @@ module EffectiveDatatablesHelper
     render :partial => 'effective/datatables/datatable', :locals => locals.merge(:datatable => datatable)
   end
 
+  def render_datatable_header_cell(form, name, opts)
+    case opts[:filter][:type]
+    when :string, :text, :number
+      form.input name, :label => false, :required => false,
+        :input_html => {
+          :autocomplete => 'off',
+          :data => {:index => opts[:index]}
+        },
+        :as => :string, :placeholder => (opts[:label] || name)
+    when :select, :boolean
+      form.input name, :label => false, :required => false,
+        :input_html => {
+          :autocomplete => 'off',
+          :data => {:index => opts[:index]}
+        },
+        :as => :select, :collection => opts[:filter][:values], :include_blank => (opts[:label] || name.titleize)
+    else
+      content_tag(:p, opts[:label] || name)
+    end
+
+  end
+
   def datatable_filter(datatable, filterable = true)
     return false unless filterable
 

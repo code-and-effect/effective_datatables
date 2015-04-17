@@ -62,6 +62,9 @@ module Effective
         raise 'Effective::Datatable.new() can only be called with a Hash like arguments' unless args.first.kind_of?(Hash)
         args.first.each { |k, v| self.attributes[k] = v }
       end
+
+      # Any pre-selected search terms should be assigned now
+      search_terms.each { |column, term| self.send("#{column}=", term) }
     end
 
     # Any attributes set on initialize will be echoed back and available to the class
@@ -144,21 +147,17 @@ module Effective
       end
     end
 
-    # returns {:name => 'term'}
     def search_terms
       @search_terms ||= HashWithIndifferentAccess.new().tap do |terms|
         if params[:draw].present? # This is an AJAX request from the DataTable
           (params[:columns] || {}).each do |_, column|
-            next if table_columns[column[:name]].blank?
-            next if (column[:search] || {})[:value].blank?
+            next if table_columns[column[:name]].blank? || (column[:search] || {})[:value].blank?
 
             terms[column[:name]] = column[:search][:value]
           end
         else # This is the initial render, and we have to apply default search terms only
           table_columns.each do |name, values|
-            next if values[:filter][:selected].blank?
-
-            terms[name] = values[:filter][:selected]
+            terms[name] = values[:filter][:selected] if values[:filter][:selected].present?
           end
         end
       end
@@ -214,6 +213,9 @@ module Effective
       (self.class.instance_methods(false) - [:collection, :search_column]).each do |view_method|
         @view.class_eval { delegate view_method, :to => :@effective_datatable }
       end
+
+      # Clear the search_terms memoization
+      @search_terms = nil
     end
 
 
@@ -405,14 +407,14 @@ module Effective
       when :belongs_to
         {
           :type => :select,
-          :values => Proc.new { belongs_to[:klass].all.map { |obj| [obj.id, obj.to_s] }.sort { |x, y| x[1] <=> y[1] } }
+          :values => Proc.new { belongs_to[:klass].all.map { |obj| [obj.to_s, obj.id] }.sort { |x, y| x[1] <=> y[1] } }
         }.merge(filter)
       when :integer
         {:type => :number}.merge(filter)
       when :boolean
-        {:type => :select, :values => [true, false]}.merge(filter)
+        {:type => :boolean, :values => [true, false]}.merge(filter)
       else
-        {:type => :text}.merge(filter)
+        {:type => :string}.merge(filter)
       end
     end
 
