@@ -1,5 +1,6 @@
 //= require dataTables/jquery.dataTables.min
 //= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
+//= require dataTables/dataTables.colReorder.min
 //= require dataTables/dataTables.colVis.min
 //= require dataTables/dataTables.fixedColumns
 //= require dataTables/dataTables.tableTools.min
