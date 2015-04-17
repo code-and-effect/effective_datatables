@@ -42,7 +42,7 @@ initializeDataTables = ->
 
         if table.parent().hasClass('dataTables_scrollHeadInner') # ScrollX support
           table = table.closest('.dataTables_scroll').children('.dataTables_scrollBody').children('table.dataTable')
-        table.DataTable().column(obj.data('index') || 0).search(obj.val()).draw()
+        table.DataTable().column("#{obj.data('column-name')}:name").search(obj.val()).draw()
 
       # For every existing Input, Set up the search events
       (search_inputs = datatable.find('thead').first().find('input,select')).each (index, input) ->
@@ -61,7 +61,7 @@ initializeDataTables = ->
       # Assign PreSearch columns
       search_inputs.each (index, input) =>
         $input = $(input)
-        table.fnSettings().aoPreSearchCols[$input.data('index')].sSearch = $input.val() if $input.val()
+        table.fnSettings().aoPreSearchCols[$input.data('column-index')].sSearch = $input.val() if $input.val()
 
       # fixedColumns = new $.fn.dataTable.FixedColumns(table,
       #  leftColumns: 2

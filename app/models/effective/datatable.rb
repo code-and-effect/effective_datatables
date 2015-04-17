@@ -96,6 +96,19 @@ module Effective
       end.each_with_index { |(_, col), index| col[:index] = index }
     end
 
+    # This is for the ColReorder plugin
+    # It sends us a list of columns that are different than our table_columns order
+    # So this method just returns an array of column names, as per ColReorder
+    def display_table_columns
+      if params[:columns].present?
+        HashWithIndifferentAccess.new().tap do |display_columns|
+          params[:columns].each do |_, values|
+            display_columns[values[:name]] = table_columns[values[:name]]
+          end
+        end
+      end
+    end
+
     def to_json
       raise 'Effective::Datatable to_json called with a nil view.  Please call render_datatable(@datatable) or @datatable.view = view before this method' unless view.present?
 
@@ -150,7 +163,7 @@ module Effective
 
     def search_terms
       @search_terms ||= HashWithIndifferentAccess.new().tap do |terms|
-        if params[:draw].present? # This is an AJAX request from the DataTable
+        if params[:columns].present? # This is an AJAX request from the DataTable
           (params[:columns] || {}).each do |_, column|
             next if table_columns[column[:name]].blank? || (column[:search] || {})[:value].blank?
 
@@ -281,7 +294,7 @@ module Effective
       end
 
       collection.each_with_index.map do |obj, index|
-        table_columns.map do |name, opts|
+        (display_table_columns || table_columns).map do |name, opts|
           value = if opts[:partial]
             rendered[name][index]
           elsif opts[:block]

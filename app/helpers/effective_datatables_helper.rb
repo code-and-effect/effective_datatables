@@ -34,7 +34,7 @@ module EffectiveDatatablesHelper
       form.input name, :label => false, :required => false,
         :input_html => {
           :autocomplete => 'off',
-          :data => {:index => opts[:index]}
+          :data => {'column-name' => opts[:name], 'column-index' => opts[:index]}
         },
         :as => :string, :placeholder => (opts[:label] || name)
     when :select, :boolean
@@ -49,7 +49,7 @@ module EffectiveDatatablesHelper
       form.input name, :label => false, :required => false,
         :input_html => {
           :autocomplete => 'off',
-          :data => {:index => opts[:index]}
+          :data => {'column-name' => opts[:name], 'column-index' => opts[:index]}
         },
         :as => :select, :collection => opts[:filter][:values], :include_blank => (opts[:label] || name.titleize)
     else
