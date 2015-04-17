@@ -51,7 +51,6 @@ module Effective
       end
     end
 
-    def to_key; []; end # Searching & Filters
 
     def initialize(*args)
       unless active_record_collection? || (collection.kind_of?(Array) && collection.first.kind_of?(Array))
@@ -71,6 +70,8 @@ module Effective
     def attributes
       @attributes ||= HashWithIndifferentAccess.new()
     end
+
+    def to_key; []; end # Searching & Filters
 
     def to_param
       self.class.name.underscore.parameterize

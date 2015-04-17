@@ -38,6 +38,14 @@ module EffectiveDatatablesHelper
         },
         :as => :string, :placeholder => (opts[:label] || name)
     when :select, :boolean
+      if opts[:filter][:values].respond_to?(:call)
+        opts[:filter][:values] = opts[:filter][:values].call()
+
+        if opts[:filter][:values].kind_of?(ActiveRecord::Relation) || (opts[:filter][:values].kind_of?(Array) && opts[:filter][:values].first.kind_of?(ActiveRecord::Base))
+          opts[:filter][:values] = opts[:filter][:values].map { |obj| [obj.to_s, obj.id] }
+        end
+      end
+
       form.input name, :label => false, :required => false,
         :input_html => {
           :autocomplete => 'off',
@@ -48,25 +56,6 @@ module EffectiveDatatablesHelper
       content_tag(:p, opts[:label] || name)
     end
 
-  end
-
-  def datatable_filter(datatable, filterable = true)
-    return false unless filterable
-
-    filters = datatable.table_columns.values.map { |options, _| options[:filter] || {:type => 'null'} }
-
-    # Process any Procs
-    filters.each do |filter|
-      if filter[:values].respond_to?(:call)
-        filter[:values] = filter[:values].call()
-
-        if filter[:values].kind_of?(ActiveRecord::Relation) || (filter[:values].kind_of?(Array) && filter[:values].first.kind_of?(ActiveRecord::Base))
-          filter[:values] = filter[:values].map { |obj| [obj.id, obj.to_s] }
-        end
-      end
-    end
-
-    filters.to_json()
   end
 
   def datatable_non_sortable(datatable, sortable = true)

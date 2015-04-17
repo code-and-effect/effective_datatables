@@ -9,7 +9,7 @@ initializeDataTables = ->
         processing: true
         deferRender: true
         serverSide: true
-        #scrollX: true
+        #scrollX: true   # Searching doesnt work with ScrollX right now
         #scrollY: '300px'
         scrollCollapse: true
         #fixedColumns won't work with deferLoading
@@ -42,7 +42,9 @@ initializeDataTables = ->
         dataTable = obj.closest('table.dataTable').DataTable()
         dataTable.column(obj.data('index') || 0).search(obj.val()).draw()
 
-      datatable.find('thead').find('input,select').each (index, input) ->
+      search_inputs = datatable.find('thead').first().find('input,select')
+
+      search_inputs.each (index, input) ->
         $input = $(input)
         $input.on 'click', (event) -> false # Dont order columns when you click inside the input
 
@@ -56,10 +58,17 @@ initializeDataTables = ->
       console.log init_options
       table = datatable.dataTable(init_options)
 
+      # Assign PreSearch columns
+      search_inputs.each (index, input) =>
+        $input = $(input)
+        if $input.val()
+          table.fnSettings().aoPreSearchCols[$input.data('index')].sSearch = $input.val()
+
       # fixedColumns = new $.fn.dataTable.FixedColumns(table,
       #  leftColumns: 2
       #  rightColumns: 1
       # )
+
 
 
 ## JuST CRAP BELOW HERE

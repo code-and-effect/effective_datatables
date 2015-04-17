@@ -5,7 +5,6 @@
     :data => {
       'effective-datatables-table' => style,
       'source' => effective_datatables.datatable_path(datatable, {:format => 'json'}.merge(:attributes => datatable.attributes)).chomp('?'),
-      'filter' => datatable_filter(datatable, filterable),
       'column-names' => datatable_column_names(datatable),
       'non-sortable' => datatable_non_sortable(datatable, sortable),
       'non-visible' => datatable_non_visible(datatable),
