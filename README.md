@@ -568,12 +568,13 @@ module Effective
 
       def collection
         [
-          [1, 'Matthew', 'Riemer', 'matthew@agilestyle.com'],
-          [2, 'Dallas', 'Meidinger', 'dallas@agilestyle.com'],
-          [3, 'Warren', 'Uhrich', 'warren@agilestyle.com'],
+          [1, 'Dana', 'Janssen', 'dana@agilestyle.com'],
+          [2, 'Ashley', 'Janssen', 'ashley@agilestyle.com'],
+          [3, 'Matthew', 'Riemer', 'matthew@agilestyle.com'],
           [4, 'Stephen', 'Brown', 'stephen@agilestyle.com'],
-          [5, 'Dana', 'Janssen', 'dana@agilestyle.com'],
-          [6, 'Ashley', 'Janssen', 'ashley@agilestyle.com'],
+          [5, 'Warren', 'Uhrich', 'warren@agilestyle.com'],
+          [6, 'Dallas', 'Meidinger', 'dallas@agilestyle.com'],
+          [7, 'Nathan', 'Feaver', 'nathan@agilestyle.com']
         ]
       end
 
