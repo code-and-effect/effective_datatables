@@ -23,7 +23,7 @@
 
 %table.effective-datatable{effective_datatable_params}
   %thead
-    = simple_form_for datatable, :url => '#' do |f|
+    = simple_form_for datatable, :url => '#', :html => {:id => "#{datatable.to_param}-form" } do |f|
       - max_depth = datatable.table_columns.map { |_, opts| opts[:th][:depth].to_i rescue 0 }.max
       - [*0..max_depth].each do |depth|
         %tr
