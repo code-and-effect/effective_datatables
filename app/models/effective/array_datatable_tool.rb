@@ -15,7 +15,7 @@ module Effective
     end
 
     def order_column
-      @order_column ||= table_columns.find { |_, values| values[:name] == order_name }.try(:second) # This pulls out the values
+      @order_column ||= table_columns[order_name]
     end
 
     def order(collection)
