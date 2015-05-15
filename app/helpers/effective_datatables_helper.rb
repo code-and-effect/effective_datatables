@@ -1,34 +1,21 @@
 module EffectiveDatatablesHelper
   def render_datatable(datatable, opts = {}, &block)
     datatable.view = self
-
-    locals = {:style => :full, :filterable => true, :sortable => true, :table_class => 'table-bordered table-striped'}
-    locals = locals.merge(opts) if opts.kind_of?(Hash)
-    locals[:table_class] = 'sorting-hidden ' + locals[:table_class].to_s if locals[:sortable] == false
-
-    # Do we have to look at empty? behaviour
-    if (block_given? || opts.kind_of?(String) || (opts.kind_of?(Hash) && opts[:empty].present?)) && datatable.empty?
-      if block_given?
-        yield; nil
-      elsif opts.kind_of?(String)
-        opts
-      elsif opts.kind_of?(Hash) && opts[:empty].present?
-        opts[:empty]
-      end
-    else
-      render :partial => 'effective/datatables/datatable', :locals => locals.merge(:datatable => datatable)
-    end
-  end
-
-  def render_simple_datatable(datatable, opts = {})
-    datatable.view = self
-    locals = {:style => :simple, :filterable => false, :sortable => false, :table_class => ''}.merge(opts)
-    locals[:table_class] = 'sorting-hidden ' + locals[:table_class].to_s if locals[:sortable] == false
+    locals = {:style => :full, :filterable => true, :sortable => true, :table_class => 'table-bordered table-striped'}.merge(opts)
 
     render :partial => 'effective/datatables/datatable', :locals => locals.merge(:datatable => datatable)
   end
 
-  def render_datatable_header_cell(form, name, opts)
+  def render_simple_datatable(datatable, opts = {})
+    datatable.view = self
+    locals = {:style => :simple, :filterable => false, :sortable => false, :table_class => 'table-bordered table-striped sorting-hidden'}.merge(opts)
+
+    render :partial => 'effective/datatables/datatable', :locals => locals.merge(:datatable => datatable)
+  end
+
+  def render_datatable_header_cell(form, name, opts, filterable = true)
+    return content_tag(:p, opts[:label] || name) if filterable == false
+
     case opts[:filter][:type]
     when :string, :text, :number
       form.input name, :label => false, :required => false,

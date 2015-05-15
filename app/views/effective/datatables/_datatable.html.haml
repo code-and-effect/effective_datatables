@@ -30,7 +30,7 @@
           - table_columns = datatable.table_columns.select { |_, opts| (opts[:th][:depth] || 0 rescue 0) == depth }
           - table_columns.each do |name, opts|
             %th{(opts[:th] || {}).merge({:title => opts[:label] || name})}
-              = render_datatable_header_cell(f, name, opts)
+              = render_datatable_header_cell(f, name, opts, filterable)
             - (opts[:append_th] || []).each do |faux_col|
               %th{(faux_col[:th] || {}).merge({:title => faux_col[:label]})}
                 = faux_col[:label]
