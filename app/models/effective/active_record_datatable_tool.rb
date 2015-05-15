@@ -20,7 +20,7 @@ module Effective
     def order(collection)
       return collection if order_column.blank?
 
-      if [:string, :text].include?(order_column[:type])
+      if [:string, :text].include?(order_column[:type]) && order_column[:sql_as_column] != true
         collection.order("COALESCE(#{order_column[:column]}, '') #{order_direction}")
       else
         collection.order("#{order_column[:column]} #{order_direction} NULLS #{order_direction == 'ASC' ? 'LAST' : 'FIRST'}")
