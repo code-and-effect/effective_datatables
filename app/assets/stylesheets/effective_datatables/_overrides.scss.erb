@@ -10,7 +10,7 @@
       vertical-align: middle;
 
       .form-group { width: 100%; }
-      input { width: 100%; }
+      input,select { width: 100%; }
       p { margin: 0px; }
     }
 
@@ -61,7 +61,7 @@
   }
 
   .dataTables_processing {
-    height: 60px;
+    top: 10px;
   }
 
   .dataTables_paginate {
@@ -91,6 +91,8 @@
   table.dataTable thead .sorting_asc { background: url(<%= asset_data_uri('dataTables/sort_asc.png') %>) no-repeat center right; }
   table.dataTable thead .sorting_desc { background: url(<%= asset_data_uri('dataTables/sort_desc.png') %>) no-repeat center right; }
 }
+
+table.dataTable.no-footer { border-bottom: 1px solid #ddd; }
 
 ul.ColVis_collection {
   width: 240px;

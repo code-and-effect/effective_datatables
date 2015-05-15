@@ -21,9 +21,9 @@
     }
   }
 
-%table.effective-datatable{effective_datatable_params}
-  %thead
-    = simple_form_for datatable, :url => '#', :html => {:id => "#{datatable.to_param}-form" } do |f|
+= simple_form_for datatable, :url => '#', :html => {:id => "#{datatable.to_param}-form" } do |f|
+  %table.effective-datatable{effective_datatable_params}
+    %thead
       - max_depth = datatable.table_columns.map { |_, opts| opts[:th][:depth].to_i rescue 0 }.max
       - [*0..max_depth].each do |depth|
         %tr
@@ -34,8 +34,8 @@
             - (opts[:append_th] || []).each do |faux_col|
               %th{(faux_col[:th] || {}).merge({:title => faux_col[:label]})}
                 = faux_col[:label]
-  %tbody
-    - (datatable.to_json[:data] || []).each do |row|
-      %tr
-        - row.each do |col|
-          %td= col.to_s.html_safe
+    %tbody
+      - (datatable.to_json[:data] || []).each do |row|
+        %tr
+          - row.each do |col|
+            %td= col.to_s.html_safe
