@@ -401,6 +401,10 @@ module Effective
           cols[name][:type] = :obfuscated_id
         end
 
+        if sql_table.present? && sql_column.blank? # This is a SELECT AS column
+          cols[name][:sql_as_column] = true
+        end
+
         cols[name][:filter] = initialize_table_column_filter(cols[name][:filter], cols[name][:type], belong_tos[name])
 
         if cols[name][:partial]

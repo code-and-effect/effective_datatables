@@ -18,12 +18,8 @@ module EffectiveDatatablesHelper
 
     case opts[:filter][:type]
     when :string, :text, :number
-      form.input name, :label => false, :required => false,
-        :input_html => {
-          :autocomplete => 'off',
-          :data => {'column-name' => opts[:name], 'column-index' => opts[:index]}
-        },
-        :as => :string, :placeholder => (opts[:label] || name)
+      form.input name, :label => false, :required => false, :as => :string, :placeholder => (opts[:label] || name),
+        :input_html => { :autocomplete => 'off', :data => {'column-name' => opts[:name], 'column-index' => opts[:index]} }
     when :select, :boolean
       if opts[:filter][:values].respond_to?(:call)
         opts[:filter][:values] = opts[:filter][:values].call()
@@ -33,16 +29,11 @@ module EffectiveDatatablesHelper
         end
       end
 
-      form.input name, :label => false, :required => false,
-        :input_html => {
-          :autocomplete => 'off',
-          :data => {'column-name' => opts[:name], 'column-index' => opts[:index]}
-        },
-        :as => :select, :collection => opts[:filter][:values], :include_blank => (opts[:label] || name.titleize)
+      form.input name, :label => false, :required => false, :as => :select, :collection => opts[:filter][:values], :include_blank => (opts[:label] || name.titleize),
+        :input_html => { :autocomplete => 'off', :data => {'column-name' => opts[:name], 'column-index' => opts[:index]} }
     else
       content_tag(:p, opts[:label] || name)
     end
-
   end
 
   def datatable_non_sortable(datatable, sortable = true)
