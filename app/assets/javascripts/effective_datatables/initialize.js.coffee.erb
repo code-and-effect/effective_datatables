@@ -23,6 +23,7 @@ initializeDataTables = ->
           showAll: 'Show all'
           restore: 'Show default'
           activate: 'click'
+          align: 'right'
           label: (index, title, th) -> $(th).prop('title')
         tableTools:
           sSwfPath: "<%= asset_path('effective_datatables/copy_csv_xls_pdf.swf') %>",

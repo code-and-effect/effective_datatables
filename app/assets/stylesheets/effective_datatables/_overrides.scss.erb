@@ -92,10 +92,29 @@
   table.dataTable thead .sorting_desc { background: url(<%= asset_data_uri('dataTables/sort_desc.png') %>) no-repeat center right; }
 }
 
+table.dataTable.DTCR_clonedTable { max-width: 200px !important; }
 table.dataTable.no-footer { border-bottom: 1px solid #ddd; }
 
 ul.ColVis_collection {
-  width: 240px;
+  width: 420px;
+  margin-left: 148px;
+
+  li {
+    width: 195px;
+  }
+
+  li.ColVis_Special.ColVis_Restore {
+    clear: both;
+  }
+
+  li:nth-child(odd) {
+    float: left;
+  }
+
+  li:nth-child(even) {
+    float: right;
+  }
+
 }
 
 div.DTTT_print_info {
