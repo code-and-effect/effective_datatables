@@ -374,7 +374,7 @@ module Effective
       belong_tos = (collection.ancestors.first.reflect_on_all_associations(:belongs_to) rescue []).inject(HashWithIndifferentAccess.new()) do |retval, bt|
         unless bt.options[:polymorphic]
           begin
-            klass = bt.klass || bt.foreign_type.gsub('_type', '').classify.constantize
+            klass = bt.klass || bt.foreign_type.sub('_type', '').classify.constantize
           rescue => e
             klass = nil
           end
