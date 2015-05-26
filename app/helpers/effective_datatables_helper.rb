@@ -8,6 +8,7 @@ module EffectiveDatatablesHelper
 
   def render_simple_datatable(datatable, opts = {})
     datatable.view = self
+    datatable.per_page = :all
     locals = {:style => :simple, :filterable => false, :sortable => false, :table_class => 'table-bordered table-striped sorting-hidden'}.merge(opts)
 
     render :partial => 'effective/datatables/datatable', :locals => locals.merge(:datatable => datatable)

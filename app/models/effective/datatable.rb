@@ -198,6 +198,15 @@ module Effective
       end
     end
 
+    def per_page=(length)
+      case length
+      when Integer
+        params[:length] = length
+      when :all
+        params[:length] = -1
+      end
+    end
+
     def page
       params[:start].to_i / per_page + 1
     end
