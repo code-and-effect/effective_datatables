@@ -1,6 +1,10 @@
 .dataTables_wrapper {   // This is the Header
   overflow: hidden;
 
+  .scroll_wrapper {
+    overflow-x: auto;
+  }
+
   table.dataTable {
     border-collapse: collapse;
     box-sizing: border-box;
@@ -39,12 +43,21 @@
     }
   }
 
+  .dataTables_length,.DTTT_container,.ColVis {
+    float: right;
+    display: inline-block;
+    margin: 0px 0px 0px 2px;
+
+    label { float: none; }
+  }
+
   .DTTT_button,
   .ColVis_Button {
     color: #00a6ff !important;
     border: 1px solid #e0eeff;
     background: #fff;
     box-shadow: none;
+    float: none;
 
     &:hover {
       color: #fff !important;

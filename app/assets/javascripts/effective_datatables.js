@@ -2,13 +2,13 @@
 //= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
 //= require dataTables/dataTables.colReorder.min
 //= require dataTables/dataTables.colVis.min
-//= require dataTables/dataTables.fixedColumns
+//= require dataTables/dataTables.fixedColumns.min
 //= require dataTables/dataTables.tableTools.min
 //= require vendor/jquery.debounce.min
 
 //= require_tree ./effective_datatables
 
 $.extend( $.fn.dataTable.defaults, {
-  'dom': "<'row'<'col-xs-6'l><'col-xs-6'TC>r>t<'row'<'col-xs-6'i><'col-xs-6'p>>"
+  'dom': "<'row header-row'<'col-sm-4'><'col-sm-8'TCl>r><'scroll_wrapper't><'row'<'col-md-6'i><'col-md-6'p>>"
 });
 

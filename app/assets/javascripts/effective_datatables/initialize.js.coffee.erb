@@ -5,14 +5,15 @@ initializeDataTables = ->
 
       init_options =
         ajax: { url: datatable.data('source'), type: 'GET' }
-        autoWidth: true
+        autoWidth: false
         processing: true
         deferRender: true
         serverSide: true
         scrollCollapse: true
         deferLoading: [datatable.data('display-records'), datatable.data('total-records')] # fixedColumns won't work with deferLoading
         pagingType: 'simple_numbers'
-        lengthMenu: [[10, 25, 50, 100, 250, 1000, -1], [10, 25, 50, 100, 250, 1000, 'All']]
+        language: { 'lengthMenu': '_MENU_'}
+        lengthMenu: [[10, 25, 50, 100, 250, 1000, -1], ['10 per page', '25 per page', '50 per page', '100 per page', '250 per page', '1000 per page', 'Show All']]
         iDisplayLength: datatable.data('default-entries')
         columnDefs: [
           { visible: false, targets: datatable.data('non-visible') },
