@@ -658,6 +658,30 @@ rescue_from Effective::AccessDenied do |exception|
 end
 ```
 
+## Examples
+
+### Search by a belongs_to objects' field
+
+In this example, a User belongs_to an Applicant.  But instead of using the built in belongs_to functionality and displaying a dropdown of users, instead we want to search by the user's email address:
+
+```ruby
+module Effective
+  module Datatables
+    class Applicants < Effective::Datatable
+      table_column :id, visible: true
+
+      table_column :user, :type => :string, :column => 'users.email' do |applicant|
+        link_to applicant.user.try(:email), edit_admin_user_path(applicant.user)
+      end
+
+      def collection
+        col = Applicant.joins(:user).includes(:user).references(:user)
+      end
+    end
+  end
+end
+```
+
 
 ## License
 
