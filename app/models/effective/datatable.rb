@@ -47,7 +47,7 @@ module Effective
       end
 
       def model_name # Searching & Filters
-        ActiveModel::Name.new(Effective::Datatable)
+        @model_name ||= ActiveModel::Name.new(self)
       end
     end
 
@@ -72,6 +72,11 @@ module Effective
     end
 
     def to_key; []; end # Searching & Filters
+
+    # Instance method.  In Rails 4.2 this needs to be defined on the instance, before it was on the class
+    def model_name # Searching & Filters
+      @model_name ||= ActiveModel::Name.new(self.class)
+    end
 
     def to_param
       self.class.name.underscore.parameterize
