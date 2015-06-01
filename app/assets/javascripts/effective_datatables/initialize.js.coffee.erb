@@ -41,9 +41,9 @@ initializeDataTables = ->
         table = obj.closest('table.dataTable')
 
         # We're using our own scroll wrapper, not the ScrollX support
-        # if table.parent().hasClass('dataTables_scrollHeadInner') # ScrollX support
-        #   table = table.closest('.dataTables_scroll').children('.dataTables_scrollBody').children('table.dataTable')
-        # table.DataTable().column("#{obj.data('column-name')}:name").search(obj.val()).draw()
+        if table.parent().hasClass('dataTables_scrollHeadInner') # ScrollX support
+          table = table.closest('.dataTables_scroll').children('.dataTables_scrollBody').children('table.dataTable')
+        table.DataTable().column("#{obj.data('column-name')}:name").search(obj.val()).draw()
 
       # For every existing Input, Set up the search events
       (search_inputs = datatable.find('thead').first().find('input,select')).each (index, input) ->
