@@ -3,60 +3,73 @@ initializeDataTables = ->
     unless $.fn.DataTable.fnIsDataTable(this)
       datatable = $(this)
 
-      aoColumnDefs = [
-        { bSortable: false, aTargets: datatable.data('non-sortable') },
-        { bVisible: false, aTargets: datatable.data('non-visible') }
-      ].concat(datatable.data('column-classes') || [])
-
       init_options =
-        bServerSide: true
-        bProcessing: true
-        bSaveState: true
-        bAutoWidth: false
-        deferLoading: [datatable.data('display-records'), datatable.data('total-records')]
+        ajax: { url: datatable.data('source'), type: 'GET' }
+        autoWidth: false
+        processing: true
         deferRender: true
-        order: datatable.data('default-order')
-        sAjaxSource: datatable.data('source')
+        serverSide: true
+        scrollCollapse: true
+        deferLoading: [datatable.data('display-records'), datatable.data('total-records')] # fixedColumns won't work with deferLoading
         pagingType: 'simple_numbers'
-        lengthMenu: [[10, 25, 50, 100, 250, 1000, -1], [10, 25, 50, 100, 250, 1000, 'All']]
+        language: { 'lengthMenu': 'Show _MENU_ per page'}
+        lengthMenu: [[10, 25, 50, 100, 250, 1000, -1], ['10', '25', '50', '100', '250', '1000', 'All']]
         iDisplayLength: datatable.data('default-entries')
-        fnServerParams: (aoData, a, b) ->
-          table = this.DataTable()
-          table.columns().flatten().each (index) ->  # Pass which columns are visible back to server
-            aoData.push({'name': "sVisible_#{index}", 'value': table.column(index).visible()})
-
-        aoColumnDefs: aoColumnDefs
-        aoColumns: datatable.data('widths')
-        oTableTools:
-          sSwfPath: "<%= asset_path('effective_datatables/copy_csv_xls_pdf.swf') %>",
-          aButtons: ['csv', {'sExtends': 'xls', 'sButtonText': 'Excel'}, 'print']
+        columnDefs: [
+          { visible: false, targets: datatable.data('non-visible') },
+          { sortable: false, targets: datatable.data('non-sortable') }
+        ].concat(datatable.data('column-classes') || []).concat(datatable.data('column-names') || [])
+        order: datatable.data('default-order')
         colVis:
           showAll: 'Show all'
           restore: 'Show default'
-          activate: 'mouseover'
-          fnStateChange: (iCol, bVisible) ->
-            table = $(this.dom.button).closest('.dataTables_wrapper').children('table').first().DataTable()
-            table.draw()
+          activate: 'click'
+          align: 'right'
+          label: (index, title, th) -> $(th).prop('title')
+        tableTools:
+          sSwfPath: "<%= asset_path('effective_datatables/copy_csv_xls_pdf.swf') %>",
+          aButtons: ['csv', {'sExtends': 'xls', 'sButtonText': 'Excel'}, 'print']
 
       simple = datatable.data('effective-datatables-table') == 'simple'
-      filter = datatable.data('filter')
-
       if simple
         init_options['lengthMenu'] = [-1] # Show all results
         init_options['dom'] = "<'row'r>t" # Just show the table
 
-      # Actually initialize it
-      datatable = datatable.dataTable(init_options)
+      # Initialize Searching
+      dataTableSearch = (event) ->   # This is the function called by a select or input to run the search
+        obj = $(event.currentTarget)
+        table = obj.closest('table.dataTable')
 
-      if filter
-        datatable.columnFilter
-          sPlaceHolder: 'head:after'
-          aoColumns : datatable.data('filter')
-          bUseColVis: true
+        # We're using our own scroll wrapper, not the ScrollX support
+        # if table.parent().hasClass('dataTables_scrollHeadInner') # ScrollX support
+        #   table = table.closest('.dataTables_scroll').children('.dataTables_scrollBody').children('table.dataTable')
+        # table.DataTable().column("#{obj.data('column-name')}:name").search(obj.val()).draw()
 
-        $.each (datatable.data('filter') || []), (index, filter) ->
-          if(filter.selected)
-            datatable.fnSettings().aoPreSearchCols[index].sSearch = filter.selected
+      # For every existing Input, Set up the search events
+      (search_inputs = datatable.find('thead').first().find('input,select')).each (index, input) ->
+        $input = $(input)
+        $input.on 'click', (event) -> false # Dont order columns when you click inside the input
+        $input.on 'mousedown', (event) -> event.stopPropagation() # Dont order columns when you click inside the input
+
+        if $input.is('select')
+          $input.on 'change', (event) -> dataTableSearch(event)
+        else if $input.is('input')
+          $input.keyup($.debounce(300, dataTableSearch))
+
+      # Let's actually initialize the table now
+      table = datatable.dataTable(init_options)
+
+      # Assign PreSearch columns
+      search_inputs.each (index, input) =>
+        $input = $(input)
+        table.fnSettings().aoPreSearchCols[$input.data('column-index')].sSearch = $input.val() if $input.val()
+
+      # FixedColumns doesn't work well yet.
+      # fixedColumns = new $.fn.dataTable.FixedColumns(table,
+      #  leftColumns: 2
+      # )
+
+      new $.fn.dataTable.ColReorder(table)
 
 $ -> initializeDataTables()
 $(document).on 'page:change', -> initializeDataTables()

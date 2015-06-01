@@ -22,6 +22,7 @@ module Effective
         end
         raise "You cannot use both :partial => '' and proc => ..." if options[:partial] && options[:proc]
 
+        send(:attr_accessor, name)
         (@table_columns ||= HashWithIndifferentAccess.new())[name] = options
       end
 
@@ -44,22 +45,37 @@ module Effective
       def default_entries(entries)
         @default_entries = entries
       end
+
+      def model_name # Searching & Filters
+        @model_name ||= ActiveModel::Name.new(self)
+      end
     end
 
+
     def initialize(*args)
+      unless active_record_collection? || (collection.kind_of?(Array) && collection.first.kind_of?(Array))
+        raise "Unsupported collection type. Should be ActiveRecord class, ActiveRecord relation, or an Array of Arrays [[1, 'something'], [2, 'something else']]"
+      end
+
       if args.present?
         raise 'Effective::Datatable.new() can only be called with a Hash like arguments' unless args.first.kind_of?(Hash)
         args.first.each { |k, v| self.attributes[k] = v }
       end
 
-      unless active_record_collection? || (collection.kind_of?(Array) && collection.first.kind_of?(Array))
-        raise "Unsupported collection type. Should be ActiveRecord class, ActiveRecord relation, or an Array of Arrays [[1, 'something'], [2, 'something else']]"
-      end
+      # Any pre-selected search terms should be assigned now
+      search_terms.each { |column, term| self.send("#{column}=", term) }
     end
 
     # Any attributes set on initialize will be echoed back and available to the class
     def attributes
       @attributes ||= HashWithIndifferentAccess.new()
+    end
+
+    def to_key; []; end # Searching & Filters
+
+    # Instance method.  In Rails 4.2 this needs to be defined on the instance, before it was on the class
+    def model_name # Searching & Filters
+      @model_name ||= ActiveModel::Name.new(self.class)
     end
 
     def to_param
@@ -85,14 +101,27 @@ module Effective
       end.each_with_index { |(_, col), index| col[:index] = index }
     end
 
+    # This is for the ColReorder plugin
+    # It sends us a list of columns that are different than our table_columns order
+    # So this method just returns an array of column names, as per ColReorder
+    def display_table_columns
+      if params[:columns].present?
+        HashWithIndifferentAccess.new().tap do |display_columns|
+          params[:columns].each do |_, values|
+            display_columns[values[:name]] = table_columns[values[:name]]
+          end
+        end
+      end
+    end
+
     def to_json
       raise 'Effective::Datatable to_json called with a nil view.  Please call render_datatable(@datatable) or @datatable.view = view before this method' unless view.present?
 
       @json ||= {
-        :sEcho => (params[:sEcho] || 0),
-        :aaData => (table_data || []),
-        :iTotalRecords => (total_records || 0),
-        :iTotalDisplayRecords => (display_records || 0)
+        :draw => (params[:draw] || 0),
+        :data => (table_data || []),
+        :recordsTotal => (total_records || 0),
+        :recordsFiltered => (display_records || 0)
       }
     end
 
@@ -104,20 +133,20 @@ module Effective
       total_records.to_i == 0
     end
 
-    # Wish these were protected
-    def order_column_index
-      if params[:iSortCol_0].present?
-        params[:iSortCol_0].to_i
-      elsif default_order.present?
-        (table_columns[default_order.keys.first.to_s] || {}).fetch(:index, 0)
-      else
-        0
+    def order_name
+      @order_name ||= begin
+        if params[:order] && params[:columns]
+          order_column_index = (params[:order].first[1][:column] rescue '0')
+          (params[:columns][order_column_index] || {})[:name]
+        elsif default_order.present?
+          default_order.keys.first
+        end || table_columns.keys.first
       end
     end
 
     def order_direction
-      if params[:sSortDir_0].present?
-        params[:sSortDir_0].try(:downcase) == 'desc' ? 'DESC' : 'ASC'
+      @order_direction ||= if params[:order].present?
+        params[:order].first[1][:dir] == 'desc' ? 'DESC' : 'ASC'
       elsif default_order.present?
         default_order.values.first.to_s.downcase == 'desc' ? 'DESC' : 'ASC'
       else
@@ -139,18 +168,15 @@ module Effective
 
     def search_terms
       @search_terms ||= HashWithIndifferentAccess.new().tap do |terms|
-        if params[:sEcho].present?
-          table_columns.keys.each_with_index do |col, x|
-            unless (params["sVisible_#{x}"] == 'false' && table_columns[col][:filter][:when_hidden] != true)
-              terms[col] = params["sSearch_#{x}"] if params["sSearch_#{x}"].present?
-            end
+        if params[:columns].present? # This is an AJAX request from the DataTable
+          (params[:columns] || {}).each do |_, column|
+            next if table_columns[column[:name]].blank? || (column[:search] || {})[:value].blank?
+
+            terms[column[:name]] = column[:search][:value]
           end
-        else
-          # We are in the initial render and have to apply default search terms only
+        else # This is the initial render, and we have to apply default search terms only
           table_columns.each do |name, values|
-            if (values[:filter][:selected].present?) && (values[:visible] != false || values[:filter][:when_hidden] == true)
-              terms[name] = values[:filter][:selected]
-            end
+            terms[name] = values[:filter][:selected] if values[:filter][:selected].present?
           end
         end
       end
@@ -166,7 +192,7 @@ module Effective
     end
 
     def per_page
-      length = (params[:iDisplayLength].presence || default_entries).to_i
+      length = (params[:length].presence || default_entries).to_i
 
       if length == -1
         9999999
@@ -177,8 +203,17 @@ module Effective
       end
     end
 
+    def per_page=(length)
+      case length
+      when Integer
+        params[:length] = length
+      when :all
+        params[:length] = -1
+      end
+    end
+
     def page
-      params[:iDisplayStart].to_i / per_page + 1
+      params[:start].to_i / per_page + 1
     end
 
     def total_records
@@ -206,7 +241,13 @@ module Effective
       (self.class.instance_methods(false) - [:collection, :search_column]).each do |view_method|
         @view.class_eval { delegate view_method, :to => :@effective_datatable }
       end
+
+      # Clear the search_terms memoization
+      @search_terms = nil
+      @order_name = nil
+      @order_direction = nil
     end
+
 
     protected
 
@@ -267,7 +308,7 @@ module Effective
       end
 
       collection.each_with_index.map do |obj, index|
-        table_columns.map do |name, opts|
+        (display_table_columns || table_columns).map do |name, opts|
           value = if opts[:partial]
             rendered[name][index]
           elsif opts[:block]
@@ -314,7 +355,11 @@ module Effective
     end
 
     def active_record_collection?
-      @active_record_collection ||= (collection.ancestors.include?(ActiveRecord::Base) rescue false)
+      if @active_record_collection.nil?
+        @active_record_collection = (collection.ancestors.include?(ActiveRecord::Base) rescue false)
+      else
+        @active_record_collection
+      end
     end
 
     def table_columns_with_defaults
@@ -334,7 +379,7 @@ module Effective
       belong_tos = (collection.ancestors.first.reflect_on_all_associations(:belongs_to) rescue []).inject(HashWithIndifferentAccess.new()) do |retval, bt|
         unless bt.options[:polymorphic]
           begin
-            klass = bt.klass || bt.foreign_type.gsub('_type', '').classify.constantize
+            klass = bt.klass || bt.foreign_type.sub('_type', '').classify.constantize
           rescue => e
             klass = nil
           end
@@ -370,6 +415,10 @@ module Effective
           cols[name][:type] = :obfuscated_id
         end
 
+        if sql_table.present? && sql_column.blank? # This is a SELECT AS column
+          cols[name][:sql_as_column] = true
+        end
+
         cols[name][:filter] = initialize_table_column_filter(cols[name][:filter], cols[name][:type], belong_tos[name])
 
         if cols[name][:partial]
@@ -379,33 +428,38 @@ module Effective
     end
 
     def initialize_table_column_filter(filter, col_type, belongs_to)
-      return {:type => :null, :when_hidden => false} if filter == false
+      return {:type => :null} if filter == false
 
       if filter.kind_of?(Symbol)
-        filter = {:type => filter}
+        filter = HashWithIndifferentAccess.new(:type => filter)
       elsif filter.kind_of?(String)
-        filter = {:type => filter.to_sym}
+        filter = HashWithIndifferentAccess.new(:type => filter.to_sym)
       elsif filter.kind_of?(Hash) == false
-        filter = {}
+        filter = HashWithIndifferentAccess.new()
       end
 
       # This is a fix for passing filter[:selected] == false, it needs to be 'false'
       filter[:selected] = filter[:selected].to_s unless filter[:selected].nil?
 
-      case col_type # null, number, select, number-range, date-range, checkbox, text(default)
+      filter = case col_type
       when :belongs_to
-        {
+        HashWithIndifferentAccess.new(
           :type => :select,
-          :when_hidden => false,
-          :values => Proc.new { belongs_to[:klass].all.map { |obj| [obj.id, obj.to_s] }.sort { |x, y| x[1] <=> y[1] } }
-        }.merge(filter)
+          :values => Proc.new { belongs_to[:klass].all.map { |obj| [obj.to_s, obj.id] }.sort { |x, y| x[1] <=> y[1] } }
+        ).merge(filter)
       when :integer
-        {:type => :number, :when_hidden => false}.merge(filter)
+        HashWithIndifferentAccess.new(:type => :number).merge(filter)
       when :boolean
-        {:type => :select, :when_hidden => false, :values => [true, false]}.merge(filter)
+        HashWithIndifferentAccess.new(:type => :boolean, :values => [true, false]).merge(filter)
       else
-        {:type => :text, :when_hidden => false}.merge(filter)
+        HashWithIndifferentAccess.new(:type => :string).merge(filter)
       end
+
+      if filter[:type] == :boolean
+        filter = HashWithIndifferentAccess.new(:values => [true, false]).merge(filter)
+      end
+
+      filter
     end
 
   end

@@ -3,27 +3,29 @@ module Effective
   class ArrayDatatableTool
     attr_accessor :table_columns
 
-    delegate :order_column_index, :order_direction, :page, :per_page, :search_column, :to => :@datatable
+    delegate :order_name, :order_direction, :page, :per_page, :search_column, :display_table_columns, :to => :@datatable
 
     def initialize(datatable, table_columns)
       @datatable = datatable
       @table_columns = table_columns
     end
 
-    def order_column
-      @order_column ||= table_columns.find { |_, values| values[:index] == order_column_index }.try(:second) # This pulls out the values
-    end
-
     def search_terms
       @search_terms ||= @datatable.search_terms.select { |name, search_term| table_columns.key?(name) }
     end
 
+    def order_column
+      @order_column ||= table_columns[order_name]
+    end
+
     def order(collection)
       if order_column.present?
+        index = display_index(order_column)
+
         if order_direction == 'ASC'
-          collection.sort! { |x, y| x[order_column[:index]] <=> y[order_column[:index]] }
+          collection.sort! { |x, y| x[index] <=> y[index] }
         else
-          collection.sort! { |x, y| y[order_column[:index]] <=> x[order_column[:index]] }
+          collection.sort! { |x, y| y[index] <=> x[index] }
         end
       end
 
@@ -41,9 +43,10 @@ module Effective
 
     def search_column_with_defaults(collection, table_column, search_term)
       search_term = search_term.downcase
+      index = display_index(table_column)
 
       collection.select! do |row|
-        value = row[table_column[:index]].to_s.downcase
+        value = row[index].to_s.downcase
 
         if table_column[:filter][:type] == :select && table_column[:filter][:fuzzy] != true
           value == search_term
@@ -56,6 +59,13 @@ module Effective
     def paginate(collection)
       Kaminari.paginate_array(collection).page(page).per(per_page)
     end
+
+    private
+
+    def display_index(column)
+      (display_table_columns || table_columns).keys.index(column[:name])
+    end
+
   end
 end
 

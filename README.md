@@ -285,7 +285,6 @@ table_column :created_at, :filter => {...}    # Enable filtering with these opti
 Some additional, lesser used options include:
 
 ```ruby
-:filter => {:when_hidden => true}  # By default a hidden column's search filter will be ignored, unless this is true.  Can be used for scoping.
 :filter => {:fuzzy => true} # Will use an ILIKE/includes rather than = when filtering.  Use this for selects.
 ```
 
@@ -444,7 +443,7 @@ This gem does its best to provide "just works" filtering of both raw SQL (table_
 
 It's also very easy to override the filter behaviour on a per-column basis.
 
-Keep in mind, columns that are hidden will not be considered by the filter results unless `:filter => {:when_hidden => true}` is passed to table_column
+Keep in mind, the filter terms on hidden columns will still be considered in filter results.
 
 For custom filter behaviour, specify a `def search_column` method in the datatables model file:
 
@@ -656,6 +655,30 @@ rescue_from Effective::AccessDenied do |exception|
   respond_to do |format|
     format.html { render 'static_pages/access_denied', :status => 403 }
     format.any { render :text => 'Access Denied', :status => 403 }
+  end
+end
+```
+
+## Examples
+
+### Search by a belongs_to objects' field
+
+In this example, a User belongs_to an Applicant.  But instead of using the built in belongs_to functionality and displaying a dropdown of users, instead we want to search by the user's email address:
+
+```ruby
+module Effective
+  module Datatables
+    class Applicants < Effective::Datatable
+      table_column :id, visible: true
+
+      table_column :user, :type => :string, :column => 'users.email' do |applicant|
+        link_to applicant.user.try(:email), edit_admin_user_path(applicant.user)
+      end
+
+      def collection
+        col = Applicant.joins(:user).includes(:user).references(:user)
+      end
+    end
   end
 end
 ```

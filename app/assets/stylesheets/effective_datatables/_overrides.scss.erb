@@ -1,19 +1,54 @@
 .dataTables_wrapper {   // This is the Header
   overflow: hidden;
 
-  .row {
-    margin-left: -15px;
-    margin-right: -15px;
+  .scroll_wrapper {
+    overflow-x: auto;
   }
 
-  .form-control {
-    color: #646464;
-    border: 1px solid #bcbcbc;
+  table.dataTable {
+    border-collapse: collapse;
+    box-sizing: border-box;
 
-    &:focus {
-      box-shadow: none;
-      border-color: #03428d;
+    thead th {
+      padding: 6px 18px 6px 6px;
+      vertical-align: middle;
+
+      .form-group { width: 100%; }
+      input,select { width: 100%; }
+      p { margin: 0px; }
     }
+
+    thead th.sorting_disabled {
+      padding: 6px 6px 6px 6px;
+    }
+
+    tbody th, tbody td, thead th, thead td {
+      border-left: none;
+      border-bottom: none;
+      white-space: nowrap;
+    }
+
+    ol,
+    ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+  }
+
+  table.dataTable.sorting-hidden {
+    thead {
+      .sorting_asc { background: none; cursor: default; }
+      .sorting_desc { background: none; cursor: default; }
+      .sorting { cursor: default; }
+    }
+  }
+
+  .DTTT_container,.ColVis {
+    float: right;
+    display: inline-block;
+    margin: 0px 0px 0px 2px;
+
+    label { float: none; }
   }
 
   .DTTT_button,
@@ -22,11 +57,12 @@
     border: 1px solid #e0eeff;
     background: #fff;
     box-shadow: none;
+    float: none;
 
-    &:hover:not(.ColVis_MasterButton) {
+    &:hover {
       color: #fff !important;
       background: #00a6ff !important;
-      border: 1px solid #e0eeff;
+      border: 1px solid black;
       background: #fff;
       box-shadow: none;
     }
@@ -37,47 +73,8 @@
     }
   }
 
-  .dataTables_length,
-  .dataTables_filter,
-  .dataTables_info,
-  .dataTables_processing,
-  .dataTables_paginate {
-    color: #646464;
-  }
-
-  table.dataTable.sorting-hidden {
-    thead {
-      .sorting_asc { background: none; cursor: default; }
-      .sorting_desc { background: none; cursor: default; }
-      .sorting { cursor: default; }
-
-      tr, th {
-        padding-left: 8px;
-        padding-right: 8px;
-      }
-    }
-  }
-
-  table.dataTable {
-    border-collapse: collapse;
-    box-sizing: border-box;
-
-    .form-inline, .form-control { width: 100%; }
-    thead, tr, th { padding-left: 6px; }
-
-    tbody th, tbody td, thead th, thead td {
-      border-left: none;
-      border-bottom: none;
-    }
-
-    thead th { border-top: none; }
-
-    .col-actions { white-space: nowrap; }
-    .col-datetime { white-space: nowrap; }
-  }
-
   .dataTables_processing {
-    height: 60px;
+    top: 10px;
   }
 
   .dataTables_paginate {
@@ -103,24 +100,35 @@
     }
   }
 
-  ol,
-  ul {
-    list-style-type: none;
-    padding-left: 0;
-  }
-
-  .DTTT_container {
-    float: right;
-    margin-right: -3px;
-  }
-
   table.dataTable thead .sorting { background: url(<%= asset_data_uri('dataTables/sort_both.png') %>) no-repeat center right; }
   table.dataTable thead .sorting_asc { background: url(<%= asset_data_uri('dataTables/sort_asc.png') %>) no-repeat center right; }
   table.dataTable thead .sorting_desc { background: url(<%= asset_data_uri('dataTables/sort_desc.png') %>) no-repeat center right; }
 }
 
+table.dataTable.DTCR_clonedTable { max-width: 200px !important; }
+table.dataTable.no-footer { border-bottom: 1px solid #ddd; }
+
 ul.ColVis_collection {
-  width: 240px;
+  width: 420px;
+  margin-left: 148px;
+  margin-top: 4px;
+
+  li {
+    width: 195px;
+  }
+
+  li.ColVis_Special.ColVis_Restore {
+    clear: both;
+  }
+
+  li:nth-child(odd) {
+    float: left;
+  }
+
+  li:nth-child(even) {
+    float: right;
+  }
+
 }
 
 div.DTTT_print_info {

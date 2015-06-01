@@ -1,50 +1,40 @@
 module EffectiveDatatablesHelper
   def render_datatable(datatable, opts = {}, &block)
     datatable.view = self
-
-    locals = {:style => :full, :filterable => true, :sortable => true, :table_class => 'table-bordered table-striped'}
-    locals = locals.merge(opts) if opts.kind_of?(Hash)
-    locals[:table_class] = 'sorting-hidden ' + locals[:table_class].to_s if locals[:sortable] == false
-
-    # Do we have to look at empty? behaviour
-    if (block_given? || opts.kind_of?(String) || (opts.kind_of?(Hash) && opts[:empty].present?)) && datatable.empty?
-      if block_given?
-        yield; nil
-      elsif opts.kind_of?(String)
-        opts
-      elsif opts.kind_of?(Hash) && opts[:empty].present?
-        opts[:empty]
-      end
-    else
-      render :partial => 'effective/datatables/datatable', :locals => locals.merge(:datatable => datatable)
-    end
-  end
-
-  def render_simple_datatable(datatable, opts = {})
-    datatable.view = self
-    locals = {:style => :simple, :filterable => false, :sortable => false, :table_class => ''}.merge(opts)
-    locals[:table_class] = 'sorting-hidden ' + locals[:table_class].to_s if locals[:sortable] == false
+    locals = {:style => :full, :filterable => true, :sortable => true, :table_class => 'table-bordered table-striped'}.merge(opts)
 
     render :partial => 'effective/datatables/datatable', :locals => locals.merge(:datatable => datatable)
   end
 
-  def datatable_filter(datatable, filterable = true)
-    return false unless filterable
+  def render_simple_datatable(datatable, opts = {})
+    datatable.view = self
+    datatable.per_page = :all
+    locals = {:style => :simple, :filterable => false, :sortable => false, :table_class => 'table-bordered table-striped sorting-hidden'}.merge(opts)
 
-    filters = datatable.table_columns.values.map { |options, _| options[:filter] || {:type => 'null'} }
+    render :partial => 'effective/datatables/datatable', :locals => locals.merge(:datatable => datatable)
+  end
 
-    # Process any Procs
-    filters.each do |filter|
-      if filter[:values].respond_to?(:call)
-        filter[:values] = filter[:values].call()
+  def render_datatable_header_cell(form, name, opts, filterable = true)
+    return content_tag(:p, opts[:label] || name) if filterable == false
 
-        if filter[:values].kind_of?(ActiveRecord::Relation) || (filter[:values].kind_of?(Array) && filter[:values].first.kind_of?(ActiveRecord::Base))
-          filter[:values] = filter[:values].map { |obj| [obj.id, obj.to_s] }
+    case opts[:filter][:type]
+    when :string, :text, :number
+      form.input name, :label => false, :required => false, :as => :string, :placeholder => (opts[:label] || name),
+        :input_html => { :autocomplete => 'off', :data => {'column-name' => opts[:name], 'column-index' => opts[:index]} }
+    when :select, :boolean
+      if opts[:filter][:values].respond_to?(:call)
+        opts[:filter][:values] = opts[:filter][:values].call()
+
+        if opts[:filter][:values].kind_of?(ActiveRecord::Relation) || (opts[:filter][:values].kind_of?(Array) && opts[:filter][:values].first.kind_of?(ActiveRecord::Base))
+          opts[:filter][:values] = opts[:filter][:values].map { |obj| [obj.to_s, obj.id] }
         end
       end
-    end
 
-    filters.to_json()
+      form.input name, :label => false, :required => false, :as => :select, :collection => opts[:filter][:values], :include_blank => (opts[:label] || name.titleize),
+        :input_html => { :autocomplete => 'off', :data => {'column-name' => opts[:name], 'column-index' => opts[:index]} }
+    else
+      content_tag(:p, opts[:label] || name)
+    end
   end
 
   def datatable_non_sortable(datatable, sortable = true)
@@ -81,6 +71,10 @@ module EffectiveDatatablesHelper
         classes << {:className => options[:class], :targets => [x]} if options[:class].present?
       end
     end.to_json()
+  end
+
+  def datatable_column_names(datatable)
+    datatable.table_columns.values.map { |options| {:name => options[:name], :targets => options[:index] } }.to_json()
   end
 
   def datatables_admin_path?
