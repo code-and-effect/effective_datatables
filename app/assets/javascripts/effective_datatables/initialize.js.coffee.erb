@@ -12,8 +12,8 @@ initializeDataTables = ->
         scrollCollapse: true
         deferLoading: [datatable.data('display-records'), datatable.data('total-records')] # fixedColumns won't work with deferLoading
         pagingType: 'simple_numbers'
-        language: { 'lengthMenu': '_MENU_'}
-        lengthMenu: [[10, 25, 50, 100, 250, 1000, -1], ['10 per page', '25 per page', '50 per page', '100 per page', '250 per page', '1000 per page', 'Show All']]
+        language: { 'lengthMenu': 'Show _MENU_ per page'}
+        lengthMenu: [[10, 25, 50, 100, 250, 1000, -1], ['10', '25', '50', '100', '250', '1000', 'All']]
         iDisplayLength: datatable.data('default-entries')
         columnDefs: [
           { visible: false, targets: datatable.data('non-visible') },
@@ -40,9 +40,10 @@ initializeDataTables = ->
         obj = $(event.currentTarget)
         table = obj.closest('table.dataTable')
 
-        if table.parent().hasClass('dataTables_scrollHeadInner') # ScrollX support
-          table = table.closest('.dataTables_scroll').children('.dataTables_scrollBody').children('table.dataTable')
-        table.DataTable().column("#{obj.data('column-name')}:name").search(obj.val()).draw()
+        # We're using our own scroll wrapper, not the ScrollX support
+        # if table.parent().hasClass('dataTables_scrollHeadInner') # ScrollX support
+        #   table = table.closest('.dataTables_scroll').children('.dataTables_scrollBody').children('table.dataTable')
+        # table.DataTable().column("#{obj.data('column-name')}:name").search(obj.val()).draw()
 
       # For every existing Input, Set up the search events
       (search_inputs = datatable.find('thead').first().find('input,select')).each (index, input) ->
