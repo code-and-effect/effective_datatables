@@ -31,7 +31,24 @@ module Effective
       end
 
       def array_column(name, options = {}, proc = nil, &block)
-        table_column(name, options.merge({:array_column => true}), proc, &block)
+        table_column(name, options.merge!({:array_column => true}), proc, &block)
+      end
+
+      def actions_column(options = {}, proc = nil, &block)
+        show = options.fetch(:show, false)
+        edit = options.fetch(:edit, true)
+        destroy = options.fetch(:destroy, true)
+        name = options.fetch(:name, 'actions')
+
+        opts = {
+          sortable: false,
+          filter: false,
+          partial: '/effective/datatables/actions_column',
+          partial_local: :resource,
+          partial_locals: { show_action: show, edit_action: edit, destroy_action: destroy }
+        }
+
+        table_column(name, opts, proc, &block)
       end
 
       def array_columns(*names)
@@ -296,12 +313,22 @@ module Effective
       rendered = {}
       table_columns.each do |name, opts|
         if opts[:partial]
+          locals = {
+            datatable: self,
+            table_column: table_columns[name],
+            controller_namespace: view.controller_path.split('/')[0...-1].map { |path| path.downcase.to_sym if path.present? }.compact,
+            show_action: (opts[:partial_locals] || {})[:show_action],
+            edit_action: (opts[:partial_locals] || {})[:edit_action],
+            destroy_action: (opts[:partial_locals] || {})[:destroy_action]
+          }
+          locals.merge!(opts[:partial_locals]) if opts[:partial_locals]
+
           rendered[name] = (render(
             :partial => opts[:partial],
             :as => opts[:partial_local],
             :collection => collection,
             :formats => :html,
-            :locals => {:datatable => self},
+            :locals => locals,
             :spacer_template => '/effective/datatables/spacer_template',
           ) || '').split('EFFECTIVEDATATABLESSPACER')
         end

@@ -1,0 +1,14 @@
+- if show_action
+  - url = (polymorphic_path([*controller_namespace, resource]) rescue nil) || (polymorphic_path(resource) rescue nil)
+  %a{href: (url || '#'), title: 'Show'}
+    %span.glyphicon.glyphicon-eye-open
+
+- if edit_action
+  - url = (edit_polymorphic_path([*controller_namespace, resource]) rescue nil) || (edit_polymorphic_path(resource) rescue nil)
+  %a{href: (url || '#'), title: 'Edit'}
+    %span.glyphicon.glyphicon-edit
+
+- if destroy_action
+  - url = (polymorphic_path([*controller_namespace, resource]) rescue nil) || (polymorphic_path(resource) rescue nil)
+  %a{href: (polymorphic_path([*controller_namespace, resource]) rescue '#'), title: 'Delete', data: {method: :delete, confirm: 'Are you sure?'}}
+    %span.glyphicon.glyphicon-trash
