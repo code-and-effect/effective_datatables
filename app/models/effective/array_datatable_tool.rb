@@ -63,7 +63,7 @@ module Effective
     private
 
     def display_index(column)
-      (display_table_columns || table_columns).keys.index(column[:name])
+      display_table_columns.present? ? display_table_columns.keys.index(column[:name]) : column[:array_index]
     end
 
   end
