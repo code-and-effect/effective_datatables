@@ -4,7 +4,7 @@ initializeDataTables = ->
       datatable = $(this)
 
       init_options =
-        ajax: { url: datatable.data('source'), type: 'GET' }
+        ajax: { url: datatable.data('source'), type: 'POST' }
         autoWidth: false
         processing: true
         deferRender: true

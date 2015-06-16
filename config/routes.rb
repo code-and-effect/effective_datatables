@@ -4,8 +4,6 @@ end
 
 EffectiveDatatables::Engine.routes.draw do
   scope :module => 'effective' do
-    resources :datatables, :only => [:show]
+    match 'datatables/:id(.:format)', to: 'datatables#show', via: [:get, :post], as: :datatable
   end
 end
-
-

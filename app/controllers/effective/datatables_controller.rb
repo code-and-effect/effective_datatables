@@ -2,6 +2,7 @@ module Effective
   class DatatablesController < ApplicationController
     skip_log_page_views if defined?(EffectiveLogging)
 
+    # This will respond to both a GET and a POST
     def show
       @datatable = Effective::Datatable.find(params[:id], params[:attributes])
       @datatable.view = view_context if !@datatable.nil?
