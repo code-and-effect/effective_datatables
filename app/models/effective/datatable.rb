@@ -68,15 +68,14 @@ module Effective
       end
     end
 
-
     def initialize(*args)
-      unless active_record_collection? || (collection.kind_of?(Array) && collection.first.kind_of?(Array))
-        raise "Unsupported collection type. Should be ActiveRecord class, ActiveRecord relation, or an Array of Arrays [[1, 'something'], [2, 'something else']]"
-      end
-
       if args.present?
         raise 'Effective::Datatable.new() can only be called with a Hash like arguments' unless args.first.kind_of?(Hash)
         args.first.each { |k, v| self.attributes[k] = v }
+      end
+
+      unless active_record_collection? || (collection.kind_of?(Array) && collection.first.kind_of?(Array))
+        raise "Unsupported collection type. Should be ActiveRecord class, ActiveRecord relation, or an Array of Arrays [[1, 'something'], [2, 'something else']]"
       end
 
       # Any pre-selected search terms should be assigned now
@@ -235,7 +234,10 @@ module Effective
 
     def total_records
       @total_records ||= (
-        if active_record_collection?
+        if active_record_collection? && collection_class.connection.respond_to?(:unrepared_statement)
+          collection_sql = collection_class.connection.unprepared_statement { collection.to_sql }
+          (collection_class.connection.execute("SELECT COUNT(*) FROM (#{collection_sql}) AS datatables_total_count").first['count'] rescue 1).to_i
+        elsif active_record_collection?
           (collection_class.connection.execute("SELECT COUNT(*) FROM (#{collection.to_sql}) AS datatables_total_count").first['count'] rescue 1).to_i
         else
           collection.size
