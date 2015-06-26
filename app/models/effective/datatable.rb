@@ -234,7 +234,8 @@ module Effective
 
     def total_records
       @total_records ||= (
-        if active_record_collection? && collection_class.connection.respond_to?(:unrepared_statement)
+        if active_record_collection? && collection_class.connection.respond_to?(:unprepared_statement)
+          # https://github.com/rails/rails/issues/15331
           collection_sql = collection_class.connection.unprepared_statement { collection.to_sql }
           (collection_class.connection.execute("SELECT COUNT(*) FROM (#{collection_sql}) AS datatables_total_count").first['count'] rescue 1).to_i
         elsif active_record_collection?
@@ -280,7 +281,13 @@ module Effective
         col = table_tool.search(col)
 
         if table_tool.search_terms.present? && array_tool.search_terms.blank?
-          self.display_records = (collection_class.connection.execute("SELECT COUNT(*) FROM (#{col.to_sql}) AS datatables_filtered_count").first['count'] rescue 1).to_i
+          if collection_class.connection.respond_to?(:unprepared_statement)
+            # https://github.com/rails/rails/issues/15331
+            col_sql = collection_class.connection.unprepared_statement { col.to_sql }
+            self.display_records = (collection_class.connection.execute("SELECT COUNT(*) FROM (#{col_sql}) AS datatables_filtered_count").first['count'] rescue 1).to_i
+          else
+            self.display_records = (collection_class.connection.execute("SELECT COUNT(*) FROM (#{col.to_sql}) AS datatables_filtered_count").first['count'] rescue 1).to_i
+          end
         end
       end
 
