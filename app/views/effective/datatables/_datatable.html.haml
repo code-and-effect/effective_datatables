@@ -21,21 +21,23 @@
     }
   }
 
-= simple_form_for datatable, :url => '#', :html => {:id => "#{datatable.to_param}-form" } do |f|
-  %table.effective-datatable{effective_datatable_params}
-    %thead
-      - max_depth = datatable.table_columns.map { |_, opts| opts[:th][:depth].to_i rescue 0 }.max
-      - [*0..max_depth].each do |depth|
-        %tr
-          - table_columns = datatable.table_columns.select { |_, opts| (opts[:th][:depth] || 0 rescue 0) == depth }
-          - table_columns.each do |name, opts|
-            %th{(opts[:th] || {}).merge({:title => opts[:label] || name})}
-              = render_datatable_header_cell(f, name, opts, filterable)
-            - (opts[:append_th] || []).each do |faux_col|
-              %th{(faux_col[:th] || {}).merge({:title => faux_col[:label]})}
-                = faux_col[:label]
-    %tbody
-      - (datatable.to_json[:data] || []).each do |row|
-        %tr
-          - row.each do |col|
-            %td= col.to_s.html_safe
+  form_builder = nil
+  simple_form_for(datatable, url: '#', html: {id: "#{datatable.to_param}-form"}) { |f| form_builder = f }
+
+%table.effective-datatable{effective_datatable_params}
+  %thead
+    - max_depth = datatable.table_columns.map { |_, opts| opts[:th][:depth].to_i rescue 0 }.max
+    - [*0..max_depth].each do |depth|
+      %tr
+        - table_columns = datatable.table_columns.select { |_, opts| (opts[:th][:depth] || 0 rescue 0) == depth }
+        - table_columns.each do |name, opts|
+          %th{(opts[:th] || {}).merge({:title => opts[:label] || name})}
+            = render_datatable_header_cell(form_builder, name, opts, filterable)
+          - (opts[:append_th] || []).each do |faux_col|
+            %th{(faux_col[:th] || {}).merge({:title => faux_col[:label]})}
+              = faux_col[:label]
+  %tbody
+    - (datatable.to_json[:data] || []).each do |row|
+      %tr
+        - row.each do |col|
+          %td= col.to_s.html_safe
