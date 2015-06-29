@@ -62,7 +62,8 @@ initializeDataTables = ->
       # Assign PreSearch columns
       search_inputs.each (index, input) =>
         $input = $(input)
-        table.fnSettings().aoPreSearchCols[$input.data('column-index')].sSearch = $input.val() if $input.val()
+        if $input.data('column-index') && $input.val()
+          table.fnSettings().aoPreSearchCols[$input.data('column-index')].sSearch = $input.val()
 
       # FixedColumns doesn't work well yet.
       # fixedColumns = new $.fn.dataTable.FixedColumns(table,
