@@ -48,13 +48,15 @@ initializeDataTables = ->
       # For every existing Input, Set up the search events
       (search_inputs = datatable.find('thead').first().find('input,select')).each (index, input) ->
         $input = $(input)
-        $input.on 'click', (event) -> false # Dont order columns when you click inside the input
-        $input.on 'mousedown', (event) -> event.stopPropagation() # Dont order columns when you click inside the input
 
-        if $input.is('select')
-          $input.on 'change', (event) -> dataTableSearch(event)
-        else if $input.is('input')
-          $input.keyup($.debounce(300, dataTableSearch))
+        if $input.data('column-name')
+          $input.on 'click', (event) -> false # Dont order columns when you click inside the input
+          $input.on 'mousedown', (event) -> event.stopPropagation() # Dont order columns when you click inside the input
+
+          if $input.is('select')
+            $input.on 'change', (event) -> dataTableSearch(event)
+          else if $input.is('input')
+            $input.keyup($.debounce(300, dataTableSearch))
 
       # Let's actually initialize the table now
       table = datatable.dataTable(init_options)
@@ -62,7 +64,7 @@ initializeDataTables = ->
       # Assign PreSearch columns
       search_inputs.each (index, input) =>
         $input = $(input)
-        if $input.data('column-index') && $input.val()
+        if $input.data('column-index') && $input.data('column-name') && $input.val()
           table.fnSettings().aoPreSearchCols[$input.data('column-index')].sSearch = $input.val()
 
       # FixedColumns doesn't work well yet.
