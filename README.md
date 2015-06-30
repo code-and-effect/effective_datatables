@@ -414,38 +414,6 @@ Valid options are `10, 25, 50, 100, 250, 1000, :all`
 
 There are a few other ways to customize the behaviour of effective_datatables
 
-### Display of an Empty Datatable
-
-How an empty datatable (0 display records) is displayed depends on how `render_datatable` is called.
-
-To render the full datatable with the default 'No data available in table' message:
-
-```haml
-= render_datatable(@datatable)
-```
-
-To skip rendering the datatable and just output a custom message:
-
-```haml
-= render_datatable(@datatable, 'There are no posts.')
-```
-
-or
-
-```haml
-= render_datatable(@datatable, :empty => 'There are no posts.')
-```
-
-To skip rendering the datatable and instead render given content:
-
-```haml
-= render_datatable(@datatable) do
-  %p There are no posts.
-  %p
-    Have a picture of a cat instead
-    = image_tag('cat.png')
-```
-
 ### Checking for Empty collection
 
 While the 'what to render when empty' situation is handled by the above syntax, you may still check whether the datatable has records to display by calling `@datatable.empty?` and `@datatable.present?`.
