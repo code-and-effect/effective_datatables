@@ -1,26 +1,27 @@
 module EffectiveDatatablesHelper
   def render_datatable(datatable, opts = {}, &block)
     datatable.view = self
-    locals = {:style => :full, :filterable => true, :sortable => true, :table_class => 'table-bordered table-striped'}.merge(opts)
+    locals = {style: :full, filterable: true, sortable: true, table_class: 'table-bordered table-striped'}.merge(opts)
 
-    render :partial => 'effective/datatables/datatable', :locals => locals.merge(:datatable => datatable)
+    render partial: 'effective/datatables/datatable', locals: locals.merge(datatable: datatable)
   end
 
   def render_simple_datatable(datatable, opts = {})
     datatable.view = self
     datatable.per_page = :all
-    locals = {:style => :simple, :filterable => false, :sortable => false, :table_class => 'table-bordered table-striped sorting-hidden'}.merge(opts)
+    locals = {style: :simple, filterable: false, sortable: false, table_class: 'table-bordered table-striped sorting-hidden'}.merge(opts)
 
-    render :partial => 'effective/datatables/datatable', :locals => locals.merge(:datatable => datatable)
+    render partial: 'effective/datatables/datatable', locals: locals.merge(datatable: datatable)
   end
 
   def render_datatable_header_cell(form, name, opts, filterable = true)
+    return render(partial: opts[:header_partial], locals: {form: form, name: (opts[:label] || name), column: opts, filterable: filterable}) if opts[:header_partial].present?
     return content_tag(:p, opts[:label] || name) if filterable == false
 
     case opts[:filter][:type]
     when :string, :text, :number
-      form.input name, :label => false, :required => false, :as => :string, :placeholder => (opts[:label] || name),
-        :input_html => { :name => nil, :autocomplete => 'off', :data => {'column-name' => opts[:name], 'column-index' => opts[:index]} }
+      form.input name, label: false, required: false, as: :string, placeholder: (opts[:label] || name),
+        input_html: { name: nil, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} }
     when :select, :boolean
       if opts[:filter][:values].respond_to?(:call)
         opts[:filter][:values] = opts[:filter][:values].call()
@@ -30,8 +31,8 @@ module EffectiveDatatablesHelper
         end
       end
 
-      form.input name, :label => false, :required => false, :as => :select, :collection => opts[:filter][:values], :include_blank => (opts[:label] || name.titleize),
-        :input_html => { :name => nil, :autocomplete => 'off', :data => {'column-name' => opts[:name], 'column-index' => opts[:index]} }
+      form.input name, label: false, required: false, as: :select, collection: opts[:filter][:values], include_blank: (opts[:label] || name.titleize),
+        input_html: { name: nil, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} }
     else
       content_tag(:p, opts[:label] || name)
     end

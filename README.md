@@ -351,6 +351,22 @@ The request object is available to the table_column, so you could just as easily
 request.referer.include?('/admin/')
 ```
 
+### Header Rendering
+
+You can override the default rendering and define a partial to use for the header `<th>`:
+
+```ruby
+table_column :special, :header_partial => '/posts/special_header'
+```
+
+The following locals will be available in the header partial:
+
+```ruby
+form        # The SimpleForm FormBuilder instance
+name        # The name of your column
+column      # the table_column options
+filterable  # whether the dataTable is filterable
+```
 
 ## table_columns
 
