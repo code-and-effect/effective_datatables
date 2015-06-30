@@ -45,8 +45,8 @@ initializeDataTables = ->
           table = table.closest('.dataTables_scroll').children('.dataTables_scrollBody').children('table.dataTable')
         table.DataTable().column("#{obj.data('column-name')}:name").search(obj.val()).draw()
 
-      # For every existing Input, Set up the search events
-      (search_inputs = datatable.find('thead').first().find('input,select')).each (index, input) ->
+      # For every existing Input (except checkboxes), Set up the search events
+      (search_inputs = datatable.find('thead').first().find('input[type!="checkbox"],select')).each (index, input) ->
         $input = $(input)
 
         if $input.data('column-name')
@@ -57,6 +57,10 @@ initializeDataTables = ->
             $input.on 'change', (event) -> dataTableSearch(event)
           else if $input.is('input')
             $input.keyup($.debounce(300, dataTableSearch))
+
+      # Reset checkboxes in table head when table contents are reloaded (this is for 'select all' checkboxes)
+      datatable.on 'draw.dt', ->
+        $(@).find('thead input[type="checkbox"]').prop('checked', false)
 
       # Let's actually initialize the table now
       table = datatable.dataTable(init_options)
