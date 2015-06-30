@@ -351,7 +351,7 @@ The request object is available to the table_column, so you could just as easily
 request.referer.include?('/admin/')
 ```
 
-### Header Rendering
+### Column Header Rendering Options
 
 You can override the default rendering and define a partial to use for the header `<th>`:
 
@@ -416,9 +416,9 @@ There are a few other ways to customize the behaviour of effective_datatables
 
 ### Checking for Empty collection
 
-While the 'what to render when empty' situation is handled by the above syntax, you may still check whether the datatable has records to display by calling `@datatable.empty?` and `@datatable.present?`.
+Check whether the datatable has records by calling `@datatable.empty?` and `@datatable.present?`.
 
-Keep in mind, these methods look at the collection's total records, rather than the display/filtered records.
+Keep in mind, these methods look at the collection's total records, not the currently displayed/filtered records.
 
 
 ### Customize Filter Behaviour
