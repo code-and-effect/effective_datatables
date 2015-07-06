@@ -201,11 +201,45 @@ def query_total
 end
 ```
 
+### Array Backed collection
+
+Don't want to use ActiveRecord? Not a problem.
+
+Define your collection as an Array of Arrays, declare only array_columns, and everything works as expected.
+
+```ruby
+module Effective
+  module Datatables
+    class ArrayBackedDataTable < Effective::Datatable
+      array_column :id
+      array_column :first_name
+      array_column :last_name
+      array_column :email
+
+      def collection
+        [
+          [1, 'Dana', 'Janssen', 'dana@agilestyle.com'],
+          [2, 'Ashley', 'Janssen', 'ashley@agilestyle.com'],
+          [3, 'Matthew', 'Riemer', 'matthew@agilestyle.com'],
+          [4, 'Stephen', 'Brown', 'stephen@agilestyle.com'],
+          [5, 'Warren', 'Uhrich', 'warren@agilestyle.com'],
+          [6, 'Dallas', 'Meidinger', 'dallas@agilestyle.com'],
+          [7, 'Nathan', 'Feaver', 'nathan@agilestyle.com']
+        ]
+      end
+
+    end
+  end
+end
+```
+
 ## table_column
 
 This is the main DSL method that you will interact with.
 
 table_column defines a 1:1 mapping between a SQL database table column and a frontend jQuery Datatables table column.  It creates a column.
+
+table_column performs searching and sorting on the raw database records, before any results are rendered.
 
 Options may be passed to specify the display, search, sort and filter behaviour for that column.
 
@@ -239,7 +273,24 @@ table_column :user_id, :if => Proc.new { attributes[:user_id].blank? }, :filter 
 end
 ```
 
-All table_columns are `:visible => true`, `:sortable => true` by default.
+All table_columns are `visible: true`, `sortable: true` by default.
+
+## array_column
+
+`array_column` accepts the same options as `table_column` and behaves identically on the frontend.
+
+The difference occurs with sorting and filtering:
+
+array_columns perform searching and sorting on the computed results after all columns have been rendered.
+
+With a `table_column`, the frontend sends some search terms to the server, the raw database table is searched & sorted using standard ActiveRecord .where(), the appropriate rows returned, and then each row is rendered as per the rendering options.
+
+With an `array_column`, the front end sends some search terms to the server, all rows are returned and rendered, and then the rendered output is searched & sorted.
+
+This allows the output of an `array_column` to be anything complex that cannot be easily computed from the database.
+
+When searching & sorting with a mix of table_columns and array_columns, all the table_columns are processed first so the most work is put on the database, the least on rails.
+
 
 ### General Options
 
@@ -375,21 +426,6 @@ Quickly create multiple table_columns all with default options:
 ```ruby
 table_columns :id, :created_at, :updated_at, :category, :title
 ```
-
-## array_column
-
-`array_column` accepts the same options as `table_column` and behaves identically on the frontend.
-
-The difference occurs with sorting and filtering:
-
-With a `table_column`, the frontend sends some search terms to the server, the raw database table is searched & sorted using standard ActiveRecord .where(), the appropriate rows returned, and then each row is rendered as per the rendering options.
-
-With an `array_column`, the front end sends some search terms to the server, all rows are returned and rendered, and then the rendered output is searched & sorted.
-
-This allows the output of an `array_column` to be anything complex that cannot be easily computed from the database.
-
-When searching & sorting with a mix of table_columns and array_columns, all the table_columns are processed first so the most work is put on the database, the least on rails.
-
 
 ## default_order
 
@@ -534,37 +570,28 @@ module Effective
 end
 ```
 
-## Array Backed collection
+## Working with other effective_gems
 
-Don't want to use ActiveRecord? Not a problem.
+### Effective Obfuscation
 
-Define your collection as an Array of Arrays, declare only array_columns, and everything works as expected.
+When working with an ActiveRecord collection that implements [effective_obfuscation](https://github.com/code-and-effect/effective_obfuscation) for the ID column,
+that column's filters and sorting will be automatically configured.
 
-```ruby
-module Effective
-  module Datatables
-    class ArrayBackedDataTable < Effective::Datatable
-      array_column :id
-      array_column :first_name
-      array_column :last_name
-      array_column :email
+Just define `table_column :id`.
 
-      def collection
-        [
-          [1, 'Dana', 'Janssen', 'dana@agilestyle.com'],
-          [2, 'Ashley', 'Janssen', 'ashley@agilestyle.com'],
-          [3, 'Matthew', 'Riemer', 'matthew@agilestyle.com'],
-          [4, 'Stephen', 'Brown', 'stephen@agilestyle.com'],
-          [5, 'Warren', 'Uhrich', 'warren@agilestyle.com'],
-          [6, 'Dallas', 'Meidinger', 'dallas@agilestyle.com'],
-          [7, 'Nathan', 'Feaver', 'nathan@agilestyle.com']
-        ]
-      end
+Unfortunately, due to the effective_obfuscation algorithm, sorting and filtering by partial values is not supported.
 
-    end
-  end
-end
-```
+So the column may not be sorted, and may only be filtered by typing the entire 10-digit number, with or without any formatting.
+
+### Effective Roles
+
+When working with an ActiveRecord collection that implements [effective_roles](https://github.com/code-and-effect/effective_roles),
+the filters and sorting will be automatically configured.
+
+Just define `table_column :roles`.
+
+The `EffectiveRoles.roles` collection will be used for the filter values, and sorting will be done by roles_mask.
+
 
 ## Get access to the raw results
 
