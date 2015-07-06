@@ -454,7 +454,8 @@ module Effective
 
         # EffectiveRoles, if you do table_column :roles, everything just works
         if name == 'roles' && defined?(EffectiveRoles) && collection.respond_to?(:with_role)
-          cols[name][:sortable] = false
+          cols[name][:sortable] = true
+          cols[name][:column] = sql_table.present? ? "\"#{sql_table.name}\".\"roles_mask\"" : name
           cols[name][:type] = :effective_roles
         end
 
