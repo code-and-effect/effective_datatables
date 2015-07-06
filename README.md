@@ -577,7 +577,7 @@ end
 When working with an ActiveRecord collection that implements [effective_obfuscation](https://github.com/code-and-effect/effective_obfuscation) for the ID column,
 that column's filters and sorting will be automatically configured.
 
-Just define `table_column :id`.
+Just define `table_column :id`
 
 Unfortunately, due to the effective_obfuscation algorithm, sorting and filtering by partial values is not supported.
 
@@ -588,7 +588,7 @@ So the column may not be sorted, and may only be filtered by typing the entire 1
 When working with an ActiveRecord collection that implements [effective_roles](https://github.com/code-and-effect/effective_roles),
 the filters and sorting will be automatically configured.
 
-Just define `table_column :roles`.
+Just define `table_column :roles`
 
 The `EffectiveRoles.roles` collection will be used for the filter values, and sorting will be done by roles_mask.
 
