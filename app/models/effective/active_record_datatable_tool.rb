@@ -42,9 +42,9 @@ module Effective
       case table_column[:type]
       when :string, :text
         if table_column[:filter][:type] == :select && table_column[:filter][:fuzzy] != true
-          collection.where("#{column} = :term", :term => term)
+          collection.where("#{column} = :term", term: term)
         else
-          collection.where("#{column} ILIKE :term", :term => "%#{term}%")
+          collection.where("#{column} ILIKE :term", term: "%#{term}%")
         end
       when :datetime
         begin
@@ -68,22 +68,24 @@ module Effective
             end_at = start_at
           end
 
-          collection.where("#{column} >= :start_at AND #{column} <= :end_at", :start_at => start_at, :end_at => end_at)
+          collection.where("#{column} >= :start_at AND #{column} <= :end_at", start_at: start_at, end_at: end_at)
         rescue => e
           collection
         end
       when :obfuscated_id
         if (deobfuscated_id = collection.deobfuscate(term)) == term # We weren't able to deobfuscate it, so this is an Invalid ID
-          collection.where("#{column} = :term", :term => 0)
+          collection.where("#{column} = :term", term: 0)
         else
-          collection.where("#{column} = :term", :term => deobfuscated_id)
+          collection.where("#{column} = :term", term: deobfuscated_id)
         end
+      when :effective_roles
+        collection.with_role(term)
       when :integer
-        collection.where("#{column} = :term", :term => term.to_i)
+        collection.where("#{column} = :term", term: term.to_i)
       when :year
-        collection.where("EXTRACT(YEAR FROM #{column}) = :term", :term => term.to_i)
+        collection.where("EXTRACT(YEAR FROM #{column}) = :term", term: term.to_i)
       else
-        collection.where("#{column} = :term", :term => term)
+        collection.where("#{column} = :term", term: term)
       end
     end
 

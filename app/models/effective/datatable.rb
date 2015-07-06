@@ -355,6 +355,8 @@ module Effective
             val = (obj.send(name) rescue nil).to_s
           elsif opts[:type] == :obfuscated_id
             (obj.send(:to_param) rescue nil).to_s
+          elsif opts[:type] == :effective_roles
+            (obj.send(:roles) rescue []).join(', ')
           else
             val = (obj.send(name) rescue nil)
             val = (obj[opts[:array_index]] rescue nil) if val == nil
@@ -365,9 +367,7 @@ module Effective
           case value
           when Date
             value.strftime(EffectiveDatatables.date_format)
-          when Time
-            value.strftime(EffectiveDatatables.datetime_format)
-          when DateTime
+          when Time, DateTime
             value.strftime(EffectiveDatatables.datetime_format)
           else
             value.to_s
@@ -429,7 +429,7 @@ module Effective
       cols.each_with_index do |(name, _), index|
         # If this is a belongs_to, add an :if clause specifying a collection scope if
         if belong_tos.key?(name)
-          cols[name][:if] ||= Proc.new { attributes[belong_tos[name][:foreign_key]].blank? } # :if => Proc.new { attributes[:user_id].blank? }
+          cols[name][:if] ||= Proc.new { attributes[belong_tos[name][:foreign_key]].blank? }
         end
 
         sql_column = (collection.columns rescue []).find do |column|
@@ -443,12 +443,19 @@ module Effective
         cols[name][:column] ||= (sql_table && sql_column) ? "\"#{sql_table.name}\".\"#{sql_column.name}\"" : name
         cols[name][:width] ||= nil
         cols[name][:sortable] = true if cols[name][:sortable] == nil
-        cols[name][:type] ||= (belong_tos.key?(name) ? :belongs_to : (sql_column.try(:type).presence || :string))
+        cols[name][:type] ||= (belong_tos.key?(name) ? :belongs_to : sql_column.try(:type).presence) || :string
         cols[name][:class] = "col-#{cols[name][:type]} col-#{name} #{cols[name][:class]}".strip
 
-        if name == 'id' && collection.respond_to?(:deobfuscate)
+        # EffectiveObfuscation
+        if name == 'id' && defined?(EffectiveObfuscation) && collection.respond_to?(:deobfuscate)
           cols[name][:sortable] = false
           cols[name][:type] = :obfuscated_id
+        end
+
+        # EffectiveRoles, if you do table_column :roles, everything just works
+        if name == 'roles' && defined?(EffectiveRoles) && collection.respond_to?(:with_role)
+          cols[name][:sortable] = false
+          cols[name][:type] = :effective_roles
         end
 
         if sql_table.present? && sql_column.blank? # This is a SELECT AS column
@@ -464,38 +471,29 @@ module Effective
     end
 
     def initialize_table_column_filter(filter, col_type, belongs_to)
-      return {:type => :null} if filter == false
+      return {type: :null} if filter == false
 
-      if filter.kind_of?(Symbol)
-        filter = HashWithIndifferentAccess.new(:type => filter)
-      elsif filter.kind_of?(String)
-        filter = HashWithIndifferentAccess.new(:type => filter.to_sym)
-      elsif filter.kind_of?(Hash) == false
-        filter = HashWithIndifferentAccess.new()
-      end
+      filter = {type: filter.to_sym} if filter.kind_of?(String)
+      filter = {} unless filter.kind_of?(Hash)
 
       # This is a fix for passing filter[:selected] == false, it needs to be 'false'
       filter[:selected] = filter[:selected].to_s unless filter[:selected].nil?
 
-      filter = case col_type
+      case col_type
       when :belongs_to
-        HashWithIndifferentAccess.new(
-          :type => :select,
-          :values => Proc.new { belongs_to[:klass].all.map { |obj| [obj.to_s, obj.id] }.sort { |x, y| x[1] <=> y[1] } }
-        ).merge(filter)
+        {
+          type: :select,
+          values: Proc.new { belongs_to[:klass].all.map { |obj| [obj.to_s, obj.id] }.sort { |x, y| x[1] <=> y[1] } }
+        }
+      when :effective_roles
+        {type: :select, values: EffectiveRoles.roles}
       when :integer
-        HashWithIndifferentAccess.new(:type => :number).merge(filter)
+        {type: :number}
       when :boolean
-        HashWithIndifferentAccess.new(:type => :boolean, :values => [true, false]).merge(filter)
+        {type: :boolean, values: [true, false]}
       else
-        HashWithIndifferentAccess.new(:type => :string).merge(filter)
-      end
-
-      if filter[:type] == :boolean
-        filter = HashWithIndifferentAccess.new(:values => [true, false]).merge(filter)
-      end
-
-      filter
+        {type: :string}
+      end.merge(filter.symbolize_keys)
     end
 
   end
