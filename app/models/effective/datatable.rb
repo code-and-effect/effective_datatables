@@ -30,6 +30,10 @@ module Effective
         names.each { |name| table_column(name) }
       end
 
+      def dynamic_columns(&block)
+        define_method(:dynamic_columns) { self.instance_exec(&block) }
+      end
+
       def array_column(name, options = {}, proc = nil, &block)
         table_column(name, options.merge!({:array_column => true}), proc, &block)
       end
@@ -72,6 +76,11 @@ module Effective
       if args.present?
         raise 'Effective::Datatable.new() can only be called with a Hash like arguments' unless args.first.kind_of?(Hash)
         args.first.each { |k, v| self.attributes[k] = v }
+      end
+
+      if self.respond_to?(:dynamic_columns)
+        dynamic_columns()
+        initalize_table_columns(self.class.instance_variable_get(:@table_columns))
       end
 
       unless active_record_collection? || (collection.kind_of?(Array) && collection.first.kind_of?(Array))
@@ -258,7 +267,7 @@ module Effective
       @view.class.send(:attr_accessor, :effective_datatable)
       @view.effective_datatable = self
 
-      (self.class.instance_methods(false) - [:collection, :search_column]).each do |view_method|
+      (self.class.instance_methods(false) - [:collection, :search_column, :dynamic_columns]).each do |view_method|
         @view.class_eval { delegate view_method, :to => :@effective_datatable }
       end
 
@@ -395,6 +404,23 @@ module Effective
         @active_record_collection = (collection.ancestors.include?(ActiveRecord::Base) rescue false)
       else
         @active_record_collection
+      end
+    end
+
+    # This is a dynamic_table column called from within dynamic_columns do .. end
+    def table_column(name, options = {}, proc = nil, &block)
+      if block_given?
+        self.class.table_column(name, options.merge(dynamic: true), proc) { yield }
+      else
+        self.class.table_column(name, options.merge(dynamic: true), proc)
+      end
+    end
+
+    def array_column(name, options = {}, proc = nil, &block)
+      if block_given?
+        self.class.array_column(name, options.merge(dynamic: true), proc) { yield }
+      else
+        self.class.array_column(name, options.merge(dynamic: true), proc)
       end
     end
 
