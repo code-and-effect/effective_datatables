@@ -54,12 +54,7 @@ module EffectiveDatatablesHelper
   end
 
   def datatable_default_order(datatable)
-    [
-      if datatable.default_order.present?
-        index = (datatable.table_columns.values.find { |options| options[:name] == datatable.default_order.keys.first.to_s }[:index] rescue nil)
-        [index, datatable.default_order.values.first] if index.present?
-      end || [0, 'asc']
-    ].to_json()
+    [datatable.order_index, datatable.order_direction.downcase].to_json()
   end
 
   def datatable_widths(datatable)

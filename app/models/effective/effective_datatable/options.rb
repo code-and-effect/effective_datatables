@@ -1,25 +1,20 @@
 # This is extended as class level into Datatable
 
 module Effective
-  module Datatables
+  module EffectiveDatatable
     module Options
+
+      def initialize_options
+        @table_columns = initialize_column_options(@table_columns)
+      end
 
       protected
 
-      def table_columns_with_defaults
-        unless self.class.instance_variable_get(:@table_columns_initialized)
-          self.class.instance_variable_set(:@table_columns_initialized, true)
-          initalize_table_columns(self.class.instance_variable_get(:@table_columns))
-        end
-
-        self.class.instance_variable_get(:@table_columns)
-      end
-
-      def initalize_table_columns(cols)
+      def initialize_column_options(cols)
         sql_table = (collection.table rescue nil)
 
         # Here we identify all belongs_to associations and build up a Hash like:
-        # {:user => {:foreign_key => 'user_id', :klass => User}, :order => {:foreign_key => 'order_id', :klass => Effective::Order}}
+        # {user: {foreign_key: 'user_id', klass: User}, order: {foreign_key: 'order_id', klass: Effective::Order}}
         belong_tos = (collection.ancestors.first.reflect_on_all_associations(:belongs_to) rescue []).inject(HashWithIndifferentAccess.new()) do |retval, bt|
           unless bt.options[:polymorphic]
             begin
@@ -28,13 +23,13 @@ module Effective
               klass = nil
             end
 
-            retval[bt.name] = {:foreign_key => bt.foreign_key, :klass => klass} if bt.foreign_key.present? && klass.present?
+            retval[bt.name] = {foreign_key: bt.foreign_key, klass: klass} if bt.foreign_key.present? && klass.present?
           end
 
           retval
         end
 
-        cols.each_with_index do |(name, _), index|
+        table_columns = cols.each_with_index do |(name, _), index|
           # If this is a belongs_to, add an :if clause specifying a collection scope if
           if belong_tos.key?(name)
             cols[name][:if] ||= Proc.new { attributes[belong_tos[name][:foreign_key]].blank? }
@@ -77,6 +72,13 @@ module Effective
             cols[name][:partial_local] ||= (sql_table.try(:name) || cols[name][:partial].split('/').last(2).first.presence || 'obj').singularize.to_sym
           end
         end
+
+        # After everything is initialized
+        # Compute any col[:if] and assign an index
+        table_columns.select do |_, col|
+          col[:if] == nil || (col[:if].respond_to?(:call) ? (view || self).instance_exec(&col[:if]) : col[:if])
+        end.each_with_index { |(_, col), index| col[:index] = index }
+
       end
 
       def initialize_table_column_filter(filter, col_type, belongs_to)

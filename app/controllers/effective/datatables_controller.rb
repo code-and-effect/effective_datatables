@@ -4,7 +4,7 @@ module Effective
 
     # This will respond to both a GET and a POST
     def show
-      @datatable = Effective::Datatable.find(params[:id], params[:attributes])
+      @datatable = find_datatable(params[:id]).try(:new, params[:attributes])
       @datatable.view = view_context if !@datatable.nil?
 
       EffectiveDatatables.authorized?(self, :index, @datatable.try(:collection_class) || Effective::Datatable)
@@ -23,6 +23,10 @@ module Effective
     end
 
     private
+
+    def find_datatable(id)
+      "effective/datatables/#{id}".classify.tap { |klass| klass << 's' if id.to_s.end_with?('s') }.safe_constantize
+    end
 
     def error_json
       {

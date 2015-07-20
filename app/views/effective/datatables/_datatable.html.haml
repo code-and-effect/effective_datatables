@@ -14,7 +14,7 @@
       'non-visible' => datatable_non_visible(datatable),
       'widths' => datatable_widths(datatable),
       'default-order' => datatable_default_order(datatable),
-      'default-entries' => datatable.default_entries,
+      'display-entries' => datatable.display_entries,
       'display-records' => (datatable.to_json[:recordsFiltered] || 0),
       'total-records' => (datatable.to_json[:recordsTotal] || 0),
       'column-classes' => datatable_column_classes(datatable)

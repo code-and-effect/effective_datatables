@@ -20,15 +20,4 @@ module EffectiveDatatables
     true
   end
 
-  def self.datatables
-    Rails.env.development? ? read_datatables : (@@datatables ||= read_datatables)
-  end
-
-  private
-
-  def self.read_datatables
-    Rails.application.eager_load! unless Rails.configuration.cache_classes
-    Effective::Datatable.descendants.map { |klass| klass }.compact
-  end
-
 end
