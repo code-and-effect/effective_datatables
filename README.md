@@ -67,10 +67,12 @@ This model exists at `/app/models/effective/datatables/posts.rb`:
 module Effective
   module Datatables
     class Posts < Effective::Datatable
-      table_column :id
-      table_column :user    # if Post belongs_to :user
-      table_column :title
-      table_column :created_at
+      datatable do
+        table_column :id
+        table_column :user    # if Post belongs_to :user
+        table_column :title
+        table_column :created_at
+      end
 
       def collection
         Post.all
@@ -88,7 +90,7 @@ We're going to display this DataTable on the posts#index action
 ```ruby
 class PostsController < ApplicationController
   def index
-    @datatable = Effective::Datatables::Posts.new()
+    @datatable = Effective::Datatables::Posts.new
   end
 end
 ```
@@ -128,31 +130,33 @@ For example: `/app/models/effective/datatables/posts.rb`:
 module Effective
   module Datatables
     class Posts < Effective::Datatable
-      default_order :created_at, :desc
-      default_entries 25
+      datatable do
+        default_order :created_at, :desc
+        default_entries 25
 
-      table_column :id, :visible => false
+        table_column :id, :visible => false
 
-      table_column :created_at, :width => '25%'
+        table_column :created_at, :width => '25%'
 
-      table_column :updated_at, :proc => Proc.new { |post| nicetime(post.updated_at) } # just a standard helper as defined in helpers/application_helper.rb
+        table_column :updated_at, :proc => Proc.new { |post| nicetime(post.updated_at) } # just a standard helper as defined in helpers/application_helper.rb
 
-      table_column :user
+        table_column :user
 
-      table_column :post_category_id, :filter => {:type => :select, :values => Proc.new { PostCategory.all } } do |post|
-        post.post_category.name.titleize
-      end
-
-      array_column :comments do |post|
-        content_tag(:ul) do
-          post.comments.where(:archived => false).map do |comment|
-            content_tag(:li, comment.title)
-          end.join('').html_safe
+        table_column :post_category_id, :filter => {:type => :select, :values => Proc.new { PostCategory.all } } do |post|
+          post.post_category.name.titleize
         end
-      end
 
-      table_column :title, :label => 'Post Title', :class => 'col-title'
-      table_column :actions, :sortable => false, :filter => false, :partial => '/posts/actions'
+        array_column :comments do |post|
+          content_tag(:ul) do
+            post.comments.where(:archived => false).map do |comment|
+              content_tag(:li, comment.title)
+            end.join('').html_safe
+          end
+        end
+
+        table_column :title, :label => 'Post Title', :class => 'col-title'
+        table_column :actions, :sortable => false, :filter => false, :partial => '/posts/actions'
+      end
 
       def collection
         Post.where(:archived => false).includes(:post_category)
@@ -211,10 +215,12 @@ Define your collection as an Array of Arrays, declare only array_columns, and ev
 module Effective
   module Datatables
     class ArrayBackedDataTable < Effective::Datatable
-      array_column :id
-      array_column :first_name
-      array_column :last_name
-      array_column :email
+      datatable do
+        array_column :id
+        array_column :first_name
+        array_column :last_name
+        array_column :email
+      end
 
       def collection
         [
@@ -503,23 +509,28 @@ class PostsController < ApplicationController
 end
 ```
 
-Scope the query to the passed user in in your collection method:
+And then in your datatable:
 
 ```ruby
-def collection
-  if attributes[:user_id]
-    Post.where(:user_id => attributes[:user_id])
-  else
-    Post.all
+module Effective
+  module Datatables
+    class Posts < Effective::Datatable
+      datatable do
+        if attributes[:user_id].blank?
+          table_column :user_id { |post| post.user.email }
+        end
+      end
+
+      def collection
+        if attributes[:user_id]
+          Post.where(user_id: attributes[:user_id])
+        else
+          Post.all
+        end
+      end
+
+    end
   end
-end
-```
-
-and remove the table_column when a user_id is present:
-
-```ruby
-table_column :user_id, :if => Proc.new { attributes[:user_id].blank? } do |post|
-  post.user.email
 end
 ```
 
@@ -531,14 +542,6 @@ Any non-private methods defined in the datatable model will be available to your
 module Effective
   module Datatables
     class Posts < Effective::Datatable
-      table_column :title do |post|
-        format_post_title(post)
-      end
-
-      def collection
-        Post.all
-      end
-
       def format_post_title(post)
         if post.title.start_with?('important')
           link_to(post.title.upcase, post_path(post))
@@ -547,6 +550,15 @@ module Effective
         end
       end
 
+      datatable do
+        table_column :title do |post|
+          format_post_title(post)
+        end
+      end
+
+      def collection
+        Post.all
+      end
     end
   end
 end
@@ -680,10 +692,12 @@ In this example, a User belongs_to an Applicant.  But instead of using the built
 module Effective
   module Datatables
     class Applicants < Effective::Datatable
-      table_column :id, visible: true
+      datatable do
+        table_column :id, visible: true
 
-      table_column :user, :type => :string, :column => 'users.email' do |applicant|
-        link_to applicant.user.try(:email), edit_admin_user_path(applicant.user)
+        table_column :user, :type => :string, :column => 'users.email' do |applicant|
+          link_to applicant.user.try(:email), edit_admin_user_path(applicant.user)
+        end
       end
 
       def collection
