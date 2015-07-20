@@ -274,8 +274,12 @@ table_column :created_at
 table_column :user
 
 # Will have the same behaviour as declaring
-table_column :user_id, :if => Proc.new { attributes[:user_id].blank? }, :filter => {:type => :select, :values => Proc.new { User.all.map { |user| [user.id, user.to_s] }.sort { |x, y| x[1] <=> y[1] } } } do |post|
-  post.user.to_s
+datatable do
+  if attributes[:user_id].blank?
+    table_column :user_id, :filter => {:type => :select, :values => Proc.new { User.all.map { |user| [user.id, user.to_s] }.sort { |x, y| x[1] <=> y[1] } } } do |post|
+      post.user.to_s
+    end
+  end
 end
 ```
 
@@ -305,7 +309,6 @@ The following options control the general behaviour of the column:
 ```ruby
 :column => 'users.id'     # Set this if you're doing something tricky with the database.  Used internally for .order() and .where() clauses
 :type => :string          # Derived from the ActiveRecord attribute default datatype.  Controls searching behaviour.  Valid options include :string, :text, :datetime, :integer, :boolean, :year
-:if => Proc.new { attributes[:user_id].blank? }  # Excludes this table_column entirely if false. See "Initialize with attributes" section of this README below
 ```
 
 ### Display Options
