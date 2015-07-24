@@ -46,7 +46,7 @@ module Effective
         else
           collection.where("#{column} ILIKE :term", term: "%#{term}%")
         end
-      when :datetime
+      when :datetime, :date
         begin
           digits = term.scan(/(\d+)/).flatten.map(&:to_i)
           start_at = Time.zone.local(*digits)

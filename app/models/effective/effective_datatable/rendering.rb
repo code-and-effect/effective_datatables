@@ -96,6 +96,10 @@ module Effective
               (obj.send(:to_param) rescue nil).to_s
             elsif opts[:type] == :effective_roles
               (obj.send(:roles) rescue []).join(', ')
+            elsif opts[:type] == :datetime
+              (obj.send(name).strftime(EffectiveDatatables.datetime_format) rescue nil)
+            elsif opts[:type] == :date
+              (obj.send(name).strftime(EffectiveDatatables.date_format) rescue nil)
             else
               val = (obj.send(name) rescue nil)
               val = (obj[opts[:array_index]] rescue nil) if val == nil
