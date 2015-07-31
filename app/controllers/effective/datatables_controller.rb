@@ -1,6 +1,6 @@
 module Effective
   class DatatablesController < ApplicationController
-    skip_log_page_views if defined?(EffectiveLogging)
+    skip_log_page_views quiet: true if defined?(EffectiveLogging)
 
     # This will respond to both a GET and a POST
     def show
