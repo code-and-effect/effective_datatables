@@ -34,6 +34,7 @@ module EffectiveDatatablesHelper
       form.input name, label: false, required: false,
         as: (defined?(EffectiveFormInputs) ? :effective_select : :select),
         collection: opts[:filter][:values],
+        multiple: opts[:filter][:multiple] == true,
         include_blank: (opts[:label] || name.titleize).present?,
         input_html: { name: nil, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} },
         input_js: { placeholder: (opts[:label] || name.titleize) }

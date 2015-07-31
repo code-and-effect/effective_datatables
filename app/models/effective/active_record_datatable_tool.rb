@@ -47,6 +47,9 @@ module Effective
           collection.where("#{column} ILIKE :term", term: "%#{term}%")
         end
       when :has_many
+        inverse_ids = term.split(',').map { |term| (term = term.to_i) == 0 ? nil : term }.compact
+        return collection unless inverse_ids.present?
+
         reflection = collection.klass.reflect_on_association(table_column[:name].to_sym)
         raise "unable to find #{collection.klass.name} :has_many :#{table_column[:name]} association" unless reflection
 
@@ -56,7 +59,7 @@ module Effective
         inverse = klass.reflect_on_association(collection.table_name) || obj.class.reflect_on_association(collection.table_name.singularize)
         raise "unable to find #{klass.name} has_many :#{collection.table_name} or belongs_to :#{collection.table_name.singularize} associations" unless inverse
 
-        ids = klass.where(id: term.to_i).joins(inverse.name).pluck(inverse.foreign_key)
+        ids = klass.where(id: inverse_ids).joins(inverse.name).pluck(inverse.foreign_key)
 
         collection.where(id: ids)
       when :datetime, :date

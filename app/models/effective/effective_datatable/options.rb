@@ -64,6 +64,11 @@ module Effective
 
           cols[name][:class] = "col-#{cols[name][:type]} col-#{name} #{cols[name][:class]}".strip
 
+          # HasMany
+          if cols[name][:type] == :has_many
+            cols[name][:sortable] = false
+          end
+
           # EffectiveObfuscation
           if name == 'id' && defined?(EffectiveObfuscation) && collection.respond_to?(:deobfuscate)
             cols[name][:sortable] = false
@@ -114,6 +119,7 @@ module Effective
         when :has_many
           {
             type: :select,
+            multiple: true,
             values: Proc.new { has_many[:klass].all.map { |obj| [obj.to_s, obj.id] }.sort { |x, y| x[1] <=> y[1] } }
           }
         when :effective_roles
