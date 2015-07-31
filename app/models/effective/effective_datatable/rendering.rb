@@ -91,7 +91,10 @@ module Effective
             elsif opts[:proc]
               view.instance_exec(obj, collection, self, &opts[:proc])
             elsif opts[:type] == :belongs_to
-              val = (obj.send(name) rescue nil).to_s
+              (obj.send(name) rescue nil).to_s
+            elsif opts[:type] == :has_many
+              objs = (obj.send(name).map(&:to_s).sort rescue [])
+              objs.length == 1 ? objs.first : (opts[:sentence] ? objs.to_sentence : objs.join('<br>'))
             elsif opts[:type] == :obfuscated_id
               (obj.send(:to_param) rescue nil).to_s
             elsif opts[:type] == :effective_roles
@@ -106,15 +109,6 @@ module Effective
               val
             end
 
-            # Last minute formatting of dates
-            case value
-            when Date
-              value.strftime(EffectiveDatatables.date_format)
-            when Time, DateTime
-              value.strftime(EffectiveDatatables.datetime_format)
-            else
-              value.to_s
-            end
           end
         end
       end

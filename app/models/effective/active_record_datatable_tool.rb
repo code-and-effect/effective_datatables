@@ -46,6 +46,19 @@ module Effective
         else
           collection.where("#{column} ILIKE :term", term: "%#{term}%")
         end
+      when :has_many
+        reflection = collection.klass.reflect_on_association(table_column[:name].to_sym)
+        raise "unable to find #{collection.klass.name} :has_many :#{table_column[:name]} association" unless reflection
+
+        obj = reflection.build_association({}) # Clinic
+        klass = obj.class
+
+        inverse = klass.reflect_on_association(collection.table_name) || obj.class.reflect_on_association(collection.table_name.singularize)
+        raise "unable to find #{klass.name} has_many :#{collection.table_name} or belongs_to :#{collection.table_name.singularize} associations" unless inverse
+
+        ids = klass.where(id: term.to_i).joins(inverse.name).pluck(inverse.foreign_key)
+
+        collection.where(id: ids)
       when :datetime, :date
         begin
           digits = term.scan(/(\d+)/).flatten.map(&:to_i)

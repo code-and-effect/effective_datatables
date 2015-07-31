@@ -15,17 +15,19 @@ module Effective
 
         # Here we identify all belongs_to associations and build up a Hash like:
         # {user: {foreign_key: 'user_id', klass: User}, order: {foreign_key: 'order_id', klass: Effective::Order}}
-        belong_tos = (collection.ancestors.first.reflect_on_all_associations(:belongs_to) rescue []).inject(HashWithIndifferentAccess.new()) do |retval, bt|
-          unless bt.options[:polymorphic]
-            begin
-              klass = bt.klass || bt.foreign_type.sub('_type', '').classify.constantize
-            rescue => e
-              klass = nil
-            end
+        belong_tos = (collection.klass.reflect_on_all_associations(:belongs_to) rescue []).inject({}) do |retval, bt|
+          next if bt.options[:polymorphic]
 
-            retval[bt.name] = {foreign_key: bt.foreign_key, klass: klass} if bt.foreign_key.present? && klass.present?
-          end
+          klass = bt.klass || (bt.foreign_type.sub('_type', '').classify.constantize rescue nil)
+          retval[bt.name.to_s] = {foreign_key: bt.foreign_key, klass: klass} if bt.foreign_key.present? && klass.present?
 
+          retval
+        end
+
+        # has_manys
+        has_manys = (collection.klass.reflect_on_all_associations(:has_many) rescue []).inject({}) do |retval, hm|
+          klass = hm.klass || (hm.build_association({}).class)
+          retval[hm.name.to_s] = {klass: klass}
           retval
         end
 
@@ -46,7 +48,20 @@ module Effective
           cols[name][:column] ||= (sql_table && sql_column) ? "\"#{sql_table.name}\".\"#{sql_column.name}\"" : name
           cols[name][:width] ||= nil
           cols[name][:sortable] = true if cols[name][:sortable] == nil
-          cols[name][:type] ||= (belong_tos.key?(name) ? :belongs_to : sql_column.try(:type).presence) || :string
+
+          # Type
+          cols[name][:type] ||= (
+            if belong_tos.key?(name)
+              :belongs_to
+            elsif has_manys.key?(name)
+              :has_many
+            elsif sql_column.try(:type).present?
+              sql_column.type
+            else
+              :string # When in doubt
+            end
+          )
+
           cols[name][:class] = "col-#{cols[name][:type]} col-#{name} #{cols[name][:class]}".strip
 
           # EffectiveObfuscation
@@ -66,7 +81,7 @@ module Effective
             cols[name][:sql_as_column] = true
           end
 
-          cols[name][:filter] = initialize_table_column_filter(cols[name][:filter], cols[name][:type], belong_tos[name])
+          cols[name][:filter] = initialize_table_column_filter(cols[name][:filter], cols[name][:type], belong_tos[name], has_manys[name])
 
           if cols[name][:partial]
             cols[name][:partial_local] ||= (sql_table.try(:name) || cols[name][:partial].split('/').last(2).first.presence || 'obj').singularize.to_sym
@@ -81,7 +96,7 @@ module Effective
 
       end
 
-      def initialize_table_column_filter(filter, col_type, belongs_to)
+      def initialize_table_column_filter(filter, col_type, belongs_to, has_many)
         return {type: :null} if filter == false
 
         filter = {type: filter.to_sym} if filter.kind_of?(String)
@@ -95,6 +110,11 @@ module Effective
           {
             type: :select,
             values: Proc.new { belongs_to[:klass].all.map { |obj| [obj.to_s, obj.id] }.sort { |x, y| x[1] <=> y[1] } }
+          }
+        when :has_many
+          {
+            type: :select,
+            values: Proc.new { has_many[:klass].all.map { |obj| [obj.to_s, obj.id] }.sort { |x, y| x[1] <=> y[1] } }
           }
         when :effective_roles
           {type: :select, values: EffectiveRoles.roles}
