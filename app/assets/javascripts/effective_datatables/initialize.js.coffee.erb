@@ -33,14 +33,17 @@ initializeDataTables = ->
           stateChange: (iCol, bVisible) ->
             timeout = $(this.dom.button).data('timeout')
             clearTimeout(timeout) if timeout
-            timeout = setTimeout((=> $(this.dom.button).closest('.dataTables_wrapper').find('table').first().DataTable().draw()), 1000)
+            timeout = setTimeout(
+              =>
+                $(this.dom.button).closest('.dataTables_wrapper').find('table').first().DataTable().draw()
+                $.event.trigger('page:change')
+            , 1000)
             $(this.dom.button).data('timeout', timeout)
         tableTools:
           sSwfPath: "<%= asset_path('effective_datatables/copy_csv_xls_pdf.swf') %>",
           aButtons: ['csv', {'sExtends': 'xls', 'sButtonText': 'Excel'}, 'print']
 
-      simple = datatable.data('effective-datatables-table') == 'simple'
-      if simple
+      if datatable.data('effective-datatables-table') == 'simple'
         init_options['lengthMenu'] = [-1] # Show all results
         init_options['dom'] = "<'row'r>t" # Just show the table
 
@@ -55,7 +58,9 @@ initializeDataTables = ->
         table.DataTable().column("#{obj.data('column-name')}:name").search(obj.val()).draw()
 
       # For every existing Input, Set up the search events
-      (search_inputs = datatable.find('thead').first().find('input,select')).each (index, input) ->
+      search_inputs = datatable.find('thead').first().find('input,select')
+
+      search_inputs.each (index, input) ->
         $input = $(input)
 
         if $input.data('column-name')
