@@ -50,8 +50,8 @@ initializeDataTables = ->
         $input = $(input)
 
         if $input.data('column-name')
-          $input.on 'click', (event) -> false # Dont order columns when you click inside the input
-          $input.on 'mousedown', (event) -> event.stopPropagation() # Dont order columns when you click inside the input
+          $input.parent().on 'click', (event) -> false # Dont order columns when you click inside the input
+          $input.parent().on 'mousedown', (event) -> event.stopPropagation() # Dont order columns when you click inside the input
 
           if $input.is('select')
             $input.on 'change', (event) -> dataTableSearch(event)
