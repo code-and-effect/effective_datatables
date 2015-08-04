@@ -59,8 +59,8 @@ module Effective
 
         # We want to use the render :collection for each column that renders partials
         rendered = {}
-        table_columns.each do |name, opts|
-          if opts[:partial]
+        (display_table_columns || table_columns).each do |name, opts|
+          if opts[:partial] && opts[:visible]
             locals = {
               datatable: self,
               table_column: table_columns[name],
@@ -84,7 +84,9 @@ module Effective
 
         collection.each_with_index.map do |obj, index|
           (display_table_columns || table_columns).map do |name, opts|
-            value = if opts[:partial]
+            if opts[:visible] == false
+              ''
+            elsif opts[:partial]
               rendered[name][index]
             elsif opts[:block]
               view.instance_exec(obj, collection, self, &opts[:block])
@@ -104,9 +106,7 @@ module Effective
             elsif opts[:type] == :date
               (obj.send(name).strftime(EffectiveDatatables.date_format) rescue nil)
             else
-              val = (obj.send(name) rescue nil)
-              val = (obj[opts[:array_index]] rescue nil) if val == nil
-              val
+              obj.send(name) rescue (obj[opts[:array_index]] rescue nil)
             end
 
           end

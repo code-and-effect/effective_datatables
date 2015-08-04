@@ -8,12 +8,11 @@ module Effective
       # It sends us a list of columns that are different than our table_columns order
       # So this method just returns an array of column names, as per ColReorder
       def display_table_columns
-        if params[:columns].present?
-          HashWithIndifferentAccess.new().tap do |display_columns|
-            params[:columns].each do |_, values|
-              display_columns[values[:name]] = table_columns[values[:name]]
-            end
-          end
+        return nil if params[:columns].blank?
+
+        @display_table_columns ||= params[:columns].each_with_object({}) do |(_, column), retval|
+          retval[column[:name]] = table_columns[column[:name]] # Same order as ColReordernow
+          retval[column[:name]][:visible] = (column[:visible] == 'true') # As per ColVis
         end
       end
 

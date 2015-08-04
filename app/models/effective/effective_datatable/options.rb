@@ -47,7 +47,8 @@ module Effective
           cols[name][:label] ||= name.titleize
           cols[name][:column] ||= (sql_table && sql_column) ? "\"#{sql_table.name}\".\"#{sql_column.name}\"" : name
           cols[name][:width] ||= nil
-          cols[name][:sortable] = true if cols[name][:sortable] == nil
+          cols[name][:sortable] = true if cols[name][:sortable].nil?
+          cols[name][:visible] = true if cols[name][:visible].nil?
 
           # Type
           cols[name][:type] ||= (

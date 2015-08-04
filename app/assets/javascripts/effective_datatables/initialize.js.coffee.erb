@@ -20,12 +20,20 @@ initializeDataTables = ->
           { sortable: false, targets: datatable.data('non-sortable') }
         ].concat(datatable.data('column-classes') || []).concat(datatable.data('column-names') || [])
         order: datatable.data('default-order')
+        serverParams: (params) ->
+          table = this.DataTable()
+          table.columns().flatten().each (index) =>  # Pass which columns are visible back to server
+            params['columns'][index]['visible'] =  table.column(index).visible()
+
         colVis:
           showAll: 'Show all'
           restore: 'Show default'
           activate: 'click'
           align: 'right'
           label: (index, title, th) -> $(th).prop('title')
+          # stateChange: (iCol, bVisible) ->
+          #   $.event.trigger({type: 'datatables:colvis:change', message: 'columns changed', colvis: this.dom.button})
+
         tableTools:
           sSwfPath: "<%= asset_path('effective_datatables/copy_csv_xls_pdf.swf') %>",
           aButtons: ['csv', {'sExtends': 'xls', 'sButtonText': 'Excel'}, 'print']
@@ -67,6 +75,11 @@ initializeDataTables = ->
         if $input.data('column-index') && $input.data('column-name') && $input.val()
           table.fnSettings().aoPreSearchCols[$input.data('column-index')].sSearch = $input.val()
 
+      # ColVis callback when columns change
+      table.on('column-visibility', (e, settings, colIdx, visibility) ->
+        console.log 'changed'
+      )
+
       # FixedColumns doesn't work well yet.
       # fixedColumns = new $.fn.dataTable.FixedColumns(table,
       #  leftColumns: 2
@@ -76,3 +89,21 @@ initializeDataTables = ->
 
 $ -> initializeDataTables()
 $(document).on 'page:change', -> initializeDataTables()
+
+
+
+
+# $(document).on 'datatables:colvis:change', (event) ->
+#   colVisChanged = ->
+#     console.log 'colvis changed'
+#     console.log event
+
+#   console.log 'colvis event'
+#   $.debounce(1000, colVisChanged)
+
+
+  # console.log 'colvis changeevent'
+  # console.log event
+  # #$(event.currentTarget).closest('.dataTables_wrapper').find('table').first().DataTable().draw()
+  # console.log $(event.colvis).closest('.dataTables_wrapper').find('table')
+  # $(event.colvis).closest('.dataTables_wrapper').find('table').first().DataTable().draw()
