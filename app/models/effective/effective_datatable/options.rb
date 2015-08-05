@@ -129,6 +129,10 @@ module Effective
           {type: :number}
         when :boolean
           {type: :boolean, values: [true, false]}
+        when :datetime
+          {type: :datetime}
+        when :date
+          {type: :date}
         else
           {type: :string}
         end.merge(filter.symbolize_keys)

@@ -22,6 +22,19 @@ module EffectiveDatatablesHelper
     when :string, :text, :number
       form.input name, label: false, required: false, as: :string, placeholder: (opts[:label] || name),
         input_html: { name: nil, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} }
+    when :date
+      form.input name, label: false, required: false,
+        as: (defined?(EffectiveFormInputs) ? :effective_date_picker : :string),
+        placeholder: (opts[:label] || name),
+        input_group: false,
+        input_html: { name: nil, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} }
+    when :datetime
+      form.input name, label: false, required: false,
+        as: (defined?(EffectiveFormInputs) ? :effective_date_time_picker : :string),
+        placeholder: (opts[:label] || name),
+        input_group: false,
+        input_html: { name: nil, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} }
+
     when :select, :boolean
       if opts[:filter][:values].respond_to?(:call)
         opts[:filter][:values] = opts[:filter][:values].call()
