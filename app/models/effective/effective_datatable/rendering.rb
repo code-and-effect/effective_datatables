@@ -95,27 +95,32 @@ module Effective
             elsif opts[:type] == :belongs_to
               (obj.send(name) rescue nil).to_s
             elsif opts[:type] == :has_many
-              objs = (obj.send(name).map(&:to_s).sort rescue [])
+              objs = (obj.send(name).map { |x| x.to_s }.sort rescue [])
               objs.length == 1 ? objs.first : (opts[:sentence] ? objs.to_sentence : objs.join('<br>'))
             elsif opts[:type] == :obfuscated_id
               (obj.send(:to_param) rescue nil).to_s
             elsif opts[:type] == :effective_roles
               (obj.send(:roles) rescue []).join(', ')
-            elsif opts[:type] == :datetime
-              (obj.send(name).strftime(EffectiveDatatables.datetime_format) rescue nil)
-            elsif opts[:type] == :date
-              (obj.send(name).strftime(EffectiveDatatables.date_format) rescue nil)
-            elsif opts[:type] == :price
-              # This is price_to_currency from effective_form_inputs retyped...
-              price = ((obj.send(name) || 0) rescue 0)
-              raise 'column type: price expects an Integer representing the number of cents' unless price.kind_of?(Integer)
-              number_to_currency(price / 100.0)
-            elsif opts[:type] == :currency
-              number_to_currency(((obj.send(name) || 0) rescue 0))
             else
-              obj.send(name) rescue (obj[opts[:array_index]] rescue nil)
-            end
+              # Normal value, but we still may want to format it
+              value = (obj.send(name) rescue nil) || (obj[name] rescue nil) || (obj[opts[:array_index]] rescue nil)
 
+              case opts[:type]
+              when :datetime
+                value.strftime(EffectiveDatatables.datetime_format) rescue nil
+              when :date
+                value.strftime(EffectiveDatatables.date_format) rescue nil
+              when :price
+                # This is an integer value, "number of cents"
+                value ||= 0
+                raise 'column type: price expects an Integer representing the number of cents' unless value.kind_of?(Integer)
+                number_to_currency(value / 100.0)
+              when :currency
+                number_to_currency(value || 0)
+              else
+                value
+              end
+            end
           end
         end
       end

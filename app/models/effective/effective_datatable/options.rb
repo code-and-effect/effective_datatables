@@ -87,7 +87,7 @@ module Effective
             cols[name][:sql_as_column] = true
           end
 
-          cols[name][:filter] = initialize_table_column_filter(cols[name][:filter], cols[name][:type], belong_tos[name], has_manys[name])
+          cols[name][:filter] = initialize_table_column_filter(cols[name], belong_tos[name], has_manys[name])
 
           if cols[name][:partial]
             cols[name][:partial_local] ||= (sql_table.try(:name) || cols[name][:partial].split('/').last(2).first.presence || 'obj').singularize.to_sym
@@ -102,7 +102,11 @@ module Effective
 
       end
 
-      def initialize_table_column_filter(filter, col_type, belongs_to, has_many)
+      def initialize_table_column_filter(column, belongs_to, has_many)
+        filter = column[:filter]
+        col_type = column[:type]
+        sql_column = column[:column].to_s.upcase
+
         return {type: :null} if filter == false
 
         filter = {type: filter.to_sym} if filter.kind_of?(String)
@@ -111,17 +115,22 @@ module Effective
         # This is a fix for passing filter[:selected] == false, it needs to be 'false'
         filter[:selected] = filter[:selected].to_s unless filter[:selected].nil?
 
+        # Check if this is an aggregate column
+        if ['SUM(', 'COUNT(', 'MAX(', 'MIN(', 'AVG('].any? { |str| sql_column.include?(str) }
+          filter[:sql_operation] = :having
+        end
+
         case col_type
         when :belongs_to
           {
             type: :select,
-            values: Proc.new { belongs_to[:klass].all.map { |obj| [obj.to_s, obj.id] }.sort { |x, y| x[1] <=> y[1] } }
+            values: Proc.new { belongs_to[:klass].all.map { |obj| [obj.to_s, obj.id] }.sort { |x, y| x[0] <=> y[0] } }
           }
         when :has_many
           {
             type: :select,
             multiple: true,
-            values: Proc.new { has_many[:klass].all.map { |obj| [obj.to_s, obj.id] }.sort { |x, y| x[1] <=> y[1] } }
+            values: Proc.new { has_many[:klass].all.map { |obj| [obj.to_s, obj.id] }.sort { |x, y| x[0] <=> y[0] } }
           }
         when :effective_roles
           {type: :select, values: EffectiveRoles.roles}

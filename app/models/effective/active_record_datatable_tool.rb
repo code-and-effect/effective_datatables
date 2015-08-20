@@ -38,13 +38,14 @@ module Effective
 
     def search_column_with_defaults(collection, table_column, term)
       column = table_column[:column]
+      sql_op = table_column[:filter][:sql_operation] || :where # only other option is :having
 
       case table_column[:type]
       when :string, :text
-        if table_column[:filter][:type] == :select && table_column[:filter][:fuzzy] != true
-          collection.where("#{column} = :term", term: term)
+        if (table_column[:filter][:type] == :select && table_column[:filter][:fuzzy] != true) || sql_op != :where
+          collection.public_send(sql_op, "#{column} = :term", term: term)
         else
-          collection.where("#{column} ILIKE :term", term: "%#{term}%")
+          collection.public_send(sql_op, "#{column} ILIKE :term", term: "%#{term}%")
         end
       when :has_many
         inverse_ids = term.split(',').map { |term| (term = term.to_i) == 0 ? nil : term }.compact
@@ -61,7 +62,15 @@ module Effective
 
         ids = klass.where(id: inverse_ids).joins(inverse.name).pluck(inverse.foreign_key)
 
-        collection.where(id: ids)
+        collection.public_send(sql_op, id: ids)
+      when :obfuscated_id
+        if (deobfuscated_id = collection.deobfuscate(term)) == term # We weren't able to deobfuscate it, so this is an Invalid ID
+          collection.public_send(sql_op, "#{column} = :term", term: 0)
+        else
+          collection.public_send(sql_op, "#{column} = :term", term: deobfuscated_id)
+        end
+      when :effective_roles
+        collection.with_role(term)
       when :datetime, :date
         begin
           digits = term.scan(/(\d+)/).flatten.map(&:to_i)
@@ -84,29 +93,21 @@ module Effective
             end_at = start_at
           end
 
-          collection.where("#{column} >= :start_at AND #{column} <= :end_at", start_at: start_at, end_at: end_at)
+          collection.public_send(sql_op, "#{column} >= :start_at AND #{column} <= :end_at", start_at: start_at, end_at: end_at)
         rescue => e
           collection
         end
-      when :obfuscated_id
-        if (deobfuscated_id = collection.deobfuscate(term)) == term # We weren't able to deobfuscate it, so this is an Invalid ID
-          collection.where("#{column} = :term", term: 0)
-        else
-          collection.where("#{column} = :term", term: deobfuscated_id)
-        end
-      when :effective_roles
-        collection.with_role(term)
       when :integer
-        collection.where("#{column} = :term", term: term.to_i)
+        collection.public_send(sql_op, "#{column} = :term", term: term.to_i)
       when :year
-        collection.where("EXTRACT(YEAR FROM #{column}) = :term", term: term.to_i)
+        collection.public_send(sql_op, "EXTRACT(YEAR FROM #{column}) = :term", term: term.to_i)
       when :price
         price_in_cents = (term.gsub(/[^0-9|\.]/, '').to_f * 100.0).to_i
-        collection.where("#{column} = :term", term: price_in_cents)
+        collection.public_send(sql_op, "#{column} = :term", term: price_in_cents)
       when :currency
-        collection.where("#{column} = :term", term: term.gsub(/[^0-9|\.]/, '').to_f)
+        collection.public_send(sql_op, "#{column} = :term", term: term.gsub(/[^0-9|\.]/, '').to_f)
       else
-        collection.where("#{column} = :term", term: term)
+        collection.public_send(sql_op, "#{column} = :term", term: term)
       end
     end
 
