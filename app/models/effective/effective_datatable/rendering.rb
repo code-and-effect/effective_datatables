@@ -105,6 +105,13 @@ module Effective
               (obj.send(name).strftime(EffectiveDatatables.datetime_format) rescue nil)
             elsif opts[:type] == :date
               (obj.send(name).strftime(EffectiveDatatables.date_format) rescue nil)
+            elsif opts[:type] == :price
+              # This is price_to_currency from effective_form_inputs retyped...
+              price = ((obj.send(name) || 0) rescue 0)
+              raise 'column type: price expects an Integer representing the number of cents' unless price.kind_of?(Integer)
+              number_to_currency(price / 100.0)
+            elsif opts[:type] == :currency
+              number_to_currency(((obj.send(name) || 0) rescue 0))
             else
               obj.send(name) rescue (obj[opts[:array_index]] rescue nil)
             end

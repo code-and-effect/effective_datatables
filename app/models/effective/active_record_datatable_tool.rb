@@ -100,6 +100,11 @@ module Effective
         collection.where("#{column} = :term", term: term.to_i)
       when :year
         collection.where("EXTRACT(YEAR FROM #{column}) = :term", term: term.to_i)
+      when :price
+        price_in_cents = (term.gsub(/[^0-9|\.]/, '').to_f * 100.0).to_i
+        collection.where("#{column} = :term", term: price_in_cents)
+      when :currency
+        collection.where("#{column} = :term", term: term.gsub(/[^0-9|\.]/, '').to_f)
       else
         collection.where("#{column} = :term", term: term)
       end

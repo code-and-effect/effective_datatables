@@ -46,8 +46,9 @@ module Effective
           filter: false,
           partial_local: :resource,
           partial_locals: { show_action: show, edit_action: edit, destroy_action: destroy }
-        }
-        opts[:partial] = '/effective/datatables/actions_column' unless (block_given? || proc.present?)
+        }.merge(options)
+
+        opts[:partial] ||= '/effective/datatables/actions_column' unless (block_given? || proc.present?)
 
         table_column(name, opts, proc, &block)
       end
