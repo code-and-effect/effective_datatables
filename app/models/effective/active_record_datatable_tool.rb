@@ -23,7 +23,7 @@ module Effective
       if [:string, :text].include?(order_column[:type]) && order_column[:sql_as_column] != true
         collection.order("COALESCE(#{order_column[:column]}, '') #{order_direction}")
       else
-        collection.order("#{order_column[:column]} #{order_direction} NULLS #{order_direction == 'ASC' ? 'LAST' : 'FIRST'}")
+        collection.order("#{order_column[:column]} #{order_direction} NULLS LAST")
       end
     end
 
