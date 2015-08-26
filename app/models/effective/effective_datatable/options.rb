@@ -124,13 +124,25 @@ module Effective
         when :belongs_to
           {
             type: :select,
-            values: Proc.new { belongs_to[:klass].all.map { |obj| [obj.to_s, obj.id] }.sort { |x, y| x[0] <=> y[0] } }
+            values: (
+              if belongs_to[:klass].respond_to?(:datatables_filter)
+                Proc.new { belongs_to[:klass].datatables_filter }
+              else
+                Proc.new { belongs_to[:klass].all.map { |obj| [obj.to_s, obj.id] }.sort { |x, y| x[0] <=> y[0] } }
+              end
+            )
           }
         when :has_many
           {
             type: :select,
             multiple: true,
-            values: Proc.new { has_many[:klass].all.map { |obj| [obj.to_s, obj.id] }.sort { |x, y| x[0] <=> y[0] } }
+            values: (
+              if has_many[:klass].respond_to?(:datatables_filter)
+                Proc.new { has_many[:klass].datatables_filter }
+              else
+                Proc.new { has_many[:klass].all.map { |obj| [obj.to_s, obj.id] }.sort { |x, y| x[0] <=> y[0] } }
+              end
+            )
           }
         when :effective_roles
           {type: :select, values: EffectiveRoles.roles}
