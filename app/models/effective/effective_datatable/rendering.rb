@@ -103,7 +103,7 @@ module Effective
               (obj.send(:roles) rescue []).join(', ')
             else
               # Normal value, but we still may want to format it
-              value = (obj.send(name) rescue nil) || (obj[name] rescue nil) || (obj[opts[:array_index]] rescue nil)
+              value = (obj.send(name) rescue (obj[name] rescue (obj[opts[:array_index]] rescue nil)))
 
               case opts[:type]
               when :datetime
