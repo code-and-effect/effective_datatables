@@ -23,8 +23,11 @@ EffectiveDatatables.setup do |config|
 
   # Date & DateTime Format
   # By default, format Date and DateTime values with the following
-  config.date_format = "%Y-%m-%d"
-  config.datetime_format = "%Y-%m-%d %H:%M"
+  config.date_format = '%Y-%m-%d'
+  config.datetime_format = '%Y-%m-%d %H:%M'
+
+  # Format integer columns with the following proc or function
+  config.integer_format = :number_with_delimiter
 
   # Default number of entries shown per page
   # Valid options are: 10, 25, 50, 100, 250, 1000, :all

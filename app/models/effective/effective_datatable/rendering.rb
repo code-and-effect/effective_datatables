@@ -131,6 +131,14 @@ module Effective
                 number_to_currency(value / 100.0)
               when :currency
                 number_to_currency(value || 0)
+              when :integer
+                if EffectiveDatatables.integer_format.kind_of?(Symbol)
+                  view.instance_exec { public_send(EffectiveDatatables.integer_format, value) }
+                elsif EffectiveDatatables.integer_format.respond_to?(:call)
+                  view.instance_exec { EffectiveDatatables.integer_format.call(value) }
+                else
+                  value
+                end
               else
                 value
               end

@@ -7,6 +7,8 @@ module EffectiveDatatables
   mattr_accessor :authorization_method
   mattr_accessor :date_format
   mattr_accessor :datetime_format
+  mattr_accessor :integer_format
+
   mattr_accessor :default_entries
   mattr_accessor :actions_column # A Hash
 
