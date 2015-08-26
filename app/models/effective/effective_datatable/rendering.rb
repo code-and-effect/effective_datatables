@@ -71,6 +71,20 @@ module Effective
             }
             locals.merge!(opts[:partial_locals]) if opts[:partial_locals]
 
+            if active_record_collection?
+              if locals[:show_action] == :authorize
+                locals[:show_action] = (EffectiveDatatables.authorized?(controller, :show, collection_class) rescue false)
+              end
+
+              if locals[:edit_action] == :authorize
+                locals[:edit_action] = (EffectiveDatatables.authorized?(controller, :edit, collection_class) rescue false)
+              end
+
+              if locals[:destroy_action] == :authorize
+                locals[:destroy_action] = (EffectiveDatatables.authorized?(controller, :destroy, collection_class) rescue false)
+              end
+            end
+
             rendered[name] = (render(
               :partial => opts[:partial],
               :as => opts[:partial_local],

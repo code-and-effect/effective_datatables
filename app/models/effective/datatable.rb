@@ -2,7 +2,7 @@ module Effective
   class Datatable
     attr_accessor :total_records, :display_records, :view, :attributes
 
-    delegate :render, :link_to, :mail_to, :number_to_currency, :to => :@view
+    delegate :render, :controller, :link_to, :mail_to, :number_to_currency, :to => :@view
 
     include Effective::EffectiveDatatable::Dsl
     extend Effective::EffectiveDatatable::Dsl::ClassMethods

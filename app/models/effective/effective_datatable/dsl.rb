@@ -36,9 +36,9 @@ module Effective
       end
 
       def actions_column(options = {}, proc = nil, &block)
-        show = options.fetch(:show, false)
-        edit = options.fetch(:edit, true)
-        destroy = options.fetch(:destroy, true)
+        show = options.fetch(:show, (EffectiveDatatables.actions_column[:show] rescue false))
+        edit = options.fetch(:edit, (EffectiveDatatables.actions_column[:edit] rescue false))
+        destroy = options.fetch(:destroy, (EffectiveDatatables.actions_column[:destroy] rescue false))
         name = options.fetch(:name, 'actions')
 
         opts = {
