@@ -98,13 +98,13 @@ module Effective
           collection
         end
       when :integer
-        collection.public_send(sql_op, "#{column} = :term", term: term.to_i)
+        collection.public_send(sql_op, "#{column} = :term", term: term.gsub(/\D/, '').to_i)
       when :year
         collection.public_send(sql_op, "EXTRACT(YEAR FROM #{column}) = :term", term: term.to_i)
       when :price
         price_in_cents = (term.gsub(/[^0-9|\.]/, '').to_f * 100.0).to_i
         collection.public_send(sql_op, "#{column} = :term", term: price_in_cents)
-      when :currency
+      when :currency, :decimal
         collection.public_send(sql_op, "#{column} = :term", term: term.gsub(/[^0-9|\.]/, '').to_f)
       else
         collection.public_send(sql_op, "#{column} = :term", term: term)
