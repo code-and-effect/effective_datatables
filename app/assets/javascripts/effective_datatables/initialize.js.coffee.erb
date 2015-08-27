@@ -90,3 +90,6 @@ initializeDataTables = ->
 
 $ -> initializeDataTables()
 $(document).on 'page:change', -> initializeDataTables()
+
+$(document).on 'click', '.ColVis_Special', -> $.event.trigger('page:change')
+
