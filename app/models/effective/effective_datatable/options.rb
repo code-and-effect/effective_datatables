@@ -149,7 +149,11 @@ module Effective
         when :integer
           {type: :number}
         when :boolean
-          {type: :boolean, values: [true, false]}
+          if EffectiveDatatables.boolean_format == :yes_no
+            {type: :boolean, values: [['Yes', true], ['No', false]] }
+          else
+            {type: :boolean, values: [['true', true], ['false', false]] }
+          end
         when :datetime
           {type: :datetime}
         when :date

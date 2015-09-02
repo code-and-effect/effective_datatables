@@ -26,6 +26,10 @@ EffectiveDatatables.setup do |config|
   config.date_format = '%Y-%m-%d'
   config.datetime_format = '%Y-%m-%d %H:%M'
 
+  # Boolean format
+  # If :yes_no, display as yes_no instead of true/false
+  config.boolean_format = :yes_no
+
   # Format integer columns with the following proc or function
   config.integer_format = :number_with_delimiter
 
@@ -48,7 +52,8 @@ EffectiveDatatables.setup do |config|
   config.actions_column = {
     show: :authorize,
     edit: :authorize,
-    destroy: :authorize
+    destroy: :authorize,
+    unarchive: :authorize
   }
 
 end

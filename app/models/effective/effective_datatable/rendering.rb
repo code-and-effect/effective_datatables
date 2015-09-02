@@ -67,7 +67,8 @@ module Effective
               controller_namespace: view.controller_path.split('/')[0...-1].map { |path| path.downcase.to_sym if path.present? }.compact,
               show_action: (opts[:partial_locals] || {})[:show_action],
               edit_action: (opts[:partial_locals] || {})[:edit_action],
-              destroy_action: (opts[:partial_locals] || {})[:destroy_action]
+              destroy_action: (opts[:partial_locals] || {})[:destroy_action],
+              unarchive_action: (opts[:partial_locals] || {})[:unarchive_action]
             }
             locals.merge!(opts[:partial_locals]) if opts[:partial_locals]
 
@@ -82,6 +83,10 @@ module Effective
 
               if locals[:destroy_action] == :authorize
                 locals[:destroy_action] = (EffectiveDatatables.authorized?(controller, :destroy, collection_class) rescue false)
+              end
+
+              if locals[:unarchive_action] == :authorize
+                locals[:unarchive_action] = (EffectiveDatatables.authorized?(controller, :unarchive, collection_class) rescue false)
               end
             end
 
@@ -136,6 +141,14 @@ module Effective
                   view.instance_exec { public_send(EffectiveDatatables.integer_format, value) }
                 elsif EffectiveDatatables.integer_format.respond_to?(:call)
                   view.instance_exec { EffectiveDatatables.integer_format.call(value) }
+                else
+                  value
+                end
+              when :boolean
+                if EffectiveDatatables.boolean_format == :yes_no && value == true
+                  'Yes'
+                elsif EffectiveDatatables.boolean_format == :yes_no && value == false
+                  'No'
                 else
                   value
                 end
