@@ -13,5 +13,15 @@
 - if destroy_action
   - url = (polymorphic_path([*controller_namespace, resource]) rescue nil) || (polymorphic_path(resource) rescue nil)
   - if url.present?
-    %a{href: url, title: 'Delete', data: {method: :delete, confirm: 'Are you sure?'}}
-      %span.glyphicon.glyphicon-trash
+    - if resource.respond_to?(:archived?) && !resource.archived?
+      %a{href: url, title: 'Archive', data: {method: :delete, confirm: "Are you sure you want to archive this item?"}}
+        %span.glyphicon.glyphicon-trash
+    - elsif resource.respond_to?(:archived?) == false
+      %a{href: url, title: 'Delete', data: {method: :delete, confirm: "Are you sure you want to delete this item?"}}
+        %span.glyphicon.glyphicon-trash
+
+- if unarchive_action && resource.respond_to?(:archived?) && resource.archived?
+  - url = (polymorphic_path([*controller_namespace, resource], action: :unarchive) rescue nil) || (polymorphic_path(resource, action: :unarchive) rescue nil)
+  - if url.present?
+    %a{href: url, title: 'Unarchive', data: {confirm: 'Are you sure you want to unarchive this item?'}}
+      %span.glyphicon.glyphicon-retweet

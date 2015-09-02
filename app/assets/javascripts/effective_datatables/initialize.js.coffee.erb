@@ -23,7 +23,7 @@ initializeDataTables = ->
         serverParams: (params) ->
           table = this.DataTable()
           table.columns().flatten().each (index) =>  # Pass which columns are visible back to server
-            params['columns'][index]['visible'] =  table.column(index).visible()
+            params['columns'][index]['visible'] = table.column(index).visible()
         colVis:
           showAll: 'Show all'
           restore: 'Show default'

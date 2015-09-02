@@ -39,13 +39,14 @@ module Effective
         show = options.fetch(:show, (EffectiveDatatables.actions_column[:show] rescue false))
         edit = options.fetch(:edit, (EffectiveDatatables.actions_column[:edit] rescue false))
         destroy = options.fetch(:destroy, (EffectiveDatatables.actions_column[:destroy] rescue false))
+        unarchive = options.fetch(:unarchive, (EffectiveDatatables.actions_column[:unarchive] rescue false))
         name = options.fetch(:name, 'actions')
 
         opts = {
           sortable: false,
           filter: false,
           partial_local: :resource,
-          partial_locals: { show_action: show, edit_action: edit, destroy_action: destroy }
+          partial_locals: { show_action: show, edit_action: edit, destroy_action: destroy, unarchive_action: unarchive }
         }.merge(options)
 
         opts[:partial] ||= '/effective/datatables/actions_column' unless (block_given? || proc.present?)
