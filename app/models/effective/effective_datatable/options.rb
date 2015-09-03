@@ -51,6 +51,8 @@ module Effective
           cols[name][:visible] = true if cols[name][:visible].nil?
 
           # Type
+          cols[name][:type] ||= cols[name][:as]  # Use as: or type: interchangeably
+
           cols[name][:type] ||= (
             if belong_tos.key?(name)
               :belongs_to
@@ -114,6 +116,9 @@ module Effective
 
         # This is a fix for passing filter[:selected] == false, it needs to be 'false'
         filter[:selected] = filter[:selected].to_s unless filter[:selected].nil?
+
+        # If you pass values, just assume it's a select
+        filter[:type] ||= :select if filter.key?(:values)
 
         # Check if this is an aggregate column
         if ['SUM(', 'COUNT(', 'MAX(', 'MIN(', 'AVG('].any? { |str| sql_column.include?(str) }
