@@ -86,6 +86,10 @@ initializeDataTables = ->
       #  leftColumns: 2
       # )
 
+      # Apply EffectiveFormInputs to the Show x per page dropdown
+      if datatable.data('effective-form-inputs')
+        table.closest('.dataTables_wrapper').find('.dataTables_length select').select2()
+
       new $.fn.dataTable.ColReorder(table)
 
 $ -> initializeDataTables()

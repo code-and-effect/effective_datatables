@@ -17,7 +17,8 @@
       'display-entries' => datatable.display_entries,
       'display-records' => (datatable.to_json[:recordsFiltered] || 0),
       'total-records' => (datatable.to_json[:recordsTotal] || 0),
-      'column-classes' => datatable_column_classes(datatable)
+      'column-classes' => datatable_column_classes(datatable),
+      'effective-form-inputs' => defined?(EffectiveFormInputs)
     }
   }
 
