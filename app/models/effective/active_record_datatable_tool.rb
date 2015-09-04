@@ -47,6 +47,15 @@ module Effective
         else
           collection.public_send(sql_op, "#{column} ILIKE :term", term: "%#{term}%")
         end
+      when :belongs_to_polymorphic
+        # our key will be something like Post_15, or Event_1
+        (type, id) = term.split('_')
+
+        if type.present? && id.present?
+          collection.public_send(sql_op, "#{column} = :id AND #{column.sub('_id"', '_type"')} = :type", id: id, type: type)
+        else
+          collection
+        end
       when :has_many
         inverse_ids = term.split(',').map { |term| (term = term.to_i) == 0 ? nil : term }.compact
         return collection unless inverse_ids.present?

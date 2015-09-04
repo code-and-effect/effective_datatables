@@ -40,7 +40,7 @@ module EffectiveDatatablesHelper
         opts[:filter][:values] = opts[:filter][:values].call()
 
         if opts[:filter][:values].kind_of?(ActiveRecord::Relation) || (opts[:filter][:values].kind_of?(Array) && opts[:filter][:values].first.kind_of?(ActiveRecord::Base))
-          opts[:filter][:values] = opts[:filter][:values].map { |obj| [obj.to_s, obj.id] }
+          opts[:filter][:values] = opts[:filter][:values].map { |obj| [obj.to_s, obj.to_param] }
         end
       end
 
@@ -49,6 +49,29 @@ module EffectiveDatatablesHelper
         collection: opts[:filter][:values],
         multiple: opts[:filter][:multiple] == true,
         include_blank: (opts[:label] || name.titleize),
+        input_html: { name: nil, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} },
+        input_js: { placeholder: (opts[:label] || name.titleize) }
+    when :grouped_select
+      raise "Expected :group_select filter to define its values as a Hash {'Posts' => Post.all, 'Events' => Event.all} or a Hash {'Posts' => [['Post A', 1], ['Post B', 2]], 'Events' => [['Event A', 1], ['Event B', 2]]}" unless opts[:filter][:values].kind_of?(Hash)
+
+      opts[:filter][:values].each do |group, options|
+        if options.kind_of?(ActiveRecord::Relation)
+          if opts[:type] == :belongs_to_polymorphic
+            opts[:filter][:values][group] = options.map { |obj| [obj.to_s, "#{options.model_name}_#{obj.to_param}"] }
+          else
+            opts[:filter][:values][group] = options.map { |obj| [obj.to_s, obj.to_param] }
+          end
+        end
+      end
+
+      form.input name, label: false, required: false,
+        as: :grouped_select,
+        collection: opts[:filter][:values],
+        multiple: opts[:filter][:multiple] == true,
+        include_blank: (opts[:label] || name.titleize),
+        grouped: true,
+        group_label_method: :first,
+        group_method: :last,
         input_html: { name: nil, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} },
         input_js: { placeholder: (opts[:label] || name.titleize) }
     else

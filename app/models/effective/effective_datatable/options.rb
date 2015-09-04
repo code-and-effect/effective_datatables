@@ -16,10 +16,12 @@ module Effective
         # Here we identify all belongs_to associations and build up a Hash like:
         # {user: {foreign_key: 'user_id', klass: User}, order: {foreign_key: 'order_id', klass: Effective::Order}}
         belong_tos = (collection.klass.reflect_on_all_associations(:belongs_to) rescue []).inject({}) do |retval, bt|
-          next if bt.options[:polymorphic]
-
-          klass = bt.klass || (bt.foreign_type.sub('_type', '').classify.constantize rescue nil)
-          retval[bt.name.to_s] = {foreign_key: bt.foreign_key, klass: klass} if bt.foreign_key.present? && klass.present?
+          if bt.options[:polymorphic]
+            retval[bt.name.to_s] = {foreign_key: bt.foreign_key, klass: bt.name, polymorphic: true}
+          else
+            klass = bt.klass || (bt.foreign_type.sub('_type', '').classify.constantize rescue nil)
+            retval[bt.name.to_s] = {foreign_key: bt.foreign_key, klass: klass} if bt.foreign_key.present? && klass.present?
+          end
 
           retval
         end
@@ -55,7 +57,11 @@ module Effective
 
           cols[name][:type] ||= (
             if belong_tos.key?(name)
-              :belongs_to
+              if belong_tos[name][:polymorphic]
+                :belongs_to_polymorphic
+              else
+                :belongs_to
+              end
             elsif has_manys.key?(name)
               :has_many
             elsif sql_column.try(:type).present?
@@ -67,8 +73,8 @@ module Effective
 
           cols[name][:class] = "col-#{cols[name][:type]} col-#{name} #{cols[name][:class]}".strip
 
-          # HasMany
-          if cols[name][:type] == :has_many
+          # We can't easily sort these fields
+          if cols[name][:type] == :has_many || cols[name][:type] == :belongs_to_polymorphic
             cols[name][:sortable] = false
           end
 
@@ -118,7 +124,7 @@ module Effective
         filter[:selected] = filter[:selected].to_s unless filter[:selected].nil?
 
         # If you pass values, just assume it's a select
-        filter[:type] ||= :select if filter.key?(:values)
+        filter[:type] ||= :select if filter.key?(:values) && col_type != :belongs_to_polymorphic
 
         # Check if this is an aggregate column
         if ['SUM(', 'COUNT(', 'MAX(', 'MIN(', 'AVG('].any? { |str| sql_column.include?(str) }
@@ -137,6 +143,8 @@ module Effective
               end
             )
           }
+        when :belongs_to_polymorphic
+          {type: :grouped_select, values: {}}
         when :has_many
           {
             type: :select,

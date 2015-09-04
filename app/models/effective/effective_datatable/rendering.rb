@@ -113,6 +113,8 @@ module Effective
               view.instance_exec(obj, collection, self, &opts[:proc])
             elsif opts[:type] == :belongs_to
               (obj.send(name) rescue nil).to_s
+            elsif opts[:type] == :belongs_to_polymorphic
+              (obj.send(name) rescue nil).to_s
             elsif opts[:type] == :has_many
               objs = (obj.send(name).map { |x| x.to_s }.sort rescue [])
               objs.length == 1 ? objs.first : (opts[:sentence] ? objs.to_sentence : objs.join('<br>'))

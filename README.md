@@ -340,6 +340,10 @@ table_column :created_at, :filter => {...}    # Enable filtering with these opti
 :filter => {:type => :select, :values => [*2010..(Time.zone.now.year+6)]}
 :filter => {:type => :select, :values => Proc.new { PostCategory.all } }
 :filter => {:type => :select, :values => Proc.new { User.all.order(:email).map { |obj| [obj.id, obj.email] } } }
+
+:filter => {:type => :grouped_select, :values => {'Active' => Events.active, 'Past' => Events.past }}
+:filter => {:type => :grouped_select, :values => {'Active' => [['Event A', 1], ['Event B', 2]], 'Past' => [['Event C', 3], ['Event D', 4]]} }
+
 ```
 
 Some additional, lesser used options include:
