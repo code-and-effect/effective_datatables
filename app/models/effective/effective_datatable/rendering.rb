@@ -154,7 +154,13 @@ module Effective
                 else
                   value
                 end
-              else
+              when :string
+                if name == 'email' && value.present?
+                  mail_to(value)
+                else
+                  value
+                end
+              else # Other col_type
                 value
               end
             end
