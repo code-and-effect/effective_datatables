@@ -20,10 +20,14 @@ module Effective
     def order(collection)
       return collection if order_column.blank?
 
+      column = order_column[:column]
+
       if [:string, :text].include?(order_column[:type]) && order_column[:sql_as_column] != true
-        collection.order("COALESCE(#{order_column[:column]}, '') #{order_direction}")
+        collection.order("COALESCE(#{column}, '') #{order_direction}")
+      elsif order_column[:type] == :belongs_to_polymorphic
+        collection.order("(#{column.sub('_id"', '_type"')}, #{column}) #{order_direction} NULLS LAST")
       else
-        collection.order("#{order_column[:column]} #{order_direction} NULLS LAST")
+        collection.order("#{column} #{order_direction} NULLS LAST")
       end
     end
 

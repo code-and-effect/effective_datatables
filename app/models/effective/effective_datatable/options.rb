@@ -73,8 +73,8 @@ module Effective
 
           cols[name][:class] = "col-#{cols[name][:type]} col-#{name} #{cols[name][:class]}".strip
 
-          # We can't easily sort these fields
-          if cols[name][:type] == :has_many || cols[name][:type] == :belongs_to_polymorphic
+          # We can't really sort a HasMany field
+          if cols[name][:type] == :has_many
             cols[name][:sortable] = false
           end
 
