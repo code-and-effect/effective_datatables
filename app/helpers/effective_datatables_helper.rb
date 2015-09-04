@@ -65,7 +65,7 @@ module EffectiveDatatablesHelper
       end
 
       form.input name, label: false, required: false,
-        as: :grouped_select,
+        as: (defined?(EffectiveFormInputs) ? :effective_select : :grouped_select),
         collection: opts[:filter][:values],
         multiple: opts[:filter][:multiple] == true,
         include_blank: (opts[:label] || name.titleize),
