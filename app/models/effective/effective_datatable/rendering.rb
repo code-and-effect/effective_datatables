@@ -3,6 +3,7 @@
 module Effective
   module EffectiveDatatable
     module Rendering
+      BLANK = ''.freeze
 
       def finalize(collection) # Override me if you like
         collection
@@ -50,6 +51,7 @@ module Effective
           col = self.arrayize(col)
         end
 
+        self.format(col)
         col = self.finalize(col)
       end
 
@@ -104,7 +106,7 @@ module Effective
         collection.each_with_index.map do |obj, index|
           (display_table_columns || table_columns).map do |name, opts|
             if opts[:visible] == false
-              ''
+              BLANK
             elsif opts[:partial]
               rendered[name][index]
             elsif opts[:block]
@@ -112,60 +114,77 @@ module Effective
             elsif opts[:proc]
               view.instance_exec(obj, collection, self, &opts[:proc])
             elsif opts[:type] == :belongs_to
-              (obj.send(name) rescue nil).to_s
+              (obj.send(name) rescue nil)
             elsif opts[:type] == :belongs_to_polymorphic
-              (obj.send(name) rescue nil).to_s
+              (obj.send(name) rescue nil)
             elsif opts[:type] == :has_many
-              objs = (obj.send(name).map { |x| x.to_s }.sort rescue [])
-              objs.length == 1 ? objs.first : (opts[:sentence] ? objs.to_sentence : objs.join('<br>'))
+              (obj.send(name).to_a rescue [])
             elsif opts[:type] == :obfuscated_id
               (obj.send(:to_param) rescue nil).to_s
             elsif opts[:type] == :effective_roles
               (obj.send(:roles) rescue []).join(', ')
+            elsif obj.kind_of?(Array) # Array backed collection
+              obj[opts[:array_index]]
             else
-              # Normal value, but we still may want to format it
-              value = (obj.send(name) rescue (obj[name] rescue (obj[opts[:array_index]] rescue nil)))
-
-              case opts[:type]
-              when :datetime
-                value.strftime(EffectiveDatatables.datetime_format) rescue nil
-              when :date
-                value.strftime(EffectiveDatatables.date_format) rescue nil
-              when :price
-                # This is an integer value, "number of cents"
-                value ||= 0
-                raise 'column type: price expects an Integer representing the number of cents' unless value.kind_of?(Integer)
-                number_to_currency(value / 100.0)
-              when :currency
-                number_to_currency(value || 0)
-              when :integer
-                if EffectiveDatatables.integer_format.kind_of?(Symbol)
-                  view.instance_exec { public_send(EffectiveDatatables.integer_format, value) }
-                elsif EffectiveDatatables.integer_format.respond_to?(:call)
-                  view.instance_exec { EffectiveDatatables.integer_format.call(value) }
-                else
-                  value
-                end
-              when :boolean
-                if EffectiveDatatables.boolean_format == :yes_no && value == true
-                  'Yes'
-                elsif EffectiveDatatables.boolean_format == :yes_no && value == false
-                  'No'
-                else
-                  value
-                end
-              when :string
-                if name == 'email' && value.present?
-                  mail_to(value)
-                else
-                  value
-                end
-              else # Other col_type
-                value
-              end
+              (obj.send(name) rescue (obj[name] rescue nil))
             end
           end
         end
+      end
+
+      def format(collection)
+        collection.each do |row|
+          (display_table_columns || table_columns).each_with_index do |(name, opts), index|
+            value = row[index]
+            next if value == nil || value == BLANK || opts[:visible] == false
+            next if opts[:block] || opts[:partial] || opts[:proc]
+
+            case opts[:type]
+            when :belongs_to, :belongs_to_polymorphic
+              row[index] = value.to_s
+            when :has_many
+              if value.kind_of?(Array)
+                if value.length == 0
+                  row[index] = BLANK
+                elsif value.length == 1
+                  row[index] = value.first.to_s
+                elsif opts[:sentence]
+                  row[index] = value.map { |v| v.to_s }.to_sentence
+                else
+                  row[index] = value.map { |v| v.to_s }.join('<br>')
+                end
+              end
+            when :datetime
+              row[index] = value.strftime(EffectiveDatatables.datetime_format) rescue BLANK
+            when :date
+              row[index] = value.strftime(EffectiveDatatables.date_format) rescue BLANK
+            when :price
+              # This is an integer value, "number of cents"
+              raise 'column type: price expects an Integer representing the number of cents' unless value.kind_of?(Integer)
+              row[index] = number_to_currency(value / 100.0)
+            when :currency
+              row[index] = number_to_currency(value || 0)
+            when :integer
+              if EffectiveDatatables.integer_format.kind_of?(Symbol)
+                row[index] = view.instance_exec { public_send(EffectiveDatatables.integer_format, value) }
+              elsif EffectiveDatatables.integer_format.respond_to?(:call)
+                row[index] = view.instance_exec { EffectiveDatatables.integer_format.call(value) }
+              end
+            when :boolean
+              if EffectiveDatatables.boolean_format == :yes_no && value == true
+                row[index] = 'Yes'
+              elsif EffectiveDatatables.boolean_format == :yes_no && value == false
+                row[index] = 'No'
+              end
+            when :string
+              row[index] = mail_to(value) if name == 'email'
+            else
+              ; # Nothing
+            end
+          end
+        end
+
+        collection
       end
 
     end # / Rendering
