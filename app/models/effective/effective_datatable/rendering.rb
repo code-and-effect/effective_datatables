@@ -121,8 +121,10 @@ module Effective
               (obj.send(name).to_a rescue [])
             elsif opts[:type] == :obfuscated_id
               (obj.send(:to_param) rescue nil).to_s
+            elsif opts[:type] == :effective_address
+              (Array(obj.send(name)) rescue [])
             elsif opts[:type] == :effective_roles
-              (obj.send(:roles) rescue []).join(', ')
+              (obj.send(:roles) rescue [])
             elsif obj.kind_of?(Array) # Array backed collection
               obj[opts[:array_index]]
             else
@@ -154,6 +156,10 @@ module Effective
                   row[index] = value.map { |v| v.to_s }.join('<br>')
                 end
               end
+            when :effective_address
+              row[index] = value.map { |addr| addr.to_html }.join('<br>')
+            when :effective_roles
+              row[index] = value.join(', ')
             when :datetime
               row[index] = value.strftime(EffectiveDatatables.datetime_format) rescue BLANK
             when :date

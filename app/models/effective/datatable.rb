@@ -57,7 +57,7 @@ module Effective
     end
 
     def collection_class
-      collection.respond_to?(:klass) ? collection.klass : self.class
+      @collection_class ||= (collection.respond_to?(:klass) ? collection.klass : self.class)
     end
 
     def to_json

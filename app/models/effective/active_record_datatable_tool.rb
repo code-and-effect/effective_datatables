@@ -2,7 +2,7 @@ module Effective
   class ActiveRecordDatatableTool
     attr_accessor :table_columns
 
-    delegate :order_name, :order_direction, :page, :per_page, :search_column, :to => :@datatable
+    delegate :order_name, :order_direction, :page, :per_page, :search_column, :collection_class, :to => :@datatable
 
     def initialize(datatable, table_columns)
       @datatable = datatable
@@ -82,6 +82,13 @@ module Effective
         else
           collection.public_send(sql_op, "#{column} = :term", term: deobfuscated_id)
         end
+      when :effective_address
+        ids = Effective::Address
+          .where('addressable_type = ?', collection_class.name)
+          .where('address1 ILIKE :term OR address2 ILIKE :term OR city ILIKE :term OR postal_code ILIKE :term OR state_code = :code OR country_code = :code', term: "%#{term}%", code: term)
+          .pluck(:addressable_id)
+
+        collection.public_send(sql_op, id: ids)
       when :effective_roles
         collection.with_role(term)
       when :datetime, :date

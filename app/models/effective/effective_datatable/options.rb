@@ -64,6 +64,8 @@ module Effective
               end
             elsif has_manys.key?(name)
               :has_many
+            elsif name.include?('_address') && (collection_class.new rescue nil).respond_to?(:effective_addresses)
+              :effective_address
             elsif sql_column.try(:type).present?
               sql_column.type
             else
@@ -73,8 +75,8 @@ module Effective
 
           cols[name][:class] = "col-#{cols[name][:type]} col-#{name} #{cols[name][:class]}".strip
 
-          # We can't really sort a HasMany field
-          if cols[name][:type] == :has_many
+          # We can't really sort a HasMany or EffectiveAddress field
+          if [:has_many, :effective_address].include?(cols[name][:type])
             cols[name][:sortable] = false
           end
 
@@ -157,6 +159,8 @@ module Effective
               end
             )
           }
+        when :effective_address
+          {type: :string}
         when :effective_roles
           {type: :select, values: EffectiveRoles.roles}
         when :integer
