@@ -146,7 +146,7 @@ module Effective
             )
           }
         when :belongs_to_polymorphic
-          {type: :grouped_select, values: {}}
+          {type: :grouped_select, polymorphic: true, values: {}}
         when :has_many
           {
             type: :select,
