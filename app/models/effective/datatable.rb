@@ -24,6 +24,10 @@ module Effective
         raise "Unsupported collection type. Should be ActiveRecord class, ActiveRecord relation, or an Array of Arrays [[1, 'something'], [2, 'something else']]"
       end
 
+      if @default_order.present? && !table_columns.key?((@default_order.keys.first rescue nil))
+        raise "default_order :#{(@default_order.keys.first rescue 'nil')} must exist as a table_column or array_column"
+      end
+
       # Any pre-selected search terms should be assigned now
       search_terms.each { |column, term| self.send("#{column}=", term) }
     end
