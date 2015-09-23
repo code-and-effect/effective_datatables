@@ -70,7 +70,7 @@ module Effective
         obj = reflection.build_association({}) # Clinic
         klass = obj.class
 
-        inverse = klass.reflect_on_association(collection.table_name) || obj.class.reflect_on_association(collection.table_name.singularize)
+        inverse = reflection.inverse_of || klass.reflect_on_association(collection.table_name) || obj.class.reflect_on_association(collection.table_name.singularize)
         raise "unable to find #{klass.name} has_many :#{collection.table_name} or belongs_to :#{collection.table_name.singularize} associations" unless inverse
 
         ids = klass.where(id: inverse_ids).joins(inverse.name).pluck(inverse.foreign_key)
