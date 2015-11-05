@@ -89,9 +89,9 @@ module Effective
           # https://github.com/rails/rails/issues/15331
           if collection_class.connection.respond_to?(:unprepared_statement)
             collection_sql = collection_class.connection.unprepared_statement { collection.to_sql }
-            (collection_class.connection.execute("SELECT COUNT(*) FROM (#{collection_sql}) AS datatables_total_count").first['count'] rescue 1).to_i
+            (collection_class.connection.execute("SELECT COUNT(*) FROM (#{collection_sql}) AS datatables_total_count").first.values.first rescue 1).to_i
           else
-            (collection_class.connection.execute("SELECT COUNT(*) FROM (#{collection.to_sql}) AS datatables_total_count").first['count'] rescue 1).to_i
+            (collection_class.connection.execute("SELECT COUNT(*) FROM (#{collection.to_sql}) AS datatables_total_count").first.values.first rescue 1).to_i
           end
         else
           collection.size
