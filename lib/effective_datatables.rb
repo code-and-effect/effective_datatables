@@ -1,7 +1,6 @@
+require 'haml-rails'
 require 'kaminari'
-
-require "effective_datatables/engine"
-require "effective_datatables/version"
+require 'effective_datatables/engine'
 
 module EffectiveDatatables
   mattr_accessor :authorization_method
