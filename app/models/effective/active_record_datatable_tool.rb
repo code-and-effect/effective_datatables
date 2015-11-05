@@ -25,9 +25,9 @@ module Effective
       if [:string, :text].include?(order_column[:type]) && order_column[:sql_as_column] != true
         collection.order("COALESCE(#{column}, '') #{order_direction}")
       elsif order_column[:type] == :belongs_to_polymorphic
-        collection.order("(#{column.sub('_id"', '_type"')}, #{column}) #{order_direction} NULLS LAST")
+        collection.order("(#{column.sub('_id"', '_type"')}, #{column}) #{order_direction}")
       else
-        collection.order("#{column} #{order_direction} NULLS LAST")
+        collection.order("COALESCE(#{column}, '') #{order_direction}")
       end
     end
 
@@ -117,6 +117,8 @@ module Effective
         rescue => e
           collection
         end
+      when :boolean
+        collection.public_send(sql_op, "#{column} = :term", term: [1, 'true', 'yes'].include?(term.to_s.downcase))
       when :integer
         collection.public_send(sql_op, "#{column} = :term", term: term.gsub(/\D/, '').to_i)
       when :year
