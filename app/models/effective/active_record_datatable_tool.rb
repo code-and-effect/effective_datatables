@@ -2,7 +2,7 @@ module Effective
   class ActiveRecordDatatableTool
     attr_accessor :table_columns
 
-    delegate :order_name, :order_direction, :page, :per_page, :search_column, :collection_class, :to => :@datatable
+    delegate :order_name, :order_direction, :page, :per_page, :search_column, :collection_class, :quote_sql, :to => :@datatable
 
     def initialize(datatable, table_columns)
       @datatable = datatable
@@ -21,13 +21,20 @@ module Effective
       return collection if order_column.blank?
 
       column = order_column[:column]
+      before = ''; after = ''
 
-      if [:string, :text].include?(order_column[:type]) && order_column[:sql_as_column] != true
-        collection.order("COALESCE(#{column}, '') #{order_direction}")
-      elsif order_column[:type] == :belongs_to_polymorphic
-        collection.order("(#{column.sub('_id"', '_type"')}, #{column}) #{order_direction}")
+      if postgres?
+        after = ' NULLS LAST'
+      elsif mysql?
+        before = "ISNULL(#{column}), "
+      end
+
+      if order_column[:type] == :belongs_to_polymorphic
+        collection.order("#{before}#{column.sub('_id', '_type')} #{order_direction}, #{column} #{order_direction}#{after}")
+      elsif order_column[:sql_as_column] == true
+        collection.order("#{column} #{order_direction}")
       else
-        collection.order("COALESCE(#{column}, '') #{order_direction}")
+        collection.order("#{before}#{column} #{order_direction}#{after}")
       end
     end
 
@@ -49,14 +56,14 @@ module Effective
         if (table_column[:filter][:type] == :select && table_column[:filter][:fuzzy] != true) || sql_op != :where
           collection.public_send(sql_op, "#{column} = :term", term: term)
         else
-          collection.public_send(sql_op, "#{column} ILIKE :term", term: "%#{term}%")
+          collection.public_send(sql_op, "#{column} #{ilike} :term", term: "%#{term}%")
         end
       when :belongs_to_polymorphic
         # our key will be something like Post_15, or Event_1
         (type, id) = term.split('_')
 
         if type.present? && id.present?
-          collection.public_send(sql_op, "#{column} = :id AND #{column.sub('_id"', '_type"')} = :type", id: id, type: type)
+          collection.public_send(sql_op, "#{column} = :id AND #{column.sub('_id', '_type')} = :type", id: id, type: type)
         else
           collection
         end
@@ -85,7 +92,7 @@ module Effective
       when :effective_address
         ids = Effective::Address
           .where('addressable_type = ?', collection_class.name)
-          .where('address1 ILIKE :term OR address2 ILIKE :term OR city ILIKE :term OR postal_code ILIKE :term OR state_code = :code OR country_code = :code', term: "%#{term}%", code: term)
+          .where("address1 #{ilike} :term OR address2 #{ilike} :term OR city #{ilike} :term OR postal_code #{ilike} :term OR state_code = :code OR country_code = :code", term: "%#{term}%", code: term)
           .pluck(:addressable_id)
 
         collection.public_send(sql_op, id: ids)
@@ -135,6 +142,22 @@ module Effective
 
     def paginate(collection)
       collection.page(page).per(per_page)
+    end
+
+    protected
+
+    def postgres?
+      return @postgres unless @postgres.nil?
+      @postgres ||= (collection_class.connection.kind_of?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter) rescue false)
+    end
+
+    def mysql?
+      return @mysql unless @mysql.nil?
+      @mysql ||= (collection_class.connection.kind_of?(ActiveRecord::ConnectionAdapters::Mysql2Adapter) rescue false)
+    end
+
+    def ilike
+      @ilike ||= (postgres? ? 'ILIKE' : 'LIKE')  # Only Postgres supports ILIKE, Mysql and Sqlite3 use LIKE
     end
 
   end

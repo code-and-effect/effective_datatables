@@ -8,6 +8,10 @@ module Effective
         @table_columns = initialize_column_options(@table_columns)
       end
 
+      def quote_sql(name)
+        collection_class.connection.quote_column_name(name) rescue name
+      end
+
       protected
 
       def initialize_column_options(cols)
@@ -47,7 +51,7 @@ module Effective
           cols[name][:array_index] = index # The index of this column in the collection, regardless of hidden table_columns
           cols[name][:name] ||= name
           cols[name][:label] ||= name.titleize
-          cols[name][:column] ||= (sql_table && sql_column) ? "\"#{sql_table.name}\".\"#{sql_column.name}\"" : name
+          cols[name][:column] ||= (sql_table && sql_column) ? "#{quote_sql(sql_table.name)}.#{quote_sql(sql_column.name)}" : name
           cols[name][:width] ||= nil
           cols[name][:sortable] = true if cols[name][:sortable].nil?
           cols[name][:visible] = true if cols[name][:visible].nil?
@@ -89,7 +93,7 @@ module Effective
           # EffectiveRoles, if you do table_column :roles, everything just works
           if name == 'roles' && defined?(EffectiveRoles) && collection.respond_to?(:with_role)
             cols[name][:sortable] = true
-            cols[name][:column] = sql_table.present? ? "\"#{sql_table.name}\".\"roles_mask\"" : name
+            cols[name][:column] = sql_table.present? ? "#{quote_sql(sql_table.name)}.#{quote_sql('roles_mask')}" : name
             cols[name][:type] = :effective_roles
           end
 
