@@ -8,6 +8,8 @@ Search raw database tables and ruby post-rendered results at the same time
 
 Packages the jQuery DataTables assets for use in a Rails 3.2.x & Rails 4.x application using Twitter Bootstrap 2 or 3
 
+Works with postgres, mysql, sqlite3 and arrays.
+
 ## Getting Started
 
 ```ruby
