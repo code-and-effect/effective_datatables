@@ -1,5 +1,6 @@
 require 'haml-rails'
 require 'kaminari'
+require 'simple_form'
 require 'effective_datatables/engine'
 
 module EffectiveDatatables
