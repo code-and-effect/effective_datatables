@@ -69,9 +69,11 @@ module Effective
     class Posts < Effective::Datatable
       datatable do
         table_column :id
-        table_column :user    # if Post belongs_to :user
+        table_column :user      # if Post belongs_to :user
+        table_column :comments  # if Post has_many :comments
         table_column :title
         table_column :created_at
+        actions_column
       end
 
       def collection
@@ -155,7 +157,7 @@ module Effective
         end
 
         table_column :title, :label => 'Post Title', :class => 'col-title'
-        table_column :actions, :sortable => false, :filter => false, :partial => '/posts/actions'
+        actions_column
       end
 
       def collection
@@ -433,6 +435,14 @@ column      # the table_column options
 filterable  # whether the dataTable is filterable
 ```
 
+## actions_column
+
+Creates a column with links to this resource's Show, Edit and Destroy actions.
+
+Optionally uses the authorization method (below) to determine if the `current_user` has permission for each of these actions.
+
+See the `config/initializers/effective_datatable.rb` file for more information.
+
 ## table_columns
 
 Quickly create multiple table_columns all with default options:
@@ -591,6 +601,15 @@ end
 ```
 
 ## Working with other effective_gems
+
+### Effective Addresses
+
+When working with an ActiveRecord collection that implements [effective_addresses](https://github.com/code-and-effect/effective_addresses),
+the filters and sorting will be automatically configured.
+
+Just define `table_column :addresses`
+
+When filtering values in this column, the address1, address2, city, postal code, state code and country code will all be matched.
 
 ### Effective Obfuscation
 
