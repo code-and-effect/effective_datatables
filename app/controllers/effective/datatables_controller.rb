@@ -25,7 +25,10 @@ module Effective
     private
 
     def find_datatable(id)
-      "effective/datatables/#{id}".classify.tap { |klass| klass << 's' if id.to_s.end_with?('s') }.safe_constantize
+      id_plural = id.pluralize == id && id.singularize != id
+      klass = "effective/datatables/#{id}".classify
+
+      (id_plural ? klass.pluralize : klass).safe_constantize
     end
 
     def error_json
