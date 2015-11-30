@@ -28,13 +28,15 @@ module EffectiveDatatablesHelper
         as: (defined?(EffectiveFormInputs) ? :effective_date_picker : :string),
         placeholder: (opts[:label] || name),
         input_group: false,
-        input_html: { name: nil, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} }
+        input_html: { name: nil, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} },
+        input_js: { useStrict: true, keepInvalid: true }
     when :datetime
       form.input name, label: false, required: false,
         as: (defined?(EffectiveFormInputs) ? :effective_date_time_picker : :string),
         placeholder: (opts[:label] || name),
         input_group: false,
-        input_html: { name: nil, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} }
+        input_html: { name: nil, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} },
+        input_js: { useStrict: true, keepInvalid: true } # Keep invalid format like "2015-11" so we can still filter by year, month or day
     when :select, :boolean
       form.input name, label: false, required: false,
         as: (defined?(EffectiveFormInputs) ? :effective_select : :select),
