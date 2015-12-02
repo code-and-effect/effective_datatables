@@ -8,17 +8,18 @@
     :width => '100%',
     :data => {
       'effective-datatables-table' => style,
+      'effective-form-inputs' => defined?(EffectiveFormInputs),
       'source' => effective_datatables.datatable_path(datatable, {:format => 'json'}.merge(:attributes => datatable.attributes)).chomp('?'),
-      'column-names' => datatable_column_names(datatable),
-      'non-sortable' => datatable_non_sortable(datatable, sortable),
-      'non-visible' => datatable_non_visible(datatable),
-      'widths' => datatable_widths(datatable),
       'default-order' => datatable_default_order(datatable),
       'display-entries' => datatable.display_entries,
       'display-records' => (datatable.to_json[:recordsFiltered] || 0),
       'total-records' => (datatable.to_json[:recordsTotal] || 0),
+
+      'column-names' => datatable_column_names(datatable),
+      'non-sortable' => datatable_non_sortable(datatable, sortable),
+      'non-visible' => datatable_non_visible(datatable),
+      'widths' => datatable_widths(datatable),
       'column-classes' => datatable_column_classes(datatable),
-      'effective-form-inputs' => defined?(EffectiveFormInputs)
     }
   }
 
@@ -33,10 +34,15 @@
         - table_columns = datatable.table_columns.select { |_, opts| (opts[:th][:depth] || 0 rescue 0) == depth }
         - table_columns.each do |name, opts|
           %th{(opts[:th] || {}).merge({:title => opts[:label] || name})}
-            = render_datatable_header_cell(form_builder, name, opts, filterable)
+            = opts[:label] || name
+            /= render_datatable_header_cell(form_builder, name, opts, filterable)
           - (opts[:append_th] || []).each do |faux_col|
             %th{(faux_col[:th] || {}).merge({:title => faux_col[:label]})}
               = faux_col[:label]
+    %tr
+      - datatable.table_columns.select { |_, opts| (opts[:th][:depth] || 0 rescue 0) == max_depth }.each do |name, opts|
+        %th= render_datatable_header_cell(form_builder, name, opts, filterable)
+
   %tbody
     - (datatable.to_json[:data] || []).each do |row|
       %tr

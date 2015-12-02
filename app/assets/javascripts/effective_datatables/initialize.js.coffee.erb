@@ -6,12 +6,6 @@ initializeDataTables = ->
       init_options =
         ajax: { url: datatable.data('source'), type: 'POST' }
         autoWidth: false
-        processing: true
-        deferRender: true
-        serverSide: true
-        scrollCollapse: true
-        deferLoading: [datatable.data('display-records'), datatable.data('total-records')] # fixedColumns won't work with deferLoading
-        pagingType: 'simple_numbers'
         buttons: [
           {
             extend: 'colvis',
@@ -23,19 +17,26 @@ initializeDataTables = ->
           }, 'copy', 'csv', 'excel', 'print'
         ]
         colReorder: true
-        responsive: true
-        language: { 'lengthMenu': 'Show _MENU_ per page'}
-        lengthMenu: [[10, 25, 50, 100, 250, 1000, -1], ['10', '25', '50', '100', '250', '1000', 'All']]
-        iDisplayLength: datatable.data('display-entries')
         columnDefs: [
           { visible: false, targets: datatable.data('non-visible') },
           { sortable: false, targets: datatable.data('non-sortable') }
         ].concat(datatable.data('column-classes') || []).concat(datatable.data('column-names') || [])
+        deferLoading: [datatable.data('display-records'), datatable.data('total-records')] # fixedColumns won't work with deferLoading
+        deferRender: true
+        iDisplayLength: datatable.data('display-entries')
+        language: { 'lengthMenu': 'Show _MENU_ per page'}
+        lengthMenu: [[10, 25, 50, 100, 250, 1000, -1], ['10', '25', '50', '100', '250', '1000', 'All']]
         order: datatable.data('default-order')
+        processing: true
+        responsive: true
         serverParams: (params) ->
           table = this.DataTable()
-          table.columns().flatten().each (index) =>  # Pass which columns are visible back to server
+          table.columns().flatten().each (index) =>
             params['columns'][index]['visible'] = table.column(index).visible()
+        serverSide: true
+        scrollCollapse: true
+        pagingType: 'simple_numbers'
+
 
       if datatable.data('effective-datatables-table') == 'simple'
         init_options['lengthMenu'] = [-1] # Show all results
@@ -45,15 +46,10 @@ initializeDataTables = ->
       dataTableSearch = (event) ->   # This is the function called by a select or input to run the search
         obj = $(event.currentTarget)
         table = obj.closest('table.dataTable')
-
-        # We're using our own scroll wrapper, not the ScrollX support
-        if table.parent().hasClass('dataTables_scrollHeadInner') # ScrollX support
-          table = table.closest('.dataTables_scroll').children('.dataTables_scrollBody').children('table.dataTable')
         table.DataTable().column("#{obj.data('column-name')}:name").search(obj.val()).draw()
 
       # For every existing Input, Set up the search events
       search_inputs = datatable.find('thead').first().find('input,select')
-
       search_inputs.each (index, input) ->
         $input = $(input)
 
@@ -74,11 +70,6 @@ initializeDataTables = ->
         $input = $(input)
         if $input.data('column-index') && $input.data('column-name') && $input.val()
           table.fnSettings().aoPreSearchCols[$input.data('column-index')].sSearch = $input.val()
-
-      # FixedColumns doesn't work well yet.
-      # fixedColumns = new $.fn.dataTable.FixedColumns(table,
-      #  leftColumns: 2
-      # )
 
       # Apply EffectiveFormInputs to the Show x per page dropdown
       if datatable.data('effective-form-inputs')

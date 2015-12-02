@@ -20,6 +20,11 @@ table.dataTable thead .sorting_desc:after {
   content: '';
 }
 
+// Filter bar
+table.dataTable .form-group { width: 100%; margin-left: 0px; margin-right: 0px; }
+table.dataTable input,select { width: 100%; min-width: 105px; }
+table.dataTable .form-control { width: 100%; min-width: 105px; }
+
 // Processing popup
 div.dataTables_wrapper div.dataTables_processing {
   top: 10px;
@@ -90,6 +95,7 @@ ul.dt-button-collection {
 
   li {
     width: 198px;
+    overflow: hidden;
   }
 
   li:nth-child(odd) {

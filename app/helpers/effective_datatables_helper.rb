@@ -15,8 +15,6 @@ module EffectiveDatatablesHelper
   end
 
   def render_datatable_header_cell(form, name, opts, filterable = true)
-    return opts[:label] || name
-
     return render(partial: opts[:header_partial], locals: {form: form, name: (opts[:label] || name), column: opts, filterable: filterable}) if opts[:header_partial].present?
     return content_tag(:p, opts[:label] || name) if filterable == false
 
