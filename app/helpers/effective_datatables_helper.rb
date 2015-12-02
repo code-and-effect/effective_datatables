@@ -62,39 +62,21 @@ module EffectiveDatatablesHelper
     end
   end
 
-  def datatable_non_sortable(datatable, sortable = true)
-    [].tap do |nonsortable|
-      datatable.table_columns.values.each_with_index { |options, x| nonsortable << x if options[:sortable] == false || sortable == false }
-    end.to_json()
-  end
-
-  def datatable_non_visible(datatable)
-    [].tap do |nonvisible|
-      datatable.table_columns.values.each_with_index do |options, x|
-        visible = (options[:visible].respond_to?(:call) ? datatable.instance_exec(&options[:visible]) : options[:visible])
-        nonvisible << x if visible == false
-      end
-    end.to_json()
-  end
-
   def datatable_default_order(datatable)
     [datatable.order_index, datatable.order_direction.downcase].to_json()
   end
 
-  def datatable_widths(datatable)
-    datatable.table_columns.values.map { |options| {'sWidth' => options[:width]} if options[:width] }.to_json()
-  end
-
-  def datatable_column_classes(datatable)
-    [].tap do |classes|
-      datatable.table_columns.values.each_with_index do |options, x|
-        classes << {:className => options[:class], :targets => [x]} if options[:class].present?
-      end
+  # https://datatables.net/reference/option/columns
+  def datatable_columns(datatable)
+    datatable.table_columns.values.map do |options|
+      {
+        name: options[:name],
+        className: options[:class],
+        width: options[:width],
+        sortable: options[:sortable],
+        visible: (options[:visible].respond_to?(:call) ? datatable.instance_exec(&options[:visible]) : options[:visible])
+      }
     end.to_json()
-  end
-
-  def datatable_column_names(datatable)
-    datatable.table_columns.values.map { |options| {:name => options[:name], :targets => options[:index] } }.to_json()
   end
 
   def datatables_admin_path?

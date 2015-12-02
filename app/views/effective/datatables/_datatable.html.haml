@@ -14,12 +14,7 @@
       'display-entries' => datatable.display_entries,
       'display-records' => (datatable.to_json[:recordsFiltered] || 0),
       'total-records' => (datatable.to_json[:recordsTotal] || 0),
-
-      'column-names' => datatable_column_names(datatable),
-      'non-sortable' => datatable_non_sortable(datatable, sortable),
-      'non-visible' => datatable_non_visible(datatable),
-      'widths' => datatable_widths(datatable),
-      'column-classes' => datatable_column_classes(datatable),
+      'columns' => datatable_columns(datatable)
     }
   }
 

@@ -17,11 +17,8 @@ initializeDataTables = ->
           }, 'copy', 'csv', 'excel', 'print'
         ]
         colReorder: true
-        columnDefs: [
-          { visible: false, targets: datatable.data('non-visible') },
-          { sortable: false, targets: datatable.data('non-sortable') }
-        ].concat(datatable.data('column-classes') || []).concat(datatable.data('column-names') || [])
-        deferLoading: [datatable.data('display-records'), datatable.data('total-records')] # fixedColumns won't work with deferLoading
+        columns: datatable.data('columns')
+        deferLoading: [datatable.data('display-records'), datatable.data('total-records')]
         deferRender: true
         iDisplayLength: datatable.data('display-entries')
         language: { 'lengthMenu': 'Show _MENU_ per page'}
@@ -36,7 +33,6 @@ initializeDataTables = ->
         serverSide: true
         scrollCollapse: true
         pagingType: 'simple_numbers'
-
 
       if datatable.data('effective-datatables-table') == 'simple'
         init_options['lengthMenu'] = [-1] # Show all results
