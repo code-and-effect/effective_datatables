@@ -10,6 +10,8 @@
 //= require dataTables/buttons/buttons.html5
 //= require dataTables/buttons/buttons.print
 
+//= require dataTables/dataTables.colReorder.min
+
 //= require_tree ./effective_datatables
 
 $.extend( $.fn.dataTable.defaults, {

@@ -12,6 +12,7 @@ initializeDataTables = ->
         scrollCollapse: true
         deferLoading: [datatable.data('display-records'), datatable.data('total-records')] # fixedColumns won't work with deferLoading
         pagingType: 'simple_numbers'
+        colReorder: true
         buttons: [
           {
             extend: 'colvis',
@@ -93,8 +94,6 @@ initializeDataTables = ->
             $.event.trigger('page:change')
           , 1000)
         )
-
-      # new $.fn.dataTable.ColReorder(table)
 
 $ -> initializeDataTables()
 $(document).on 'page:change', -> initializeDataTables()
