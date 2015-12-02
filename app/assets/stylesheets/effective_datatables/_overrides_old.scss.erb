@@ -1,0 +1,135 @@
+.dataTables_wrapper {   // This is the Header
+  .scroll_wrapper {
+    overflow-x: auto;
+  }
+
+  table.dataTable {
+    border-collapse: collapse;
+    box-sizing: border-box;
+
+    .form-group { width: 100%; margin-left: 0px; margin-right: 0px; }
+    input,select { width: 100%; min-width: 105px; }
+    p { margin: 0px; }
+
+    thead th {
+      padding: 6px 18px 6px 6px;
+      vertical-align: middle;
+    }
+
+    thead th.sorting_disabled {
+      padding: 6px 6px 6px 6px;
+    }
+
+    tbody th, tbody td, thead th, thead td {
+      border-left: none;
+      border-bottom: none;
+      white-space: nowrap;
+    }
+
+    ol,
+    ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+  }
+
+  table.dataTable.sorting-hidden {
+    thead {
+      .sorting_asc { background: none; cursor: default; }
+      .sorting_desc { background: none; cursor: default; }
+      .sorting { cursor: default; }
+    }
+  }
+
+  .DTTT_container,.ColVis {
+    float: right;
+    display: inline-block;
+    margin: 0px 0px 0px 2px;
+
+    label { float: none; }
+  }
+
+  .DTTT_button,
+  .ColVis_Button {
+    color: #00a6ff !important;
+    border: 1px solid #e0eeff;
+    background: #fff;
+    box-shadow: none;
+    float: none;
+
+    &:hover {
+      color: #fff !important;
+      background: #00a6ff !important;
+      border: 1px solid black;
+      background: #fff;
+      box-shadow: none;
+    }
+
+    &.active {
+      color: #fff;
+      background: #03428d !important;
+    }
+  }
+
+  .dataTables_processing {
+    top: 10px;
+  }
+
+  .dataTables_paginate {
+    overflow: hidden;
+
+    .pagination {
+      padding: 0px;
+
+      .paginate_button {
+        padding: 0px;
+
+        &:hover {
+          background: none;
+          border: 1px solid transparent;
+        }
+
+        &:active {
+          background: none;
+          box-shadow: none;
+          outline: none;
+        }
+      }
+    }
+  }
+
+  table.dataTable thead .sorting { background: url(<%= asset_data_uri('dataTables/sort_both.png') %>) no-repeat center right; }
+  table.dataTable thead .sorting_asc { background: url(<%= asset_data_uri('dataTables/sort_asc.png') %>) no-repeat center right; }
+  table.dataTable thead .sorting_desc { background: url(<%= asset_data_uri('dataTables/sort_desc.png') %>) no-repeat center right; }
+}
+
+table.dataTable.DTCR_clonedTable { max-width: 200px !important; }
+table.dataTable.no-footer { border-bottom: 1px solid #ddd; }
+
+ul.ColVis_collection {
+  width: 420px;
+  margin-left: 148px;
+  margin-top: 4px;
+
+  li {
+    width: 195px;
+  }
+
+  li.ColVis_Special.ColVis_Restore {
+    clear: both;
+  }
+
+  li:nth-child(odd) {
+    float: left;
+  }
+
+  li:nth-child(even) {
+    float: right;
+  }
+
+}
+
+div.DTTT_print_info {
+  h6 { color: black; }
+  p { color: black; }
+}
