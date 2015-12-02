@@ -55,3 +55,53 @@ div.dataTables_wrapper div.dataTables_info {
     }
   }
 }
+
+// Buttons
+div.dt-buttons { float: right; }
+
+.dt-buttons > a {
+  color: #00a6ff !important;
+  border: 1px solid #e0eeff;
+  background: #fff;
+  font-size: 12px;
+  padding: 6px;
+  margin-right: 6px;
+  float: none;
+
+  &:hover {
+    color: #fff !important;
+    background: #00a6ff !important;
+    border: 1px solid black;
+    background: #fff;
+    box-shadow: none;
+  }
+
+  &:last-child { margin-right: 0px; }
+
+  &.active {
+    color: #fff;
+    background: #03428d !important;
+  }
+}
+
+// Show / hide columns button
+ul.dt-button-collection {
+  width: 400px;
+
+  li {
+    width: 198px;
+  }
+
+  li:nth-child(odd) {
+    float: left;
+  }
+
+  li:nth-child(even) {
+    float: right;
+  }
+
+  .buttons-colvisGroup,.buttons-colvisRestore {
+    clear: left;
+    border-top: 1px solid grey;
+  }
+}

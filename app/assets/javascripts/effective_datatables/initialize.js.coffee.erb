@@ -12,6 +12,16 @@ initializeDataTables = ->
         scrollCollapse: true
         deferLoading: [datatable.data('display-records'), datatable.data('total-records')] # fixedColumns won't work with deferLoading
         pagingType: 'simple_numbers'
+        buttons: [
+          {
+            extend: 'colvis',
+            text: 'Show / hide columns',
+            postfixButtons: [
+              { extend: 'colvisGroup', text: 'Show all', show: ':hidden'},
+              { extend: 'colvisRestore', text: 'Show default'}
+            ]
+          }, 'copy', 'csv', 'excel', 'print'
+        ]
         language: { 'lengthMenu': 'Show _MENU_ per page'}
         lengthMenu: [[10, 25, 50, 100, 250, 1000, -1], ['10', '25', '50', '100', '250', '1000', 'All']]
         iDisplayLength: datatable.data('display-entries')
@@ -71,6 +81,18 @@ initializeDataTables = ->
       # Apply EffectiveFormInputs to the Show x per page dropdown
       if datatable.data('effective-form-inputs')
         table.closest('.dataTables_wrapper').find('.dataTables_length select').select2()
+
+      # Capture column visibility changes and refresh datatable
+      datatable.on 'column-visibility.dt', (event, settings, index, state) ->
+        $table = $(event.currentTarget)
+
+        timeout = $table.data('timeout')
+        clearTimeout(timeout) if timeout
+        $table.data('timeout', setTimeout( =>
+            $table.DataTable().draw()
+            $.event.trigger('page:change')
+          , 1000)
+        )
 
       # new $.fn.dataTable.ColReorder(table)
 
