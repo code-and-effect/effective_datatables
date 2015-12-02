@@ -12,6 +12,9 @@
 
 //= require dataTables/dataTables.colReorder.min
 
+//= require dataTables/responsive/dataTables.responsive.min
+//= require dataTables/responsive/responsive.bootstrap.min
+
 //= require_tree ./effective_datatables
 
 $.extend( $.fn.dataTable.defaults, {

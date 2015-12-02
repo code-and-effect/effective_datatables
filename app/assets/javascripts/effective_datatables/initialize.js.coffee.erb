@@ -12,7 +12,6 @@ initializeDataTables = ->
         scrollCollapse: true
         deferLoading: [datatable.data('display-records'), datatable.data('total-records')] # fixedColumns won't work with deferLoading
         pagingType: 'simple_numbers'
-        colReorder: true
         buttons: [
           {
             extend: 'colvis',
@@ -23,6 +22,8 @@ initializeDataTables = ->
             ]
           }, 'copy', 'csv', 'excel', 'print'
         ]
+        colReorder: true
+        responsive: true
         language: { 'lengthMenu': 'Show _MENU_ per page'}
         lengthMenu: [[10, 25, 50, 100, 250, 1000, -1], ['10', '25', '50', '100', '250', '1000', 'All']]
         iDisplayLength: datatable.data('display-entries')
