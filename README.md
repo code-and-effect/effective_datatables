@@ -99,7 +99,6 @@ Here we just render the datatable:
 <%= render_datatable(@datatable) %>
 ```
 
-
 ## How It Works
 
 When the jQuery DataTable is first initialized on the front-end, it makes an AJAX request back to the server asking for data.
