@@ -45,6 +45,7 @@ module Effective
         opts = {
           sortable: false,
           filter: false,
+          responsivePriority: 0,
           partial_local: :resource,
           partial_locals: { show_action: show, edit_action: edit, destroy_action: destroy, unarchive_action: unarchive }
         }.merge(options)

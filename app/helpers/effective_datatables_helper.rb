@@ -29,6 +29,7 @@ module EffectiveDatatablesHelper
         title: options[:label],
         className: options[:class],
         width: options[:width],
+        responsivePriority: (options[:responsivePriority] || 10000),  # 10,000 is datatables default
         sortable: options[:sortable],
         visible: (options[:visible].respond_to?(:call) ? datatable.instance_exec(&options[:visible]) : options[:visible]),
         filterHtml: datatable_header_filter(form_builder, name, options),

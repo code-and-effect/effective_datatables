@@ -6,7 +6,7 @@ Use a simple DSL in just one ruby file to implement all features
 
 Search raw database tables and ruby post-rendered results at the same time
 
-Packages the jQuery DataTables assets for use in a Rails 3.2.x & Rails 4.x application using Twitter Bootstrap 2 or 3
+Packages the jQuery DataTables assets for use in a Rails 3.2.x & Rails 4.x application using Twitter Bootstrap 3
 
 Works with postgres, mysql, sqlite3 and arrays.
 
@@ -30,25 +30,16 @@ rails generate effective_datatables:install
 
 The generator will install an initializer which describes all configuration options.
 
-
 Require the javascript on the asset pipeline by adding the following to your application.js:
 
 ```ruby
-# For use with Bootstrap3 (which is not included in this gem):
 //= require effective_datatables
-
-# For use with Bootstrap2 (which is not includled in this gem):
-//= require effective_datatables.bootstrap2
 ```
 
 Require the stylesheet on the asset pipeline by adding the following to your application.css:
 
 ```ruby
-# For use with Bootstrap3 (which is not included in this gem):
 *= require effective_datatables
-
-# For use with Bootstrap2 (which is not not included in this gem):
-*= require effective_datatables.bootstrap2
 ```
 
 ## Usage
