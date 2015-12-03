@@ -57,7 +57,7 @@ initializeDataTables = ->
             table.settings()[0].aoPreSearchCols[index].sSearch = settings.filterSelectedValue
 
           if settings.filterHtml  # Append the html filter HTML and initialize input events
-            $th.append(settings.filterHtml)
+            $th.append('<br>' + settings.filterHtml)
             initializeFilterEvents($th)
 
           $th.addClass('initialized')
