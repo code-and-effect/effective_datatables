@@ -16,17 +16,34 @@ initializeDataTables = ->
             { extend: 'colvisRestore', text: 'Show default'}
           ]
         },
-        'copy',
+        {
+          extend: 'copy',
+          exportOptions:
+            format:
+              header: (str) -> str.substring(0, str.indexOf('<'))
+            columns: ':visible:not(.col-actions)'
+        },
         {
           extend: 'csv',
           exportOptions:
             format:
-              header: (d) ->
-                console.log d
-                d
+              header: (str) -> str.substring(0, str.indexOf('<'))
+            columns: ':visible:not(.col-actions)'
         },
-        'excel',
-        'print'
+        {
+          extend: 'excel',
+          exportOptions:
+            format:
+              header: (str) -> str.substring(0, str.indexOf('<'))
+            columns: ':visible:not(.col-actions)'
+        },
+        {
+          extend: 'print',
+          exportOptions:
+            format:
+              header: (str) -> str.substring(0, str.indexOf('<'))
+            columns: ':visible:not(.col-actions)'
+        },
       ]
       colReorder: true
       columns: datatable.data('columns')
@@ -100,7 +117,7 @@ initializeDataTables = ->
       $table.data('timeout', setTimeout( =>
           $table.DataTable().draw()
           $.event.trigger('page:change')
-        , 1000)
+        , 700)
       )
 
 $ -> initializeDataTables()

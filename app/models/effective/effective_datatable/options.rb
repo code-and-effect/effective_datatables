@@ -70,7 +70,7 @@ module Effective
               :has_many
             elsif name.include?('_address') && (collection_class.new rescue nil).respond_to?(:effective_addresses)
               :effective_address
-            elsif name.include?('year') || name.include?('_id')
+            elsif name == 'id' || name.include?('year') || name.include?('_id')
               :non_formatted_integer
             elsif sql_column.try(:type).present?
               sql_column.type

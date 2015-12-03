@@ -24,11 +24,12 @@ table.dataTable thead .sorting_desc:after {
 }
 
 table.dataTable thead th {
-  text-align: center;
+  text-align: left;
   border-bottom: none;
+  white-space: nowrap;
   padding: 6px;
 
-  .form-group { text-align: left; }
+  .form-group { margin-bottom: 0px; }
 }
 
 table.dataTable thead > tr > th.sorting_asc,
@@ -50,37 +51,15 @@ div.dataTables_wrapper div.dataTables_processing {
   box-shadow: none;
 }
 
-// Showing 1 to 25 of 100 entries
-div.dataTables_wrapper div.dataTables_info {
-  padding-top: 0px;
-}
-
-// Pagination
-.dataTables_paginate {
-  overflow: hidden;
-
-  .pagination {
-    padding: 0px;
-
-    .paginate_button {
-      padding: 0px;
-
-      &:hover {
-        background: none;
-        border: 1px solid transparent;
-      }
-
-      &:active {
-        background: none;
-        box-shadow: none;
-        outline: none;
-      }
-    }
-  }
-}
+// Show x per page
+.dataTables_length { margin-bottom: 4px; }
 
 // Buttons
-div.dt-buttons { float: right; }
+div.dt-buttons {
+  float: right;
+  display: inherit;
+  width: auto;
+}
 
 .dt-buttons > a {
   color: #00a6ff !important;
@@ -131,5 +110,35 @@ ul.dt-button-collection {
 
   .buttons-colvisRestore {
     border-top: 1px solid grey;
+  }
+}
+
+
+// Showing 1 to 25 of 100 entries
+div.dataTables_wrapper div.dataTables_info {
+  padding-top: 0px;
+}
+
+// Pagination
+.dataTables_paginate {
+  overflow: hidden;
+
+  .pagination {
+    padding: 0px;
+
+    .paginate_button {
+      padding: 0px;
+
+      &:hover {
+        background: none;
+        border: 1px solid transparent;
+      }
+
+      &:active {
+        background: none;
+        box-shadow: none;
+        outline: none;
+      }
+    }
   }
 }
