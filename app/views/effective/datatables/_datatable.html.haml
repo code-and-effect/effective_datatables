@@ -7,36 +7,22 @@
     :border => 0,
     :width => '100%',
     :data => {
-      'effective-datatables-table' => style,
-      'effective-form-inputs' => defined?(EffectiveFormInputs),
-      'source' => effective_datatables.datatable_path(datatable, {:format => 'json'}.merge(:attributes => datatable.attributes)).chomp('?'),
+      'columns' => datatable_columns(datatable),
       'default-order' => datatable_default_order(datatable),
       'display-entries' => datatable.display_entries,
       'display-records' => (datatable.to_json[:recordsFiltered] || 0),
-      'total-records' => (datatable.to_json[:recordsTotal] || 0),
-      'columns' => datatable_columns(datatable)
+      'effective-datatables-table' => style,
+      'effective-form-inputs' => defined?(EffectiveFormInputs),
+      'source' => effective_datatables.datatable_path(datatable, {:format => 'json'}.merge(:attributes => datatable.attributes)).chomp('?'),
+      'total-records' => (datatable.to_json[:recordsTotal] || 0)
     }
   }
 
-  form_builder = nil
-  simple_form_for(datatable, url: '#', html: {id: "#{datatable.to_param}-form"}) { |f| form_builder = f }
-
 %table.effective-datatable{effective_datatable_params}
   %thead
-    - max_depth = datatable.table_columns.map { |_, opts| opts[:th][:depth].to_i rescue 0 }.max
-    - [*0..max_depth].each do |depth|
-      %tr
-        - table_columns = datatable.table_columns.select { |_, opts| (opts[:th][:depth] || 0 rescue 0) == depth }
-        - table_columns.each do |name, opts|
-          %th{(opts[:th] || {}).merge({:title => opts[:label] || name})}
-            = opts[:label] || name
-            /= render_datatable_header_cell(form_builder, name, opts, filterable)
-          - (opts[:append_th] || []).each do |faux_col|
-            %th{(faux_col[:th] || {}).merge({:title => faux_col[:label]})}
-              = faux_col[:label]
     %tr
-      - datatable.table_columns.select { |_, opts| (opts[:th][:depth] || 0 rescue 0) == max_depth }.each do |name, opts|
-        %th= render_datatable_header_cell(form_builder, name, opts, filterable)
+      - datatable.table_columns.each do |name, opts|
+        %th= opts[:label] || name
 
   %tbody
     - (datatable.to_json[:data] || []).each do |row|

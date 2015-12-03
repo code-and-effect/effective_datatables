@@ -1,87 +1,99 @@
 initializeDataTables = ->
   $('table[data-effective-datatables-table]').each ->
-    unless $.fn.DataTable.fnIsDataTable(this)
-      datatable = $(this)
+    return if $.fn.DataTable.fnIsDataTable(this)
 
-      init_options =
-        ajax: { url: datatable.data('source'), type: 'POST' }
-        autoWidth: false
-        buttons: [
-          {
-            extend: 'colvis',
-            text: 'Show / hide columns',
-            postfixButtons: [
-              { extend: 'colvisGroup', text: 'Show all', show: ':hidden'},
-              { extend: 'colvisRestore', text: 'Show default'}
-            ]
-          }, 'copy', 'csv', 'excel', 'print'
-        ]
-        colReorder: true
-        columns: datatable.data('columns')
-        deferLoading: [datatable.data('display-records'), datatable.data('total-records')]
-        deferRender: true
-        iDisplayLength: datatable.data('display-entries')
-        language: { 'lengthMenu': 'Show _MENU_ per page'}
-        lengthMenu: [[10, 25, 50, 100, 250, 1000, -1], ['10', '25', '50', '100', '250', '1000', 'All']]
-        order: datatable.data('default-order')
-        processing: true
-        responsive: true
-        serverParams: (params) ->
-          table = this.DataTable()
-          table.columns().flatten().each (index) =>
-            params['columns'][index]['visible'] = table.column(index).visible()
-        serverSide: true
-        scrollCollapse: true
-        pagingType: 'simple_numbers'
+    datatable = $(this)
 
-      if datatable.data('effective-datatables-table') == 'simple'
-        init_options['lengthMenu'] = [-1] # Show all results
-        init_options['dom'] = "<'row'r>t" # Just show the table
+    init_options =
+      ajax: { url: datatable.data('source'), type: 'POST' }
+      autoWidth: false
+      buttons: [
+        {
+          extend: 'colvis',
+          text: 'Show / hide columns',
+          postfixButtons: [
+            { extend: 'colvisGroup', text: 'Show all', show: ':hidden'},
+            { extend: 'colvisRestore', text: 'Show default'}
+          ]
+        }, 'copy', 'csv', 'excel', 'print'
+      ]
+      colReorder: true
+      columns: datatable.data('columns')
+      deferLoading: [datatable.data('display-records'), datatable.data('total-records')]
+      deferRender: true
+      iDisplayLength: datatable.data('display-entries')
+      language: { 'lengthMenu': 'Show _MENU_ per page'}
+      lengthMenu: [[10, 25, 50, 100, 250, 1000, -1], ['10', '25', '50', '100', '250', '1000', 'All']]
+      order: datatable.data('default-order')
+      processing: true
+      responsive: true
+      serverParams: (params) ->
+        table = this.api()
+        table.columns().flatten().each (index) =>
+          params['columns'][index]['visible'] = table.column(index).visible()
+      serverSide: true
+      scrollCollapse: true
+      pagingType: 'simple_numbers'
+      headerCallback: ->
+        table = this.api()
+        table.columns().flatten().each (index) =>
+          $th = $(table.column(index).header())
+          return if $th.hasClass('initialized')
 
-      # Initialize Searching
-      dataTableSearch = (event) ->   # This is the function called by a select or input to run the search
-        obj = $(event.currentTarget)
-        table = obj.closest('table.dataTable')
-        table.DataTable().column("#{obj.data('column-name')}:name").search(obj.val()).draw()
+          settings = table.settings()[0].aoColumns[index] # column specific settings
 
-      # For every existing Input, Set up the search events
-      search_inputs = datatable.find('thead').first().find('input,select')
-      search_inputs.each (index, input) ->
-        $input = $(input)
+          if settings.filterHtml  # Append the html filters
+            $th.append(settings.filterHtml)
 
-        if $input.data('column-name')
-          $input.parent().on 'click', (event) -> false # Dont order columns when you click inside the input
-          $input.parent().on 'mousedown', (event) -> event.stopPropagation() # Dont order columns when you click inside the input
+          if settings.filterSelectedValue  # Assign preselected filter values
+            table.settings()[0].aoPreSearchCols[index].sSearch = settings.filterSelectedValue
 
-          if $input.is('select')
-            $input.on 'change', (event) -> dataTableSearch(event)
-          else if $input.is('input')
-            $input.keyup($.debounce(300, dataTableSearch))
+          $th.addClass('initialized')
 
-      # Let's actually initialize the table now
-      table = datatable.dataTable(init_options)
+    if datatable.data('effective-datatables-table') == 'simple'
+      init_options['lengthMenu'] = [-1] # Show all results
+      init_options['dom'] = "<'row'r>t" # Just show the table
 
-      # Assign PreSearch columns
-      search_inputs.each (index, input) =>
-        $input = $(input)
-        if $input.data('column-index') && $input.data('column-name') && $input.val()
-          table.fnSettings().aoPreSearchCols[$input.data('column-index')].sSearch = $input.val()
+    # Initialize Searching
+    dataTableSearch = (event) ->   # This is the function called by a select or input to run the search
+      obj = $(event.currentTarget)
+      table = obj.closest('table.dataTable')
+      table.DataTable().column("#{obj.data('column-name')}:name").search(obj.val()).draw()
 
-      # Apply EffectiveFormInputs to the Show x per page dropdown
-      if datatable.data('effective-form-inputs')
-        table.closest('.dataTables_wrapper').find('.dataTables_length select').select2()
+    # For every existing Input, Set up the search events
+    search_inputs = datatable.find('thead').first().find('input,select')
+    console.log 'serach inputs'
+    console.log search_inputs
+    search_inputs.each (index, input) ->
+      $input = $(input)
 
-      # Capture column visibility changes and refresh datatable
-      datatable.on 'column-visibility.dt', (event, settings, index, state) ->
-        $table = $(event.currentTarget)
+      if $input.data('column-name')
+        $input.parent().on 'click', (event) -> false # Dont order columns when you click inside the input
+        $input.parent().on 'mousedown', (event) -> event.stopPropagation() # Dont order columns when you click inside the input
 
-        timeout = $table.data('timeout')
-        clearTimeout(timeout) if timeout
-        $table.data('timeout', setTimeout( =>
-            $table.DataTable().draw()
-            $.event.trigger('page:change')
-          , 1000)
-        )
+        if $input.is('select')
+          $input.on 'change', (event) -> dataTableSearch(event)
+        else if $input.is('input')
+          $input.keyup($.debounce(300, dataTableSearch))
+
+    # Let's actually initialize the table now
+    table = datatable.dataTable(init_options)
+
+    # Apply EffectiveFormInputs to the Show x per page dropdown
+    if datatable.data('effective-form-inputs')
+      table.closest('.dataTables_wrapper').find('.dataTables_length select').select2()
+
+    # Capture column visibility changes and refresh datatable
+    datatable.on 'column-visibility.dt', (event, settings, index, state) ->
+      $table = $(event.currentTarget)
+
+      timeout = $table.data('timeout')
+      clearTimeout(timeout) if timeout
+      $table.data('timeout', setTimeout( =>
+          $table.DataTable().draw()
+          $.event.trigger('page:change')
+        , 1000)
+      )
 
 $ -> initializeDataTables()
 $(document).on 'page:change', -> initializeDataTables()

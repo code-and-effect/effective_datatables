@@ -14,7 +14,7 @@ module EffectiveDatatablesHelper
     render partial: 'effective/datatables/datatable', locals: locals.merge(datatable: datatable)
   end
 
-  def render_datatable_header_cell(form, name, opts, filterable = true)
+  def datatable_header_filter(form, name, opts, filterable = true)
     return render(partial: opts[:header_partial], locals: {form: form, name: (opts[:label] || name), column: opts, filterable: filterable}) if opts[:header_partial].present?
     return content_tag(:p, opts[:label] || name) if filterable == false
 
@@ -68,13 +68,19 @@ module EffectiveDatatablesHelper
 
   # https://datatables.net/reference/option/columns
   def datatable_columns(datatable)
-    datatable.table_columns.values.map do |options|
+    form_builder = nil
+    simple_form_for(datatable, url: '#', html: {id: "#{datatable.to_param}-form"}) { |f| form_builder = f }
+
+    datatable.table_columns.map do |name, options|
       {
         name: options[:name],
+        title: options[:label],
         className: options[:class],
         width: options[:width],
         sortable: options[:sortable],
-        visible: (options[:visible].respond_to?(:call) ? datatable.instance_exec(&options[:visible]) : options[:visible])
+        visible: (options[:visible].respond_to?(:call) ? datatable.instance_exec(&options[:visible]) : options[:visible]),
+        filterHtml: datatable_header_filter(form_builder, name, options),
+        filterSelectedValue: options[:filter][:selected]
       }
     end.to_json()
   end
