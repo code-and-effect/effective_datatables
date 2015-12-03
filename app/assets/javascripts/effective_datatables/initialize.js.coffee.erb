@@ -15,7 +15,18 @@ initializeDataTables = ->
             { extend: 'colvisGroup', text: 'Show all', show: ':hidden'},
             { extend: 'colvisRestore', text: 'Show default'}
           ]
-        }, 'copy', 'csv', 'excel', 'print'
+        },
+        'copy',
+        {
+          extend: 'csv',
+          exportOptions:
+            format:
+              header: (d) ->
+                console.log d
+                d
+        },
+        'excel',
+        'print'
       ]
       colReorder: true
       columns: datatable.data('columns')
