@@ -42,11 +42,12 @@ initializeDataTables = ->
 
           settings = table.settings()[0].aoColumns[index] # column specific settings
 
-          if settings.filterHtml  # Append the html filters
-            $th.append(settings.filterHtml)
-
           if settings.filterSelectedValue  # Assign preselected filter values
             table.settings()[0].aoPreSearchCols[index].sSearch = settings.filterSelectedValue
+
+          if settings.filterHtml  # Append the html filter HTML and initialize input events
+            $th.append(settings.filterHtml)
+            initializeFilterEvents($th)
 
           $th.addClass('initialized')
 
@@ -54,20 +55,10 @@ initializeDataTables = ->
       init_options['lengthMenu'] = [-1] # Show all results
       init_options['dom'] = "<'row'r>t" # Just show the table
 
-    # Initialize Searching
-    dataTableSearch = (event) ->   # This is the function called by a select or input to run the search
-      obj = $(event.currentTarget)
-      table = obj.closest('table.dataTable')
-      table.DataTable().column("#{obj.data('column-name')}:name").search(obj.val()).draw()
-
-    # For every existing Input, Set up the search events
-    search_inputs = datatable.find('thead').first().find('input,select')
-    console.log 'serach inputs'
-    console.log search_inputs
-    search_inputs.each (index, input) ->
-      $input = $(input)
-
-      if $input.data('column-name')
+    # Sets up the proper events for each input
+    initializeFilterEvents = (th) ->
+      th.find('input,select').each (_, input) ->
+        $input = $(input)
         $input.parent().on 'click', (event) -> false # Dont order columns when you click inside the input
         $input.parent().on 'mousedown', (event) -> event.stopPropagation() # Dont order columns when you click inside the input
 
@@ -75,6 +66,12 @@ initializeDataTables = ->
           $input.on 'change', (event) -> dataTableSearch(event)
         else if $input.is('input')
           $input.keyup($.debounce(300, dataTableSearch))
+
+    # Do the actual search
+    dataTableSearch = (event) ->   # This is the function called by a select or input to run the search
+      obj = $(event.currentTarget)
+      table = obj.closest('table.dataTable')
+      table.DataTable().column("#{obj.data('column-name')}:name").search(obj.val()).draw()
 
     # Let's actually initialize the table now
     table = datatable.dataTable(init_options)

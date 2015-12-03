@@ -7,13 +7,13 @@
     :border => 0,
     :width => '100%',
     :data => {
+      'effective-datatables-table' => style,
+      'effective-form-inputs' => defined?(EffectiveFormInputs),
       'columns' => datatable_columns(datatable),
+      'source' => effective_datatables.datatable_path(datatable, {:format => 'json'}.merge(:attributes => datatable.attributes)).chomp('?'),
       'default-order' => datatable_default_order(datatable),
       'display-entries' => datatable.display_entries,
       'display-records' => (datatable.to_json[:recordsFiltered] || 0),
-      'effective-datatables-table' => style,
-      'effective-form-inputs' => defined?(EffectiveFormInputs),
-      'source' => effective_datatables.datatable_path(datatable, {:format => 'json'}.merge(:attributes => datatable.attributes)).chomp('?'),
       'total-records' => (datatable.to_json[:recordsTotal] || 0)
     }
   }

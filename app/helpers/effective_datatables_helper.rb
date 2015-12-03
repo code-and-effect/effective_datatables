@@ -14,6 +14,29 @@ module EffectiveDatatablesHelper
     render partial: 'effective/datatables/datatable', locals: locals.merge(datatable: datatable)
   end
 
+  def datatable_default_order(datatable)
+    [datatable.order_index, datatable.order_direction.downcase].to_json()
+  end
+
+  # https://datatables.net/reference/option/columns
+  def datatable_columns(datatable)
+    form_builder = nil
+    simple_form_for(datatable, url: '#', html: {id: "#{datatable.to_param}-form"}) { |f| form_builder = f }
+
+    datatable.table_columns.map do |name, options|
+      {
+        name: options[:name],
+        title: options[:label],
+        className: options[:class],
+        width: options[:width],
+        sortable: options[:sortable],
+        visible: (options[:visible].respond_to?(:call) ? datatable.instance_exec(&options[:visible]) : options[:visible]),
+        filterHtml: datatable_header_filter(form_builder, name, options),
+        filterSelectedValue: options[:filter][:selected]
+      }
+    end.to_json()
+  end
+
   def datatable_header_filter(form, name, opts, filterable = true)
     return render(partial: opts[:header_partial], locals: {form: form, name: (opts[:label] || name), column: opts, filterable: filterable}) if opts[:header_partial].present?
     return content_tag(:p, opts[:label] || name) if filterable == false
@@ -60,29 +83,6 @@ module EffectiveDatatablesHelper
     else
       content_tag(:p, opts[:label] || name)
     end
-  end
-
-  def datatable_default_order(datatable)
-    [datatable.order_index, datatable.order_direction.downcase].to_json()
-  end
-
-  # https://datatables.net/reference/option/columns
-  def datatable_columns(datatable)
-    form_builder = nil
-    simple_form_for(datatable, url: '#', html: {id: "#{datatable.to_param}-form"}) { |f| form_builder = f }
-
-    datatable.table_columns.map do |name, options|
-      {
-        name: options[:name],
-        title: options[:label],
-        className: options[:class],
-        width: options[:width],
-        sortable: options[:sortable],
-        visible: (options[:visible].respond_to?(:call) ? datatable.instance_exec(&options[:visible]) : options[:visible]),
-        filterHtml: datatable_header_filter(form_builder, name, options),
-        filterSelectedValue: options[:filter][:selected]
-      }
-    end.to_json()
   end
 
   def datatables_admin_path?
