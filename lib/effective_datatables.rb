@@ -2,6 +2,7 @@ require 'haml-rails'
 require 'kaminari'
 require 'simple_form'
 require 'effective_datatables/engine'
+require 'effective_datatables/version'
 
 module EffectiveDatatables
   mattr_accessor :authorization_method
