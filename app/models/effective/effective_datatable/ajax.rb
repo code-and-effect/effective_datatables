@@ -75,6 +75,8 @@ module Effective
       end
 
       def per_page
+        return 9999999 if simple?
+
         length = (params[:length].presence || display_entries).to_i
 
         if length == -1

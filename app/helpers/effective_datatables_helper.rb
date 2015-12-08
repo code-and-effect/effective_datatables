@@ -1,17 +1,13 @@
 module EffectiveDatatablesHelper
-  def render_datatable(datatable, opts = {}, &block)
+  def render_datatable(datatable)
     datatable.view = self
-    locals = {style: :full, filterable: true, sortable: true, table_class: 'table-bordered table-striped'}.merge(opts)
-
-    render partial: 'effective/datatables/datatable', locals: locals.merge(datatable: datatable)
+    render partial: 'effective/datatables/datatable', locals: { datatable: datatable }
   end
 
-  def render_simple_datatable(datatable, opts = {})
+  def render_simple_datatable(datatable)
     datatable.view = self
-    datatable.per_page = :all
-    locals = {style: :simple, filterable: false, sortable: false, table_class: 'table-bordered table-striped sorting-hidden'}.merge(opts)
-
-    render partial: 'effective/datatables/datatable', locals: locals.merge(datatable: datatable)
+    datatable.simple = true
+    render partial: 'effective/datatables/datatable', locals: { datatable: datatable }
   end
 
   def datatable_default_order(datatable)
@@ -20,8 +16,8 @@ module EffectiveDatatablesHelper
 
   # https://datatables.net/reference/option/columns
   def datatable_columns(datatable)
-    form_builder = nil
-    simple_form_for(datatable, url: '#', html: {id: "#{datatable.to_param}-form"}) { |f| form_builder = f }
+    form = nil
+    simple_form_for(datatable, url: '#', html: {id: "#{datatable.to_param}-form"}) { |f| form = f }
 
     datatable.table_columns.map do |name, options|
       {
@@ -30,17 +26,16 @@ module EffectiveDatatablesHelper
         className: options[:class],
         width: options[:width],
         responsivePriority: (options[:responsivePriority] || 10000),  # 10,000 is datatables default
-        sortable: options[:sortable],
+        sortable: (options[:sortable] && !datatable.simple?),
         visible: (options[:visible].respond_to?(:call) ? datatable.instance_exec(&options[:visible]) : options[:visible]),
-        filterHtml: datatable_header_filter(form_builder, name, options),
+        filterHtml: (datatable_header_filter(form, name, options) unless datatable.simple?),
         filterSelectedValue: options[:filter][:selected]
       }
     end.to_json()
   end
 
-  def datatable_header_filter(form, name, opts, filterable = true)
-    return render(partial: opts[:header_partial], locals: {form: form, name: (opts[:label] || name), column: opts, filterable: filterable}) if opts[:header_partial].present?
-    return content_tag(:p, opts[:label] || name) if filterable == false
+  def datatable_header_filter(form, name, opts)
+    return render(partial: opts[:header_partial], locals: {form: form, name: (opts[:label] || name), column: opts}) if opts[:header_partial].present?
 
     case opts[:filter][:type]
     when :string, :text, :number

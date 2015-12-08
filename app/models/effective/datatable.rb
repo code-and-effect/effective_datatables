@@ -1,6 +1,9 @@
 module Effective
   class Datatable
-    attr_accessor :total_records, :display_records, :view, :attributes
+    attr_accessor :display_records, :view, :attributes
+
+    # These two options control the render behaviour of a datatable
+    attr_accessor :table_html_class, :simple
 
     delegate :render, :controller, :link_to, :mail_to, :number_to_currency, :to => :@view
 
@@ -119,6 +122,17 @@ module Effective
       @search_terms = nil
       @order_name = nil
       @order_direction = nil
+    end
+
+    def table_html_class
+      @table_html_class.presence || 'table table-bordered table-striped'
+    end
+
+    # When simple only a table will be rendered with
+    # no sorting, no filtering, no export buttons, no pagination, no per page, no colReorder
+    # default sorting only, default visibility only, all records returned, and responsive enabled
+    def simple?
+      @simple == true
     end
 
     protected

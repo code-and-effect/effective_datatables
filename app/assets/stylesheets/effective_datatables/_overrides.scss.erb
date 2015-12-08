@@ -1,3 +1,4 @@
+// Use asset_data_uri to prevent 3 additional GET requests for icons
 table.dataTable thead .sorting {
   background-image: url(<%= asset_data_uri('dataTables/sort_both.png') %>);
   background-position: 100% 70%;
@@ -13,14 +14,16 @@ table.dataTable thead .sorting_desc {
   background-position: 100% 70%;
 }
 
-table.dataTable thead .sorting:after {
-  content: '';
-}
-table.dataTable thead .sorting_asc:after {
-  content: '';
-}
-table.dataTable thead .sorting_desc:after {
-  content: '';
+// Override bootstrap default glyphicons
+table.dataTable thead .sorting:after { content: ''; }
+table.dataTable thead .sorting_asc:after { content: ''; }
+table.dataTable thead .sorting_desc:after { content: ''; }
+
+// Table header
+table.dataTable thead > tr > th.sorting_asc,
+table.dataTable thead > tr > th.sorting_desc,
+table.dataTable thead > tr > th.sorting {
+  padding-right: 18px;
 }
 
 table.dataTable thead th {
@@ -32,12 +35,10 @@ table.dataTable thead th {
   .form-group { margin-bottom: 0px; font-weight: normal; }
 }
 
-table.dataTable thead > tr > th.sorting_asc,
-table.dataTable thead > tr > th.sorting_desc,
-table.dataTable thead > tr > th.sorting {
-  padding-right: 18px;
-  white-space: nowrap;
-}
+// Sorting disabled
+table.dataTable.sort-hidden thead .sorting { background-image: none; }
+table.dataTable.sort-hidden thead .sorting_asc { background-image: none; }
+table.dataTable.sort-hidden thead .sorting_desc { background-image: none; }
 
 // Filter bar
 table.dataTable .form-group { width: 100%; margin-left: 0px; margin-right: 0px; }

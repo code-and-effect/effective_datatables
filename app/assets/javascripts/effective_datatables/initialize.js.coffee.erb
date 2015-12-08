@@ -1,8 +1,9 @@
 initializeDataTables = ->
-  $('table[data-effective-datatables-table]').each ->
+  $('table.effective-datatable').each ->
     return if $.fn.DataTable.fnIsDataTable(this)
 
     datatable = $(this)
+    simple = (datatable.data('simple') == true)
 
     init_options =
       ajax: { url: datatable.data('source'), type: 'POST' }
@@ -45,7 +46,7 @@ initializeDataTables = ->
             columns: ':visible:not(.col-actions)'
         },
       ]
-      colReorder: true
+      colReorder: !simple
       columns: datatable.data('columns')
       deferLoading: [datatable.data('display-records'), datatable.data('total-records')]
       deferRender: true
@@ -79,10 +80,6 @@ initializeDataTables = ->
 
           $th.addClass('initialized')
 
-    if datatable.data('effective-datatables-table') == 'simple'
-      init_options['lengthMenu'] = [-1] # Show all results
-      init_options['dom'] = "<'row'r>t" # Just show the table
-
     # Sets up the proper events for each input
     initializeFilterEvents = (th) ->
       th.find('input,select').each (_, input) ->
@@ -100,6 +97,10 @@ initializeDataTables = ->
       obj = $(event.currentTarget)
       table = obj.closest('table.dataTable')
       table.DataTable().column("#{obj.data('column-name')}:name").search(obj.val()).draw()
+
+    if simple
+      init_options['dom'] = "<'row'<'col-sm-12'tr>>" # Just show the table
+      datatable.addClass('sort-hidden')
 
     # Let's actually initialize the table now
     table = datatable.dataTable(init_options)
