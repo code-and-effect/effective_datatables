@@ -4,6 +4,7 @@ initializeDataTables = ->
 
     datatable = $(this)
     simple = (datatable.data('simple') == true)
+    input_js_options = datatable.data('input-js-options') || {}
 
     init_options =
       ajax: { url: datatable.data('source'), type: 'POST' }
@@ -103,7 +104,7 @@ initializeDataTables = ->
       datatable.addClass('sort-hidden')
 
     # Let's actually initialize the table now
-    table = datatable.dataTable(init_options)
+    table = datatable.dataTable(jQuery.extend(init_options, input_js_options))
 
     # Apply EffectiveFormInputs to the Show x per page dropdown
     if datatable.data('effective-form-inputs')

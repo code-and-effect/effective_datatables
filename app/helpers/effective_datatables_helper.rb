@@ -1,13 +1,15 @@
 module EffectiveDatatablesHelper
-  def render_datatable(datatable)
+  def render_datatable(datatable, input_js_options = nil)
     datatable.view = self
-    render partial: 'effective/datatables/datatable', locals: { datatable: datatable }
+    render partial: 'effective/datatables/datatable',
+      locals: { datatable: datatable, input_js_options: (input_js_options.to_json if input_js_options) }
   end
 
-  def render_simple_datatable(datatable)
+  def render_simple_datatable(datatable, input_js_options = nil)
     datatable.view = self
     datatable.simple = true
-    render partial: 'effective/datatables/datatable', locals: { datatable: datatable }
+    render partial: 'effective/datatables/datatable',
+      locals: {datatable: datatable, input_js_options: (input_js_options.to_json if input_js_options) }
   end
 
   def datatable_default_order(datatable)

@@ -5,6 +5,7 @@
     data: {
       'effective-form-inputs' => defined?(EffectiveFormInputs),
       'columns' => datatable_columns(datatable),
+      'input-js-options' => local_assigns[:input_js_options],
       'simple' => datatable.simple?.to_s,
       'source' => effective_datatables.datatable_path(datatable, {format: 'json'}.merge(attributes: datatable.attributes)).chomp('?'),
       'default-order' => datatable_default_order(datatable),
