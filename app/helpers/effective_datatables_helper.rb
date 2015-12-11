@@ -78,8 +78,6 @@ module EffectiveDatatablesHelper
         group_method: opts[:filter][:group_method] || :last,
         input_html: { name: nil, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} },
         input_js: { placeholder: (opts[:label] || name.titleize) }
-    else
-      content_tag(:p, opts[:label] || name)
     end
   end
 
