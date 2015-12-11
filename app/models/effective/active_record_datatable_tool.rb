@@ -24,7 +24,7 @@ module Effective
       before = ''; after = ''
 
       if postgres?
-        after = ' NULLS LAST'
+        after = " NULLS #{order_direction == 'DESC' ? 'FIRST' : 'LAST' }"
       elsif mysql?
         before = "ISNULL(#{column}), "
       end
@@ -54,7 +54,11 @@ module Effective
       case table_column[:type]
       when :string, :text
         if (table_column[:filter][:type] == :select && table_column[:filter][:fuzzy] != true) || sql_op != :where
-          collection.public_send(sql_op, "#{column} = :term", term: term)
+          if ['null', 'nil', nil].include?(term)
+            collection.public_send(sql_op, "#{column} = :term OR #{column} IS NULL", term: term)
+          else
+            collection.public_send(sql_op, "#{column} = :term", term: term)
+          end
         else
           collection.public_send(sql_op, "#{column} #{ilike} :term", term: "%#{term}%")
         end
