@@ -141,6 +141,10 @@ module Effective
             next if value == nil || value == BLANK || opts[:visible] == false
             next if opts[:block] || opts[:partial] || opts[:proc]
 
+            if opts[:sql_as_column]
+              row[index] = value.to_s
+            end
+
             case opts[:type]
             when :belongs_to, :belongs_to_polymorphic
               row[index] = value.to_s

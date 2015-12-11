@@ -99,7 +99,7 @@ module Effective
             cols[name][:type] = :effective_roles
           end
 
-          if sql_table.present? && sql_column.blank? # This is a SELECT AS column
+          if sql_table.present? && sql_column.blank? # This is a SELECT AS column, or a JOIN column
             cols[name][:sql_as_column] = true
           end
 
@@ -131,8 +131,15 @@ module Effective
         # This is a fix for passing filter[:selected] == false, it needs to be 'false'
         filter[:selected] = filter[:selected].to_s unless filter[:selected].nil?
 
+        # Allow values or collection to be used interchangeably
+        if filter.key?(:collection)
+          filter[:values] ||= filter[:collection]
+        end
+
         # If you pass values, just assume it's a select
-        filter[:type] ||= :select if filter.key?(:values) && col_type != :belongs_to_polymorphic
+        if filter.key?(:values) && col_type != :belongs_to_polymorphic
+          filter[:type] ||= :select
+        end
 
         # Check if this is an aggregate column
         if ['SUM(', 'COUNT(', 'MAX(', 'MIN(', 'AVG('].any? { |str| sql_column.include?(str) }
