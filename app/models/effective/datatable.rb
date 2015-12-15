@@ -30,9 +30,6 @@ module Effective
       if @default_order.present? && !table_columns.key?((@default_order.keys.first rescue nil))
         raise "default_order :#{(@default_order.keys.first rescue 'nil')} must exist as a table_column or array_column"
       end
-
-      # Any pre-selected search terms should be assigned now
-      search_terms.each { |column, term| self.send("#{column}=", term) }
     end
 
     def table_columns
@@ -142,11 +139,11 @@ module Effective
     end
 
     def table_tool
-      @table_tool ||= ActiveRecordDatatableTool.new(self, table_columns.select { |_, col| col[:array_column] == false })
+      @table_tool ||= ActiveRecordDatatableTool.new(self, table_columns.reject { |_, col| col[:array_column] })
     end
 
     def array_tool
-      @array_tool ||= ArrayDatatableTool.new(self, table_columns.select { |_, col| col[:array_column] == true })
+      @array_tool ||= ArrayDatatableTool.new(self, table_columns.select { |_, col| col[:array_column] })
     end
 
     def active_record_collection?

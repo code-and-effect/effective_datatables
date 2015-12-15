@@ -27,7 +27,6 @@ module Effective
         end
         raise "You cannot use both partial: ... and proc: ..." if options[:partial] && options[:proc]
 
-        self.class.send(:attr_accessor, name)
         (@table_columns ||= HashWithIndifferentAccess.new())[name] = options
       end
 

@@ -19,7 +19,7 @@ module EffectiveDatatablesHelper
   # https://datatables.net/reference/option/columns
   def datatable_columns(datatable)
     form = nil
-    simple_form_for(datatable, url: '#', html: {id: "#{datatable.to_param}-form"}) { |f| form = f }
+    simple_form_for(:datatable_filter, url: '#', html: {id: "#{datatable.to_param}-form"}) { |f| form = f }
 
     datatable.table_columns.map do |name, options|
       {
@@ -30,44 +30,45 @@ module EffectiveDatatablesHelper
         responsivePriority: (options[:responsivePriority] || 10000),  # 10,000 is datatables default
         sortable: (options[:sortable] && !datatable.simple?),
         visible: (options[:visible].respond_to?(:call) ? datatable.instance_exec(&options[:visible]) : options[:visible]),
-        filterHtml: (datatable_header_filter(form, name, options) unless datatable.simple?),
+        filterHtml: (datatable_header_filter(form, name, datatable.search_terms[name], options) unless datatable.simple?),
         filterSelectedValue: options[:filter][:selected]
       }
     end.to_json()
   end
 
-  def datatable_header_filter(form, name, opts)
+  def datatable_header_filter(form, name, value, opts)
     return render(partial: opts[:header_partial], locals: {form: form, name: (opts[:label] || name), column: opts}) if opts[:header_partial].present?
 
     case opts[:filter][:type]
     when :string, :text, :number
-      form.input name, label: false, required: false, as: :string, placeholder: (opts[:label] || name),
-        input_html: { name: nil, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} }
-
+      form.input name, label: false, required: false, value: value,
+        as: :string,
+        placeholder: (opts[:label] || name),
+        input_html: { name: nil, value: value, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} }
     when :date
-      form.input name, label: false, required: false,
+      form.input name, label: false, required: false, value: value,
         as: (defined?(EffectiveFormInputs) ? :effective_date_picker : :string),
         placeholder: (opts[:label] || name),
         input_group: false,
         input_html: { name: nil, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} },
         input_js: { useStrict: true, keepInvalid: true }
     when :datetime
-      form.input name, label: false, required: false,
+      form.input name, label: false, required: false, value: value,
         as: (defined?(EffectiveFormInputs) ? :effective_date_time_picker : :string),
         placeholder: (opts[:label] || name),
         input_group: false,
-        input_html: { name: nil, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} },
+        input_html: { name: nil, value: value, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} },
         input_js: { useStrict: true, keepInvalid: true } # Keep invalid format like "2015-11" so we can still filter by year, month or day
     when :select, :boolean
-      form.input name, label: false, required: false,
+      form.input name, label: false, required: false, value: value,
         as: (defined?(EffectiveFormInputs) ? :effective_select : :select),
         collection: opts[:filter][:values],
         multiple: opts[:filter][:multiple] == true,
         include_blank: (opts[:label] || name.titleize),
-        input_html: { name: nil, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} },
+        input_html: { name: nil, value: value, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} },
         input_js: { placeholder: (opts[:label] || name.titleize) }
     when :grouped_select
-      form.input name, label: false, required: false,
+      form.input name, label: false, required: false, value: value,
         as: (defined?(EffectiveFormInputs) ? :effective_select : :grouped_select),
         collection: opts[:filter][:values],
         multiple: opts[:filter][:multiple] == true,
@@ -76,7 +77,7 @@ module EffectiveDatatablesHelper
         polymorphic: opts[:filter][:polymorphic] == true,
         group_label_method: opts[:filter][:group_label_method] || :first,
         group_method: opts[:filter][:group_method] || :last,
-        input_html: { name: nil, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} },
+        input_html: { name: nil, value: value, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} },
         input_js: { placeholder: (opts[:label] || name.titleize) }
     end
   end
