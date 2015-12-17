@@ -24,7 +24,7 @@ module EffectiveDatatablesHelper
     datatable.table_columns.map do |name, options|
       {
         name: options[:name],
-        title: options[:label],
+        title: content_tag(:span, options[:label], class: 'filter-label'),
         className: options[:class],
         width: options[:width],
         responsivePriority: (options[:responsivePriority] || 10000),  # 10,000 is datatables default
