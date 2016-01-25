@@ -47,21 +47,21 @@ module EffectiveDatatablesHelper
         input_html: { name: nil, value: value, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} }
     when :date
       form.input name, label: false, required: false, value: value,
-        as: (defined?(EffectiveFormInputs) ? :effective_date_picker : :string),
+        as: (ActionView::Helpers::FormBuilder.instance_methods.include?(:effective_date_picker) ? :effective_date_picker : :string),
         placeholder: (opts[:label] || name),
         input_group: false,
         input_html: { name: nil, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} },
         input_js: { useStrict: true, keepInvalid: true }
     when :datetime
       form.input name, label: false, required: false, value: value,
-        as: (defined?(EffectiveFormInputs) ? :effective_date_time_picker : :string),
+        as: (ActionView::Helpers::FormBuilder.instance_methods.include?(:effective_date_time_picker) ? :effective_date_time_picker : :string),
         placeholder: (opts[:label] || name),
         input_group: false,
         input_html: { name: nil, value: value, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} },
         input_js: { useStrict: true, keepInvalid: true } # Keep invalid format like "2015-11" so we can still filter by year, month or day
     when :select, :boolean
       form.input name, label: false, required: false, value: value,
-        as: (defined?(EffectiveFormInputs) ? :effective_select : :select),
+        as: (ActionView::Helpers::FormBuilder.instance_methods.include?(:effective_select) ? :effective_select : :select),
         collection: opts[:filter][:values],
         selected: opts[:filter][:selected],
         multiple: opts[:filter][:multiple] == true,
@@ -70,7 +70,7 @@ module EffectiveDatatablesHelper
         input_js: { placeholder: (opts[:label] || name.titleize) }
     when :grouped_select
       form.input name, label: false, required: false, value: value,
-        as: (defined?(EffectiveFormInputs) ? :effective_select : :grouped_select),
+        as: (ActionView::Helpers::FormBuilder.instance_methods.include?(:effective_select) ? :effective_select : :grouped_select),
         collection: opts[:filter][:values],
         selected: opts[:filter][:selected],
         multiple: opts[:filter][:multiple] == true,
