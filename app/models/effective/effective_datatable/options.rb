@@ -112,10 +112,17 @@ module Effective
 
         # After everything is initialized
         # Compute any col[:if] and assign an index
-        table_columns.select do |_, col|
-          col[:if] == nil || (col[:if].respond_to?(:call) ? (view || self).instance_exec(&col[:if]) : col[:if])
-        end.each_with_index { |(_, col), index| col[:index] = index }
-
+        count = 0
+        table_columns.each do |name, col|
+          if display_column?(col)
+            col[:index] = count
+            count += 1
+          else
+            # deleting rather than using `table_columns.select` above in order to maintain
+            # this hash as a type of HashWithIndifferentAccess
+            table_columns.delete(name)
+          end
+        end
       end
 
       def initialize_table_column_filter(column, belongs_to, has_many)
@@ -193,7 +200,15 @@ module Effective
         end.merge(filter.symbolize_keys)
       end
 
+      private
 
+      def display_column?(col)
+        if col[:if].respond_to?(:call)
+          (view || self).instance_exec(&col[:if])
+        else
+          col.fetch(:if, true)
+        end
+      end
     end
   end
 end
