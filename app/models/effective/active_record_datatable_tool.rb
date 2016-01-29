@@ -72,19 +72,33 @@ module Effective
           collection
         end
       when :has_many
-        inverse_ids = term.split(',').map { |term| (term = term.to_i) == 0 ? nil : term }.compact
-        return collection unless inverse_ids.present?
-
         reflection = collection.klass.reflect_on_association(table_column[:name].to_sym)
         raise "unable to find #{collection.klass.name} :has_many :#{table_column[:name]} association" unless reflection
 
-        obj = reflection.build_association({}) # Clinic
+        obj = reflection.build_association({})
         klass = obj.class
 
         inverse = reflection.inverse_of || klass.reflect_on_association(collection.table_name) || obj.class.reflect_on_association(collection.table_name.singularize)
         raise "unable to find #{klass.name} has_many :#{collection.table_name} or belongs_to :#{collection.table_name.singularize} associations" unless inverse
 
-        ids = klass.where(id: inverse_ids).joins(inverse.name).pluck(inverse.foreign_key)
+        ids = if [:select, :grouped_select].include?(table_column[:filter][:type])
+          # Treat the search term as one or more IDs
+          inverse_ids = term.split(',').map { |term| (term = term.to_i) == 0 ? nil : term }.compact
+          return collection unless inverse_ids.present?
+
+          klass.where(id: inverse_ids).joins(inverse.name).pluck(inverse.foreign_key)
+        else
+          # Treat the search term as a string.
+          klass_columns = if (table_column[:column] == klass.table_name) # No custom column has been defined
+            klass.columns.map { |col| col.name if col.text? }.compact  # Search all database text? columns
+          else
+            [table_column[:column].gsub("#{klass.table_name}.", '')] # table_column :order_items, column: 'order_items.title'
+          end
+
+          conditions = klass_columns.map { |col_name| "#{klass.table_name}.#{col_name} #{ilike} :term" }
+
+          klass.where(conditions.join(' OR '), term: "%#{term}%", num: term.to_i).joins(inverse.name).pluck(inverse.foreign_key)
+        end
 
         collection.public_send(sql_op, id: ids)
       when :obfuscated_id
