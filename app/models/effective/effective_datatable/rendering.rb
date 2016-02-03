@@ -63,7 +63,7 @@ module Effective
         rendered = {}
         (display_table_columns || table_columns).each do |name, opts|
           if opts[:partial] && opts[:visible]
-            locals = {
+            locals = HashWithIndifferentAccess.new(
               datatable: self,
               table_column: table_columns[name],
               controller_namespace: view.controller_path.split('/')[0...-1].map { |path| path.downcase.to_sym if path.present? }.compact,
@@ -71,7 +71,8 @@ module Effective
               edit_action: (opts[:partial_locals] || {})[:edit_action],
               destroy_action: (opts[:partial_locals] || {})[:destroy_action],
               unarchive_action: (opts[:partial_locals] || {})[:unarchive_action]
-            }
+            )
+
             locals.merge!(opts[:partial_locals]) if opts[:partial_locals]
 
             if active_record_collection?
@@ -119,6 +120,8 @@ module Effective
               (obj.send(name) rescue nil)
             elsif opts[:type] == :has_many
               (obj.send(name).to_a rescue [])
+            elsif opts[:type] == :bulk_actions_column
+              BLANK
             elsif opts[:type] == :obfuscated_id
               (obj.send(:to_param) rescue nil).to_s
             elsif opts[:type] == :effective_address

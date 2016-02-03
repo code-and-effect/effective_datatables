@@ -64,27 +64,39 @@ initializeDataTables = ->
       serverSide: true
       scrollCollapse: true
       pagingType: 'simple_numbers'
-      headerCallback: ->
-        table = this.api()
-        table.columns().flatten().each (index) =>
-          $th = $(table.column(index).header())
-          return if $th.hasClass('initialized')
+      initComplete: (params) ->
+        initializeBulkActions(this.api())
+        initializeFilters(this.api())
 
-          settings = table.settings()[0].aoColumns[index] # column specific settings
+    # Copies the bulk actions html, stored in a data attribute on the table, into the buttons area
+    initializeBulkActions = (api) ->
+      $table = $(api.table().node())
+      bulkActions = $table.data('bulk-actions')
 
-          if settings.filterSelectedValue  # Assign preselected filter values
-            table.settings()[0].aoPreSearchCols[index].sSearch = settings.filterSelectedValue
+      if bulkActions
+        $table.closest('.dataTables_wrapper').children().first()
+          .find('.dt-buttons').first().prepend(bulkActions['dropdownHtml'])
 
-          if settings.filterHtml  # Append the html filter HTML and initialize input events
-            $th.append('<br>' + settings.filterHtml)
-            initializeFilterEvents($th)
+    # Appends the filter html, stored in the column definitions, into each column header
+    initializeFilters = (api) ->
+      api.columns().flatten().each (index) =>
+        $th = $(api.column(index).header())
+        settings = api.settings()[0].aoColumns[index] # column specific settings
 
-          $th.addClass('initialized')
+        if settings.filterSelectedValue  # Assign preselected filter values
+          api.settings()[0].aoPreSearchCols[index].sSearch = settings.filterSelectedValue
+
+        if settings.filterHtml  # Append the html filter HTML and initialize input events
+          $th.append('<br>' + settings.filterHtml)
+          initializeFilterEvents($th)
 
     # Sets up the proper events for each input
     initializeFilterEvents = (th) ->
       th.find('input,select').each (_, input) ->
         $input = $(input)
+
+        return true if $input.attr('type') == 'hidden' || $input.attr('type') == 'checkbox'
+
         $input.parent().on 'click', (event) -> false # Dont order columns when you click inside the input
         $input.parent().on 'mousedown', (event) -> event.stopPropagation() # Dont order columns when you click inside the input
 

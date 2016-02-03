@@ -73,33 +73,35 @@ div.dt-buttons {
   width: auto;
 }
 
-.dt-buttons > a {
-  border: none;
-  color: #337ab7;
-  border-color: transparent;
-  background: #fff;
-  font-size: 12px;
-  padding: 6px;
-  margin-right: 6px;
-  float: none;
-
-  &:hover,
-  &:focus {
+.dt-buttons {
+  a, button {
     border: none;
+    color: #337ab7;
     border-color: transparent;
-    background: #eee !important;
+    background: #fff;
+    font-size: 12px;
+    padding: 6px;
+    margin-right: 6px;
+    float: none;
+
+    &:hover,
+    &:focus {
+      border: none;
+      border-color: transparent;
+      background: #eee !important;
+    }
+
+    &:last-child { margin-right: 0px; }
+
+    &.active {
+      color: #fff;
+      background: #03428d !important;
+    }
+
+    .caret {
+      margin-bottom: 4px;
+    }
   }
-
-  &:last-child { margin-right: 0px; }
-
-  &.active {
-    color: #fff;
-    background: #03428d !important;
-  }
-}
-
-.dt-buttons.btn-group > a {
-  margin-right: 0;
 }
 
 // Show / hide columns button

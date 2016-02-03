@@ -15,7 +15,8 @@
 //= require dataTables/responsive/dataTables.responsive.min
 //= require dataTables/responsive/responsive.bootstrap.min
 
-//= require_tree ./effective_datatables
+//= require effective_datatables/bulk_actions
+//= require effective_datatables/initialize
 
 $.extend( $.fn.dataTable.defaults, {
   'dom': "<'row'<'col-sm-4'l><'col-sm-8'B>><'row'<'col-sm-12'tr>><'row'<'col-sm-6'i><'col-sm-6'p>>"

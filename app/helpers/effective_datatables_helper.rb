@@ -36,6 +36,18 @@ module EffectiveDatatablesHelper
     end.to_json()
   end
 
+  def datatable_bulk_actions(datatable)
+    bulk_actions_column = datatable.table_columns.find { |_, options| options[:bulk_actions_column] }.try(:second)
+    return false unless bulk_actions_column
+
+    {
+      dropdownHtml: render(
+        partial: bulk_actions_column[:dropdown_partial],
+        locals: { datatable: datatable }.merge(bulk_actions_column[:partial_locals])
+      )
+    }.to_json()
+  end
+
   def datatable_header_filter(form, name, value, opts)
     return render(partial: opts[:header_partial], locals: {form: form, name: (opts[:label] || name), column: opts}) if opts[:header_partial].present?
 
@@ -81,6 +93,10 @@ module EffectiveDatatablesHelper
         group_method: opts[:filter][:group_method] || :last,
         input_html: { name: nil, value: value, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} },
         input_js: { placeholder: (opts[:label] || name.titleize) }
+    when :bulk_actions_column
+      form.input name, label: false, required: false, value: nil,
+        as: :boolean,
+        input_html: { name: nil, value: nil, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index], 'role' => 'bulk-actions-all'} }
     end
   end
 

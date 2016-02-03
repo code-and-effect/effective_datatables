@@ -54,6 +54,23 @@ module Effective
         table_column(name, opts, proc, &block)
       end
 
+      def bulk_actions_column(options = {}, proc = nil, &block)
+        name = options.fetch(:name, 'bulk_actions')
+        resource_method = options.fetch(:resource_method, :to_param)
+
+        opts = {
+          bulk_actions_column: true,
+          label: '',
+          partial_local: :resource,
+          partial: '/effective/datatables/bulk_actions_column',
+          partial_locals: { resource_method: resource_method },
+          dropdown_partial: '/effective/datatables/bulk_actions_dropdown',
+          sortable: false
+        }.merge(options)
+
+        table_column(name, opts, proc, &block)
+      end
+
     end
   end
 end
