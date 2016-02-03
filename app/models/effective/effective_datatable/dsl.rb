@@ -64,11 +64,12 @@ module Effective
           partial_local: :resource,
           partial: '/effective/datatables/bulk_actions_column',
           partial_locals: { resource_method: resource_method },
+          sortable: false,
           dropdown_partial: '/effective/datatables/bulk_actions_dropdown',
-          sortable: false
+          dropdown_block: block
         }.merge(options)
 
-        table_column(name, opts, proc, &block)
+        table_column(name, opts, proc)
       end
 
     end

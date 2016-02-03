@@ -3,6 +3,8 @@
     Bulk Actions
     %span.caret
   %ul.dropdown-menu
-    %li
-      %a{href: '#'} Action One
-      %a{href: '#'} Action Two
+    - if content_for?(:effective_datatables_bulk_actions)
+      = yield :effective_datatables_bulk_actions
+    - else
+      %li
+        %a{href: '#'} None
