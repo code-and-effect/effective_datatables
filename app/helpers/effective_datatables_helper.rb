@@ -40,8 +40,7 @@ module EffectiveDatatablesHelper
     bulk_actions_column = datatable.table_columns.find { |_, options| options[:bulk_actions_column] }.try(:second)
     return false unless bulk_actions_column
 
-    # This sets content_for(:effective_datatables_bulk_actions)
-    # As per the 3 bulk_action methods below
+    # This sets content_for(:effective_datatables_bulk_actions) as per the 3 bulk_action methods below
     instance_exec(&bulk_actions_column[:dropdown_block]) if bulk_actions_column[:dropdown_block].respond_to?(:call)
 
     {
@@ -123,12 +122,12 @@ module EffectiveDatatablesHelper
     content_for(:effective_datatables_bulk_actions) { content_tag(:li, link_to(*args)) }
   end
 
-  def bulk_action_divider(*args)
+  def bulk_action_divider
     content_for(:effective_datatables_bulk_actions) { content_tag(:li, '', class: 'divider', role: 'separator') }
   end
 
   def bulk_action_content(&block)
-    content_for(:effective_datatables_bulk_actions) { content_tag(:li, block.call) }
+    content_for(:effective_datatables_bulk_actions) { block.call }
   end
 
 end

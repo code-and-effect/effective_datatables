@@ -64,9 +64,13 @@ initializeDataTables = ->
       serverSide: true
       scrollCollapse: true
       pagingType: 'simple_numbers'
-      initComplete: (params) ->
+      initComplete: (settings) ->
         initializeBulkActions(this.api())
         initializeFilters(this.api())
+      drawCallback: (settings) ->
+        $table = $(this.api().table().node())
+        selected = $table.data('bulk-actions-restore-selected-values')
+        completeBulkAction($table, selected) if selected && selected.length > 0
 
     # Copies the bulk actions html, stored in a data attribute on the table, into the buttons area
     initializeBulkActions = (api) ->
@@ -76,6 +80,16 @@ initializeDataTables = ->
       if bulkActions
         $table.closest('.dataTables_wrapper').children().first()
           .find('.dt-buttons').first().prepend(bulkActions['dropdownHtml'])
+
+    # After we perform a bulk action, we have to re-select the checkboxes manually and do a bit of house keeping
+    completeBulkAction = ($table, selected) ->
+      $table.find("input[data-role='bulk-actions-resource']").each (_, input) ->
+        $input = $(input)
+        $input.prop('checked', selected.indexOf($input.val()) > -1)
+
+      $wrapper = $table.closest('.dataTables_wrapper')
+      $wrapper.children().first().find('.buttons-bulk-actions').children('button').removeAttr('disabled')
+      $table.siblings('.dataTables_processing').html('Processing...')
 
     # Appends the filter html, stored in the column definitions, into each column header
     initializeFilters = (api) ->
@@ -91,8 +105,8 @@ initializeDataTables = ->
           initializeFilterEvents($th)
 
     # Sets up the proper events for each input
-    initializeFilterEvents = (th) ->
-      th.find('input,select').each (_, input) ->
+    initializeFilterEvents = ($th) ->
+      $th.find('input,select').each (_, input) ->
         $input = $(input)
 
         return true if $input.attr('type') == 'hidden' || $input.attr('type') == 'checkbox'
