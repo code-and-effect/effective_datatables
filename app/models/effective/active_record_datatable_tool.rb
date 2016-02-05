@@ -24,7 +24,7 @@ module Effective
       before = ''; after = ''
 
       if postgres?
-        after = " NULLS #{order_direction == 'DESC' ? 'FIRST' : 'LAST' }"
+        after = " NULLS LAST"
       elsif mysql?
         before = "ISNULL(#{column}), "
       end
