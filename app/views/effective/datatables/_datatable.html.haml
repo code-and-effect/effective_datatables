@@ -4,6 +4,7 @@
     class: "#{datatable.table_html_class}",
     data: {
       'effective-form-inputs' => defined?(EffectiveFormInputs),
+      'bulk-actions' => datatable_bulk_actions(datatable),
       'columns' => datatable_columns(datatable),
       'input-js-options' => local_assigns[:input_js_options],
       'simple' => datatable.simple?.to_s,

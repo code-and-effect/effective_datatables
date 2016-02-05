@@ -68,6 +68,8 @@ module Effective
               end
             elsif has_manys.key?(name)
               :has_many
+            elsif cols[name][:bulk_actions_column]
+              :bulk_actions_column
             elsif name.include?('_address') && (collection_class.new rescue nil).respond_to?(:effective_addresses)
               :effective_address
             elsif name == 'id' || name.include?('year') || name.include?('_id')
@@ -195,6 +197,8 @@ module Effective
           {type: :datetime}
         when :date
           {type: :date}
+        when :bulk_actions_column
+          {type: :bulk_actions_column}
         else
           {type: :string}
         end.merge(filter.symbolize_keys)

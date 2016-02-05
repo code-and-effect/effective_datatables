@@ -435,6 +435,59 @@ Optionally uses the authorization method (below) to determine if the `current_us
 
 See the `config/initializers/effective_datatable.rb` file for more information.
 
+## bulk_actions_column
+
+Creates a column of checkboxes to select one, some, or all rows and adds a bulk actions dropdown button.
+
+When one or more checkboxes are checked, the bulk actions dropdown is enabled and any defined `bulk_action`s will be available to click.
+
+Clicking a bulk action makes an AJAX POST request with the parameters `ids: [1, 2, 3]` as per the selected rows.
+
+By default, the method used to determine each row's checkbox value is `to_param`. To call a different method use `bulk_actions_column(resource_method: :slug) do ... end`.
+
+This feature has been built with an ActiveRecord collection in mind. To work with an Array backed collection try `resource_method: :first` or similar.
+
+After the AJAX request is done, the datatable will be redrawn so any changes made to the collection will be displayed immediately.
+
+You can define any number of `bulk_action`s, and separate them with one or more `bulk_action_divider`s.
+
+The `bulk_action` method is just an alias for `link_to`, so all the same options will work.
+
+```ruby
+bulk_actions_column do
+  bulk_action 'Approve all', bulk_approve_posts_path, data: { confirm: 'Approve all selected posts?' }
+  bulk_action_divider
+  bulk_action 'Send emails', bulk_email_posts_path, data : { confirm: 'Really send emails?' }
+end
+```
+
+You still need to write your own controller action to process the bulk action.  Something like:
+
+```ruby
+class PostsController < ApplicationController
+  def bulk_approve
+    @posts = Post.where(id: params[:ids])
+
+    # You should probably write this inside a transaction.  This is just an example.
+    begin
+      @posts.each { |post| post.approve! }
+    rescue => e
+      render json: { status: 500, message: 'An error occured while approving a post.' }
+    end
+  end
+end
+```
+
+and in your `routes.rb`:
+
+```ruby
+resources :posts do
+  collection do
+    post :bulk_approve
+  end
+end
+```
+
 ## table_columns
 
 Quickly create multiple table_columns all with default options:
@@ -460,7 +513,6 @@ default_entries :all
 ```
 
 Valid options are `10, 25, 50, 100, 250, 1000, :all`
-
 
 ## Additional Functionality
 

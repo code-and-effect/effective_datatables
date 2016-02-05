@@ -1,0 +1,10 @@
+.btn-group.buttons-bulk-actions
+  %button.btn.btn-default.dropdown-toggle{'type' => 'button', 'data-toggle' => 'dropdown', 'aria-haspopup' => true, 'aria-expanded' => false, 'disabled' => 'disabled'}
+    Bulk Actions
+    %span.caret
+  %ul.dropdown-menu
+    - if content_for?(:effective_datatables_bulk_actions)
+      = yield :effective_datatables_bulk_actions
+    - else
+      %li
+        %a{href: '#'} No bulk actions

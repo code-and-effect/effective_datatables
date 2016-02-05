@@ -36,6 +36,21 @@ module EffectiveDatatablesHelper
     end.to_json()
   end
 
+  def datatable_bulk_actions(datatable)
+    bulk_actions_column = datatable.table_columns.find { |_, options| options[:bulk_actions_column] }.try(:second)
+    return false unless bulk_actions_column
+
+    # This sets content_for(:effective_datatables_bulk_actions) as per the 3 bulk_action methods below
+    instance_exec(&bulk_actions_column[:dropdown_block]) if bulk_actions_column[:dropdown_block].respond_to?(:call)
+
+    {
+      dropdownHtml: render(
+        partial: bulk_actions_column[:dropdown_partial],
+        locals: HashWithIndifferentAccess.new(datatable: datatable).merge(bulk_actions_column[:partial_locals])
+      )
+    }.to_json()
+  end
+
   def datatable_header_filter(form, name, value, opts)
     return render(partial: opts[:header_partial], locals: {form: form, name: (opts[:label] || name), column: opts}) if opts[:header_partial].present?
 
@@ -81,6 +96,10 @@ module EffectiveDatatablesHelper
         group_method: opts[:filter][:group_method] || :last,
         input_html: { name: nil, value: value, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} },
         input_js: { placeholder: (opts[:label] || name.titleize) }
+    when :bulk_actions_column
+      form.input name, label: false, required: false, value: nil,
+        as: :boolean,
+        input_html: { name: nil, value: nil, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index], 'role' => 'bulk-actions-all'} }
     end
   end
 
@@ -95,6 +114,20 @@ module EffectiveDatatablesHelper
   # TODO: Improve on this
   def datatables_active_admin_path?
     attributes[:active_admin_path] rescue false
+  end
+
+
+  ### Bulk Actions DSL Methods
+  def bulk_action(*args)
+    content_for(:effective_datatables_bulk_actions) { content_tag(:li, link_to(*args)) }
+  end
+
+  def bulk_action_divider
+    content_for(:effective_datatables_bulk_actions) { content_tag(:li, '', class: 'divider', role: 'separator') }
+  end
+
+  def bulk_action_content(&block)
+    content_for(:effective_datatables_bulk_actions) { block.call }
   end
 
 end
