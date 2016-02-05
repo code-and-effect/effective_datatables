@@ -468,7 +468,7 @@ class PostsController < ApplicationController
   def bulk_approve
     @posts = Post.where(id: params[:ids])
 
-    # You should probably write this inside a transaction.  This code is just for example.
+    # You should probably write this inside a transaction.  This is just an example.
     begin
       @posts.each { |post| post.approve! }
     rescue => e
