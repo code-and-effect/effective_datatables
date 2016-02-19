@@ -30,11 +30,18 @@ module Effective
           retval
         end
 
-        # has_manys
-        has_manys = (collection.klass.reflect_on_all_associations(:has_many) rescue []).inject({}) do |retval, hm|
-          klass = hm.klass || (hm.build_association({}).class)
-          retval[hm.name.to_s] = {klass: klass}
-          retval
+        # Figure out has_manys and has_many_belongs_to_many's
+        has_manys = {}
+        has_and_belongs_to_manys = {}
+
+        (collection.klass.reflect_on_all_associations() rescue []).each do |reflect|
+          if reflect.macro == :has_many
+            klass = reflect.klass || (reflect.build_association({}).class)
+            has_manys[reflect.name.to_s] = { klass: klass }
+          elsif reflect.macro == :has_and_belongs_to_many
+            klass = reflect.klass || (reflect.build_association({}).class)
+            has_and_belongs_to_manys[reflect.name.to_s] = { klass: klass }
+          end
         end
 
         table_columns = cols.each_with_index do |(name, _), index|
@@ -68,6 +75,8 @@ module Effective
               end
             elsif has_manys.key?(name)
               :has_many
+            elsif has_and_belongs_to_manys.key?(name)
+              :has_and_belongs_to_many
             elsif cols[name][:bulk_actions_column]
               :bulk_actions_column
             elsif name.include?('_address') && (collection_class.new rescue nil).respond_to?(:effective_addresses)
@@ -105,7 +114,7 @@ module Effective
             cols[name][:sql_as_column] = true
           end
 
-          cols[name][:filter] = initialize_table_column_filter(cols[name], belong_tos[name], has_manys[name])
+          cols[name][:filter] = initialize_table_column_filter(cols[name], belong_tos[name], has_manys[name], has_and_belongs_to_manys[name])
 
           if cols[name][:partial]
             cols[name][:partial_local] ||= (sql_table.try(:name) || cols[name][:partial].split('/').last(2).first.presence || 'obj').singularize.to_sym
@@ -127,7 +136,7 @@ module Effective
         end
       end
 
-      def initialize_table_column_filter(column, belongs_to, has_many)
+      def initialize_table_column_filter(column, belongs_to, has_many, has_and_belongs_to_manys)
         filter = column[:filter]
         col_type = column[:type]
         sql_column = column[:column].to_s.upcase
@@ -178,6 +187,18 @@ module Effective
                 Proc.new { has_many[:klass].datatables_filter }
               else
                 Proc.new { has_many[:klass].all.map { |obj| [obj.to_s, obj.id] }.sort { |x, y| x[0] <=> y[0] } }
+              end
+            )
+          }
+        when :has_and_belongs_to_many
+          {
+            type: :select,
+            multiple: true,
+            values: (
+              if has_and_belongs_to_manys[:klass].respond_to?(:datatables_filter)
+                Proc.new { has_and_belongs_to_manys[:klass].datatables_filter }
+              else
+                Proc.new { has_and_belongs_to_manys[:klass].all.map { |obj| [obj.to_s, obj.id] }.sort { |x, y| x[0] <=> y[0] } }
               end
             )
           }

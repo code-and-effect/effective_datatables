@@ -119,7 +119,9 @@ module Effective
             elsif opts[:type] == :belongs_to_polymorphic
               (obj.send(name) rescue nil)
             elsif opts[:type] == :has_many
-              (obj.send(name).to_a rescue [])
+              (obj.send(name).map { |obj| obj.to_s }.join('<br>') rescue BLANK)
+            elsif opts[:type] == :has_and_belongs_to_many
+              (obj.send(name).map { |obj| obj.to_s }.join('<br>') rescue BLANK)
             elsif opts[:type] == :bulk_actions_column
               BLANK
             elsif opts[:type] == :obfuscated_id
