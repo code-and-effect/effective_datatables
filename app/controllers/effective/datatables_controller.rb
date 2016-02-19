@@ -4,7 +4,9 @@ module Effective
 
     # This will respond to both a GET and a POST
     def show
-      @datatable = find_datatable(params[:id]).try(:new, params[:attributes])
+      attributes = (params[:attributes].presence || {}).merge(referer: request.referer)
+
+      @datatable = find_datatable(params[:id]).try(:new, attributes)
       @datatable.view = view_context if !@datatable.nil?
 
       EffectiveDatatables.authorized?(self, :index, @datatable.try(:collection_class) || @datatable.try(:class))

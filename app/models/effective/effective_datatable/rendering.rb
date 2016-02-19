@@ -66,7 +66,7 @@ module Effective
             locals = HashWithIndifferentAccess.new(
               datatable: self,
               table_column: table_columns[name],
-              controller_namespace: view.controller_path.split('/')[0...-1].map { |path| path.downcase.to_sym if path.present? }.compact,
+              controller_namespace: controller_namespace,
               show_action: (opts[:partial_locals] || {})[:show_action],
               edit_action: (opts[:partial_locals] || {})[:edit_action],
               destroy_action: (opts[:partial_locals] || {})[:destroy_action],
@@ -198,6 +198,20 @@ module Effective
         end
 
         collection
+      end
+
+      private
+
+      def controller_namespace
+        @controller_namespace ||= (
+          path = if attributes[:referer].present?
+            URI(attributes[:referer]).path
+          else
+            view.controller_path
+          end
+
+          path.split('/')[0...-1].map { |path| path.downcase.to_sym if path.present? }.compact
+        )
       end
 
     end # / Rendering
