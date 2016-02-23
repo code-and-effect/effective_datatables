@@ -24,7 +24,13 @@ module Effective
       before = ''; after = ''
 
       if postgres?
-        after = " NULLS LAST"
+        after = if order_column[:nulls] == :first
+          ' NULLS FIRST'
+        elsif order_column[:nulls] == :last
+          ' NULLS LAST'
+        else
+          " NULLS #{order_direction == 'DESC' ? 'FIRST' : 'LAST' }"
+        end
       elsif mysql?
         before = "ISNULL(#{column}), "
       end
