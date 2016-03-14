@@ -106,34 +106,40 @@ module Effective
 
         collection.each_with_index.map do |obj, index|
           (display_table_columns || table_columns).map do |name, opts|
-            if opts[:visible] == false
-              BLANK
-            elsif opts[:partial]
-              rendered[name][index]
-            elsif opts[:block]
-              view.instance_exec(obj, collection, self, &opts[:block])
-            elsif opts[:proc]
-              view.instance_exec(obj, collection, self, &opts[:proc])
-            elsif opts[:type] == :belongs_to
-              (obj.send(name) rescue nil)
-            elsif opts[:type] == :belongs_to_polymorphic
-              (obj.send(name) rescue nil)
-            elsif opts[:type] == :has_many
-              (obj.send(name).map { |obj| obj.to_s }.join('<br>') rescue BLANK)
-            elsif opts[:type] == :has_and_belongs_to_many
-              (obj.send(name).map { |obj| obj.to_s }.join('<br>') rescue BLANK)
-            elsif opts[:type] == :bulk_actions_column
-              BLANK
-            elsif opts[:type] == :obfuscated_id
-              (obj.send(:to_param) rescue nil).to_s
-            elsif opts[:type] == :effective_address
-              (Array(obj.send(name)) rescue [])
-            elsif opts[:type] == :effective_roles
-              (obj.send(:roles) rescue [])
-            elsif obj.kind_of?(Array) # Array backed collection
-              obj[opts[:array_index]]
-            else
-              (obj.send(name) rescue (obj[name] rescue nil))
+            begin
+              if opts[:visible] == false
+                BLANK
+              elsif opts[:partial]
+                rendered[name][index]
+              elsif opts[:block]
+                view.instance_exec(obj, collection, self, &opts[:block])
+              elsif opts[:proc]
+                view.instance_exec(obj, collection, self, &opts[:proc])
+              elsif opts[:type] == :belongs_to
+                (obj.send(name) rescue nil)
+              elsif opts[:type] == :belongs_to_polymorphic
+                (obj.send(name) rescue nil)
+              elsif opts[:type] == :has_many
+                (obj.send(name).map { |obj| obj.to_s }.join('<br>') rescue BLANK)
+              elsif opts[:type] == :has_and_belongs_to_many
+                (obj.send(name).map { |obj| obj.to_s }.join('<br>') rescue BLANK)
+              elsif opts[:type] == :bulk_actions_column
+                BLANK
+              elsif opts[:type] == :year
+                obj.send(name).try(:year)
+              elsif opts[:type] == :obfuscated_id
+                (obj.send(:to_param) rescue nil).to_s
+              elsif opts[:type] == :effective_address
+                (Array(obj.send(name)) rescue [])
+              elsif opts[:type] == :effective_roles
+                (obj.send(:roles) rescue [])
+              elsif obj.kind_of?(Array) # Array backed collection
+                obj[opts[:array_index]]
+              else
+                obj.send(name)
+              end
+            rescue => e
+              obj.try(:[], name)
             end
           end
         end
