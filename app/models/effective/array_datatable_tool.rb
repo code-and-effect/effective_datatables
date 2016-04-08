@@ -23,9 +23,9 @@ module Effective
         index = display_index(order_column)
 
         if order_direction == 'ASC'
-          collection.sort! { |x, y| x[index] <=> y[index] }
+          collection.sort! { |x, y| (x[index] && y[index]) ? (x[index] <=> y[index]) : 0 }
         else
-          collection.sort! { |x, y| y[index] <=> x[index] }
+          collection.sort! { |x, y| (x[index] && y[index]) ? (y[index] <=> x[index]) : 0 }
         end
       end
 
