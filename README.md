@@ -455,9 +455,9 @@ The `bulk_action` method is just an alias for `link_to`, so all the same options
 
 ```ruby
 bulk_actions_column do
-  bulk_action 'Approve all', bulk_approve_posts_path, data: { confirm: 'Approve all selected posts?' }
+  bulk_action 'Approve all', bulk_approve_posts_path, data: { method: :post, confirm: 'Approve all selected posts?' }
   bulk_action_divider
-  bulk_action 'Send emails', bulk_email_posts_path, data : { confirm: 'Really send emails?' }
+  bulk_action 'Send emails', bulk_email_posts_path, data : { method: :post, confirm: 'Really send emails?' }
 end
 ```
 
