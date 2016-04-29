@@ -218,13 +218,10 @@ module Effective
 
       def collection
         [
-          [1, 'Dana', 'Janssen', 'dana@agilestyle.com'],
-          [2, 'Ashley', 'Janssen', 'ashley@agilestyle.com'],
-          [3, 'Matthew', 'Riemer', 'matthew@agilestyle.com'],
-          [4, 'Stephen', 'Brown', 'stephen@agilestyle.com'],
-          [5, 'Warren', 'Uhrich', 'warren@agilestyle.com'],
-          [6, 'Dallas', 'Meidinger', 'dallas@agilestyle.com'],
-          [7, 'Nathan', 'Feaver', 'nathan@agilestyle.com']
+          [1, 'June', 'Huang', 'june@einstein.com'],
+          [2, 'Leo', 'Stubbs', 'leo@einstein.com'],
+          [3, 'Quincy', 'Pompey', 'quincy@einstein.com'],
+          [4, 'Annie', 'Wojcik', 'annie@einstein.com'],
         ]
       end
 
@@ -315,6 +312,7 @@ The following options control the display behaviour of the column:
 :visible => true|false    # Hide this column at startup.  Column visbility can be changed on the frontend.  By default, hidden column filter terms are ignored.
 :width => '100%'|'100px'  # Set the width of this column.  Can be set on one, all or some of the columns.  If using percentages, should never add upto more than 100%
 :class => 'col-example'   # Adds an html class to the column's TH and all TD elements.  Add more than one class with 'example col-example something'
+:responsivePriority => 0  # Set which columns collapse when the table is shrunk down.  10000 is the default value.
 ```
 
 ### Filtering Options
@@ -430,6 +428,14 @@ filterable  # whether the dataTable is filterable
 ## actions_column
 
 Creates a column with links to this resource's Show, Edit and Destroy actions.
+
+Sets `responsivePriority: 0` so the column is last to collapse when the table is shrunk down.
+
+Override the default actions by passing your own partial:
+
+```ruby
+actions_column partial: 'admin/posts/actions'
+```
 
 Optionally uses the authorization method (below) to determine if the `current_user` has permission for each of these actions.
 
