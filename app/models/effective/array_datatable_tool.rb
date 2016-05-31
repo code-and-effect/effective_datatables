@@ -21,14 +21,12 @@ module Effective
     def order(collection)
       return collection unless order_by_column.present?
 
-      column_order = order_column(collection, order_by_column, @datatable.order_direction)
+      column_order = order_column(collection, order_by_column, @datatable.order_direction, display_index(order_by_column))
       raise 'order_column must return an Array' unless column_order.kind_of?(Array)
       column_order
     end
 
-    def order_column_with_defaults(collection, table_column, direction)
-      index = display_index(table_column)
-
+    def order_column_with_defaults(collection, table_column, direction, index)
       if direction == :asc
         collection.sort! do |x, y|
           if (x[index] && y[index])
@@ -60,16 +58,15 @@ module Effective
 
     def search(collection)
       search_terms.each do |name, search_term|
-        column_search = search_column(collection, table_columns[name], search_term)
+        column_search = search_column(collection, table_columns[name], search_term, display_index(table_columns[name]))
         raise 'search_column must return an Array object' unless column_search.kind_of?(Array)
         collection = column_search
       end
       collection
     end
 
-    def search_column_with_defaults(collection, table_column, search_term)
+    def search_column_with_defaults(collection, table_column, search_term, index)
       search_term = search_term.downcase
-      index = display_index(table_column)
 
       collection.select! do |row|
         value = row[index].to_s.downcase

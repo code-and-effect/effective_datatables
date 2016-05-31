@@ -20,13 +20,12 @@ module Effective
     def order(collection)
       return collection unless order_by_column.present?
 
-      column_order = order_column(collection, order_by_column, @datatable.order_direction)
+      column_order = order_column(collection, order_by_column, @datatable.order_direction, order_by_column[:column])
       raise 'order_column must return an ActiveRecord::Relation object' unless column_order.kind_of?(ActiveRecord::Relation)
       column_order
     end
 
-    def order_column_with_defaults(collection, table_column, direction)
-      sql_column = table_column[:column]
+    def order_column_with_defaults(collection, table_column, direction, sql_column)
       before = ''; after = ''
       sql_direction = (direction == :desc ? 'DESC' : 'ASC')
 
@@ -53,34 +52,33 @@ module Effective
 
     def search(collection)
       search_terms.each do |name, search_term|
-        column_search = search_column(collection, table_columns[name], search_term)
+        column_search = search_column(collection, table_columns[name], search_term, table_columns[name][:column])
         raise 'search_column must return an ActiveRecord::Relation object' unless column_search.kind_of?(ActiveRecord::Relation)
         collection = column_search
       end
       collection
     end
 
-    def search_column_with_defaults(collection, table_column, term)
-      column = table_column[:column]
+    def search_column_with_defaults(collection, table_column, term, sql_column)
       sql_op = table_column[:filter][:sql_operation] || :where # only other option is :having
 
       case table_column[:type]
       when :string, :text
         if (table_column[:filter][:as] == :select && table_column[:filter][:fuzzy] != true) || sql_op != :where
           if ['null', 'nil', nil].include?(term)
-            collection.public_send(sql_op, "#{column} = :term OR #{column} IS NULL", term: term)
+            collection.public_send(sql_op, "#{sql_column} = :term OR #{sql_column} IS NULL", term: term)
           else
-            collection.public_send(sql_op, "#{column} = :term", term: term)
+            collection.public_send(sql_op, "#{sql_column} = :term", term: term)
           end
         else
-          collection.public_send(sql_op, "#{column} #{ilike} :term", term: "%#{term}%")
+          collection.public_send(sql_op, "#{sql_column} #{ilike} :term", term: "%#{term}%")
         end
       when :belongs_to_polymorphic
         # our key will be something like Post_15, or Event_1
         (type, id) = term.split('_')
 
         if type.present? && id.present?
-          collection.public_send(sql_op, "#{column} = :id AND #{column.sub('_id', '_type')} = :type", id: id, type: type)
+          collection.public_send(sql_op, "#{sql_column} = :id AND #{sql_column.sub('_id', '_type')} = :type", id: id, type: type)
         else
           collection
         end
@@ -102,10 +100,10 @@ module Effective
           klass.where(id: inverse_ids).joins(inverse.name).pluck(inverse.foreign_key)
         else
           # Treat the search term as a string.
-          klass_columns = if (table_column[:column] == klass.table_name) # No custom column has been defined
+          klass_columns = if (sql_column == klass.table_name) # No custom column has been defined
             klass.columns.map { |col| col.name if col.text? }.compact  # Search all database text? columns
           else
-            [table_column[:column].gsub("#{klass.table_name}.", '')] # table_column :order_items, column: 'order_items.title'
+            [sql_column.gsub("#{klass.table_name}.", '')] # table_column :order_items, column: 'order_items.title'
           end
 
           conditions = klass_columns.map { |col_name| "#{klass.table_name}.#{col_name} #{ilike} :term" }
@@ -134,10 +132,10 @@ module Effective
         else
           # Treat the search term as a string.
 
-          klass_columns = if (table_column[:column] == klass.table_name) # No custom column has been defined
+          klass_columns = if (sql_column == klass.table_name) # No custom column has been defined
             klass.columns.map { |col| col.name if col.text? }.compact  # Search all database text? columns
           else
-            [table_column[:column].gsub("#{klass.table_name}.", '')] # table_column :order_items, column: 'order_items.title'
+            [sql_column.gsub("#{klass.table_name}.", '')] # table_column :order_items, column: 'order_items.title'
           end
 
           conditions = klass_columns.map { |col_name| "#{klass.table_name}.#{col_name} #{ilike} :term" }
@@ -148,9 +146,9 @@ module Effective
         collection.public_send(sql_op, id: ids)
       when :obfuscated_id
         if (deobfuscated_id = collection.deobfuscate(term)) == term # We weren't able to deobfuscate it, so this is an Invalid ID
-          collection.public_send(sql_op, "#{column} = :term", term: 0)
+          collection.public_send(sql_op, "#{sql_column} = :term", term: 0)
         else
-          collection.public_send(sql_op, "#{column} = :term", term: deobfuscated_id)
+          collection.public_send(sql_op, "#{sql_column} = :term", term: deobfuscated_id)
         end
       when :effective_address
         ids = Effective::Address
@@ -183,23 +181,23 @@ module Effective
             end_at = start_at
           end
 
-          collection.public_send(sql_op, "#{column} >= :start_at AND #{column} <= :end_at", start_at: start_at, end_at: end_at)
+          collection.public_send(sql_op, "#{sql_column} >= :start_at AND #{sql_column} <= :end_at", start_at: start_at, end_at: end_at)
         rescue => e
           collection
         end
       when :boolean
-        collection.public_send(sql_op, "#{column} = :term", term: [1, 'true', 'yes'].include?(term.to_s.downcase))
+        collection.public_send(sql_op, "#{sql_column} = :term", term: [1, 'true', 'yes'].include?(term.to_s.downcase))
       when :integer
-        collection.public_send(sql_op, "#{column} = :term", term: term.gsub(/\D/, '').to_i)
+        collection.public_send(sql_op, "#{sql_column} = :term", term: term.gsub(/\D/, '').to_i)
       when :year
-        collection.public_send(sql_op, "EXTRACT(YEAR FROM #{column}) = :term", term: term.to_i)
+        collection.public_send(sql_op, "EXTRACT(YEAR FROM #{sql_column}) = :term", term: term.to_i)
       when :price
         price_in_cents = (term.gsub(/[^0-9|\.]/, '').to_f * 100.0).to_i
-        collection.public_send(sql_op, "#{column} = :term", term: price_in_cents)
+        collection.public_send(sql_op, "#{sql_column} = :term", term: price_in_cents)
       when :currency, :decimal
-        collection.public_send(sql_op, "#{column} = :term", term: term.gsub(/[^0-9|\.]/, '').to_f)
+        collection.public_send(sql_op, "#{sql_column} = :term", term: term.gsub(/[^0-9|\.]/, '').to_f)
       else
-        collection.public_send(sql_op, "#{column} = :term", term: term)
+        collection.public_send(sql_op, "#{sql_column} = :term", term: term)
       end
     end
 
