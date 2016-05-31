@@ -164,6 +164,11 @@ module Effective
           filter[:as] ||= :select
         end
 
+        # Fuzzy by default throughout
+        unless filter.key?(:fuzzy)
+          filter[:fuzzy] = true
+        end
+
         # Check if this is an aggregate column
         if ['SUM(', 'COUNT(', 'MAX(', 'MIN(', 'AVG('].any? { |str| sql_column.include?(str) }
           filter[:sql_operation] = :having

@@ -66,15 +66,13 @@ module Effective
     end
 
     def search_column_with_defaults(collection, table_column, search_term, index)
-      search_term = search_term.downcase
+      search_term = search_term.downcase if table_column[:filter][:fuzzy]
 
       collection.select! do |row|
-        value = row[index].to_s.downcase
-
-        if table_column[:filter][:fuzzy] != true
-          value == search_term
+        if table_column[:filter][:fuzzy]
+          row[index].to_s.downcase.include?(search_term)
         else
-          value.include?(search_term)
+          row[index] == search_term
         end
       end || collection
     end

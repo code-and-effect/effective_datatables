@@ -68,10 +68,10 @@ module Effective
           collection.public_send(sql_op, "#{sql_column} = :term", term: term)
         elsif ['null', 'nil', nil].include?(term)
           collection.public_send(sql_op, "#{sql_column} = :term OR #{sql_column} IS NULL", term: '')
-        elsif table_column[:filter][:fuzzy] != true
-          collection.public_send(sql_op, "#{sql_column} = :term", term: term)
-        else
+        elsif table_column[:filter][:fuzzy]
           collection.public_send(sql_op, "#{sql_column} #{ilike} :term", term: "%#{term}%")
+        else
+          collection.public_send(sql_op, "#{sql_column} = :term", term: term)
         end
       when :belongs_to_polymorphic
         # our key will be something like Post_15, or Event_1
