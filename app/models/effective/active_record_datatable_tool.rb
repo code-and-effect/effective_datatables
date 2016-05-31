@@ -28,6 +28,7 @@ module Effective
     def order_column_with_defaults(collection, table_column, direction)
       sql_column = table_column[:column]
       before = ''; after = ''
+      sql_direction = (direction == :desc ? 'DESC' : 'ASC')
 
       if postgres?
         after = if table_column[:nulls] == :first
@@ -35,18 +36,18 @@ module Effective
         elsif table_column[:nulls] == :last
           ' NULLS LAST'
         else
-          " NULLS #{direction == 'DESC' ? 'FIRST' : 'LAST' }"
+          " NULLS #{direction == :desc ? 'FIRST' : 'LAST' }"
         end
       elsif mysql?
         before = "ISNULL(#{sql_column}), "
       end
 
       if table_column[:type] == :belongs_to_polymorphic
-        collection.order("#{before}#{sql_column.sub('_id', '_type')} #{direction}, #{sql_column} #{direction}#{after}")
+        collection.order("#{before}#{sql_column.sub('_id', '_type')} #{sql_direction}, #{sql_column} #{sql_direction}#{after}")
       elsif table_column[:sql_as_column] == true
-        collection.order("#{sql_column} #{direction}")
+        collection.order("#{sql_column} #{sql_direction}")
       else
-        collection.order("#{before}#{sql_column} #{direction}#{after}")
+        collection.order("#{before}#{sql_column} #{sql_direction}#{after}")
       end
     end
 

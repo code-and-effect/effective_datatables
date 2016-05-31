@@ -33,11 +33,11 @@ module Effective
 
       def order_direction
         @order_direction ||= if params[:order].present?
-          params[:order].first[1][:dir] == 'desc' ? 'DESC' : 'ASC'
+          params[:order].first[1][:dir] == 'desc' ? :desc : :asc
         elsif @default_order.present?
-          @default_order.values.first.to_s.downcase == 'desc' ? 'DESC' : 'ASC'
+          @default_order.values.first.to_s.downcase == 'desc' ? :desc : :asc
         else
-          'ASC'
+          :asc
         end
       end
 

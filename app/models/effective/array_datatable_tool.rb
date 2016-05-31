@@ -29,7 +29,7 @@ module Effective
     def order_column_with_defaults(collection, table_column, direction)
       index = display_index(table_column)
 
-      if direction == 'ASC'
+      if direction == :asc
         collection.sort! do |x, y|
           if (x[index] && y[index])
             x[index] <=> y[index]
