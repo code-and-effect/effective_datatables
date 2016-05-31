@@ -5,10 +5,6 @@ module Effective
     module Rendering
       BLANK = ''.freeze
 
-      def finalize(collection) # Override me if you like
-        collection
-      end
-
       protected
 
       # So the idea here is that we want to do as much as possible on the database in ActiveRecord

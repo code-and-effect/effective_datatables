@@ -65,24 +65,6 @@ module Effective
         end
       end
 
-      # This is here so classes that inherit from Datatables can can override the specific where clauses on a search column
-      def search_column(collection, table_column, search_term)
-        if table_column[:array_column]
-          array_tool.search_column_with_defaults(collection, table_column, search_term)
-        else
-          table_tool.search_column_with_defaults(collection, table_column, search_term)
-        end
-      end
-
-      # This is here so classes that inherit from Datatables can can override the specific where clauses on a order column
-      def order_column(collection, table_column, direction)
-        if table_column[:array_column]
-          array_tool.order_column_with_defaults(collection, table_column, direction)
-        else
-          table_tool.order_column_with_defaults(collection, table_column, direction)
-        end
-      end
-
       def per_page
         return 9999999 if simple?
 

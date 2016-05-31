@@ -11,6 +11,7 @@ module Effective
     extend Effective::EffectiveDatatable::Dsl::ClassMethods
 
     include Effective::EffectiveDatatable::Ajax
+    include Effective::EffectiveDatatable::Hooks
     include Effective::EffectiveDatatable::Options
     include Effective::EffectiveDatatable::Rendering
 
@@ -111,7 +112,7 @@ module Effective
       @view.class.send(:attr_accessor, :effective_datatable)
       @view.effective_datatable = self
 
-      (self.class.instance_methods(false) - [:collection, :search_column]).each do |view_method|
+      (self.class.instance_methods(false) - [:collection, :search_column, :order_column]).each do |view_method|
         @view.class_eval { delegate view_method, :to => :@effective_datatable }
       end
 
