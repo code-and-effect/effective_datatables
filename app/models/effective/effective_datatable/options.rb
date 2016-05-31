@@ -141,22 +141,27 @@ module Effective
         col_type = column[:type]
         sql_column = column[:column].to_s.upcase
 
-        return {type: :null} if filter == false
+        return {as: :null} if filter == false
 
-        filter = {type: filter.to_sym} if filter.kind_of?(String)
+        filter = {as: filter.to_sym} if filter.kind_of?(String)
         filter = {} unless filter.kind_of?(Hash)
 
         # This is a fix for passing filter[:selected] == false, it needs to be 'false'
         filter[:selected] = filter[:selected].to_s unless filter[:selected].nil?
 
-        # Allow values or collection to be used interchangeably
+        # Allow :values or :collection to be used interchangeably
         if filter.key?(:values)
           filter[:collection] ||= filter[:values]
         end
 
-        # If you pass values, just assume it's a select
+        # Allow :as or :type to be used interchangeably
+        if filter.key?(:type)
+          filter[:as] ||= filter[:type]
+        end
+
+        # If you pass a collection, just assume it's a select
         if filter.key?(:collection) && col_type != :belongs_to_polymorphic
-          filter[:type] ||= :select
+          filter[:as] ||= :select
         end
 
         # Check if this is an aggregate column
@@ -167,7 +172,7 @@ module Effective
         case col_type
         when :belongs_to
           {
-            type: :select,
+            as: :select,
             collection: (
               if belongs_to[:klass].respond_to?(:datatables_filter)
                 Proc.new { belongs_to[:klass].datatables_filter }
@@ -177,10 +182,10 @@ module Effective
             )
           }
         when :belongs_to_polymorphic
-          {type: :grouped_select, polymorphic: true, collection: {}}
+          {as: :grouped_select, polymorphic: true, collection: {}}
         when :has_many
           {
-            type: :select,
+            as: :select,
             multiple: true,
             collection: (
               if has_many[:klass].respond_to?(:datatables_filter)
@@ -192,7 +197,7 @@ module Effective
           }
         when :has_and_belongs_to_many
           {
-            type: :select,
+            as: :select,
             multiple: true,
             collection: (
               if has_and_belongs_to_manys[:klass].respond_to?(:datatables_filter)
@@ -203,25 +208,25 @@ module Effective
             )
           }
         when :effective_address
-          {type: :string}
+          {as: :string}
         when :effective_roles
-          {type: :select, collection: EffectiveRoles.roles}
+          {as: :select, collection: EffectiveRoles.roles}
         when :integer
-          {type: :number}
+          {as: :number}
         when :boolean
           if EffectiveDatatables.boolean_format == :yes_no
-            {type: :boolean, collection: [['Yes', true], ['No', false]] }
+            {as: :boolean, collection: [['Yes', true], ['No', false]] }
           else
-            {type: :boolean, collection: [['true', true], ['false', false]] }
+            {as: :boolean, collection: [['true', true], ['false', false]] }
           end
         when :datetime
-          {type: :datetime}
+          {as: :datetime}
         when :date
-          {type: :date}
+          {as: :date}
         when :bulk_actions_column
-          {type: :bulk_actions_column}
+          {as: :bulk_actions_column}
         else
-          {type: :string}
+          {as: :string}
         end.merge(filter.symbolize_keys)
       end
 

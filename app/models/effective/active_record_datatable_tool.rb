@@ -59,7 +59,7 @@ module Effective
 
       case table_column[:type]
       when :string, :text
-        if (table_column[:filter][:type] == :select && table_column[:filter][:fuzzy] != true) || sql_op != :where
+        if (table_column[:filter][:as] == :select && table_column[:filter][:fuzzy] != true) || sql_op != :where
           if ['null', 'nil', nil].include?(term)
             collection.public_send(sql_op, "#{column} = :term OR #{column} IS NULL", term: term)
           else
@@ -87,7 +87,7 @@ module Effective
         inverse = reflection.inverse_of || klass.reflect_on_association(collection.table_name) || obj.class.reflect_on_association(collection.table_name.singularize)
         raise "unable to find #{klass.name} has_many :#{collection.table_name} or belongs_to :#{collection.table_name.singularize} associations" unless inverse
 
-        ids = if [:select, :grouped_select].include?(table_column[:filter][:type])
+        ids = if [:select, :grouped_select].include?(table_column[:filter][:as])
           # Treat the search term as one or more IDs
           inverse_ids = term.split(',').map { |term| (term = term.to_i) == 0 ? nil : term }.compact
           return collection unless inverse_ids.present?
@@ -118,7 +118,7 @@ module Effective
         inverse = reflection.inverse_of || klass.reflect_on_association(collection.table_name) || obj.class.reflect_on_association(collection.table_name.singularize)
         raise "unable to find #{klass.name} has_and_belongs_to_many :#{collection.table_name} or belongs_to :#{collection.table_name.singularize} associations" unless inverse
 
-        ids = if [:select, :grouped_select].include?(table_column[:filter][:type])
+        ids = if [:select, :grouped_select].include?(table_column[:filter][:as])
           # Treat the search term as one or more IDs
           inverse_ids = term.split(',').map { |term| (term = term.to_i) == 0 ? nil : term }.compact
           return collection unless inverse_ids.present?

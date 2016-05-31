@@ -136,7 +136,7 @@ module Effective
 
         table_column :user
 
-        table_column :post_category_id, :filter => {:type => :select, :collection => Proc.new { PostCategory.all } } do |post|
+        table_column :post_category_id, :filter => {:as => :select, :collection => Proc.new { PostCategory.all } } do |post|
           post.post_category.name.titleize
         end
 
@@ -267,7 +267,7 @@ table_column :user
 # Will have the same behaviour as declaring
 datatable do
   if attributes[:user_id].blank?
-    table_column :user_id, :filter => {:type => :select, :collection => Proc.new { User.all.map { |user| [user.id, user.to_s] }.sort { |x, y| x[1] <=> y[1] } } } do |post|
+    table_column :user_id, :filter => {:as => :select, :collection => Proc.new { User.all.map { |user| [user.id, user.to_s] }.sort { |x, y| x[1] <=> y[1] } } } do |post|
       post.user.to_s
     end
   end
@@ -325,16 +325,16 @@ The following options control the filtering behaviour of the column:
 table_column :created_at, :filter => false    # Disable filtering on this column entirely
 table_column :created_at, :filter => {...}    # Enable filtering with these options
 
-:filter => {:type => :number}
-:filter => {:type => :text}
+:filter => {:as => :number}
+:filter => {:as => :text}
 
-:filter => {:type => :select, :collection => ['One', 'Two'], :selected => 'Two'}
-:filter => {:type => :select, :collection => [*2010..(Time.zone.now.year+6)]}
-:filter => {:type => :select, :collection => Proc.new { PostCategory.all } }
-:filter => {:type => :select, :collection => Proc.new { User.all.order(:email).map { |obj| [obj.id, obj.email] } } }
+:filter => {:as => :select, :collection => ['One', 'Two'], :selected => 'Two'}
+:filter => {:as => :select, :collection => [*2010..(Time.zone.now.year+6)]}
+:filter => {:as => :select, :collection => Proc.new { PostCategory.all } }
+:filter => {:as => :select, :collection => Proc.new { User.all.order(:email).map { |obj| [obj.id, obj.email] } } }
 
-:filter => {:type => :grouped_select, :collection => {'Active' => Events.active, 'Past' => Events.past }}
-:filter => {:type => :grouped_select, :collection => {'Active' => [['Event A', 1], ['Event B', 2]], 'Past' => [['Event C', 3], ['Event D', 4]]} }
+:filter => {:as => :grouped_select, :collection => {'Active' => Events.active, 'Past' => Events.past }}
+:filter => {:as => :grouped_select, :collection => {'Active' => [['Event A', 1], ['Event B', 2]], 'Past' => [['Event C', 3], ['Event D', 4]]} }
 
 ```
 

@@ -54,7 +54,7 @@ module EffectiveDatatablesHelper
   def datatable_header_filter(form, name, value, opts)
     return render(partial: opts[:header_partial], locals: {form: form, name: (opts[:label] || name), column: opts}) if opts[:header_partial].present?
 
-    case opts[:filter][:type]
+    case opts[:filter][:as]
     when :string, :text, :number
       form.input name, label: false, required: false, value: value,
         as: :string,

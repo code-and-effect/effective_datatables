@@ -68,7 +68,7 @@ module Effective
       collection.select! do |row|
         value = row[index].to_s.downcase
 
-        if table_column[:filter][:type] == :select && table_column[:filter][:fuzzy] != true
+        if table_column[:filter][:as] == :select && table_column[:filter][:fuzzy] != true
           value == search_term
         else
           value.include?(search_term)
