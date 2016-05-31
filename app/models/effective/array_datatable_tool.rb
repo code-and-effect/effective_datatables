@@ -3,7 +3,7 @@ module Effective
   class ArrayDatatableTool
     attr_accessor :table_columns
 
-    delegate :order_name, :order_direction, :page, :per_page, :search_column, :display_table_columns, :to => :@datatable
+    delegate :order_name, :order_direction, :page, :per_page, :search_column, :order_column, :display_table_columns, :to => :@datatable
 
     def initialize(datatable, table_columns)
       @datatable = datatable
@@ -14,37 +14,43 @@ module Effective
       @search_terms ||= @datatable.search_terms.select { |name, search_term| table_columns.key?(name) }
     end
 
-    def order_column
-      @order_column ||= table_columns[order_name]
+    def order_by_column
+      @order_by_column ||= table_columns[order_name]
     end
 
     def order(collection)
-      if order_column.present?
-        index = display_index(order_column)
+      return collection unless order_by_column.present?
 
-        if order_direction == 'ASC'
-          collection.sort! do |x, y|
-            if (x[index] && y[index])
-              x[index] <=> y[index]
-            elsif x[index]
-              -1
-            elsif y[index]
-              1
-            else
-              0
-            end
+      column_order = order_column(collection, order_by_column, order_direction)
+      raise 'order_column must return an Array' unless column_order.kind_of?(Array)
+      column_order
+    end
+
+    def order_column_with_defaults(collection, table_column, direction)
+      index = display_index(table_column)
+
+      if direction == 'ASC'
+        collection.sort! do |x, y|
+          if (x[index] && y[index])
+            x[index] <=> y[index]
+          elsif x[index]
+            -1
+          elsif y[index]
+            1
+          else
+            0
           end
-        else
-          collection.sort! do |x, y|
-            if (x[index] && y[index])
-              y[index] <=> x[index]
-            elsif x[index]
-              1
-            elsif y[index]
-              -1
-            else
-              0
-            end
+        end
+      else
+        collection.sort! do |x, y|
+          if (x[index] && y[index])
+            y[index] <=> x[index]
+          elsif x[index]
+            1
+          elsif y[index]
+            -1
+          else
+            0
           end
         end
       end
