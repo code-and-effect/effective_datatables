@@ -64,12 +64,12 @@ module Effective
 
       case table_column[:type]
       when :string, :text
-        if (table_column[:filter][:as] == :select && table_column[:filter][:fuzzy] != true) || sql_op != :where
-          if ['null', 'nil', nil].include?(term)
-            collection.public_send(sql_op, "#{sql_column} = :term OR #{sql_column} IS NULL", term: term)
-          else
-            collection.public_send(sql_op, "#{sql_column} = :term", term: term)
-          end
+        if sql_op != :where
+          collection.public_send(sql_op, "#{sql_column} = :term", term: term)
+        elsif ['null', 'nil', nil].include?(term)
+          collection.public_send(sql_op, "#{sql_column} = :term OR #{sql_column} IS NULL", term: '')
+        elsif table_column[:filter][:fuzzy] != true
+          collection.public_send(sql_op, "#{sql_column} = :term", term: term)
         else
           collection.public_send(sql_op, "#{sql_column} #{ilike} :term", term: "%#{term}%")
         end
@@ -161,7 +161,7 @@ module Effective
         collection.with_role(term)
       when :datetime, :date
         begin
-          digits = term.scan(/(\d+)/).flatten.map(&:to_i)
+          digits = term.scan(/(\d+)/).flatten.map { |digit| digit.to_i }
           start_at = Time.zone.local(*digits)
 
           case digits.length
@@ -194,7 +194,7 @@ module Effective
       when :price
         price_in_cents = (term.gsub(/[^0-9|\.]/, '').to_f * 100.0).to_i
         collection.public_send(sql_op, "#{sql_column} = :term", term: price_in_cents)
-      when :currency, :decimal
+      when :currency, :decimal, :number
         collection.public_send(sql_op, "#{sql_column} = :term", term: term.gsub(/[^0-9|\.]/, '').to_f)
       else
         collection.public_send(sql_op, "#{sql_column} = :term", term: term)
