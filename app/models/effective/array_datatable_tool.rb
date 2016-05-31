@@ -3,7 +3,7 @@ module Effective
   class ArrayDatatableTool
     attr_accessor :table_columns
 
-    delegate :order_name, :order_direction, :page, :per_page, :search_column, :order_column, :display_table_columns, :to => :@datatable
+    delegate :page, :per_page, :search_column, :order_column, :display_table_columns, :to => :@datatable
 
     def initialize(datatable, table_columns)
       @datatable = datatable
@@ -15,13 +15,13 @@ module Effective
     end
 
     def order_by_column
-      @order_by_column ||= table_columns[order_name]
+      @order_by_column ||= table_columns[@datatable.order_name]
     end
 
     def order(collection)
       return collection unless order_by_column.present?
 
-      column_order = order_column(collection, order_by_column, order_direction)
+      column_order = order_column(collection, order_by_column, @datatable.order_direction)
       raise 'order_column must return an Array' unless column_order.kind_of?(Array)
       column_order
     end
