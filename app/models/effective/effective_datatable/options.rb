@@ -150,12 +150,12 @@ module Effective
         filter[:selected] = filter[:selected].to_s unless filter[:selected].nil?
 
         # Allow values or collection to be used interchangeably
-        if filter.key?(:collection)
-          filter[:values] ||= filter[:collection]
+        if filter.key?(:values)
+          filter[:collection] ||= filter[:values]
         end
 
         # If you pass values, just assume it's a select
-        if filter.key?(:values) && col_type != :belongs_to_polymorphic
+        if filter.key?(:collection) && col_type != :belongs_to_polymorphic
           filter[:type] ||= :select
         end
 
@@ -168,7 +168,7 @@ module Effective
         when :belongs_to
           {
             type: :select,
-            values: (
+            collection: (
               if belongs_to[:klass].respond_to?(:datatables_filter)
                 Proc.new { belongs_to[:klass].datatables_filter }
               else
@@ -177,12 +177,12 @@ module Effective
             )
           }
         when :belongs_to_polymorphic
-          {type: :grouped_select, polymorphic: true, values: {}}
+          {type: :grouped_select, polymorphic: true, collection: {}}
         when :has_many
           {
             type: :select,
             multiple: true,
-            values: (
+            collection: (
               if has_many[:klass].respond_to?(:datatables_filter)
                 Proc.new { has_many[:klass].datatables_filter }
               else
@@ -194,7 +194,7 @@ module Effective
           {
             type: :select,
             multiple: true,
-            values: (
+            collection: (
               if has_and_belongs_to_manys[:klass].respond_to?(:datatables_filter)
                 Proc.new { has_and_belongs_to_manys[:klass].datatables_filter }
               else
@@ -205,14 +205,14 @@ module Effective
         when :effective_address
           {type: :string}
         when :effective_roles
-          {type: :select, values: EffectiveRoles.roles}
+          {type: :select, collection: EffectiveRoles.roles}
         when :integer
           {type: :number}
         when :boolean
           if EffectiveDatatables.boolean_format == :yes_no
-            {type: :boolean, values: [['Yes', true], ['No', false]] }
+            {type: :boolean, collection: [['Yes', true], ['No', false]] }
           else
-            {type: :boolean, values: [['true', true], ['false', false]] }
+            {type: :boolean, collection: [['true', true], ['false', false]] }
           end
         when :datetime
           {type: :datetime}
