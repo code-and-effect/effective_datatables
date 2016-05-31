@@ -30,7 +30,7 @@ module Effective
       if direction == :asc
         collection.sort! do |x, y|
           if (x[index] && y[index])
-            x[index] <=> y[index]
+            cast_array_column_value(table_column, x[index]) <=> cast_array_column_value(table_column, y[index])
           elsif x[index]
             -1
           elsif y[index]
@@ -42,7 +42,7 @@ module Effective
       else
         collection.sort! do |x, y|
           if (x[index] && y[index])
-            y[index] <=> x[index]
+            cast_array_column_value(table_column, y[index]) <=> cast_array_column_value(table_column, x[index])
           elsif x[index]
             1
           elsif y[index]
@@ -87,6 +87,19 @@ module Effective
 
     def display_index(column)
       display_table_columns.present? ? display_table_columns.keys.index(column[:name]) : column[:array_index]
+    end
+
+    # When we order by Array, it's already a string.
+    # This gives us a mechanism to sort numbers as numbers
+    def cast_array_column_value(table_column, value)
+      case table_column[:type]
+      when :number, :price, :decimal, :float
+        (value.to_s.gsub(/[^0-9|\.]/, '').to_f rescue 0.00)
+      when :integer
+        (value.to_s.gsub(/\D/, '').to_i rescue 0)
+      else
+        value
+      end
     end
 
   end
