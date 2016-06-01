@@ -88,8 +88,13 @@ module Effective
 
         obj = reflection.build_association({})
         klass = obj.class
+        polymorphic = reflection.options[:as].present?
 
-        inverse = reflection.inverse_of || klass.reflect_on_association(collection.table_name) || obj.class.reflect_on_association(collection.table_name.singularize)
+        inverse = reflection.inverse_of
+        inverse ||= klass.reflect_on_association(reflection.options[:as]) if polymorphic
+        inverse ||= klass.reflect_on_association(collection.table_name)
+        inverse ||= obj.class.reflect_on_association(collection.table_name.singularize)
+
         raise "unable to find #{klass.name} has_many :#{collection.table_name} or belongs_to :#{collection.table_name.singularize} associations" unless inverse
 
         ids = if [:select, :grouped_select].include?(table_column[:filter][:as])
@@ -106,9 +111,17 @@ module Effective
             [sql_column.gsub("#{klass.table_name}.", '')] # table_column :order_items, column: 'order_items.title'
           end
 
+          if polymorphic
+            klass_columns -= [reflection.type]
+          end
+
           conditions = klass_columns.map { |col_name| "#{klass.table_name}.#{col_name} #{ilike} :term" }
 
-          klass.where(conditions.join(' OR '), term: "%#{term}%", num: term.to_i).joins(inverse.name).pluck(inverse.foreign_key)
+          if polymorphic
+            klass.where(conditions.join(' OR '), term: "%#{term}%", num: term.to_i).where(reflection.type => collection.klass.name).pluck(reflection.foreign_key)
+          else
+            klass.where(conditions.join(' OR '), term: "%#{term}%", num: term.to_i).joins(inverse.name).pluck(inverse.foreign_key)
+          end
         end
 
         collection.public_send(sql_op, id: ids)
