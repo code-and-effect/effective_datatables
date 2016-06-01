@@ -438,7 +438,7 @@ filterable  # whether the dataTable is filterable
 
 ## actions_column
 
-Creates a column with links to this resource's Show, Edit and Destroy actions.
+Creates a column with links to this resource's `show`, `edit` and `destroy` actions.
 
 Sets `responsivePriority: 0` so the column is last to collapse when the table is shrunk down.
 
@@ -448,7 +448,37 @@ Override the default actions by passing your own partial:
 actions_column partial: 'admin/posts/actions'
 ```
 
-Optionally uses the authorization method (below) to determine if the `current_user` has permission for each of these actions.
+### Showing action buttons
+
+The show/edit/destroy action buttons can be configured to always show, always hide, or to consider the current_user's permission level.
+
+To always show / hide:
+
+```ruby
+actions_column show: false, edit: true, destroy: true, unarchive: true
+```
+
+To authorize based on the current_user and the `config.authorization_method`:
+
+```ruby
+actions_column show: :authorize
+```
+
+The above will call the effective_datatables `config.authorization_method` just once to see if the current_user has permission to show/edit/destroy the collection class.
+
+The action button will be displayed if `EffectiveDatatables.authorized?(controller, :edit, Post)` returns true.
+
+To call authorize on each individual resource:
+
+```ruby
+actions_column show: :authorize_each
+```
+
+Or via a Proc:
+
+```ruby
+actions_column show: Proc.new { |resource| can?(:show, resource.parent) }
+```
 
 See the `config/initializers/effective_datatable.rb` file for more information.
 

@@ -43,6 +43,7 @@ EffectiveDatatables.setup do |config|
   # false (never include a link to this action)
   # :authorize (include link only if authorized to show/edit/destroy the resource class)
   # :authorize_each (include link only if authorized to show/edit/destroy the resource)
+  # Proc.new { |resource| can?(:edit, resource.parent) }
   #
   # When :authorize, a single check will be made via the above config.authorization_method
   # to see if the current_user has permission to :show/:edit/:destroy the collection class, i.e. Post
@@ -52,7 +53,8 @@ EffectiveDatatables.setup do |config|
   # If you want to authorize each individual resource, use :authorize_each
   # EffectiveDatatables.authorized? (:show || :edit || :destroy), Post.find(1)
   #
-  # You can override this default by calling `actions_column show: false, edit: true, destroy: :authorize`
+  # You can override these defaults on a per-table basis
+  # by calling `actions_column(show: false, edit: true, destroy: :authorize)`
   config.actions_column = {
     show: :authorize,
     edit: :authorize,

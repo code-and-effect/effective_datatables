@@ -1,7 +1,27 @@
-- show_action = (EffectiveDatatables.authorized?(controller, :show, resource) rescue false) if show_action == :authorize_each
-- edit_action = (EffectiveDatatables.authorized?(controller, :edit, resource) rescue false) if edit_action == :authorize_each
-- destroy_action = (EffectiveDatatables.authorized?(controller, :destroy, resource) rescue false) if destroy_action == :authorize_each
-- unarchive_action = (EffectiveDatatables.authorized?(controller, :unarchive, resource) rescue false) if unarchive_action == :authorize_each
+:ruby
+  if show_action == :authorize_each
+    show_action = (EffectiveDatatables.authorized?(controller, :show, resource) rescue false)
+  elsif show_action.respond_to?(:call)
+    show_action = instance_exec(resource, &show_action)
+  end
+
+  if edit_action == :authorize_each
+    edit_action = (EffectiveDatatables.authorized?(controller, :edit, resource) rescue false)
+  elsif edit_action.respond_to?(:call)
+    edit_action = instance_exec(resource, &edit_action)
+  end
+
+  if destroy_action == :authorize_each
+    destroy_action = (EffectiveDatatables.authorized?(controller, :destroy, resource) rescue false)
+  elsif destroy_action.respond_to?(:call)
+    destroy_action = instance_exec(resource, &destroy_action)
+  end
+
+  if unarchive_action == :authorize_each
+    unarchive_action = (EffectiveDatatables.authorized?(controller, :unarchive, resource) rescue false)
+  elsif unarchive_action.respond_to?(:call)
+    unarchive_action = instance_exec(resource, &unarchive_action)
+  end
 
 - if show_action
   - url = (polymorphic_path([*controller_namespace, resource]) rescue nil) || (polymorphic_path(resource) rescue nil)
