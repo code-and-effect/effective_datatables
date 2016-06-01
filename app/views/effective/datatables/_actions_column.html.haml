@@ -1,3 +1,8 @@
+- show_action = (EffectiveDatatables.authorized?(controller, :show, resource) rescue false) if show_action == :authorize_each
+- edit_action = (EffectiveDatatables.authorized?(controller, :edit, resource) rescue false) if edit_action == :authorize_each
+- destroy_action = (EffectiveDatatables.authorized?(controller, :destroy, resource) rescue false) if destroy_action == :authorize_each
+- unarchive_action = (EffectiveDatatables.authorized?(controller, :unarchive, resource) rescue false) if unarchive_action == :authorize_each
+
 - if show_action
   - url = (polymorphic_path([*controller_namespace, resource]) rescue nil) || (polymorphic_path(resource) rescue nil)
   - if url.present?

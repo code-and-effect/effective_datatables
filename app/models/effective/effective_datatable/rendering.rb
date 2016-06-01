@@ -89,6 +89,8 @@ module Effective
               end
             end
 
+            # If locals[:show_action] == :authorize_each, this will get run again.
+
             rendered[name] = (render(
               :partial => opts[:partial],
               :as => opts[:partial_local],
