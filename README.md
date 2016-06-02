@@ -571,6 +571,24 @@ Check whether the datatable has records by calling `@datatable.empty?` and `@dat
 
 Keep in mind, these methods look at the collection's total records, not the currently displayed/filtered records.
 
+### Hide the buttons
+
+To hide the Bulk Actions, Show / Hide Columns, CSV, Excel, Print, etc buttons:
+
+```ruby
+render_datatable(@datatable, buttons: false)
+```
+
+### Override javascript options
+
+The javascript options used to initialize a datatable can be overriden as follows:
+
+```ruby
+render_datatable(@datatable, {dom: "<'row'<'col-sm-12'tr>>", autoWidth: true})
+```
+
+Please see [datatables options](https://datatables.net/reference/option/) for a list of initialization options.
+
 
 ### Customize Filter Behaviour
 

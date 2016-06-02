@@ -6,6 +6,9 @@ initializeDataTables = ->
     simple = (datatable.data('simple') == true)
     input_js_options = datatable.data('input-js-options') || {}
 
+    if input_js_options['buttons'] == false
+      input_js_options['buttons'] = []
+
     init_options =
       ajax: { url: datatable.data('source'), type: 'POST' }
       autoWidth: false
