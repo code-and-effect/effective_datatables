@@ -16,6 +16,7 @@
 //= require dataTables/responsive/responsive.bootstrap.min
 
 //= require effective_datatables/bulk_actions
+//= require effective_datatables/responsive
 //= require effective_datatables/initialize
 
 $.extend( $.fn.dataTable.defaults, {
