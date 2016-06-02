@@ -102,7 +102,11 @@ module Effective
           inverse_ids = term.split(',').map { |term| (term = term.to_i) == 0 ? nil : term }.compact
           return collection unless inverse_ids.present?
 
-          klass.where(id: inverse_ids).joins(inverse.name).pluck(inverse.foreign_key)
+          if polymorphic
+            klass.where(id: inverse_ids).where(reflection.type => collection.klass.name).pluck(reflection.foreign_key)
+          else
+            klass.where(id: inverse_ids).joins(inverse.name).pluck(inverse.foreign_key)
+          end
         else
           # Treat the search term as a string.
           klass_columns = if (sql_column == klass.table_name) # No custom column has been defined
