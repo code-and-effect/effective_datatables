@@ -54,23 +54,26 @@ module EffectiveDatatablesHelper
   def datatable_header_filter(form, name, value, opts)
     return render(partial: opts[:header_partial], locals: {form: form, name: (opts[:label] || name), column: opts}) if opts[:header_partial].present?
 
+    include_blank = opts[:filter].key?(:include_blank) ? opts[:filter][:include_blank] : (opts[:label] || name.titleize)
+    placeholder = opts[:filter].key?(:placeholder) ? opts[:filter][:placeholder] : (opts[:label] || name.titleize)
+
     case opts[:filter][:as]
     when :string, :text, :number
       form.input name, label: false, required: false, value: value,
         as: :string,
-        placeholder: (opts[:label] || name),
+        placeholder: placeholder,
         input_html: { name: nil, value: value, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} }
     when :date
       form.input name, label: false, required: false, value: value,
         as: (ActionView::Helpers::FormBuilder.instance_methods.include?(:effective_date_picker) ? :effective_date_picker : :string),
-        placeholder: (opts[:label] || name),
+        placeholder: placeholder,
         input_group: false,
         input_html: { name: nil, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} },
         input_js: { useStrict: true, keepInvalid: true }
     when :datetime
       form.input name, label: false, required: false, value: value,
         as: (ActionView::Helpers::FormBuilder.instance_methods.include?(:effective_date_time_picker) ? :effective_date_time_picker : :string),
-        placeholder: (opts[:label] || name),
+        placeholder: placeholder,
         input_group: false,
         input_html: { name: nil, value: value, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} },
         input_js: { useStrict: true, keepInvalid: true } # Keep invalid format like "2015-11" so we can still filter by year, month or day
@@ -80,22 +83,22 @@ module EffectiveDatatablesHelper
         collection: opts[:filter][:collection],
         selected: opts[:filter][:selected],
         multiple: opts[:filter][:multiple] == true,
-        include_blank: (opts[:label] || name.titleize),
+        include_blank: include_blank,
         input_html: { name: nil, value: value, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} },
-        input_js: { placeholder: (opts[:label] || name.titleize) }
+        input_js: { placeholder: placeholder }
     when :grouped_select
       form.input name, label: false, required: false, value: value,
         as: (ActionView::Helpers::FormBuilder.instance_methods.include?(:effective_select) ? :effective_select : :grouped_select),
         collection: opts[:filter][:collection],
         selected: opts[:filter][:selected],
         multiple: opts[:filter][:multiple] == true,
-        include_blank: (opts[:label] || name.titleize),
+        include_blank: include_blank,
         grouped: true,
         polymorphic: opts[:filter][:polymorphic] == true,
         group_label_method: opts[:filter][:group_label_method] || :first,
         group_method: opts[:filter][:group_method] || :last,
         input_html: { name: nil, value: value, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} },
-        input_js: { placeholder: (opts[:label] || name.titleize) }
+        input_js: { placeholder: placeholder }
     when :bulk_actions_column
       form.input name, label: false, required: false, value: nil,
         as: :boolean,
