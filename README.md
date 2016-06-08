@@ -354,6 +354,8 @@ Some additional, lesser used options include:
 ```ruby
 :filter => {:fuzzy => true} # Will use an ILIKE/includes rather than = when filtering.  Use this for selects.
 :filter => {sql_operation => :having}  # Will use .having() instead of .where() to handle aggregate columns (autodetected)
+:filter => {include_blank: false}
+:filter => {placeholder: false}
 ```
 
 ### Rendering Options
