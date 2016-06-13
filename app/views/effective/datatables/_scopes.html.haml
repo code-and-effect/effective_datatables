@@ -1,0 +1,15 @@
+.row
+  .col-sm-12
+    = simple_form_for :scopes, url: request.path, method: :get, html: { class: 'form-inline' } do |form|
+
+      - datatable.scopes.each do |scope, options|
+        - if options[:block].present?
+          = form.instance_exec(form, &options[:block])
+        - elsif options[:partial].present?
+          = render partial: options[:partial], locals: { form: form, f: form, datatable: datatable }
+        - else
+          = form.input scope, options
+
+      = form.submit 'Refresh', class: 'btn btn-primary', 'data-disable-with' => 'Refreshing...'
+      = link_to 'Reset', '#', 'data-reset-form' => true
+

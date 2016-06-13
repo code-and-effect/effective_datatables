@@ -37,9 +37,13 @@ module Effective
       @table_columns
     end
 
+    def scopes
+      @scopes
+    end
+
     # Any attributes set on initialize will be echoed back and available to the class
     def attributes
-      @attributes ||= HashWithIndifferentAccess.new()
+      @attributes ||= HashWithIndifferentAccess.new
     end
 
     def to_key; []; end # Searching & Filters
@@ -103,6 +107,17 @@ module Effective
     def view=(view_context)
       @view = view_context
       @view.formats = [:html]
+
+      if @view.params[:scopes].kind_of?(Hash)
+        @view.params[:scopes].each do |name, value|
+          next unless scopes.key?(name)
+
+          self.attributes[name] = value
+
+          self.scopes[name][:input_html] ||= HashWithIndifferentAccess.new
+          self.scopes[name][:input_html][:value] = value
+        end
+      end
 
       # 'Just work' with attributes
       @view.class.send(:attr_accessor, :attributes)

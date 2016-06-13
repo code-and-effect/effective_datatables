@@ -27,7 +27,7 @@ module Effective
         end
         raise "You cannot use both partial: ... and proc: ..." if options[:partial] && options[:proc]
 
-        (@table_columns ||= HashWithIndifferentAccess.new())[name] = options
+        (@table_columns ||= HashWithIndifferentAccess.new)[name] = options
       end
 
       def array_column(name, options = {}, proc = nil, &block)
@@ -70,6 +70,15 @@ module Effective
         }.merge(options)
 
         table_column(name, opts, proc)
+      end
+
+      def scope(name, options = {}, &block)
+        if block_given?
+          raise "You cannot use partial: ... with the block syntax" if options[:partial]
+          options[:block] = block
+        end
+
+        (@scopes ||= HashWithIndifferentAccess.new)[name] = options
       end
 
     end

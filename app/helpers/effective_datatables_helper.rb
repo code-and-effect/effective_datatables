@@ -51,6 +51,17 @@ module EffectiveDatatablesHelper
     }.to_json()
   end
 
+  def datatable_scopes(datatable)
+    return false unless datatable.scopes.present?
+
+    {
+      scopeHtml: render(
+        partial: 'effective/datatables/scopes',
+        locals: HashWithIndifferentAccess.new(datatable: datatable)
+      )
+    }.to_json()
+  end
+
   def datatable_header_filter(form, name, value, opts)
     return render(partial: opts[:header_partial], locals: {form: form, name: (opts[:label] || name), column: opts}) if opts[:header_partial].present?
 
@@ -118,7 +129,6 @@ module EffectiveDatatablesHelper
   def datatables_active_admin_path?
     attributes[:active_admin_path] rescue false
   end
-
 
   ### Bulk Actions DSL Methods
   def bulk_action(*args)

@@ -69,6 +69,7 @@ initializeDataTables = ->
       pagingType: 'simple_numbers'
       initComplete: (settings) ->
         initializeBulkActions(this.api())
+        initializeScopes(this.api())
         initializeFilters(this.api())
       drawCallback: (settings) ->
         $table = $(this.api().table().node())
@@ -93,6 +94,13 @@ initializeDataTables = ->
       $wrapper = $table.closest('.dataTables_wrapper')
       $wrapper.children().first().find('.buttons-bulk-actions').children('button').removeAttr('disabled')
       $table.siblings('.dataTables_processing').html('Processing...')
+
+    # Appends the scope html
+    initializeScopes = (api) ->
+      $table = $(api.table().node())
+      scopes = $table.data('scopes')
+
+      $table.closest('.dataTables_wrapper').prepend(scopes['scopeHtml']) if scopes
 
     # Appends the filter html, stored in the column definitions, into each column header
     initializeFilters = (api) ->
