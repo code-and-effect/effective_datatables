@@ -137,7 +137,7 @@ initializeDataTables = ->
 
     # Apply EffectiveFormInputs to the Show x per page dropdown
     if datatable.data('effective-form-inputs')
-      table.closest('.dataTables_wrapper').find('.dataTables_length select').select2()
+      try table.closest('.dataTables_wrapper').find('.dataTables_length select').select2()
 
     # Capture column visibility changes and refresh datatable
     datatable.on 'column-visibility.dt', (event, settings, index, state) ->
