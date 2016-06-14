@@ -72,13 +72,13 @@ module Effective
         table_column(name, opts, proc)
       end
 
-      def scope(name, options = {}, &block)
+      def scope(name, default, options = {}, &block)
         if block_given?
           raise "You cannot use partial: ... with the block syntax" if options[:partial]
           options[:block] = block
         end
 
-        (@scopes ||= HashWithIndifferentAccess.new)[name] = options
+        (@scopes ||= HashWithIndifferentAccess.new)[name] = options.merge(default: default)
       end
 
     end

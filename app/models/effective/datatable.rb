@@ -23,6 +23,7 @@ module Effective
 
       initialize_datatable  # This creates @table_columns based on the DSL datatable do .. end block
       initialize_options    # This normalizes all the options
+      initialize_scopes     # This normalizes scopes, and copies scopes to attributes
 
       unless active_record_collection? || array_collection?
         raise "Unsupported collection type. Should be ActiveRecord class, ActiveRecord relation, or an Array of Arrays [[1, 'something'], [2, 'something else']]"
@@ -108,14 +109,15 @@ module Effective
       @view = view_context
       @view.formats = [:html]
 
+      # Set any scopes
       if @view.params[:scopes].kind_of?(Hash)
         @view.params[:scopes].each do |name, value|
           next unless scopes.key?(name)
 
           self.attributes[name] = value
 
-          self.scopes[name][:input_html] ||= HashWithIndifferentAccess.new
-          self.scopes[name][:input_html][:value] = value
+          self.scopes[name][:filter][:input_html] ||= HashWithIndifferentAccess.new
+          self.scopes[name][:filter][:input_html][:value] = value
         end
       end
 
