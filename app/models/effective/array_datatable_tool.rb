@@ -92,7 +92,7 @@ module Effective
     def cast_array_column_value(table_column, value)
       return value if table_column[:sortable] == :raw
 
-      if value.html_safe?
+      if value.html_safe? && value.kind_of?(String) && value.start_with?('<')
         value = ActionView::Base.full_sanitizer.sanitize(value)
       end
 
