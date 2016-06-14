@@ -211,7 +211,7 @@ module Effective
       when :price
         price_in_cents = (term.gsub(/[^0-9|\.]/, '').to_f * 100.0).to_i
         collection.public_send(sql_op, "#{sql_column} = :term", term: price_in_cents)
-      when :currency, :decimal, :number
+      when :currency, :decimal, :number, :percentage
         collection.public_send(sql_op, "#{sql_column} = :term", term: term.gsub(/[^0-9|\.]/, '').to_f)
       else
         collection.public_send(sql_op, "#{sql_column} = :term", term: term)

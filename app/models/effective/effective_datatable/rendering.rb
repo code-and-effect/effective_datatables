@@ -183,6 +183,8 @@ module Effective
               row[index] = number_to_currency(value / 100.0)
             when :currency
               row[index] = number_to_currency(value || 0)
+            when :percentage
+              row[index] = number_to_percentage(value || 0)
             when :integer
               if EffectiveDatatables.integer_format.kind_of?(Symbol)
                 row[index] = view.instance_exec { public_send(EffectiveDatatables.integer_format, value) }

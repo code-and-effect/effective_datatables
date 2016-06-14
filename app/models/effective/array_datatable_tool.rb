@@ -90,8 +90,14 @@ module Effective
     # When we order by Array, it's already a string.
     # This gives us a mechanism to sort numbers as numbers
     def cast_array_column_value(table_column, value)
+      return value if table_column[:sortable] == :raw
+
+      if value.html_safe?
+        value = ActionView::Base.full_sanitizer.sanitize(value)
+      end
+
       case table_column[:type]
-      when :number, :price, :decimal, :float
+      when :number, :price, :decimal, :float, :percentage
         (value.to_s.gsub(/[^0-9|\.]/, '').to_f rescue 0.00)
       when :integer
         (value.to_s.gsub(/\D/, '').to_i rescue 0)
