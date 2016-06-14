@@ -114,6 +114,10 @@ module Effective
         @view.params[:scopes].each do |name, value|
           next unless scopes.key?(name)
 
+          if scopes[name][:fallback] || scopes[name][:presence]
+            value = value.presence || scopes[name][:default]
+          end
+
           self.attributes[name] = value
 
           self.scopes[name][:filter][:input_html] ||= HashWithIndifferentAccess.new
