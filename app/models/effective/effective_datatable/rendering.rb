@@ -137,7 +137,7 @@ module Effective
                 obj.send(name)
               end
             rescue => e
-              obj.try(:[], name)
+              Rails.env.production? ? obj.try(:[], name) : raise(e)
             end
           end
         end
