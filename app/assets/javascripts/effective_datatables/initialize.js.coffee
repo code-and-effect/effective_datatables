@@ -26,21 +26,21 @@ initializeDataTables = ->
           exportOptions:
             format:
               header: (str) -> $("<div>#{str}</div>").children('.filter-label').first().text()
-            columns: ':visible:not(.col-actions)'
+            columns: ':not(.col-actions)'
         },
         {
           extend: 'csv',
           exportOptions:
             format:
               header: (str) -> $("<div>#{str}</div>").children('.filter-label').first().text()
-            columns: ':visible:not(.col-actions)'
+            columns: ':not(.col-actions)'
         },
         {
           extend: 'excel',
           exportOptions:
             format:
               header: (str) -> $("<div>#{str}</div>").children('.filter-label').first().text()
-            columns: ':visible:not(.col-actions)'
+            columns: ':not(.col-actions)'
         },
         {
           extend: 'print',
