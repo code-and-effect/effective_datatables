@@ -537,6 +537,33 @@ resources :posts do
 end
 ```
 
+## scopes
+
+When declaring a scope, a form field will automatically be placed above the datatable that can filter on the collection.
+
+The value of the scope, its default value, will be available for use anywehre in your datatable via the `attributes` hash.
+
+```ruby
+scope :start_date, Time.zone.now-3.months, filter: { input_html: { class: 'datepicker' } }
+```
+
+and then in your collection, or any `table_column` block:
+
+```ruby
+def collection
+  Post.where('updated_at > ?', attributes[:start_date])
+end
+```
+
+So initially, the `:start_date` will have the value of `Time.zone.now-3.months` and when submitted by the form, the value will be set there.
+
+The form value will come back as a string, so you may need to `Time.zone.parse` that value.
+
+Pass `scope :start_date, Time.zone.now-3.months, fallback: true` to fallback to the default value when the form submission is not present.
+
+Any `filter: { ... }` options will be passed straight into simple_form.
+
+
 ## table_columns
 
 Quickly create multiple table_columns all with default options:
