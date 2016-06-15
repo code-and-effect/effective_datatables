@@ -24,14 +24,14 @@ module Effective
       # A scope comes to us like {:start_date => {default: Time.zone.now, filter: {as: :select, collection: ... input_html :}}}
       # We want to make sure an input_html: { value: default } exists
       def initialize_scope_options(scopes)
-        scopes.each do |name, options|
+        (scopes || []).each do |name, options|
           options[:filter] ||= HashWithIndifferentAccess.new()
           options[:filter][:input_html] ||= HashWithIndifferentAccess.new()
           options[:filter][:input_html][:value] = options[:default]
         end
 
         # For each scope, copy it into the attributes, so we can get at the value
-        scopes.each do |name, options|
+        (scopes || []).each do |name, options|
           self.attributes[name] = options[:default]
         end
 
