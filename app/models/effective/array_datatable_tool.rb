@@ -3,7 +3,7 @@ module Effective
   class ArrayDatatableTool
     attr_accessor :table_columns
 
-    delegate :page, :per_page, :search_column, :order_column, :display_table_columns, :cast_array_column_value, :to => :@datatable
+    delegate :page, :per_page, :search_column, :order_column, :display_table_columns, :convert_to_column_type, :to => :@datatable
 
     def initialize(datatable, table_columns)
       @datatable = datatable
