@@ -32,7 +32,7 @@ module Effective
 
         # For each scope, copy it into the attributes, so we can get at the value
         (scopes || []).each do |name, options|
-          self.attributes[name] = options[:default]
+          self.attributes[name] ||= options[:default]
         end
 
         scopes
