@@ -105,8 +105,6 @@ module Effective
               :bulk_actions_column
             elsif name.include?('_address') && (collection_class.new rescue nil).respond_to?(:effective_addresses)
               :effective_address
-            elsif name == 'id' || name.include?('year') || name.include?('_id')
-              :non_formatted_integer
             elsif sql_column.try(:type).present?
               sql_column.type
             else
@@ -115,6 +113,11 @@ module Effective
           )
 
           cols[name][:class] = "col-#{cols[name][:type]} col-#{name} #{cols[name][:class]}".strip
+
+          # Formats
+          if name == 'id' || name.include?('year') || name.include?('_id')
+            cols[name][:format] = :non_formatted_integer
+          end
 
           # We can't really sort a HasMany or EffectiveAddress field
           if [:has_many, :effective_address].include?(cols[name][:type])

@@ -154,7 +154,7 @@ module Effective
               row[index] = value.to_s
             end
 
-            case opts[:type]
+            case (opts[:format] || opts[:type])
             when :belongs_to, :belongs_to_polymorphic
               row[index] = value.to_s
             when :has_many
@@ -220,9 +220,9 @@ module Effective
             if column[:visible] != true
               ''
             elsif options[:proc].respond_to?(:call)
-              view.instance_exec(column, values[index], &options[:proc])
+              view.instance_exec(column, values[index], values, &options[:proc])
             elsif options[:block].respond_to?(:call)
-              view.instance_exec(column, values[index], &options[:block])
+              view.instance_exec(column, values[index], values, &options[:block])
             else
               ''
             end
