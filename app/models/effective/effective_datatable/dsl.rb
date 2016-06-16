@@ -81,6 +81,15 @@ module Effective
         (@scopes ||= HashWithIndifferentAccess.new)[name] = options.merge(default: default)
       end
 
+      def aggregate(name, options = {}, &block)
+        if block_given?
+          raise "You cannot use proc: ... with the block syntax" if options[:proc]
+          options[:block] = block
+        end
+
+        (@aggregates ||= HashWithIndifferentAccess.new)[name] = options
+      end
+
     end
   end
 end

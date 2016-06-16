@@ -11,6 +11,7 @@ module Effective
     extend Effective::EffectiveDatatable::Dsl::ClassMethods
 
     include Effective::EffectiveDatatable::Ajax
+    include Effective::EffectiveDatatable::Helpers
     include Effective::EffectiveDatatable::Hooks
     include Effective::EffectiveDatatable::Options
     include Effective::EffectiveDatatable::Rendering
@@ -40,6 +41,10 @@ module Effective
 
     def scopes
       @scopes
+    end
+
+    def aggregates
+      @aggregates
     end
 
     # Any attributes set on initialize will be echoed back and available to the class
@@ -73,12 +78,17 @@ module Effective
     def to_json
       raise 'Effective::Datatable to_json called with a nil view.  Please call render_datatable(@datatable) or @datatable.view = view before this method' unless view.present?
 
-      @json ||= {
-        :draw => (params[:draw] || 0),
-        :data => (table_data || []),
-        :recordsTotal => (total_records || 0),
-        :recordsFiltered => (display_records || 0)
-      }
+      @json ||= begin
+        data = table_data
+
+        {
+          :draw => (params[:draw] || 0),
+          :data => (data || []),
+          :recordsTotal => (total_records || 0),
+          :recordsFiltered => (display_records || 0),
+          :aggregates => (aggregate_data(data) || [])
+        }
+      end
     end
 
     def present?
@@ -135,6 +145,10 @@ module Effective
 
       (self.class.instance_methods(false) - [:collection, :search_column, :order_column]).each do |view_method|
         @view.class_eval { delegate view_method, :to => :@effective_datatable }
+      end
+
+      Effective::EffectiveDatatable::Helpers.instance_methods(false).each do |helper_method|
+        @view.class_eval { delegate helper_method, :to => :@effective_datatable }
       end
 
       # Clear the search_terms memoization

@@ -208,6 +208,28 @@ module Effective
         collection
       end
 
+      # This should return an Array of values the same length as table_data
+      def aggregate_data(table_data)
+        return false unless aggregates.present?
+
+        values = table_data.transpose
+
+        aggregates.map do |name, options|
+          (display_table_columns || table_columns).map.with_index do |(name, column), index|
+
+            if column[:visible] != true
+              ''
+            elsif options[:proc].respond_to?(:call)
+              view.instance_exec(column, values[index], &options[:proc])
+            elsif options[:block].respond_to?(:call)
+              view.instance_exec(column, values[index], &options[:block])
+            else
+              ''
+            end
+          end
+        end
+      end
+
       private
 
       def controller_namespace

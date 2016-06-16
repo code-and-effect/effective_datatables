@@ -76,6 +76,9 @@ initializeDataTables = ->
         selected = $table.data('bulk-actions-restore-selected-values')
         completeBulkAction($table, selected) if selected && selected.length > 0
 
+        if settings['json'] && settings['json']['aggregates']
+          drawAggregates($table, settings['json']['aggregates'])
+
     # Copies the bulk actions html, stored in a data attribute on the table, into the buttons area
     initializeBulkActions = (api) ->
       $table = $(api.table().node())
@@ -94,6 +97,15 @@ initializeDataTables = ->
       $wrapper = $table.closest('.dataTables_wrapper')
       $wrapper.children().first().find('.buttons-bulk-actions').children('button').removeAttr('disabled')
       $table.siblings('.dataTables_processing').html('Processing...')
+
+    drawAggregates = ($table, aggregates) ->
+      $tfoot = $table.find('tfoot').first()
+
+      $.each aggregates, (row, values) =>
+        $row = $tfoot.children().eq(row)
+
+        if $row
+          $.each values, (col, value) => $row.children().eq(col).html(value)
 
     # Appends the scope html
     initializeScopes = (api) ->
