@@ -219,10 +219,8 @@ module Effective
 
             if column[:visible] != true
               ''
-            elsif options[:proc].respond_to?(:call)
-              view.instance_exec(column, values[index], values, &options[:proc])
-            elsif options[:block].respond_to?(:call)
-              view.instance_exec(column, values[index], values, &options[:block])
+            elsif (options[:block] || options[:proc]).respond_to?(:call)
+              view.instance_exec(column, (values[index] || []), values, &(options[:block] || options[:proc]))
             else
               ''
             end

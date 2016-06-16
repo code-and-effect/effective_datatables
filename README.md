@@ -563,6 +563,30 @@ Pass `scope :start_date, Time.zone.now-3.months, fallback: true` to fallback to 
 
 Any `filter: { ... }` options will be passed straight into simple_form.
 
+## aggregates
+
+Each `aggregate` directive adds an additional row to the table's tfoot.
+
+This feature is intended to display a sum or average of all the table's currently displayed values.
+
+```ruby
+aggregate :average do |table_column, values, table_data|
+  if table_column[:name] == 'user'
+    'Average'
+  else
+    average = (values.sum { |value| convert_to_column_type(table_column, value) } / [values.length, 1].max)
+    content_tag(:span, number_to_percentage(average, precision: 0))
+  end
+end
+```
+
+The above aggregate block will be called for each currently visible column in a datatable.
+
+Here `table_column` is the table_column being rendered, `values` is an array of all the values in this one column. `table_data` is the whole transposed array of data.
+
+The values will be whatever datatype each table_column returns.
+
+It might be the case that the formatted values (strings) are returned, which is why `convert_to_column_type` is used above.
 
 ## table_columns
 

@@ -70,7 +70,7 @@ module Effective
 
       collection.select! do |row|
         if table_column[:filter][:fuzzy]
-          row[index].to_s.downcase.include?(search_term)
+          convert_to_column_type(table_column, row[index]).to_s.downcase.include?(search_term)
         else
           row[index] == search_term
         end
