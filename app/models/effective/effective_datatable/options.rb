@@ -29,9 +29,10 @@ module Effective
         (scopes || []).each do |name, options|
           value = attributes.key?(name) ? attributes[name] : options[:default]
 
-          options[:filter] ||= HashWithIndifferentAccess.new()
-          options[:filter][:input_html] ||= HashWithIndifferentAccess.new()
+          options[:filter] ||= {}
+          options[:filter][:input_html] ||= {}
           options[:filter][:input_html][:value] = value
+          options[:filter][:selected] = value
 
           if attributes.key?(name) == false
             self.attributes[name] = options[:default]

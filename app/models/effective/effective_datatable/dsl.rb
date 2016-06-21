@@ -78,7 +78,8 @@ module Effective
           options[:block] = block
         end
 
-        (@scopes ||= HashWithIndifferentAccess.new)[name] = options.merge(default: default)
+        # This needs to be a {} not WithIndifferentAccess or rendering _scopes won't work correctly
+        (@scopes ||= {})[name] = options.merge(default: default)
       end
 
       def aggregate(name, options = {}, &block)
