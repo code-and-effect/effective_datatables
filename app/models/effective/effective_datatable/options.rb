@@ -19,23 +19,28 @@ module Effective
       protected
 
       # The scope DSL is
-      # scope :start_date, default_value, options {}
+      # scope :start_date, default_value, options: {}
+      #
+      # The value might already be assigned, but if not, we have to assign the default to attributes
 
       # A scope comes to us like {:start_date => {default: Time.zone.now, filter: {as: :select, collection: ... input_html :}}}
       # We want to make sure an input_html: { value: default } exists
       def initialize_scope_options(scopes)
         (scopes || []).each do |name, options|
+          value = attributes.key?(name) ? attributes[name] : options[:default]
+
           options[:filter] ||= HashWithIndifferentAccess.new()
           options[:filter][:input_html] ||= HashWithIndifferentAccess.new()
-          options[:filter][:input_html][:value] = options[:default]
-        end
+          options[:filter][:input_html][:value] = value
 
-        # For each scope, copy it into the attributes, so we can get at the value
-        (scopes || []).each do |name, options|
-          self.attributes[name] ||= options[:default]
-        end
+          if attributes.key?(name) == false
+            self.attributes[name] = options[:default]
+          end
 
-        scopes
+          if (options[:fallback] || options[:presence]) && attributes[name].blank? && attributes[name] != false
+            self.attributes[name] = options[:default]
+          end
+        end
       end
 
       def initialize_column_options(cols)

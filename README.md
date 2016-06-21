@@ -555,6 +555,12 @@ def collection
 end
 ```
 
+As well, you need to change the controller where you define the datatable to be aware of the scope params.
+
+```ruby
+@datatable = Effective::Datatables::Posts.new(params[:scopes])
+```
+
 So initially, the `:start_date` will have the value of `Time.zone.now-3.months` and when submitted by the form, the value will be set there.
 
 The form value will come back as a string, so you may need to `Time.zone.parse` that value.

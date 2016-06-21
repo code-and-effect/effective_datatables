@@ -5,7 +5,7 @@ module Effective
     # These two options control the render behaviour of a datatable
     attr_accessor :table_html_class, :simple
 
-    delegate :render, :controller, :link_to, :mail_to, :number_to_currency, :to => :@view
+    delegate :render, :controller, :link_to, :mail_to, :number_to_currency, :number_to_percentage, :to => :@view
 
     include Effective::EffectiveDatatable::Dsl
     extend Effective::EffectiveDatatable::Dsl::ClassMethods
@@ -23,8 +23,8 @@ module Effective
       end
 
       initialize_datatable  # This creates @table_columns based on the DSL datatable do .. end block
+      initialize_scopes     # This normalizes scopes, and copies scope default values to attributes
       initialize_options    # This normalizes all the options
-      initialize_scopes     # This normalizes scopes, and copies scopes to attributes
 
       unless active_record_collection? || array_collection?
         raise "Unsupported collection type. Should be ActiveRecord class, ActiveRecord relation, or an Array of Arrays [[1, 'something'], [2, 'something else']]"
@@ -118,22 +118,6 @@ module Effective
     def view=(view_context)
       @view = view_context
       @view.formats = [:html]
-
-      # Set any scopes
-      if @view.params[:scopes].kind_of?(Hash)
-        @view.params[:scopes].each do |name, value|
-          next unless scopes.key?(name)
-
-          if scopes[name][:fallback] || scopes[name][:presence]
-            value = value.presence || scopes[name][:default]
-          end
-
-          self.attributes[name] = value
-
-          self.scopes[name][:filter][:input_html] ||= HashWithIndifferentAccess.new
-          self.scopes[name][:filter][:input_html][:value] = value
-        end
-      end
 
       # 'Just work' with attributes
       @view.class.send(:attr_accessor, :attributes)
