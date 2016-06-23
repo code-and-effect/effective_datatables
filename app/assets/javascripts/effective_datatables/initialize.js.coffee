@@ -69,7 +69,6 @@ initializeDataTables = ->
       pagingType: 'simple_numbers'
       initComplete: (settings) ->
         initializeBulkActions(this.api())
-        initializeScopes(this.api())
         initializeFilters(this.api())
       drawCallback: (settings) ->
         $table = $(this.api().table().node())
@@ -106,13 +105,6 @@ initializeDataTables = ->
 
         if $row
           $.each values, (col, value) => $row.children().eq(col).html(value)
-
-    # Appends the scope html
-    initializeScopes = (api) ->
-      $table = $(api.table().node())
-      scopes = $table.data('scopes')
-
-      $table.closest('.dataTables_wrapper').prepend(scopes['scopeHtml']) if scopes
 
     # Appends the filter html, stored in the column definitions, into each column header
     initializeFilters = (api) ->

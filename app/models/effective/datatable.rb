@@ -7,8 +7,10 @@ module Effective
 
     delegate :render, :controller, :link_to, :mail_to, :number_to_currency, :number_to_percentage, :to => :@view
 
-    include Effective::EffectiveDatatable::Dsl
-    extend Effective::EffectiveDatatable::Dsl::ClassMethods
+    extend Effective::EffectiveDatatable::Dsl
+
+    include Effective::EffectiveDatatable::Dsl::Datatable
+    include Effective::EffectiveDatatable::Dsl::Scopes
 
     include Effective::EffectiveDatatable::Ajax
     include Effective::EffectiveDatatable::Helpers
@@ -22,9 +24,15 @@ module Effective
         args.first.each { |k, v| self.attributes[k] = v }
       end
 
-      initialize_datatable  # This creates @table_columns based on the DSL datatable do .. end block
-      initialize_scopes     # This normalizes scopes, and copies scope default values to attributes
-      initialize_options    # This normalizes all the options
+      if respond_to?(:initialize_scopes)  # There was at least one scope defined in the scopes do .. end block
+        initialize_scopes
+        initialize_scope_options
+      end
+
+      if respond_to?(:initialize_datatable)
+        initialize_datatable          # This creates @table_columns based on the DSL datatable do .. end block
+        initialize_datatable_options  # This normalizes all the options
+      end
 
       unless active_record_collection? || array_collection?
         raise "Unsupported collection type. Should be ActiveRecord class, ActiveRecord relation, or an Array of Arrays [[1, 'something'], [2, 'something else']]"

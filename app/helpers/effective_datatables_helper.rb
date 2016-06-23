@@ -1,12 +1,19 @@
 module EffectiveDatatablesHelper
   def render_datatable(datatable, input_js_options = nil)
-    datatable.view = self
+    datatable.view ||= self
     render partial: 'effective/datatables/datatable',
       locals: { datatable: datatable, input_js_options: input_js_options.try(:to_json) }
   end
 
+  def render_datatable_scopes(datatable)
+    return unless datatable.scopes.present?
+
+    datatable.view ||= self
+    render partial: 'effective/datatables/scopes', locals: { datatable: datatable }
+  end
+
   def render_simple_datatable(datatable, input_js_options = nil)
-    datatable.view = self
+    datatable.view ||= self
     datatable.simple = true
     render partial: 'effective/datatables/datatable',
       locals: {datatable: datatable, input_js_options: input_js_options.try(:to_json) }
@@ -47,17 +54,6 @@ module EffectiveDatatablesHelper
       dropdownHtml: render(
         partial: bulk_actions_column[:dropdown_partial],
         locals: HashWithIndifferentAccess.new(datatable: datatable).merge(bulk_actions_column[:partial_locals])
-      )
-    }.to_json()
-  end
-
-  def datatable_scopes(datatable)
-    return false unless datatable.scopes.present?
-
-    {
-      scopeHtml: render(
-        partial: 'effective/datatables/scopes',
-        locals: HashWithIndifferentAccess.new(datatable: datatable)
       )
     }.to_json()
   end

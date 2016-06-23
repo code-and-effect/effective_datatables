@@ -4,12 +4,12 @@ module Effective
   module EffectiveDatatable
     module Options
 
-      def initialize_options
-        @table_columns = initialize_column_options(@table_columns)
+      def initialize_datatable_options
+        @table_columns = _initialize_datatable_options(@table_columns)
       end
 
-      def initialize_scopes
-        @scopes = initialize_scope_options(@scopes)
+      def initialize_scope_options
+        @scopes = _initialize_scope_options(@scopes)
       end
 
       def quote_sql(name)
@@ -25,7 +25,7 @@ module Effective
 
       # A scope comes to us like {:start_date => {default: Time.zone.now, filter: {as: :select, collection: ... input_html :}}}
       # We want to make sure an input_html: { value: default } exists
-      def initialize_scope_options(scopes)
+      def _initialize_scope_options(scopes)
         (scopes || []).each do |name, options|
           value = attributes.key?(name) ? attributes[name] : options[:default]
 
@@ -44,7 +44,7 @@ module Effective
         end
       end
 
-      def initialize_column_options(cols)
+      def _initialize_datatable_options(cols)
         sql_table = (collection.table rescue nil)
 
         # Here we identify all belongs_to associations and build up a Hash like:
