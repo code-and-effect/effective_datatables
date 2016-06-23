@@ -8,7 +8,7 @@ module Effective
     delegate :render, :controller, :link_to, :mail_to, :number_to_currency, :number_to_percentage, :to => :@view
 
     extend Effective::EffectiveDatatable::Dsl
-
+    include Effective::EffectiveDatatable::Dsl::Charts
     include Effective::EffectiveDatatable::Dsl::Datatable
     include Effective::EffectiveDatatable::Dsl::Scopes
 
@@ -34,6 +34,11 @@ module Effective
         initialize_datatable_options  # This normalizes all the options
       end
 
+      if respond_to?(:initialize_charts)
+        initialize_charts
+        initialize_chart_options
+      end
+
       unless active_record_collection? || array_collection?
         raise "Unsupported collection type. Should be ActiveRecord class, ActiveRecord relation, or an Array of Arrays [[1, 'something'], [2, 'something else']]"
       end
@@ -49,6 +54,10 @@ module Effective
 
     def scopes
       @scopes
+    end
+
+    def charts
+      @charts
     end
 
     def aggregates
@@ -147,6 +156,10 @@ module Effective
       @search_terms = nil
       @order_name = nil
       @order_direction = nil
+    end
+
+    def view_context
+      view
     end
 
     def table_html_class

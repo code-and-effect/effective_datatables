@@ -12,6 +12,10 @@ module Effective
         @scopes = _initialize_scope_options(@scopes)
       end
 
+      def initialize_chart_options
+        @charts = _initialize_chart_options(@charts)
+      end
+
       def quote_sql(name)
         collection_class.connection.quote_column_name(name) rescue name
       end
@@ -42,6 +46,10 @@ module Effective
             self.attributes[name] = options[:default]
           end
         end
+      end
+
+      def _initialize_chart_options(charts)
+        charts
       end
 
       def _initialize_datatable_options(cols)

@@ -1,20 +1,54 @@
 module EffectiveDatatablesHelper
   def render_datatable(datatable, input_js_options = nil)
+    return unless datatable.present?
     datatable.view ||= self
+
     render partial: 'effective/datatables/datatable',
       locals: { datatable: datatable, input_js_options: input_js_options.try(:to_json) }
   end
 
   def render_datatable_scopes(datatable)
     return unless datatable.scopes.present?
-
     datatable.view ||= self
+
     render partial: 'effective/datatables/scopes', locals: { datatable: datatable }
   end
 
+  def render_datatable_charts(datatable)
+    return unless datatable.charts.present?
+    datatable.view ||= self
+
+    datatable.charts.each { |name, _| concat(render_datatable_chart(datatable, name)) }
+    nil
+  end
+
+  def render_datatable_chart(datatable, name)
+    return unless datatable.charts.present?
+    return unless (chart = datatable.charts[name]).present?
+    datatable.view ||= self
+
+    unless @effective_datatables_chart_javascript_rendered
+      concat javascript_include_tag('https://www.google.com/jsapi')
+      concat javascript_tag("if(google && google.visualization === undefined) { google.load('visualization', '1', {packages:#{EffectiveDatatables.google_chart_packages}}); }")
+
+      @effective_datatables_chart_javascript_rendered = true
+    end
+
+    chart_data = if chart[:block].present?
+      datatable.instance_exec(&chart[:block])
+    else
+      datatable.to_json[:data]
+    end
+
+    render partial: (chart[:partial] || 'effective/datatables/chart'),
+      locals: { datatable: datatable, chart: chart, chart_data: chart_data }
+  end
+
   def render_simple_datatable(datatable, input_js_options = nil)
+    return unless datatable.present?
     datatable.view ||= self
     datatable.simple = true
+
     render partial: 'effective/datatables/datatable',
       locals: {datatable: datatable, input_js_options: input_js_options.try(:to_json) }
   end

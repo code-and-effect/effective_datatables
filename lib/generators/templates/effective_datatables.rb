@@ -62,4 +62,7 @@ EffectiveDatatables.setup do |config|
     unarchive: :authorize
   }
 
+  # Which packages to load when using the charts DSL
+  config.google_chart_packages = ['corechart', 'gauge', 'geochart']
+
 end
