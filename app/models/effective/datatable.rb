@@ -13,6 +13,7 @@ module Effective
     include Effective::EffectiveDatatable::Dsl::Scopes
 
     include Effective::EffectiveDatatable::Ajax
+    include Effective::EffectiveDatatable::Charts
     include Effective::EffectiveDatatable::Helpers
     include Effective::EffectiveDatatable::Hooks
     include Effective::EffectiveDatatable::Options
@@ -103,7 +104,8 @@ module Effective
           :data => (data || []),
           :recordsTotal => (total_records || 0),
           :recordsFiltered => (display_records || 0),
-          :aggregates => (aggregate_data(data) || [])
+          :aggregates => (aggregate_data(data) || []),
+          :charts => (charts_data || {})
         }
       end
     end

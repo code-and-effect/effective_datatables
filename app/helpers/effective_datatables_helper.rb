@@ -24,7 +24,7 @@ module EffectiveDatatablesHelper
 
   def render_datatable_chart(datatable, name)
     return unless datatable.charts.present?
-    return unless (chart = datatable.charts[name]).present?
+    return unless datatable.charts[name].present?
     datatable.view ||= self
 
     unless @effective_datatables_chart_javascript_rendered
@@ -34,14 +34,8 @@ module EffectiveDatatablesHelper
       @effective_datatables_chart_javascript_rendered = true
     end
 
-    chart_data = if chart[:block].present?
-      datatable.instance_exec(&chart[:block])
-    else
-      datatable.to_json[:data]
-    end
-
-    render partial: (chart[:partial] || 'effective/datatables/chart'),
-      locals: { datatable: datatable, chart: chart, chart_data: chart_data }
+    render partial: (datatable.charts[name][:partial] || 'effective/datatables/chart'),
+      locals: { datatable: datatable, chart: datatable.to_json[:charts][name] }
   end
 
   def render_simple_datatable(datatable, input_js_options = nil)

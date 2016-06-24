@@ -4,11 +4,12 @@ module Effective
       module Charts
         # Instance Methods inside the charts do .. end block
         def chart(name, type, options = {}, &block)
+
           (@charts ||= HashWithIndifferentAccess.new)[name] = {
             name: name,
             type: type,
             partial: options.delete(:partial),
-            options: options,
+            options: options.reverse_merge(title: name.to_s.titleize),
             block: (block if block_given?)
           }
         end
