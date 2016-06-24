@@ -544,8 +544,12 @@ When declaring a scope, a form field will automatically be placed above the data
 The value of the scope, its default value, will be available for use anywehre in your datatable via the `attributes` hash.
 
 ```ruby
-scope :start_date, Time.zone.now-3.months, filter: { input_html: { class: 'datepicker' } }
+scopes do
+  scope :start_date, Time.zone.now-3.months, filter: { input_html: { class: 'datepicker' } }
+end
 ```
+
+(scopes is declared outside of the `datatable do ... end` block)
 
 and then in your collection, or any `table_column` block:
 
