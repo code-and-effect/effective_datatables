@@ -6,6 +6,7 @@ module Effective
         def chart(name, type, options = {}, &block)
 
           options[:title] ||= (options[:label] || name.to_s.titleize)
+          options[:legend] = 'none' if options[:legend] == false
 
           (@charts ||= HashWithIndifferentAccess.new)[name] = {
             name: name,
