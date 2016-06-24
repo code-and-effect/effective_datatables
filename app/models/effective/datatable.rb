@@ -121,7 +121,6 @@ module Effective
     def total_records
       @total_records ||= (
         if active_record_collection?
-          # https://github.com/rails/rails/issues/15331
           if collection_class.connection.respond_to?(:unprepared_statement)
             collection_sql = collection_class.connection.unprepared_statement { collection.to_sql }
             (collection_class.connection.execute("SELECT COUNT(*) FROM (#{collection_sql}) AS datatables_total_count").first.values.first rescue 1).to_i
@@ -147,11 +146,11 @@ module Effective
       @view.effective_datatable = self
 
       (self.class.instance_methods(false) - [:collection, :search_column, :order_column]).each do |view_method|
-        @view.class_eval { delegate view_method, :to => :@effective_datatable }
+        @view.class_eval { delegate view_method, to: :@effective_datatable }
       end
 
       Effective::EffectiveDatatable::Helpers.instance_methods(false).each do |helper_method|
-        @view.class_eval { delegate helper_method, :to => :@effective_datatable }
+        @view.class_eval { delegate helper_method, to: :@effective_datatable }
       end
 
       # Clear the search_terms memoization

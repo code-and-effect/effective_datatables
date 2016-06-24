@@ -3,8 +3,8 @@ module Effective
     module Charts
 
       def charts_data
-        {}.tap do |retval|
-          charts.each do |name, chart|
+        HashWithIndifferentAccess.new().tap do |retval|
+          (charts || {}).each do |name, chart|
             retval[name] = {
               name: chart[:name],
               type: chart[:type],

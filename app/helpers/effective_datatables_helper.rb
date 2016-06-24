@@ -18,8 +18,7 @@ module EffectiveDatatablesHelper
     return unless datatable.charts.present?
     datatable.view ||= self
 
-    datatable.charts.each { |name, _| concat(render_datatable_chart(datatable, name)) }
-    nil
+    datatable.charts.map { |name, _| render_datatable_chart(datatable, name) }.join.html_safe
   end
 
   def render_datatable_chart(datatable, name)
@@ -34,8 +33,11 @@ module EffectiveDatatablesHelper
       @effective_datatables_chart_javascript_rendered = true
     end
 
-    render partial: (datatable.charts[name][:partial] || 'effective/datatables/chart'),
-      locals: { datatable: datatable, chart: datatable.to_json[:charts][name] }
+    options = datatable.charts[name]
+    chart = datatable.to_json[:charts][name]
+
+    render partial: (options[:partial] || 'effective/datatables/chart'),
+      locals: { datatable: datatable, chart: chart }
   end
 
   def render_simple_datatable(datatable, input_js_options = nil)

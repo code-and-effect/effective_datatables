@@ -75,8 +75,12 @@ initializeDataTables = ->
         selected = $table.data('bulk-actions-restore-selected-values')
         completeBulkAction($table, selected) if selected && selected.length > 0
 
-        if settings['json'] && settings['json']['aggregates']
-          drawAggregates($table, settings['json']['aggregates'])
+        if settings['json']
+          if settings['json']['aggregates']
+            drawAggregates($table, settings['json']['aggregates'])
+
+          if settings['json']['charts']
+            drawCharts($table, settings['json']['charts'])
 
     # Copies the bulk actions html, stored in a data attribute on the table, into the buttons area
     initializeBulkActions = (api) ->
@@ -105,6 +109,12 @@ initializeDataTables = ->
 
         if $row
           $.each values, (col, value) => $row.children().eq(col).html(value)
+
+    drawCharts = ($table, charts) ->
+      $.each charts, (name, data) =>
+        $(".effective-datatables-chart[data-name='#{name}']").each (_, obj) =>
+          chart = new google.visualization[data['type']](obj)
+          chart.draw(google.visualization.arrayToDataTable(data['data']), data['options'])
 
     # Appends the filter html, stored in the column definitions, into each column header
     initializeFilters = (api) ->
