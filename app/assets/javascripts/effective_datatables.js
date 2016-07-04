@@ -1,4 +1,4 @@
-//= require vendor/jquery.debounce.min
+//= require vendor/jquery.delayedChange
 //= require vendor/jszip.min
 
 //= require dataTables/jquery.dataTables.min

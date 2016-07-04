@@ -140,15 +140,14 @@ initializeDataTables = ->
         $input.parent().on 'mousedown', (event) -> event.stopPropagation() # Dont order columns when you click inside the input
 
         if $input.is('select')
-          $input.on 'change', (event) -> dataTableSearch(event)
+          $input.on 'change', (event) -> dataTableSearch($(event.currentTarget))
         else if $input.is('input')
-          $input.keyup($.debounce(300, dataTableSearch))
+          $input.delayedChange ($input) -> dataTableSearch($input)
 
     # Do the actual search
-    dataTableSearch = (event) ->   # This is the function called by a select or input to run the search
-      obj = $(event.currentTarget)
-      table = obj.closest('table.dataTable')
-      table.DataTable().column("#{obj.data('column-name')}:name").search(obj.val()).draw()
+    dataTableSearch = ($input) ->   # This is the function called by a select or input to run the search
+      table = $input.closest('table.dataTable')
+      table.DataTable().column("#{$input.data('column-name')}:name").search($input.val()).draw()
 
     if simple
       init_options['dom'] = "<'row'<'col-sm-12'tr>>" # Just show the table
