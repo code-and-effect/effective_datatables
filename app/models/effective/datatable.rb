@@ -8,6 +8,7 @@ module Effective
     delegate :render, :controller, :link_to, :mail_to, :number_to_currency, :number_to_percentage, :to => :@view
 
     extend Effective::EffectiveDatatable::Dsl
+    include Effective::EffectiveDatatable::Dsl::BulkActions
     include Effective::EffectiveDatatable::Dsl::Charts
     include Effective::EffectiveDatatable::Dsl::Datatable
     include Effective::EffectiveDatatable::Dsl::Scopes
@@ -147,6 +148,10 @@ module Effective
 
       (self.class.instance_methods(false) - [:collection, :search_column, :order_column]).each do |view_method|
         @view.class_eval { delegate view_method, to: :@effective_datatable }
+      end
+
+      Effective::EffectiveDatatable::Dsl::BulkActions.instance_methods(false).each do |helper_method|
+        @view.class_eval { delegate helper_method, to: :@effective_datatable }
       end
 
       Effective::EffectiveDatatable::Helpers.instance_methods(false).each do |helper_method|
