@@ -146,16 +146,16 @@ module Effective
       @view.class.send(:attr_accessor, :effective_datatable)
       @view.effective_datatable = self
 
-      (self.class.instance_methods(false) - [:collection, :search_column, :order_column]).each do |view_method|
-        @view.class_eval { delegate view_method, to: :@effective_datatable }
-      end
-
-      Effective::EffectiveDatatable::Dsl::BulkActions.instance_methods(false).each do |helper_method|
-        @view.class_eval { delegate helper_method, to: :@effective_datatable }
+      unless @view.respond_to?(:bulk_action)
+        @view.class.send(:include, Effective::EffectiveDatatable::Dsl::BulkActions)
       end
 
       Effective::EffectiveDatatable::Helpers.instance_methods(false).each do |helper_method|
         @view.class_eval { delegate helper_method, to: :@effective_datatable }
+      end
+
+      (self.class.instance_methods(false) - [:collection, :search_column, :order_column]).each do |view_method|
+        @view.class_eval { delegate view_method, to: :@effective_datatable }
       end
 
       # Clear the search_terms memoization
