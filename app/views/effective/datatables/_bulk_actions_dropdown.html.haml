@@ -3,8 +3,9 @@
     Bulk Actions
     %span.caret
   %ul.dropdown-menu
-    - if content_for?(:effective_datatables_bulk_actions)
-      = yield :effective_datatables_bulk_actions
+    - if dropdown_block.respond_to?(:call)
+      = capture do
+        - instance_exec(&dropdown_block)
     - else
       %li
         %a{href: '#'} No bulk actions

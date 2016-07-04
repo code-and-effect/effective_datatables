@@ -1,22 +1,23 @@
 #### Checkbox toggling and Bulk Actions dropdown disabling
 
 $(document).on 'change', "input[data-role='bulk-actions-resource']", (event) ->
-  $("input[data-role='bulk-actions-all']").prop('checked', false)
-  toggleClosestBulkActionsButton($(event.currentTarget))
+  $wrapper = $(event.currentTarget).closest('.dataTables_wrapper')
+
+  $wrapper.find("input[data-role='bulk-actions-all']").prop('checked', false)
+  toggleClosestBulkActionsButton($wrapper)
 
 $(document).on 'change', "input[data-role='bulk-actions-all']", (event) ->
-  $checkAll = $(event.currentTarget)
-  $resources = $("input[data-role='bulk-actions-resource']")
+  $wrapper = $(event.currentTarget).closest('.dataTables_wrapper')
+  $resources = $wrapper.find("input[data-role='bulk-actions-resource']")
 
-  if $checkAll.is(':checked')
+  if $(event.currentTarget).is(':checked')
     $resources.prop('checked', true)
   else
     $resources.prop('checked', false)
 
-  toggleClosestBulkActionsButton($checkAll)
+  toggleClosestBulkActionsButton($wrapper)
 
-toggleClosestBulkActionsButton = (element) ->
-  $wrapper = element.closest('.dataTables_wrapper')
+toggleClosestBulkActionsButton = ($wrapper) ->
   $bulkActions = $wrapper.children().first().find('.buttons-bulk-actions').children('button')
 
   if $wrapper.find("input[data-role='bulk-actions-resource']:checked").length > 0
