@@ -118,6 +118,8 @@ module Effective
               :effective_address
             elsif sql_column.try(:type).present?
               sql_column.type
+            elsif name.end_with?('_id')
+              :integer
             else
               :string # When in doubt
             end
@@ -126,7 +128,7 @@ module Effective
           cols[name][:class] = "col-#{cols[name][:type]} col-#{name} #{cols[name][:class]}".strip
 
           # Formats
-          if name == 'id' || name.include?('year') || name.include?('_id')
+          if name == 'id' || name.include?('year') || name.end_with?('_id')
             cols[name][:format] = :non_formatted_integer
           end
 
