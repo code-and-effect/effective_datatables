@@ -124,9 +124,9 @@ module Effective
         if active_record_collection?
           if collection_class.connection.respond_to?(:unprepared_statement)
             collection_sql = collection_class.connection.unprepared_statement { collection.to_sql }
-            (collection_class.connection.execute("SELECT COUNT(*) FROM (#{collection_sql}) AS datatables_total_count").first.values.first rescue 1).to_i
+            (collection_class.connection.exec_query("SELECT COUNT(*) FROM (#{collection_sql}) AS datatables_total_count").rows[0][0] rescue 1).to_i
           else
-            (collection_class.connection.execute("SELECT COUNT(*) FROM (#{collection.to_sql}) AS datatables_total_count").first.values.first rescue 1).to_i
+            (collection_class.connection.exec_query("SELECT COUNT(*) FROM (#{collection.to_sql}) AS datatables_total_count").rows[0][0] rescue 1).to_i
           end
         else
           collection.size
