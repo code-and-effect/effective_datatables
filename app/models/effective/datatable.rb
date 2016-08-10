@@ -112,26 +112,15 @@ module Effective
     end
 
     def present?
-      total_records.to_i > 0
+      total_records > 0
     end
 
     def empty?
-      total_records.to_i == 0
+      total_records == 0
     end
 
     def total_records
-      @total_records ||= (
-        if active_record_collection?
-          if collection_class.connection.respond_to?(:unprepared_statement)
-            collection_sql = collection_class.connection.unprepared_statement { collection.to_sql }
-            (collection_class.connection.exec_query("SELECT COUNT(*) FROM (#{collection_sql}) AS datatables_total_count").rows[0][0] rescue 1).to_i
-          else
-            (collection_class.connection.exec_query("SELECT COUNT(*) FROM (#{collection.to_sql}) AS datatables_total_count").rows[0][0] rescue 1).to_i
-          end
-        else
-          collection.size
-        end
-      )
+      @total_records ||= (active_record_collection? ? active_record_collection_size(collection) : collection.size)
     end
 
     def view=(view_context)
@@ -194,11 +183,35 @@ module Effective
     end
 
     def active_record_collection?
-      collection.ancestors.include?(ActiveRecord::Base) rescue false
+      @active_record_collection ||= (collection.ancestors.include?(ActiveRecord::Base) rescue false)
     end
 
     def array_collection?
       collection.kind_of?(Array) && collection.first.kind_of?(Array)
+    end
+
+    # Not every ActiveRecord query will work when calling the simple .count
+    # Custom selects:
+    #   User.select(:email, :first_name).count will throw an error
+    #   .count(:all) and .size seem to work
+    # Grouped Queries:
+    #   User.all.group(:email).count will return a Hash
+    def active_record_collection_size(collection)
+      count = (collection.size rescue nil)
+
+      case count
+      when Integer
+        count
+      when Hash
+        count.size  # This represents the number of displayed datatable rows, not the sum all groups (which might be more)
+      else
+        if collection.klass.connection.respond_to?(:unprepared_statement)
+          collection_sql = collection.klass.connection.unprepared_statement { collection.to_sql }
+          (collection.klass.connection.exec_query("SELECT COUNT(*) FROM (#{collection_sql}) AS datatables_total_count").rows[0][0] rescue 1)
+        else
+          (collection.klass.connection.exec_query("SELECT COUNT(*) FROM (#{collection.to_sql}) AS datatables_total_count").rows[0][0] rescue 1)
+        end.to_i
+      end
     end
 
   end
