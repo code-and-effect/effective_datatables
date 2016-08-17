@@ -174,4 +174,5 @@ initializeDataTables = ->
 
 $ -> initializeDataTables()
 $(document).on 'page:change', -> initializeDataTables()
+$(document).on 'turbolinks:load', -> initializeDataTables()
 

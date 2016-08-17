@@ -11,3 +11,4 @@ initializeCharts = ->
 
 $ -> initializeCharts()
 $(document).on 'page:change', -> initializeCharts()
+$(document).on 'turbolinks:load', -> initializeCharts()
