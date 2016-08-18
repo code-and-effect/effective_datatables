@@ -127,6 +127,8 @@ module Effective
                 (obj.send(:roles) rescue [])
               elsif obj.kind_of?(Array) # Array backed collection
                 obj[opts[:array_index]]
+              elsif opts[:sql_as_column]
+                obj[name]
               else
                 obj.send(name)
               end
