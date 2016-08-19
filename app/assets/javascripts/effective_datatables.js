@@ -2,7 +2,7 @@
 //= require vendor/jszip.min
 
 //= require dataTables/jquery.dataTables.min
-//= require dataTables/jquery.dataTables.bootstrap
+//= require dataTables/dataTables.bootstrap
 
 //= require dataTables/buttons/dataTables.buttons
 //= require dataTables/buttons/buttons.bootstrap
