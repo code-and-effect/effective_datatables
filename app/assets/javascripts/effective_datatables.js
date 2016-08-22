@@ -1,9 +1,9 @@
 //= require vendor/jquery.delayedChange
+//= require dataTables/jszip/jszip
 
 //= require dataTables/jquery.dataTables
 //= require dataTables/dataTables.bootstrap
 
-//= require dataTables/jszip/jszip
 //= require dataTables/buttons/dataTables.buttons
 //= require dataTables/buttons/buttons.bootstrap
 //= require dataTables/buttons/buttons.colVis

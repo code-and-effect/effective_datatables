@@ -1,13 +1,7 @@
-@import 'dataTables/jquery.dataTables.min';
-@import 'dataTables/dataTables.bootstrap.min';
+@import 'dataTables/dataTables.bootstrap';
 
-@import 'dataTables/buttons/buttons.dataTables.min';
-@import 'dataTables/buttons/buttons.bootstrap.min';
-
-@import 'dataTables/colReorder/colReorder.dataTables.min';
-@import 'dataTables/colReorder/colReorder.bootstrap.min';
-
-@import 'dataTables/responsive/responsive.dataTables.min';
-@import 'dataTables/responsive/responsive.bootstrap.min';
+@import 'dataTables/buttons/buttons.bootstrap';
+@import 'dataTables/colReorder/colReorder.bootstrap';
+@import 'dataTables/responsive/responsive.bootstrap';
 
 @import 'effective_datatables/overrides';

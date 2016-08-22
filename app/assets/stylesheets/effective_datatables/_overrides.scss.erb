@@ -35,7 +35,6 @@ table.dataTable thead tr th {
   padding: 6px;
 
   .form-group { margin-bottom: 0px; font-weight: normal; }
-
 }
 
 table.dataTable td ul {
@@ -156,7 +155,6 @@ div.dataTables_wrapper div.dataTables_info {
 
       &:hover {
         background: none;
-        border: 1px solid transparent;
       }
 
       &:active {
@@ -180,4 +178,8 @@ table.dataTable.dtr-inline.collapsed > tbody > tr:not(.child) > th:first-child {
 // Column specific adjustments
 table.dataTable tbody {
   td.col-price { text-align: right; }
+
+  td.col-bulk_actions {
+    input[type='checkbox'] { margin-left: 3px; }
+  }
 }
