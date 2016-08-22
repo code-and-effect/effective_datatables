@@ -10,16 +10,20 @@ module Effective
       def display_table_columns
         return nil if params[:columns].blank?
 
-        @display_table_columns ||= params[:columns].each_with_object({}) do |(_, column), retval|
-          retval[column[:name]] = table_columns[column[:name]] # Same order as ColReordernow
-          retval[column[:name]][:visible] = (column[:visible] == 'true') # As per ColVis
-        end
+        @display_table_columns ||= (
+          {}.tap do |retval|
+            params[:columns].each do |_, column|
+              retval[column[:name]] = table_columns[column[:name]] # Same order as ColReordernow
+              retval[column[:name]][:visible] = (column[:visible] == 'true') # As per ColVis
+            end
+          end
+        )
       end
 
       def order_name
         @order_name ||= begin
           if params[:order] && params[:columns]
-            order_by_column_index = (params[:order].first[1][:column] rescue '0')
+            order_by_column_index = (params[:order]['0'][:column] rescue '0')
             (params[:columns][order_by_column_index] || {})[:name]
           elsif @default_order.present?
             @default_order.keys.first
@@ -33,7 +37,7 @@ module Effective
 
       def order_direction
         @order_direction ||= if params[:order].present?
-          params[:order].first[1][:dir] == 'desc' ? :desc : :asc
+          params[:order]['0'][:dir] == 'desc' ? :desc : :asc
         elsif @default_order.present?
           @default_order.values.first.to_s.downcase == 'desc' ? :desc : :asc
         else
