@@ -49,7 +49,7 @@ var _dtButtons = DataTable.ext.buttons;
 var Buttons = function( dt, config )
 {
 	// Allow a boolean true for defaults
-	if ( config === true ) {
+	if ( config === true || config === undefined ) {
 		config = {};
 	}
 
