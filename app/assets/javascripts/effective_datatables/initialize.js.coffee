@@ -73,7 +73,9 @@ initializeDataTables = ->
       drawCallback: (settings) ->
         $table = $(this.api().table().node())
         selected = $table.data('bulk-actions-restore-selected-values')
+
         completeBulkAction($table, selected) if selected && selected.length > 0
+
 
         if settings['json']
           if settings['json']['aggregates']
@@ -97,9 +99,11 @@ initializeDataTables = ->
         $input = $(input)
         $input.prop('checked', selected.indexOf($input.val()) > -1)
 
+      $table.data('bulk-actions-restore-selected-values', [])
+      $table.data('bulk-actions-block-processing-hide', true)
+
       $wrapper = $table.closest('.dataTables_wrapper')
       $wrapper.children().first().find('.buttons-bulk-actions').children('button').removeAttr('disabled')
-      $table.siblings('.dataTables_processing').html('Processing...')
 
     drawAggregates = ($table, aggregates) ->
       $tfoot = $table.find('tfoot').first()
@@ -173,6 +177,21 @@ initializeDataTables = ->
           $.event.trigger('page:change')
         , 700)
       )
+
+    # We borrow the Processing div for our bulk action success/error messages
+    # This makes sure that the message is displayed for 1500ms
+    datatable.on 'processing.dt', (event, settings, visible) ->
+      $table = $(event.currentTarget)
+
+      if !visible || $table.data('bulk-actions-block-processing-hide')
+        $table.data('bulk-actions-block-processing-hide', null)
+        $processing = $table.siblings('.dataTables_processing')
+        $processing.show()
+
+        setTimeout( =>
+          $processing.html('Processing...').hide()
+        , 1500)
+
 
 destroyDataTables = ->
   $('table.effective-datatable').each ->

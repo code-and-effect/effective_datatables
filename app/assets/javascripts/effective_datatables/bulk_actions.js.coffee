@@ -52,6 +52,7 @@ $(document).on 'click', '.buttons-bulk-actions a', (event) ->
     $table.siblings('.dataTables_processing').html(success)
   ).fail((response) ->
     error = response['message'] || "An error occured while attempting #{title} bulk action: #{response.statusText}"
+    $table.siblings('.dataTables_processing').html(error)
     alert(error)
   ).always((response) ->
     $table.dataTable().data('bulk-actions-restore-selected-values', values)
