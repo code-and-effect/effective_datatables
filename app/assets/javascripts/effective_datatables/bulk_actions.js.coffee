@@ -33,6 +33,7 @@ $(document).on 'click', '.buttons-bulk-actions a', (event) ->
   $bulkAction = $(event.currentTarget)  # This is a regular <a href=...> tag
   $wrapper = $bulkAction.closest('.dataTables_wrapper')
   $table = $wrapper.find('table.dataTable').first()
+  $processing = $table.siblings('.dataTables_processing').first()
   $selected = $table.find("input[data-role='bulk-actions-resource']:checked")
 
   url = $bulkAction.attr('href')
@@ -41,18 +42,20 @@ $(document).on 'click', '.buttons-bulk-actions a', (event) ->
 
   return unless url && values
 
-  # Show Processing... and disable the Bulk Actions dropdown
-  $table.siblings('.dataTables_processing').show()
-  $wrapper.children().first().find('.buttons-bulk-actions').children('button').attr('disabled', 'disabled')
+  # Disable the Bulk Actions dropdown, so only one can be run at a time
+  $bulkAction.closest('button').attr('disabled', 'disabled')
+
+  # Show Processing...
+  $processing.show().data('bulk-actions-processing', true)
 
   $.post(
     url, { ids: values }
   ).done((response) ->
     success = response['message'] || "Successfully completed #{title} bulk action"
-    $table.siblings('.dataTables_processing').html(success)
+    $processing.html(success)
   ).fail((response) ->
     error = response['message'] || "An error occured while attempting #{title} bulk action: #{response.statusText}"
-    $table.siblings('.dataTables_processing').html(error)
+    $processing.html(error)
     alert(error)
   ).always((response) ->
     $table.dataTable().data('bulk-actions-restore-selected-values', values)

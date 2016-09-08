@@ -72,10 +72,6 @@ initializeDataTables = ->
         initializeFilters(this.api())
       drawCallback: (settings) ->
         $table = $(this.api().table().node())
-        selected = $table.data('bulk-actions-restore-selected-values')
-
-        completeBulkAction($table, selected) if selected && selected.length > 0
-
 
         if settings['json']
           if settings['json']['aggregates']
@@ -83,6 +79,8 @@ initializeDataTables = ->
 
           if settings['json']['charts']
             drawCharts($table, settings['json']['charts'])
+
+        drawBulkActions($table)
 
     # Copies the bulk actions html, stored in a data attribute on the table, into the buttons area
     initializeBulkActions = (api) ->
@@ -94,16 +92,20 @@ initializeDataTables = ->
           .find('.dt-buttons').first().prepend(bulkActions['dropdownHtml'])
 
     # After we perform a bulk action, we have to re-select the checkboxes manually and do a bit of house keeping
-    completeBulkAction = ($table, selected) ->
-      $table.find("input[data-role='bulk-actions-resource']").each (_, input) ->
-        $input = $(input)
-        $input.prop('checked', selected.indexOf($input.val()) > -1)
+    drawBulkActions = ($table) ->
+      selected = $table.data('bulk-actions-restore-selected-values')
 
-      $table.data('bulk-actions-restore-selected-values', [])
-      $table.data('bulk-actions-block-processing-hide', true)
+      $bulkActions = $table.closest('.dataTables_wrapper').children().first().find('.buttons-bulk-actions').children('button')
 
-      $wrapper = $table.closest('.dataTables_wrapper')
-      $wrapper.children().first().find('.buttons-bulk-actions').children('button').removeAttr('disabled')
+      if selected && selected.length > 0
+        $table.find("input[data-role='bulk-actions-resource']").each (_, input) ->
+          $input = $(input)
+          $input.prop('checked', selected.indexOf($input.val()) > -1)
+
+        $bulkActions.removeAttr('disabled')
+        $table.data('bulk-actions-restore-selected-values', [])
+      else
+        $bulkActions.attr('disabled', 'disabled')
 
     drawAggregates = ($table, aggregates) ->
       $tfoot = $table.find('tfoot').first()
@@ -181,17 +183,16 @@ initializeDataTables = ->
     # We borrow the Processing div for our bulk action success/error messages
     # This makes sure that the message is displayed for 1500ms
     datatable.on 'processing.dt', (event, settings, visible) ->
-      $table = $(event.currentTarget)
+      $processing = $(event.currentTarget).siblings('.dataTables_processing').first()
+      return unless $processing.data('bulk-actions-processing')
 
-      if !visible || $table.data('bulk-actions-block-processing-hide')
-        $table.data('bulk-actions-block-processing-hide', null)
-        $processing = $table.siblings('.dataTables_processing')
-        $processing.show()
-
-        setTimeout( =>
+      timeout = $processing.show().data('timeout')
+      clearTimeout(timeout) if timeout
+      $processing.data('timeout', setTimeout( =>
           $processing.html('Processing...').hide()
+          $processing.data('bulk-actions-processing', null)
         , 1500)
-
+      )
 
 destroyDataTables = ->
   $('table.effective-datatable').each ->
