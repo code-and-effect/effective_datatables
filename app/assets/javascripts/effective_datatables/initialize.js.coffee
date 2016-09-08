@@ -146,6 +146,8 @@ initializeDataTables = ->
 
     # Do the actual search
     dataTableSearch = ($input) ->   # This is the function called by a select or input to run the search
+      return if $input.is(':invalid')
+
       table = $input.closest('table.dataTable')
       table.DataTable().column("#{$input.data('column-name')}:name").search($input.val()).draw()
 

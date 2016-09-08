@@ -114,8 +114,12 @@ module Effective
               :has_and_belongs_to_many
             elsif cols[name][:bulk_actions_column]
               :bulk_actions_column
-            elsif name.include?('_address') && (collection_class.new rescue nil).respond_to?(:effective_addresses)
+            elsif name.include?('_address') && defined?(EffectiveAddresses) && (collection_class.new rescue nil).respond_to?(:effective_addresses)
               :effective_address
+            elsif name == 'id' && defined?(EffectiveObfuscation) && collection.respond_to?(:deobfuscate)
+              :obfuscated_id
+            elsif name == 'roles' && defined?(EffectiveRoles) && collection.respond_to?(:with_role)
+              :effective_roles
             elsif sql_column.try(:type).present?
               sql_column.type
             elsif name.end_with?('_id')
@@ -132,22 +136,14 @@ module Effective
             cols[name][:format] = :non_formatted_integer
           end
 
-          # We can't really sort a HasMany or EffectiveAddress field
-          if [:has_many, :effective_address].include?(cols[name][:type])
+          # Sortable - Disable sorting on these types
+          if [:has_many, :effective_address, :obfuscated_id].include?(cols[name][:type])
             cols[name][:sortable] = false
-          end
-
-          # EffectiveObfuscation
-          if name == 'id' && defined?(EffectiveObfuscation) && collection.respond_to?(:deobfuscate)
-            cols[name][:sortable] = false
-            cols[name][:type] = :obfuscated_id
           end
 
           # EffectiveRoles, if you do table_column :roles, everything just works
-          if name == 'roles' && defined?(EffectiveRoles) && collection.respond_to?(:with_role)
-            cols[name][:sortable] = true
+          if cols[name][:type] == :effective_roles
             cols[name][:column] = sql_table.present? ? "#{quote_sql(sql_table.name)}.#{quote_sql('roles_mask')}" : name
-            cols[name][:type] = :effective_roles
           end
 
           if sql_table.present? && sql_column.blank? # This is a SELECT AS column, or a JOIN column
@@ -256,6 +252,8 @@ module Effective
           {as: :string}
         when :effective_roles
           {as: :select, collection: EffectiveRoles.roles}
+        when :obfuscated_id
+          {as: :obfuscated_id}
         when :integer
           {as: :number}
         when :boolean
