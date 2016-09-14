@@ -146,7 +146,7 @@ module Effective
             cols[name][:column] = sql_table.present? ? "#{quote_sql(sql_table.name)}.#{quote_sql('roles_mask')}" : name
           end
 
-          if sql_table.present? && sql_column.blank? # This is a SELECT AS column, or a JOIN column
+          if sql_table.present? && sql_column.blank? && !cols[name][:array_column] # This is a SELECT AS column, or a JOIN column
             cols[name][:sql_as_column] = true
           end
 
