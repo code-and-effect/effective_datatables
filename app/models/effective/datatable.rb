@@ -182,6 +182,9 @@ module Effective
       @array_tool ||= ArrayDatatableTool.new(self, table_columns.select { |_, col| col[:array_column] })
     end
 
+    # TODO
+    # Check if collection has an order() clause and warn about it
+    # Usually that will make the table results look weird.
     def active_record_collection?
       @active_record_collection ||= (collection.ancestors.include?(ActiveRecord::Base) rescue false)
     end
