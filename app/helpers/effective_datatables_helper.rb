@@ -1,6 +1,6 @@
 module EffectiveDatatablesHelper
   def render_datatable(datatable, input_js_options = nil)
-    return unless datatable.present?
+    return if datatable.nil?
     datatable.view ||= self
 
     render partial: 'effective/datatables/datatable',
@@ -41,7 +41,7 @@ module EffectiveDatatablesHelper
   end
 
   def render_simple_datatable(datatable, input_js_options = nil)
-    return unless datatable.present?
+    return if datatable.nil?
     datatable.view ||= self
     datatable.simple = true
 
