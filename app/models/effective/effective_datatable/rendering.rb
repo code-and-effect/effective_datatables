@@ -108,9 +108,9 @@ module Effective
               elsif opts[:proc]
                 view.instance_exec(obj, collection, self, &opts[:proc])
               elsif opts[:type] == :belongs_to
-                (obj.send(name) rescue nil)
+                (obj.send(name) rescue nil).to_s
               elsif opts[:type] == :belongs_to_polymorphic
-                (obj.send(name) rescue nil)
+                (obj.send(name) rescue nil).to_s
               elsif opts[:type] == :has_many
                 (obj.send(name).map { |obj| obj.to_s }.join('<br>') rescue BLANK)
               elsif opts[:type] == :has_and_belongs_to_many
