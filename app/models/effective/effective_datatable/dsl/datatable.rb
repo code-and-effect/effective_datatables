@@ -27,6 +27,8 @@ module Effective
         end
 
         def actions_column(options = {}, proc = nil, &block)
+          raise 'first parameter to actions_column should be a hash' unless options.kind_of?(Hash)
+
           show = options.fetch(:show, (EffectiveDatatables.actions_column[:show] rescue false))
           edit = options.fetch(:edit, (EffectiveDatatables.actions_column[:edit] rescue false))
           destroy = options.fetch(:destroy, (EffectiveDatatables.actions_column[:destroy] rescue false))
@@ -34,6 +36,7 @@ module Effective
           name = options.fetch(:name, 'actions')
 
           opts = {
+            type: :actions,
             sortable: false,
             filter: false,
             responsivePriority: 0,
@@ -47,6 +50,8 @@ module Effective
         end
 
         def bulk_actions_column(options = {}, proc = nil, &block)
+          raise 'first parameter to bulk_actions_column should be a hash' unless options.kind_of?(Hash)
+
           name = options.fetch(:name, 'bulk_actions')
           resource_method = options.fetch(:resource_method, :to_param)
 

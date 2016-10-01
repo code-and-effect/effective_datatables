@@ -23,30 +23,23 @@
     unarchive_action = instance_exec(resource, &unarchive_action)
   end
 
-- if show_action
-  - url = (polymorphic_path([*controller_namespace, resource]) rescue nil) || (polymorphic_path(resource) rescue nil)
-  - if url.present?
-    %a{href: url, title: 'Show'}
-      %span.glyphicon.glyphicon-eye-open
+- if show_action && show_path
+  %a{href: show_path.gsub(':to_param', resource.to_param), title: 'Show'}
+    %span.glyphicon.glyphicon-eye-open
 
-- if edit_action
-  - url = (edit_polymorphic_path([*controller_namespace, resource]) rescue nil) || (edit_polymorphic_path(resource) rescue nil)
-  - if url.present?
-    %a{href: url, title: 'Edit'}
-      %span.glyphicon.glyphicon-edit
+- if edit_action && edit_path
+  %a{href: edit_path.gsub(':to_param', resource.to_param), title: 'Edit'}
+    %span.glyphicon.glyphicon-edit
 
-- if destroy_action
-  - url = (polymorphic_path([*controller_namespace, resource]) rescue nil) || (polymorphic_path(resource) rescue nil)
-  - if url.present?
-    - if resource.respond_to?(:archived?) && !resource.archived?
-      %a{href: url, title: 'Archive', data: {method: :delete, confirm: "Are you sure you want to archive this item?"}}
-        %span.glyphicon.glyphicon-trash
-    - elsif resource.respond_to?(:archived?) == false
-      %a{href: url, title: 'Delete', data: {method: :delete, confirm: "Are you sure you want to delete this item?"}}
-        %span.glyphicon.glyphicon-trash
+- if destroy_action && destroy_path
+  - if resource.respond_to?(:archived?) && !resource.archived?
+    %a{href: destroy_path.gsub(':to_param', resource.to_param), title: 'Archive', data: {method: :delete, confirm: "Are you sure you want to archive this item?"}}
+      %span.glyphicon.glyphicon-trash
+  - elsif resource.respond_to?(:archived?) == false
+    %a{href: destroy_path.gsub(':to_param', resource.to_param), title: 'Delete', data: {method: :delete, confirm: "Are you sure you want to delete this item?"}}
+      %span.glyphicon.glyphicon-trash
 
-- if unarchive_action && resource.respond_to?(:archived?) && resource.archived?
-  - url = (polymorphic_path([*controller_namespace, resource], action: :unarchive) rescue nil) || (polymorphic_path(resource, action: :unarchive) rescue nil)
-  - if url.present?
-    %a{href: url, title: 'Unarchive', data: {confirm: 'Are you sure you want to unarchive this item?'}}
+- if unarchive_action && unarchive_path
+  - if resource.respond_to?(:archived?) && resource.archived?
+    %a{href: unarchive_path.gsub(':to_param', resource.to_param), title: 'Unarchive', data: {confirm: 'Are you sure you want to unarchive this item?'}}
       %span.glyphicon.glyphicon-retweet
