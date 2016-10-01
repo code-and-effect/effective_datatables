@@ -88,6 +88,22 @@ module EffectiveDatatablesHelper
     glyphicon_to('retweet', path, defaults.merge(options))
   end
 
+  def settings_icon_to(path, options = {})
+    glyphicon_to('cog', path, {title: 'Settings'}.merge(options))
+  end
+
+  def ok_icon_to(path, options = {})
+    glyphicon_to('ok', path, {title: 'OK'}.merge(options))
+  end
+
+  def approve_icon_to(path, options = {})
+    glyphicon_to('ok', path, {title: 'Approve'}.merge(options))
+  end
+
+  def remove_icon_to(path, options = {})
+    glyphicon_to('remove', path, {title: 'Remove'}.merge(options))
+  end
+
   def glyphicon_to(icon, path, options = {})
     content_tag(:a, options.merge(href: path)) do
       if icon.start_with?('glyphicon-')
