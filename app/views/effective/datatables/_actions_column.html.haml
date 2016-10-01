@@ -24,22 +24,17 @@
   end
 
 - if show_action && show_path
-  %a{href: show_path.gsub(':to_param', resource.to_param), title: 'Show'}
-    %span.glyphicon.glyphicon-eye-open
+  = show_icon_to show_path.gsub(':to_param', resource.to_param)
 
 - if edit_action && edit_path
-  %a{href: edit_path.gsub(':to_param', resource.to_param), title: 'Edit'}
-    %span.glyphicon.glyphicon-edit
+  = edit_icon_to edit_path.gsub(':to_param', resource.to_param)
 
 - if destroy_action && destroy_path
   - if resource.respond_to?(:archived?) && !resource.archived?
-    %a{href: destroy_path.gsub(':to_param', resource.to_param), title: 'Archive', data: {method: :delete, confirm: "Are you sure you want to archive this item?"}}
-      %span.glyphicon.glyphicon-trash
+    = archive_icon_to destroy_path.gsub(':to_param', resource.to_param)
   - elsif resource.respond_to?(:archived?) == false
-    %a{href: destroy_path.gsub(':to_param', resource.to_param), title: 'Delete', data: {method: :delete, confirm: "Are you sure you want to delete this item?"}}
-      %span.glyphicon.glyphicon-trash
+    = destroy_icon_to destroy_path.gsub(':to_param', resource.to_param)
 
 - if unarchive_action && unarchive_path
   - if resource.respond_to?(:archived?) && resource.archived?
-    %a{href: unarchive_path.gsub(':to_param', resource.to_param), title: 'Unarchive', data: {confirm: 'Are you sure you want to unarchive this item?'}}
-      %span.glyphicon.glyphicon-retweet
+    = unarchive_icon_to unarchive_path.gsub(':to_param', resource.to_param)

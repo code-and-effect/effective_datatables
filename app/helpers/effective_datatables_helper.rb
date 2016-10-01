@@ -163,4 +163,34 @@ module EffectiveDatatablesHelper
     attributes[:active_admin_path] rescue false
   end
 
+  ### Icon Helpers for actions_column
+  def show_icon_to(path, options = {})
+    bootstrap_icon_to(path, 'glyphicon-eye-open', {title: 'Show'}.merge(options))
+  end
+
+  def edit_icon_to(path, options = {})
+    bootstrap_icon_to(path, 'glyphicon-edit', {title: 'Edit'}.merge(options))
+  end
+
+  def destroy_icon_to(path, options = {})
+    defaults = {title: 'Destroy', data: {method: :delete, confirm: 'Delete this item?'}}
+    bootstrap_icon_to(path, 'glyphicon-trash', defaults.merge(options))
+  end
+
+  def archive_icon_to(path, options = {})
+    defaults = {title: 'Archive', data: {method: :delete, confirm: 'Archive this item?'}}
+    bootstrap_icon_to(path, 'glyphicon-trash', defaults.merge(options))
+  end
+
+  def unarchive_icon_to(path, options = {})
+    defaults = {title: 'Unarchive', data: {confirm: 'Unarchive this item?'}}
+    bootstrap_icon_to(path, 'glyphicon-retweet', defaults.merge(options))
+  end
+
+  def bootstrap_icon_to(path, glyphicon, options = {})
+    content_tag(:a, options.merge(href: path)) do
+      content_tag(:span, '', class: "glyphicon #{glyphicon}")
+    end
+  end
+
 end

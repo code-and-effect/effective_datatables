@@ -13,7 +13,7 @@ module Effective
 
         def table_column(name, options = {}, proc = nil, &block)
           if block_given?
-            raise "You cannot use partial: ... with the block syntax" if options[:partial]
+            raise "You cannot use partial: ... with the block syntax" if options[:partial] && !options[:type] == :actions
             raise "You cannot use proc: ... with the block syntax" if options[:proc]
             options[:block] = block
           end
@@ -44,7 +44,7 @@ module Effective
           }.merge(options)
 
           opts[:partial_local] ||= :resource unless opts[:partial].present?
-          opts[:partial] ||= '/effective/datatables/actions_column' unless (block_given? || proc.present?)
+          opts[:partial] ||= '/effective/datatables/actions_column' unless proc.present?
 
           table_column(name, opts, proc, &block)
         end

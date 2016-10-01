@@ -83,12 +83,20 @@ module Effective
             begin
               if opts[:visible] == false
                 BLANK
-              elsif opts[:partial]
-                rendered[name][index]
               elsif opts[:block]
-                view.instance_exec(obj, collection, self, &opts[:block])
+                begin
+                  view.instance_exec(obj, collection, self, &opts[:block])
+                rescue NoMethodError => e
+                  if opts[:type] == :actions && e.message == 'super called outside of method'
+                    rendered[name][index]
+                  else
+                    raise(e)
+                  end
+                end
               elsif opts[:proc]
                 view.instance_exec(obj, collection, self, &opts[:proc])
+              elsif opts[:partial]
+                rendered[name][index]
               elsif opts[:type] == :belongs_to
                 (obj.send(name) rescue nil).to_s
               elsif opts[:type] == :belongs_to_polymorphic
