@@ -2,11 +2,12 @@
 module EffectiveDatatablesHelper
 
   def render_datatable(datatable, input_js_options = nil)
-    return if datatable.nil?
+    raise 'expected datatable to be present' unless datatable
+
     datatable.view ||= self
 
     begin
-      EffectiveDatatables.authorized?(controller, :index, datatable.try(:collection_class) || datatable.try(:class))
+      EffectiveDatatables.authorized?(controller, :index, datatable.try(:collection_class) || datatable.try(:class)) || raise('unauthorized')
     rescue => e
       return content_tag(:p, "You are not authorized to view this datatable. (cannot :index, #{datatable.try(:collection_class) || datatable.try(:class)})")
     end
@@ -16,12 +17,13 @@ module EffectiveDatatablesHelper
   end
 
   def render_simple_datatable(datatable, input_js_options = nil)
-    return if datatable.nil?
+    raise 'expected datatable to be present' unless datatable
+
     datatable.view ||= self
     datatable.simple = true
 
     begin
-      EffectiveDatatables.authorized?(controller, :index, datatable.try(:collection_class) || datatable.try(:class))
+      EffectiveDatatables.authorized?(controller, :index, datatable.try(:collection_class) || datatable.try(:class)) || raise('unauthorized')
     rescue => e
       return content_tag(:p, "You are not authorized to view this datatable. (cannot :index, #{datatable.try(:collection_class) || datatable.try(:class)})")
     end
@@ -31,6 +33,8 @@ module EffectiveDatatablesHelper
   end
 
   def render_datatable_scopes(datatable)
+    raise 'expected datatable to be present' unless datatable
+
     return unless datatable.scopes.present?
     datatable.view ||= self
 
@@ -38,6 +42,8 @@ module EffectiveDatatablesHelper
   end
 
   def render_datatable_charts(datatable)
+    raise 'expected datatable to be present' unless datatable
+
     return unless datatable.charts.present?
     datatable.view ||= self
 
@@ -45,6 +51,8 @@ module EffectiveDatatablesHelper
   end
 
   def render_datatable_chart(datatable, name)
+    raise 'expected datatable to be present' unless datatable
+
     return unless datatable.charts.present?
     return unless datatable.charts[name].present?
     datatable.view ||= self
