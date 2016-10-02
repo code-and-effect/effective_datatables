@@ -5,8 +5,29 @@ module EffectiveDatatablesHelper
     return if datatable.nil?
     datatable.view ||= self
 
+    begin
+      EffectiveDatatables.authorized?(controller, :index, datatable.try(:collection_class) || datatable.try(:class))
+    rescue => e
+      return content_tag(:p, "You are not authorized to view this datatable. (cannot :index, #{datatable.try(:collection_class) || datatable.try(:class)})")
+    end
+
     render partial: 'effective/datatables/datatable',
       locals: { datatable: datatable, input_js_options: input_js_options.try(:to_json) }
+  end
+
+  def render_simple_datatable(datatable, input_js_options = nil)
+    return if datatable.nil?
+    datatable.view ||= self
+    datatable.simple = true
+
+    begin
+      EffectiveDatatables.authorized?(controller, :index, datatable.try(:collection_class) || datatable.try(:class))
+    rescue => e
+      return content_tag(:p, "You are not authorized to view this datatable. (cannot :index, #{datatable.try(:collection_class) || datatable.try(:class)})")
+    end
+
+    render partial: 'effective/datatables/datatable',
+      locals: {datatable: datatable, input_js_options: input_js_options.try(:to_json) }
   end
 
   def render_datatable_scopes(datatable)
@@ -40,15 +61,6 @@ module EffectiveDatatablesHelper
 
     render partial: (options[:partial] || 'effective/datatables/chart'),
       locals: { datatable: datatable, chart: chart }
-  end
-
-  def render_simple_datatable(datatable, input_js_options = nil)
-    return if datatable.nil?
-    datatable.view ||= self
-    datatable.simple = true
-
-    render partial: 'effective/datatables/datatable',
-      locals: {datatable: datatable, input_js_options: input_js_options.try(:to_json) }
   end
 
   def datatables_admin_path?

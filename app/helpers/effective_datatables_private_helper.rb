@@ -53,8 +53,8 @@ module EffectiveDatatablesPrivateHelper
         placeholder: placeholder,
         input_html: { name: nil, value: value, title: title, pattern: pattern, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} }
     when :obfuscated_id
-      pattern ||= "[0-9]{3}-?[0-9]{4}-?[0-9]{3}"
-      title = opts[:filter].key?(:title) ? opts[:filter][:title] : "Expected format: XXX-XXXX-XXX"
+      pattern ||= '[0-9]{3}-?[0-9]{4}-?[0-9]{3}'
+      title = opts[:filter].key?(:title) ? opts[:filter][:title] : 'Expected format: XXX-XXXX-XXX'
 
       form.input name, label: false, required: false, value: value,
         as: :string,
