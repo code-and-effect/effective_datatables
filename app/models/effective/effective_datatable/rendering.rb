@@ -118,7 +118,7 @@ module Effective
               elsif obj.kind_of?(Array) # Array backed collection
                 obj[opts[:array_index]]
               elsif opts[:sql_as_column]
-                obj[name]
+                obj[name] || obj.send(name)
               else
                 obj.send(name)
               end
@@ -219,8 +219,6 @@ module Effective
       def add_actions_column_locals(locals)
         return unless active_record_collection?
 
-        # Consider authorization levels first
-
         if locals[:show_action] == :authorize
           locals[:show_action] = (EffectiveDatatables.authorized?(controller, :show, collection_class) rescue false)
         end
@@ -244,6 +242,7 @@ module Effective
         begin
           resource = collection_class.new(id: 123)
           resource.define_singleton_method(:persisted?) { true }  # We override persisted? to get the correct action urls
+          raise 'no to param' unless resource.to_param.present?
         rescue => e
           return
         end
@@ -261,7 +260,7 @@ module Effective
 
           # So if we have a URL, this is an action we can link to
           if url
-            locals[:show_path] = url.gsub('123', ':to_param')
+            locals[:show_path] = url.gsub("/#{resource.to_param}", '/:to_param')
           else
             locals[:show_action] = false
           end
@@ -280,7 +279,7 @@ module Effective
 
           # So if we have a URL, this is an action we can link to
           if url
-            locals[:edit_path] = url.gsub('123', ':to_param')
+            locals[:edit_path] = url.gsub("/#{resource.to_param}", '/:to_param')
           else
             locals[:edit_action] = false
           end
@@ -299,7 +298,7 @@ module Effective
 
           # So if we have a URL, this is an action we can link to
           if url
-            locals[:destroy_path] = url.gsub('123', ':to_param')
+            locals[:destroy_path] = url.gsub("/#{resource.to_param}", '/:to_param')
           else
             locals[:destroy_action] = false
           end
@@ -319,7 +318,7 @@ module Effective
 
             # So if we have a URL, this is an action we can link to
             if url
-              locals[:unarchive_path] = url.gsub('123', ':to_param')
+              locals[:unarchive_path] = url.gsub("/#{resource.to_param}", '/:to_param')
             else
               locals[:unarchive_action] = false
             end
