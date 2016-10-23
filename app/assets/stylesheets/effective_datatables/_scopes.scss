@@ -1,8 +1,8 @@
 .effective-datatable-scopes {
   .form-inline {
-    .form-control {
-      margin-left: 10px;
-      margin-right: 10px;
+    .form-control, input[type='submit'] {
+      margin-left: 8px;
     }
   }
+  margin-bottom: 12px;
 }

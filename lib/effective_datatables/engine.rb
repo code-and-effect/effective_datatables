@@ -9,6 +9,8 @@ module EffectiveDatatables
       ActiveSupport.on_load :action_controller do
         helper EffectiveDatatablesHelper
         helper EffectiveDatatablesPrivateHelper
+
+        ActionController::Base.send :include, ::EffectiveDatatablesControllerHelper
       end
     end
 
