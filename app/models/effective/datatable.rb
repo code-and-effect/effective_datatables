@@ -23,7 +23,7 @@ module Effective
     def initialize(*args)
       if args.present? && args.first != nil
         raise "#{self.class.name}.new() can only be initialized with a Hash like arguments" unless args.first.kind_of?(Hash)
-        args.first.each { |k, v| self.attributes[k] = v }
+        args.first.each { |k, v| self.attributes[k] = v.presence }
       end
 
       if respond_to?(:initialize_scopes)  # There was at least one scope defined in the scopes do .. end block

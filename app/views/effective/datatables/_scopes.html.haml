@@ -1,5 +1,5 @@
 .row
-  .col-sm-12
+  .col-sm-12.effective-datatable-scopes
     = simple_form_for :scopes, url: request.path, method: :get, html: { class: 'form-inline' } do |form|
 
       - datatable.scopes.each do |name, options|

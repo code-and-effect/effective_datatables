@@ -31,9 +31,14 @@ module Effective
       # We want to make sure an input_html: { value: default } exists
       def _initialize_scope_options(scopes)
         (scopes || []).each do |name, options|
-          value = attributes.key?(name) ? attributes[name] : options[:default]
+          value = attributes.key?(name) ? attributes[name].presence : options[:default]
 
-          if (options[:fallback] || options[:presence]) && attributes[name].blank? && attributes[name] != false
+          if attributes.key?(name) == false
+            self.attributes[name] = options[:default]
+            value = options[:default]
+          end
+
+          if (options[:fallback] || options[:presence]) && attributes[name].blank?
             self.attributes[name] = options[:default]
             value = options[:default]
           end
