@@ -81,7 +81,7 @@ module Effective
         collection.each_with_index.map do |obj, index|
           (display_table_columns || table_columns).map do |name, opts|
             begin
-              if opts[:visible] == false
+              if opts[:visible] == false && (name != order_name.to_s) # Sort by invisible array column
                 BLANK
               elsif opts[:block]
                 begin
