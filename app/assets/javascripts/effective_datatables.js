@@ -1,4 +1,5 @@
 //= require vendor/jquery.delayedChange
+//= require vendor/jquery.fileDownload
 //= require dataTables/jszip/jszip
 
 //= require dataTables/jquery.dataTables

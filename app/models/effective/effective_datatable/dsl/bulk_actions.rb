@@ -8,6 +8,10 @@ module Effective
           concat content_tag(:li, link_to(*args))
         end
 
+        def bulk_download(*args)
+          concat content_tag(:li, link_to(*args), 'data-authenticity-token' => form_authenticity_token)
+        end
+
         def bulk_action_divider
           concat content_tag(:li, '', class: 'divider', role: 'separator')
         end

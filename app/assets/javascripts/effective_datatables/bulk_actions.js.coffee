@@ -39,6 +39,7 @@ $(document).on 'click', '.buttons-bulk-actions a', (event) ->
   url = $bulkAction.attr('href')
   title = $bulkAction.text()
   values = $.map($selected, (input) -> input.getAttribute('value'))
+  token = $bulkAction.parent('li').data('authenticity-token')
 
   return unless url && values
 
@@ -48,16 +49,33 @@ $(document).on 'click', '.buttons-bulk-actions a', (event) ->
   # Show Processing...
   $processing.show().data('bulk-actions-processing', true)
 
-  $.post(
-    url, { ids: values }
-  ).done((response) ->
-    success = response['message'] || "Successfully completed #{title} bulk action"
-    $processing.html(success)
-  ).fail((response) ->
-    error = response['message'] || "An error occured while attempting #{title} bulk action: #{response.statusText}"
-    $processing.html(error)
-    alert(error)
-  ).always((response) ->
-    $table.dataTable().data('bulk-actions-restore-selected-values', values)
-    $table.DataTable().draw()
-  )
+  if token # This is a file download
+    $.fileDownload(url,
+      httpMethod: 'POST',
+      data: { ids: values, authenticity_token: token }
+      successCallback: ->
+        success = "Successfully completed #{title} bulk action"
+        $processing.html(success)
+        $table.dataTable().data('bulk-actions-restore-selected-values', values)
+        $table.DataTable().draw()
+      failCallback:  ->
+        error = "An error occured while attempting #{title} bulk action"
+        $processing.html(error)
+        alert(error)
+        $table.dataTable().data('bulk-actions-restore-selected-values', values)
+        $table.DataTable().draw()
+    )
+  else # Normal AJAX post
+    $.post(
+      url, { ids: values }
+    ).done((response) ->
+      success = response['message'] || "Successfully completed #{title} bulk action"
+      $processing.html(success)
+    ).fail((response) ->
+      error = response['message'] || "An error occured while attempting #{title} bulk action: #{response.statusText}"
+      $processing.html(error)
+      alert(error)
+    ).always((response) ->
+      $table.dataTable().data('bulk-actions-restore-selected-values', values)
+      $table.DataTable().draw()
+    )
