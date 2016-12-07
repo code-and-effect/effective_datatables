@@ -6,9 +6,8 @@ module EffectiveDatatables
       source_root File.expand_path("../../templates", __FILE__)
 
       def copy_initializer
-        template 'effective_datatables.rb', 'config/initializers/effective_datatables.rb'
+        template ('../' * 3) + 'config/effective_datatables.rb', 'config/initializers/effective_datatables.rb'
       end
-
     end
   end
 end

@@ -18,8 +18,7 @@ EffectiveDatatables.setup do |config|
   #
   # Or disable the check completely:
   # config.authorization_method = false
-
-  config.authorization_method = Proc.new { |controller, action, resource| true } # All users can see every screen
+  config.authorization_method = Proc.new { |controller, action, resource| authorize!(action, resource) } # CanCanCan
 
   # Date & DateTime Format
   # By default, format Date and DateTime values with the following
