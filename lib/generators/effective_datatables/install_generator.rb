@@ -6,12 +6,9 @@ module EffectiveDatatables
       source_root File.expand_path("../../templates", __FILE__)
 
       def copy_initializer
-        template "effective_datatables.rb", "config/initializers/effective_datatables.rb"
+        template 'effective_datatables.rb', 'config/initializers/effective_datatables.rb'
       end
 
-      def show_readme
-        readme "README" if behavior == :invoke
-      end
     end
   end
 end
