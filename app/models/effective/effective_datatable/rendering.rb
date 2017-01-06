@@ -19,27 +19,33 @@ module Effective
           if table_tool.search_terms.present? && array_tool.search_terms.blank?
             self.display_records = active_record_collection_size(col)
           end
+
+          if array_tool.search_terms.present?
+            col = self.arrayize(col)
+            col = array_tool.search(col)
+            self.display_records = col.size
+          end
+
+          if array_tool.order_by_column.present?
+            col = self.arrayize(col)
+            col = array_tool.order(col)
+          end
         end
 
-        if array_tool.search_terms.present?
-          col = self.arrayize(col)
-          col = array_tool.search(col)
-          self.display_records = col.size
-        end
-
-        if array_tool.order_by_column.present?
-          col = self.arrayize(col)
+        if array_collection?
           col = array_tool.order(col)
+          col = array_tool.search(col)
         end
 
         self.display_records ||= total_records
 
-        if col.kind_of?(Array)
+        if array_collection?
           col = array_tool.paginate(col)
         else
           col = table_tool.paginate(col)
-          col = self.arrayize(col)
         end
+
+        col = self.arrayize(col)
 
         self.format(col)
         col = self.finalize(col)
@@ -85,7 +91,11 @@ module Effective
                 BLANK
               elsif opts[:block]
                 begin
-                  view.instance_exec(obj, collection, self, &opts[:block])
+                  if active_record_collection?
+                    view.instance_exec(obj, collection, self, &opts[:block])
+                  else
+                    view.instance_exec(obj, obj[opts[:array_index]], collection, self, &opts[:block])
+                  end
                 rescue NoMethodError => e
                   if opts[:type] == :actions && e.message == 'super called outside of method'
                     rendered[name][index]
@@ -94,7 +104,11 @@ module Effective
                   end
                 end
               elsif opts[:proc]
-                view.instance_exec(obj, collection, self, &opts[:proc])
+                if active_record_collection?
+                  view.instance_exec(obj, collection, self, &opts[:proc])
+                else
+                  view.instance_exec(obj, obj[opts[:array_index]], collection, self, &opts[:proc])
+                end
               elsif opts[:partial]
                 rendered[name][index]
               elsif opts[:type] == :belongs_to

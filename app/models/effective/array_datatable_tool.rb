@@ -30,7 +30,7 @@ module Effective
       if direction == :asc
         collection.sort! do |x, y|
           if (x[index] && y[index])
-            convert_to_column_type(table_column, x[index]) <=> convert_to_column_type(table_column, y[index])
+            x[index] <=> y[index]
           elsif x[index]
             -1
           elsif y[index]
@@ -42,7 +42,7 @@ module Effective
       else
         collection.sort! do |x, y|
           if (x[index] && y[index])
-            convert_to_column_type(table_column, y[index]) <=> convert_to_column_type(table_column, x[index])
+            y[index] <=> x[index]
           elsif x[index]
             1
           elsif y[index]
@@ -70,7 +70,7 @@ module Effective
 
       collection.select! do |row|
         if table_column[:filter][:fuzzy]
-          convert_to_column_type(table_column, row[index]).to_s.downcase.include?(search_term)
+          row[index].to_s.downcase.include?(search_term)
         else
           row[index] == search_term
         end

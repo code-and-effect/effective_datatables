@@ -134,7 +134,7 @@ module Effective
             end
           )
 
-          cols[name][:class] = "col-#{cols[name][:type]} col-#{name} #{cols[name][:class]}".strip
+          cols[name][:class] = "col-#{cols[name][:type]} col-#{name.parameterize} #{cols[name][:class]}".strip
 
           # Formats
           if name == 'id' || name.include?('year') || name.end_with?('_id')

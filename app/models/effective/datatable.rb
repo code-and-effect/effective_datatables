@@ -186,11 +186,19 @@ module Effective
     # Check if collection has an order() clause and warn about it
     # Usually that will make the table results look weird.
     def active_record_collection?
-      @active_record_collection ||= (collection.ancestors.include?(ActiveRecord::Base) rescue false)
+      if @active_record_collection == nil
+        @active_record_collection = (collection.ancestors.include?(ActiveRecord::Base) rescue false)
+      end
+
+      @active_record_collection
     end
 
     def array_collection?
-      collection.kind_of?(Array) && collection.first.kind_of?(Array)
+      if @array_collection == nil
+        @array_collection = (collection.kind_of?(Array) && collection.first.kind_of?(Array))
+      end
+
+      @array_collection
     end
 
     # Not every ActiveRecord query will work when calling the simple .count
