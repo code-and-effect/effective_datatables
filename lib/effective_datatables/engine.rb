@@ -2,7 +2,7 @@ module EffectiveDatatables
   class Engine < ::Rails::Engine
     engine_name 'effective_datatables'
 
-    config.autoload_paths += Dir["#{config.root}/app/models/concerns"]
+    config.autoload_paths += Dir["#{config.root}/app/models/concerns", '/app/datatables/**/']
 
     # Include Helpers to base application
     initializer 'effective_datatables.action_controller' do |app|

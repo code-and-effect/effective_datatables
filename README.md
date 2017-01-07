@@ -48,33 +48,27 @@ We create a model, initialize it within our controller, then render it from a vi
 
 ### The Model
 
-Start by creating a model in the `/app/models/effective/datatables/` directory.
-
-Any `Effective::Datatable` models that exist in this directory will be automatically detected and 'just work'.
+Start by creating a new datatable.
 
 Below is a very simple example file, which we will expand upon later.
 
-This model exists at `/app/models/effective/datatables/posts.rb`:
+This model exists at `/app/datatables/posts_datatable.rb`:
 
 ```ruby
-module Effective
-  module Datatables
-    class Posts < Effective::Datatable
-      datatable do
-        table_column :id
-        table_column :user      # if Post belongs_to :user
-        table_column :comments  # if Post has_many :comments
-        table_column :title
-        table_column :created_at
-        actions_column
-      end
-
-      def collection
-        Post.all
-      end
-
-    end
+class PostsDatatable < Effective::Datatable
+  datatable do
+    table_column :id
+    table_column :user      # if Post belongs_to :user
+    table_column :comments  # if Post has_many :comments
+    table_column :title
+    table_column :created_at
+    actions_column
   end
+
+  def collection
+    Post.all
+  end
+
 end
 ```
 
@@ -85,7 +79,7 @@ We're going to display this DataTable on the posts#index action
 ```ruby
 class PostsController < ApplicationController
   def index
-    @datatable = Effective::Datatables::Posts.new
+    @datatable = PostsDatatable.new
   end
 end
 ```
@@ -116,48 +110,42 @@ Once your controller and view are set up to render a Datatable, the model is the
 
 This single model file contains just 1 required method and responds to only 3 DSL commands.
 
-Each `Effective::Datatable` model must be defined in the `/app/models/effective/datatables/` directory.
-
-For example: `/app/models/effective/datatables/posts.rb`:
+For example: `/app/datatables/posts_datatable.rb`:
 
 ```ruby
-module Effective
-  module Datatables
-    class Posts < Effective::Datatable
-      datatable do
-        default_order :created_at, :desc
-        default_entries 25
+class PostsDatatable < Effective::Datatable
+  datatable do
+    default_order :created_at, :desc
+    default_entries 25
 
-        table_column :id, :visible => false
+    table_column :id, :visible => false
 
-        table_column :created_at, :width => '25%'
+    table_column :created_at, :width => '25%'
 
-        table_column :updated_at, :proc => Proc.new { |post| nicetime(post.updated_at) } # just a standard helper as defined in helpers/application_helper.rb
+    table_column :updated_at, :proc => Proc.new { |post| nicetime(post.updated_at) } # just a standard helper as defined in helpers/application_helper.rb
 
-        table_column :user
+    table_column :user
 
-        table_column :post_category_id, :filter => {:as => :select, :collection => Proc.new { PostCategory.all } } do |post|
-          post.post_category.name.titleize
-        end
-
-        array_column :comments do |post|
-          content_tag(:ul) do
-            post.comments.where(:archived => false).map do |comment|
-              content_tag(:li, comment.title)
-            end.join('').html_safe
-          end
-        end
-
-        table_column :title, :label => 'Post Title', :class => 'col-title'
-        actions_column
-      end
-
-      def collection
-        Post.where(:archived => false).includes(:post_category)
-      end
-
+    table_column :post_category_id, :filter => {:as => :select, :collection => Proc.new { PostCategory.all } } do |post|
+      post.post_category.name.titleize
     end
+
+    array_column :comments do |post|
+      content_tag(:ul) do
+        post.comments.where(:archived => false).map do |comment|
+          content_tag(:li, comment.title)
+        end.join('').html_safe
+      end
+    end
+
+    table_column :title, :label => 'Post Title', :class => 'col-title'
+    actions_column
   end
+
+  def collection
+    Post.where(:archived => false).includes(:post_category)
+  end
+
 end
 ```
 
@@ -169,7 +157,7 @@ It can be as simple or as complex as you'd like:
 
 ```ruby
 def collection
-  Posts.all
+  Post.all
 end
 ```
 
@@ -206,27 +194,23 @@ Don't want to use ActiveRecord? Not a problem.
 Define your collection as an Array of Arrays, declare only array_columns, and everything works as expected.
 
 ```ruby
-module Effective
-  module Datatables
-    class ArrayBackedDataTable < Effective::Datatable
-      datatable do
-        array_column :id
-        array_column :first_name
-        array_column :last_name
-        array_column :email
-      end
-
-      def collection
-        [
-          [1, 'June', 'Huang', 'june@einstein.com'],
-          [2, 'Leo', 'Stubbs', 'leo@einstein.com'],
-          [3, 'Quincy', 'Pompey', 'quincy@einstein.com'],
-          [4, 'Annie', 'Wojcik', 'annie@einstein.com'],
-        ]
-      end
-
-    end
+class ArrayBackedDatatable < Effective::Datatable
+  datatable do
+    array_column :id
+    array_column :first_name
+    array_column :last_name
+    array_column :email
   end
+
+  def collection
+    [
+      [1, 'June', 'Huang', 'june@einstein.com'],
+      [2, 'Leo', 'Stubbs', 'leo@einstein.com'],
+      [3, 'Quincy', 'Pompey', 'quincy@einstein.com'],
+      [4, 'Annie', 'Wojcik', 'annie@einstein.com'],
+    ]
+  end
+
 end
 ```
 
@@ -562,7 +546,7 @@ end
 As well, you need to change the controller where you define the datatable to be aware of the scope params.
 
 ```ruby
-@datatable = Effective::Datatables::Posts.new(params[:scopes])
+@datatable = PostsDatatable.new(params[:scopes])
 ```
 
 And to display the scopes anywhere in your view:
@@ -741,7 +725,7 @@ In your controller:
 ```ruby
 class PostsController < ApplicationController
   def index
-    @datatable = Effective::Datatables::Posts.new(:user_id => current_user.try(:id))
+    @datatable = PostsDatatable.new(:user_id => current_user.try(:id))
   end
 end
 ```
@@ -749,23 +733,18 @@ end
 And then in your datatable:
 
 ```ruby
-module Effective
-  module Datatables
-    class Posts < Effective::Datatable
-      datatable do
-        if attributes[:user_id].blank?
-          table_column :user_id { |post| post.user.email }
-        end
-      end
+class PostsDatatable < Effective::Datatable
+  datatable do
+    if attributes[:user_id].blank?
+      table_column :user_id { |post| post.user.email }
+    end
+  end
 
-      def collection
-        if attributes[:user_id]
-          Post.where(user_id: attributes[:user_id])
-        else
-          Post.all
-        end
-      end
-
+  def collection
+    if attributes[:user_id]
+      Post.where(user_id: attributes[:user_id])
+    else
+      Post.all
     end
   end
 end
@@ -776,27 +755,23 @@ end
 Any non-private methods defined in the datatable model will be available to your table_columns and evaluated in the view_context.
 
 ```ruby
-module Effective
-  module Datatables
-    class Posts < Effective::Datatable
-      def format_post_title(post)
-        if post.title.start_with?('important')
-          link_to(post.title.upcase, post_path(post))
-        else
-          link_to(post.title, post_path(post))
-        end
-      end
-
-      datatable do
-        table_column :title do |post|
-          format_post_title(post)
-        end
-      end
-
-      def collection
-        Post.all
-      end
+class PostsDatatable < Effective::Datatable
+  def format_post_title(post)
+    if post.title.start_with?('important')
+      link_to(post.title.upcase, post_path(post))
+    else
+      link_to(post.title, post_path(post))
     end
+  end
+
+  datatable do
+    table_column :title do |post|
+      format_post_title(post)
+    end
+  end
+
+  def collection
+    Post.all
   end
 end
 ```
@@ -809,13 +784,8 @@ end
 ```
 
 ```ruby
-module Effective
-  module Datatables
-    class Posts < Effective::Datatable
-      include PostsHelper
-
-    end
-  end
+class PostsDatatable < Effective::Datatable
+  include PostsHelper
 end
 ```
 
@@ -927,33 +897,6 @@ rescue_from Effective::AccessDenied do |exception|
   end
 end
 ```
-
-## Examples
-
-### Search by a belongs_to objects' field
-
-In this example, a User belongs_to an Applicant.  But instead of using the built in belongs_to functionality and displaying a dropdown of users, instead we want to search by the user's email address:
-
-```ruby
-module Effective
-  module Datatables
-    class Applicants < Effective::Datatable
-      datatable do
-        table_column :id, visible: true
-
-        table_column :user, :type => :string, :column => 'users.email' do |applicant|
-          link_to applicant.user.try(:email), edit_admin_user_path(applicant.user)
-        end
-      end
-
-      def collection
-        col = Applicant.joins(:user).includes(:user).references(:user)
-      end
-    end
-  end
-end
-```
-
 
 ## License
 
