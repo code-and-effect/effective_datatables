@@ -171,6 +171,8 @@ initializeDataTables = ->
 
     # Capture column visibility changes and refresh datatable
     datatable.on 'column-visibility.dt', (event, settings, index, state) ->
+      return if settings.bDestroying
+
       $table = $(event.currentTarget)
 
       timeout = $table.data('timeout')
@@ -184,6 +186,8 @@ initializeDataTables = ->
     # We borrow the Processing div for our bulk action success/error messages
     # This makes sure that the message is displayed for 1500ms
     datatable.on 'processing.dt', (event, settings, visible) ->
+      return if settings.bDestroying
+
       $processing = $(event.currentTarget).siblings('.dataTables_processing').first()
       return unless $processing.data('bulk-actions-processing')
 
