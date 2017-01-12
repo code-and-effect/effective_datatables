@@ -79,3 +79,19 @@ $(document).on 'click', '.buttons-bulk-actions a', (event) ->
       $table.dataTable().data('bulk-actions-restore-selected-values', values)
       $table.DataTable().draw()
     )
+
+# We borrow the Processing div for our bulk action success/error messages
+# This makes sure that the message is displayed for 1500ms
+$(document).on 'processing.dt', (event, settings, visible) ->
+  return if settings.bDestroying
+
+  $processing = $(event.target).siblings('.dataTables_processing').first()
+  return unless $processing.data('bulk-actions-processing')
+
+  timeout = $processing.show().data('timeout')
+  clearTimeout(timeout) if timeout
+  $processing.data('timeout', setTimeout( =>
+      $processing.html('Processing...').hide()
+      $processing.data('bulk-actions-processing', null)
+    , 1500)
+  )
