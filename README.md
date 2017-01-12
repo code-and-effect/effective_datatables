@@ -487,10 +487,15 @@ You can define any number of `bulk_action`s, and separate them with one or more 
 The `bulk_action` method is just an alias for `link_to`, so all the same options will work.
 
 ```ruby
-bulk_actions_column do
-  bulk_action 'Approve all', bulk_approve_posts_path, data: { method: :post, confirm: 'Approve all selected posts?' }
-  bulk_action_divider
-  bulk_action 'Send emails', bulk_email_posts_path, data : { method: :post, confirm: 'Really send emails?' }
+datatable do
+  bulk_actions_column do
+    bulk_action 'Approve all', bulk_approve_posts_path, data: {confirm: 'Approve all selected posts?'}
+    bulk_action_divider
+    bulk_action 'Send emails', bulk_email_posts_path, data : {confirm: 'Really send emails?'}
+  end
+
+  ...
+
 end
 ```
 
@@ -504,6 +509,7 @@ class PostsController < ApplicationController
     # You should probably write this inside a transaction.  This is just an example.
     begin
       @posts.each { |post| post.approve! }
+      render json: { status: 200, message: "Successfully approved #{@posts.length} posts." }
     rescue => e
       render json: { status: 500, message: 'An error occured while approving a post.' }
     end
