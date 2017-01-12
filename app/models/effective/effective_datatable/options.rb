@@ -5,7 +5,7 @@ module Effective
     module Options
 
       def initialize_datatable_options
-        @table_columns = _initialize_datatable_options(@table_columns)
+        @table_columns = _initialize_datatable_options(@table_columns, the_collection)
       end
 
       def initialize_scope_options
@@ -54,7 +54,13 @@ module Effective
         charts
       end
 
-      def _initialize_datatable_options(cols)
+      def _initialize_datatable_options(cols, collection)
+        # We set some memoized helper values
+        @collection_class = (collection.respond_to?(:klass) ? collection.klass : self.class)
+        @active_record_collection = (collection.ancestors.include?(ActiveRecord::Base) rescue false)
+        @array_collection = (collection.kind_of?(Array) && collection.first.kind_of?(Array))
+
+        # And then parse all the colums
         sql_table = (collection.table rescue nil)
 
         # Here we identify all belongs_to associations and build up a Hash like:

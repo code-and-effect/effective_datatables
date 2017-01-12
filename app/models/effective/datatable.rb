@@ -91,8 +91,8 @@ module Effective
       raise "You must define a collection. Something like an ActiveRecord User.all or an Array of Arrays [[1, 'something'], [2, 'something else']]"
     end
 
-    def collection_class
-      @collection_class ||= (collection.respond_to?(:klass) ? collection.klass : self.class)
+    def collection_class  # This is set by initialize_datatable_options()
+      @collection_class  # Will be either User/Post/etc or Array
     end
 
     def to_json
@@ -121,7 +121,7 @@ module Effective
     end
 
     def total_records
-      @total_records ||= (active_record_collection? ? active_record_collection_size(collection) : collection.size)
+      @total_records ||= (active_record_collection? ? active_record_collection_size(the_collection) : the_collection.size)
     end
 
     def view=(view_context)
@@ -144,7 +144,7 @@ module Effective
         @view.class_eval { delegate helper_method, to: :@effective_datatable }
       end
 
-      (self.class.instance_methods(false) - [:collection, :search_column, :order_column]).each do |view_method|
+      (self.class.instance_methods(false) - [:initialize_datatable, :collection, :search_column, :order_column]).each do |view_method|
         @view.class_eval { delegate view_method, to: :@effective_datatable }
       end
 
@@ -171,6 +171,10 @@ module Effective
 
     protected
 
+    def the_collection
+      @memoized_collection ||= collection
+    end
+
     def params
       view.try(:params) || HashWithIndifferentAccess.new()
     end
@@ -187,19 +191,11 @@ module Effective
     # Check if collection has an order() clause and warn about it
     # Usually that will make the table results look weird.
     def active_record_collection?
-      if @active_record_collection == nil
-        @active_record_collection = (collection.ancestors.include?(ActiveRecord::Base) rescue false)
-      end
-
-      @active_record_collection
+      @active_record_collection == true
     end
 
     def array_collection?
-      if @array_collection == nil
-        @array_collection = (collection.kind_of?(Array) && collection.first.kind_of?(Array))
-      end
-
-      @array_collection
+      @array_collection == true
     end
 
     # Not every ActiveRecord query will work when calling the simple .count
