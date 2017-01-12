@@ -94,7 +94,7 @@ module Effective
                   if active_record_collection?
                     view.instance_exec(obj, collection, self, &opts[:block])
                   else
-                    view.instance_exec(obj, obj[opts[:array_index]], collection, self, &opts[:block])
+                    view.instance_exec(obj, obj[opts[:index]], collection, self, &opts[:block])
                   end
                 rescue NoMethodError => e
                   if opts[:type] == :actions && e.message == 'super called outside of method'
@@ -107,7 +107,7 @@ module Effective
                 if active_record_collection?
                   view.instance_exec(obj, collection, self, &opts[:proc])
                 else
-                  view.instance_exec(obj, obj[opts[:array_index]], collection, self, &opts[:proc])
+                  view.instance_exec(obj, obj[opts[:index]], collection, self, &opts[:proc])
                 end
               elsif opts[:partial]
                 rendered[name][index]
@@ -130,7 +130,7 @@ module Effective
               elsif opts[:type] == :effective_roles
                 (obj.send(:roles) rescue [])
               elsif obj.kind_of?(Array) # Array backed collection
-                obj[opts[:array_index]]
+                obj[opts[:index]]
               elsif opts[:sql_as_column]
                 obj[name] || obj.send(name)
               else

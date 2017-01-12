@@ -90,7 +90,7 @@ module Effective
           end
 
           cols[name][:array_column] ||= false
-          cols[name][:array_index] = index # The index of this column in the collection, regardless of hidden table_columns
+          cols[name][:index] = index # The index of this column in the collection, regardless of hidden table_columns
           cols[name][:name] ||= name
           cols[name][:label] ||= name.titleize
           cols[name][:column] ||= (sql_table && sql_column) ? "#{quote_sql(sql_table.name)}.#{quote_sql(sql_column.name)}" : name
@@ -158,13 +158,6 @@ module Effective
           end
         end
 
-        # After everything is initialized
-        # Compute any col[:if] and assign an index
-        count = 0
-        table_columns.each do |name, col|
-          col[:index] = count
-          count += 1
-        end
       end
 
       def initialize_table_column_filter(column, belongs_to, has_many, has_and_belongs_to_manys)
