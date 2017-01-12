@@ -83,7 +83,7 @@ module Effective
     end
 
     def to_param
-      @to_param ||= self.class.name.underscore.sub('effective/datatables/', '')
+      @to_param ||= self.class.name.underscore
     end
 
     def collection

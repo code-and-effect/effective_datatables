@@ -10,7 +10,7 @@ module Effective
       @datatable = find_datatable(params[:id]).try(:new, attributes.merge(scopes))
       @datatable.view = view_context if !@datatable.nil?
 
-      EffectiveDatatables.authorized?(self, :index, @datatable.try(:collection_class) || @datatable.try(:class))
+      EffectiveDatatables.authorized?(self, :index, @datatable.try(:collection_class))
 
       respond_to do |format|
         format.html
@@ -29,7 +29,7 @@ module Effective
 
     def find_datatable(id)
       id_plural = id.pluralize == id && id.singularize != id
-      klass = "effective/datatables/#{id}".classify
+      klass = id.classify
 
       (id_plural ? klass.pluralize : klass).safe_constantize
     end
