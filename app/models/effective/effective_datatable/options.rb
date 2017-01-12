@@ -85,11 +85,6 @@ module Effective
         end
 
         table_columns = cols.each_with_index do |(name, _), index|
-          # If this is a belongs_to, add an :if clause specifying a collection scope if
-          if belong_tos.key?(name)
-            cols[name][:if] ||= Proc.new { attributes[belong_tos[name][:foreign_key]].blank? }
-          end
-
           sql_column = (collection.columns rescue []).find do |column|
             column.name == name.to_s || (belong_tos.key?(name) && column.name == belong_tos[name][:foreign_key])
           end
@@ -167,14 +162,8 @@ module Effective
         # Compute any col[:if] and assign an index
         count = 0
         table_columns.each do |name, col|
-          if display_column?(col)
-            col[:index] = count
-            count += 1
-          else
-            # deleting rather than using `table_columns.select` above in order to maintain
-            # this hash as a type of HashWithIndifferentAccess
-            table_columns.delete(name)
-          end
+          col[:index] = count
+          count += 1
         end
       end
 
@@ -279,15 +268,6 @@ module Effective
         end.merge(filter.symbolize_keys)
       end
 
-      private
-
-      def display_column?(col)
-        if col[:if].respond_to?(:call)
-          (view || self).instance_exec(&col[:if])
-        else
-          col.fetch(:if, true)
-        end
-      end
     end
   end
 end

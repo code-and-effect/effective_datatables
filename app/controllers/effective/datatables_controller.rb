@@ -28,10 +28,7 @@ module Effective
     private
 
     def find_datatable(id)
-      id_plural = id.pluralize == id && id.singularize != id
-      klass = id.classify
-
-      (id_plural ? klass.pluralize : klass).safe_constantize
+      id.classify.safe_constantize || id.classify.pluralize.safe_constantize
     end
 
     def error_json
