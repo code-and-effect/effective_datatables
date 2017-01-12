@@ -45,12 +45,14 @@ module EffectiveDatatablesPrivateHelper
     pattern = opts[:filter].key?(:pattern) ? opts[:filter][:pattern] : nil
     placeholder = opts[:filter].key?(:placeholder) ? opts[:filter][:placeholder] : (opts[:label] || name.titleize)
     title = opts[:filter].key?(:title) ? opts[:filter][:title] : (opts[:label] || name.titleize)
+    wrapper_html = { class: 'datatable_filter' }
 
     case opts[:filter][:as]
     when :string, :text, :number
       form.input name, label: false, required: false, value: value,
         as: :string,
         placeholder: placeholder,
+        wrapper_html: wrapper_html,
         input_html: { name: nil, value: value, title: title, pattern: pattern, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} }
     when :obfuscated_id
       pattern ||= '[0-9]{3}-?[0-9]{4}-?[0-9]{3}'
@@ -59,11 +61,13 @@ module EffectiveDatatablesPrivateHelper
       form.input name, label: false, required: false, value: value,
         as: :string,
         placeholder: placeholder,
+        wrapper_html: wrapper_html,
         input_html: { name: nil, value: value, title: title, pattern: pattern, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} }
     when :date
       form.input name, label: false, required: false, value: value,
         as: (ActionView::Helpers::FormBuilder.instance_methods.include?(:effective_date_picker) ? :effective_date_picker : :string),
         placeholder: placeholder,
+        wrapper_html: wrapper_html,
         input_group: false,
         input_html: { name: nil, value: value, title: title, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} },
         input_js: { useStrict: true, keepInvalid: true }
@@ -71,6 +75,7 @@ module EffectiveDatatablesPrivateHelper
       form.input name, label: false, required: false, value: value,
         as: (ActionView::Helpers::FormBuilder.instance_methods.include?(:effective_date_time_picker) ? :effective_date_time_picker : :string),
         placeholder: placeholder,
+        wrapper_html: wrapper_html,
         input_group: false,
         input_html: { name: nil, value: value, title: title, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} },
         input_js: { useStrict: true, keepInvalid: true } # Keep invalid format like "2015-11" so we can still filter by year, month or day
@@ -81,6 +86,7 @@ module EffectiveDatatablesPrivateHelper
         selected: opts[:filter][:selected],
         multiple: opts[:filter][:multiple] == true,
         include_blank: include_blank,
+        wrapper_html: wrapper_html,
         input_html: { name: nil, value: value, title: title, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} },
         input_js: { placeholder: placeholder }
     when :grouped_select
@@ -94,6 +100,7 @@ module EffectiveDatatablesPrivateHelper
         polymorphic: opts[:filter][:polymorphic] == true,
         group_label_method: opts[:filter][:group_label_method] || :first,
         group_method: opts[:filter][:group_method] || :last,
+        wrapper_html: wrapper_html,
         input_html: { name: nil, value: value, title: title, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} },
         input_js: { placeholder: placeholder }
     when :bulk_actions_column
