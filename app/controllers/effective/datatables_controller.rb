@@ -16,9 +16,9 @@ module Effective
         format.html
         format.json {
           if Rails.env.production?
-            render :json => (@datatable.to_json rescue error_json)
+            render json: (@datatable.to_json rescue error_json)
           else
-            render :json => @datatable.to_json
+            render json: @datatable.to_json
           end
         }
       end
@@ -36,12 +36,12 @@ module Effective
 
     def error_json
       {
-        :draw => params[:draw].to_i,
-        :data => [],
-        :recordsTotal => 0,
-        :recordsFiltered => 0,
-        :aggregates => [],
-        :charts => {}
+        draw: params[:draw].to_i,
+        data: [],
+        recordsTotal: 0,
+        recordsFiltered: 0,
+        aggregates: [],
+        charts: {}
       }.to_json
     end
 

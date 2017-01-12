@@ -169,20 +169,6 @@ initializeDataTables = ->
     if datatable.data('effective-form-inputs')
       try table.closest('.dataTables_wrapper').find('.dataTables_length select').select2()
 
-    # Capture column visibility changes and refresh datatable
-    datatable.on 'column-visibility.dt', (event, settings, index, state) ->
-      return if settings.bDestroying
-
-      $table = $(event.currentTarget)
-
-      timeout = $table.data('timeout')
-      clearTimeout(timeout) if timeout
-      $table.data('timeout', setTimeout( =>
-          $table.DataTable().draw()
-          $.event.trigger('page:change')
-        , 700)
-      )
-
     # We borrow the Processing div for our bulk action success/error messages
     # This makes sure that the message is displayed for 1500ms
     datatable.on 'processing.dt', (event, settings, visible) ->

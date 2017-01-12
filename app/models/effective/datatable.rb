@@ -8,6 +8,7 @@ module Effective
     delegate :render, :controller, :link_to, :mail_to, :number_to_currency, :number_to_percentage, :to => :@view
 
     extend Effective::EffectiveDatatable::Dsl
+
     include Effective::EffectiveDatatable::Dsl::BulkActions
     include Effective::EffectiveDatatable::Dsl::Charts
     include Effective::EffectiveDatatable::Dsl::Datatable
@@ -101,12 +102,12 @@ module Effective
         data = table_data
 
         {
-          :draw => (params[:draw] || 0),
-          :data => (data || []),
-          :recordsTotal => (total_records || 0),
-          :recordsFiltered => (display_records || 0),
-          :aggregates => (aggregate_data(data) || []),
-          :charts => (charts_data || {})
+          draw: (params[:draw] || 0),
+          data: (data || []),
+          recordsTotal: (total_records || 0),
+          recordsFiltered: (display_records || 0),
+          aggregates: (aggregate_data(data) || []),
+          charts: (charts_data || {})
         }
       end
     end
