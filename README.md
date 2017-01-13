@@ -569,6 +569,35 @@ Pass `scope :start_date, Time.zone.now-3.months, fallback: true` to fallback to 
 
 Any `filter: { ... }` options will be passed straight into simple_form.
 
+### current_scope / model scopes
+
+You can also use scopes as defined on your ActiveRecord model
+
+When a scope is passed like follows, without a default value, it is assumed to be a klass level scope:
+
+```ruby
+scopes do
+  scope :all
+  scope :standard, default: true
+  scope :extended
+  scope :archived
+end
+
+def collection
+  collection = Post.all
+  collection = collection.send(current_scope) if current_scope
+  collection
+end
+```
+
+The front end will render these klass scopes as a radio buttons / button group.
+
+To determine which scope is selected, you can call `current_scope` or `attributes[:current_scope]` or `attributes[:standard]`
+
+When no scopes are selected, and no defaults are present, the above will return nil.
+
+It's a bit confusing, but you can mix and match these with regular attribute scopes.
+
 ## aggregates
 
 Each `aggregate` directive adds an additional row to the table's tfoot.
