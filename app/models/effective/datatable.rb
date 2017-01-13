@@ -73,6 +73,10 @@ module Effective
       scopes.select { |name, options| collection_class.respond_to?(name, true) }
     end
 
+    def klass_scope # The currently selected klass_scope
+      attributes[:klass_scope]
+    end
+
     def charts
       @charts
     end

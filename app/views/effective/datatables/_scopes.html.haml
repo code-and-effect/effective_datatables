@@ -5,7 +5,7 @@
       - if datatable.klass_scopes.present?
         = form.input :klass_scope, label: false, as: :effective_radio_buttons,
           collection: datatable.klass_scopes.keys.map { |key| [key.to_s.titleize, key] },
-          checked: datatable.attributes[:klass_scope] || :all,
+          checked: datatable.klass_scope,
           buttons: true
 
       - datatable.scopes.except(*datatable.klass_scopes.keys).each do |name, options|
