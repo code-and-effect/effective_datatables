@@ -10,6 +10,7 @@ module Effective
 
       def initialize_scope_options
         @scopes = _initialize_scope_options(@scopes)
+        _initialize_klass_scope
       end
 
       def initialize_chart_options
@@ -47,6 +48,12 @@ module Effective
           options[:filter][:input_html] ||= {}
           options[:filter][:input_html][:value] = value
           options[:filter][:selected] = value
+        end
+      end
+
+      def _initialize_klass_scope
+        if attributes[:klass_scope].present?
+          attributes[attributes[:klass_scope]] = true
         end
       end
 

@@ -3,7 +3,7 @@ module Effective
     module Dsl
       module Scopes
         # Instance Methods inside the scopes do .. end block
-        def scope(name, default, options = {}, &block)
+        def scope(name, default = nil, options = {}, &block)
           if block_given?
             raise "You cannot use partial: ... with the block syntax" if options[:partial]
             options[:block] = block

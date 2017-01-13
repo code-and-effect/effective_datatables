@@ -22,13 +22,19 @@ module Effective
     include Effective::EffectiveDatatable::Rendering
 
     def initialize(*args)
-      if args.present? && args.first != nil
-        raise "#{self.class.name}.new() can only be initialized with a Hash like arguments" unless args.first.kind_of?(Hash)
-        args.first.each { |k, v| self.attributes[k] = v.presence }
+      initialize_scopes if respond_to?(:initialize_scopes) # There was at least one scope defined in the scopes do .. end block
+
+      args.compact.each do |arg|
+        if arg.respond_to?(:permit) # ActionController::Parameters / Rails 5
+          arg = arg.permit(*permitted_params).to_h()  # We permit only the scopes params
+        end
+
+        raise "#{self.class.name}.new() can only be initialized with a Hash like arguments" unless arg.kind_of?(Hash)
+
+        arg.each { |k, v| self.attributes[k] = v.presence }
       end
 
       if respond_to?(:initialize_scopes)  # There was at least one scope defined in the scopes do .. end block
-        initialize_scopes
         initialize_scope_options
       end
 
@@ -57,6 +63,14 @@ module Effective
 
     def scopes
       @scopes
+    end
+
+    def permitted_params
+      scopes.keys + [:klass_scope]
+    end
+
+    def klass_scopes # It is defined as a class method on the active record model
+      scopes.select { |name, options| collection_class.respond_to?(name, true) }
     end
 
     def charts

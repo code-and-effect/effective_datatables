@@ -2,7 +2,13 @@
   .col-sm-12.effective-datatable-scopes
     = simple_form_for :scopes, url: request.path, method: :get, html: { class: 'form-inline' } do |form|
 
-      - datatable.scopes.each do |name, options|
+      - if datatable.klass_scopes.present?
+        = form.input :klass_scope, label: false, as: :effective_radio_buttons,
+          collection: datatable.klass_scopes.keys.map { |key| [key.to_s.titleize, key] },
+          checked: datatable.attributes[:klass_scope] || :all,
+          buttons: true
+
+      - datatable.scopes.except(*datatable.klass_scopes.keys).each do |name, options|
         - if options[:block].present?
           = form.instance_exec(form, &options[:block])
         - elsif options[:partial].present?
