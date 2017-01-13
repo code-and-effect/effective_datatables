@@ -69,8 +69,8 @@ module Effective
       scopes.keys + [:klass_scope]
     end
 
-    def klass_scopes # It is defined as a class method on the active record model
-      scopes.select { |name, options| collection_class.respond_to?(name, true) }
+    def klass_scopes
+      scopes.select { |name, options| options[:klass_scope] }
     end
 
     def klass_scope # The currently selected klass_scope
