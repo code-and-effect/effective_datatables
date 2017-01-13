@@ -10,7 +10,7 @@ module Effective
 
       def initialize_scope_options
         @scopes = _initialize_scope_options(@scopes)
-        _initialize_klass_scope_attribute
+        _initialize_current_scope_attribute
       end
 
       def initialize_chart_options
@@ -51,16 +51,16 @@ module Effective
         end
       end
 
-      def _initialize_klass_scope_attribute
-        attributes[:klass_scope] ||= klass_scopes.find { |name, options| options[:klass_scope] && options[:default] }.try(:first)
+      def _initialize_current_scope_attribute
+        attributes[:current_scope] ||= klass_scopes.find { |name, options| options[:klass_scope] && options[:default] }.try(:first)
 
-        if attributes[:klass_scope].present?
-          attributes[:klass_scope] = attributes[:klass_scope].to_sym
-          attributes[:klass_scope] = nil unless klass_scopes.keys.include?(attributes[:klass_scope])
+        if attributes[:current_scope].present?
+          attributes[:current_scope] = attributes[:current_scope].to_sym
+          attributes[:current_scope] = nil unless klass_scopes.keys.include?(attributes[:current_scope])
         end
 
-        if attributes[:klass_scope].present?
-          klass_scopes.each { |name, _| attributes[name] = (name == attributes[:klass_scope]) }
+        if attributes[:current_scope].present?
+          klass_scopes.each { |name, _| attributes[name] = (name == attributes[:current_scope]) }
         end
       end
 

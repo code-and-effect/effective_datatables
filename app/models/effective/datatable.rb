@@ -65,16 +65,16 @@ module Effective
       @scopes
     end
 
-    def permitted_params
-      scopes.keys + [:klass_scope]
-    end
-
     def klass_scopes
       scopes.select { |name, options| options[:klass_scope] }
     end
 
-    def klass_scope # The currently selected klass_scope
-      attributes[:klass_scope]
+    def current_scope # The currently selected (klass) scope
+      attributes[:current_scope]
+    end
+
+    def permitted_params
+      scopes.keys + [:current_scope]
     end
 
     def charts
