@@ -8,6 +8,10 @@ module Effective
         @table_columns = _initialize_datatable_options(@table_columns, the_collection)
       end
 
+      def initialize_attributes(args)
+        _initialize_attributes(args)
+      end
+
       def initialize_scope_options
         @scopes = _initialize_scope_options(@scopes)
         _initialize_current_scope_attribute
@@ -22,6 +26,18 @@ module Effective
       end
 
       protected
+
+      def _initialize_attributes(args)
+        args.compact.each do |arg|
+          if arg.respond_to?(:permit) # ActionController::Parameters / Rails 5
+            arg = arg.permit(*permitted_params).to_h()  # We permit only the scopes params
+          end
+
+          raise "#{self.class.name}.new() can only be initialized with a Hash like arguments" unless arg.kind_of?(Hash)
+
+          arg.each { |k, v| self.attributes[k] = v.presence }
+        end
+      end
 
       # The scope DSL is
       # scope :start_date, default_value, options: {}
