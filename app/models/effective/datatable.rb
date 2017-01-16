@@ -74,7 +74,7 @@ module Effective
     end
 
     def permitted_params
-      scopes.keys + [:current_scope]
+      scopes.keys + [:current_scope, :referer]
     end
 
     def charts
