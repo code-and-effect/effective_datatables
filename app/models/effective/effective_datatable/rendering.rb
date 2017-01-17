@@ -32,14 +32,14 @@ module Effective
           end
         end
 
-        if array_collection?
+        if col.kind_of?(Array)
           col = array_tool.order(col)
           col = array_tool.search(col)
         end
 
         self.display_records ||= total_records
 
-        if array_collection?
+        if col.kind_of?(Array)
           col = array_tool.paginate(col)
         else
           col = table_tool.paginate(col)
