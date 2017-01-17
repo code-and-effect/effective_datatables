@@ -5,6 +5,7 @@ initializeDataTables = ->
     datatable = $(this)
     simple = (datatable.data('simple') == true)
     input_js_options = datatable.data('input-js-options') || {}
+    buttons_export_columns = input_js_options['buttons_export_columns'] || ':not(.col-actions)'
 
     if input_js_options['buttons'] == false
       input_js_options['buttons'] = []
@@ -26,21 +27,21 @@ initializeDataTables = ->
           exportOptions:
             format:
               header: (str) -> $("<div>#{str}</div>").children('.filter-label').first().text()
-            columns: ':not(.col-actions)'
+            columns: buttons_export_columns
         },
         {
           extend: 'csv',
           exportOptions:
             format:
               header: (str) -> $("<div>#{str}</div>").children('.filter-label').first().text()
-            columns: ':not(.col-actions)'
+            columns: buttons_export_columns
         },
         {
           extend: 'excel',
           exportOptions:
             format:
               header: (str) -> $("<div>#{str}</div>").children('.filter-label').first().text()
-            columns: ':not(.col-actions)'
+            columns: buttons_export_columns
         },
         {
           extend: 'print',

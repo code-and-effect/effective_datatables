@@ -876,6 +876,20 @@ def finalize(collection)
 end
 ```
 
+## Customize the datatables JS initializer
+
+You can customize the initializer javascript passed to datatables.
+
+The support for this is still pretty limitted.
+
+```
+= render_datatable(@datatable, {colReorder: false})
+```
+
+```
+= render_datatable(@datatable, { buttons_export_columns: ':visible:not(.col-actions)' })
+```
+
 ## Authorization
 
 All authorization checks are handled via the config.authorization_method found in the `config/initializers/effective_datatables.rb` file.
