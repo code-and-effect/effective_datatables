@@ -40,13 +40,14 @@ module Effective
             sortable: false,
             filter: false,
             responsivePriority: 0,
-            partial_locals: { show_action: show, edit_action: edit, destroy_action: destroy, unarchive_action: unarchive }
+            partial_locals: { show_action: show, edit_action: edit, destroy_action: destroy, unarchive_action: unarchive },
+            actions_block: block
           }.merge(options)
 
           opts[:partial_local] ||= :resource unless opts[:partial].present?
           opts[:partial] ||= '/effective/datatables/actions_column' unless proc.present?
 
-          table_column(name, opts, proc, &block)
+          table_column(name, opts, proc)
         end
 
         def bulk_actions_column(options = {}, proc = nil, &block)

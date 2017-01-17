@@ -71,7 +71,10 @@ module Effective
 
             locals.merge!(opts[:partial_locals]) if opts[:partial_locals]
 
-            add_actions_column_locals(locals) if opts[:type] == :actions
+            if opts[:type] == :actions
+              add_actions_column_locals(locals)
+              locals[:actions_block] = opts[:actions_block]
+            end
 
             rendered[name] = (render(
               :partial => opts[:partial],

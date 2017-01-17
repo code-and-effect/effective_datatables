@@ -434,6 +434,16 @@ Override the default actions by passing your own partial:
 actions_column partial: 'admin/posts/actions'
 ```
 
+or just extend the default by
+
+```ruby
+actions_column do |post|
+  unless post.approved?
+    glyphicon_to('ok', approve_post_path(post), title: 'Approve')
+  end
+end
+```
+
 ### Showing action buttons
 
 The show/edit/destroy action buttons can be configured to always show, always hide, or to consider the current_user's permission level.

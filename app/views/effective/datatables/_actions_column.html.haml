@@ -38,3 +38,7 @@
 - if unarchive_action && unarchive_path
   - if resource.respond_to?(:archived?) && resource.archived?
     = unarchive_icon_to unarchive_path.gsub(':to_param', resource.to_param)
+
+- if actions_block
+  = capture do
+    - instance_exec(resource, &actions_block)
