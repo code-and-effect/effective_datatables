@@ -125,11 +125,11 @@ module Effective
     end
 
     def present?
-      total_records > 0
+      total_records > 0 || current_scope.present?
     end
 
     def empty?
-      total_records == 0
+      total_records == 0 && current_scope.blank?
     end
 
     def total_records

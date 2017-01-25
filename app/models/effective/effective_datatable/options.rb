@@ -29,9 +29,7 @@ module Effective
 
       def _initialize_attributes(args)
         args.compact.each do |arg|
-          if arg.respond_to?(:permit) # ActionController::Parameters / Rails 5
-            arg = arg.permit(*permitted_params).to_h()  # We permit only the scopes params
-          end
+          arg = arg.to_unsafe_h if arg.respond_to?(:permit) # ActionController::Parameters / Rails 5 hack. TODO.
 
           raise "#{self.class.name}.new() can only be initialized with a Hash like arguments" unless arg.kind_of?(Hash)
 
