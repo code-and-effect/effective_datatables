@@ -43,7 +43,7 @@ module EffectiveDatatablesPrivateHelper
 
     include_blank = opts[:filter].key?(:include_blank) ? opts[:filter][:include_blank] : (opts[:label] || name.titleize)
     pattern = opts[:filter].key?(:pattern) ? opts[:filter][:pattern] : nil
-    placeholder = opts[:filter].key?(:placeholder) ? opts[:filter][:placeholder] : (opts[:label] || name.titleize)
+    placeholder = (opts[:filter][:placeholder] || '')
     title = opts[:filter].key?(:title) ? opts[:filter][:title] : (opts[:label] || name.titleize)
     wrapper_html = { class: 'datatable_filter' }
 
@@ -60,7 +60,7 @@ module EffectiveDatatablesPrivateHelper
 
       form.input name, label: false, required: false, value: value,
         as: :string,
-        placeholder: placeholder,
+        placeholder: placeholder.presence || '###-####-###',
         wrapper_html: wrapper_html,
         input_html: { name: nil, value: value, title: title, pattern: pattern, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} }
     when :date
