@@ -23,19 +23,19 @@
     unarchive_action = instance_exec(resource, &unarchive_action)
   end
 
-- if show_action && show_path
+- if show_action && defined?(show_path)
   = show_icon_to show_path.gsub(':to_param', resource.to_param)
 
-- if edit_action && edit_path
+- if edit_action && defined?(edit_path)
   = edit_icon_to edit_path.gsub(':to_param', resource.to_param)
 
-- if destroy_action && destroy_path
+- if destroy_action && defined?(destroy_path)
   - if resource.respond_to?(:archived?) && !resource.archived?
     = archive_icon_to destroy_path.gsub(':to_param', resource.to_param)
   - elsif resource.respond_to?(:archived?) == false
     = destroy_icon_to destroy_path.gsub(':to_param', resource.to_param)
 
-- if unarchive_action && unarchive_path
+- if unarchive_action && defined?(unarchive_path)
   - if resource.respond_to?(:archived?) && resource.archived?
     = unarchive_icon_to unarchive_path.gsub(':to_param', resource.to_param)
 
