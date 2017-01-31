@@ -171,9 +171,12 @@ initializeDataTables = ->
       try table.closest('.dataTables_wrapper').find('.dataTables_length select').select2()
 
 destroyDataTables = ->
+  $('table.effective-datatable').each ->
+    if $.fn.DataTable.fnIsDataTable(this)
+      $(this).DataTable().destroy()
+
+anotherDestroy = ->
   for settings in $.fn.dataTable.settings
-    console.log settings
-    console.log settings.nTableWrapper
     $(settings.nTableWrapper).unbind('.DT').find(':not(tbody *)').unbind('.DT')
     $(window).unbind('.DT-'+settings.sInstance)
 
