@@ -33,7 +33,7 @@ module Effective
 
           raise "#{self.class.name}.new() can only be initialized with a Hash like arguments" unless arg.kind_of?(Hash)
 
-          arg.each { |k, v| self.attributes[k] = v.presence }
+          arg.each { |k, v| self.attributes[k] = v }
         end
       end
 
@@ -239,6 +239,8 @@ module Effective
             collection: (
               if belongs_to[:klass].respond_to?(:datatables_filter)
                 Proc.new { belongs_to[:klass].datatables_filter }
+              elsif belongs_to[:klass].respond_to?(:sorted)
+                Proc.new { belongs_to[:klass].sorted }
               else
                 Proc.new { belongs_to[:klass].all.map { |obj| [obj.to_s, obj.id] }.sort { |x, y| x[0] <=> y[0] } }
               end
@@ -253,6 +255,8 @@ module Effective
             collection: (
               if has_many[:klass].respond_to?(:datatables_filter)
                 Proc.new { has_many[:klass].datatables_filter }
+              elsif belongs_to[:klass].respond_to?(:sorted)
+                Proc.new { belongs_to[:klass].sorted }
               else
                 Proc.new { has_many[:klass].all.map { |obj| [obj.to_s, obj.id] }.sort { |x, y| x[0] <=> y[0] } }
               end
@@ -265,6 +269,8 @@ module Effective
             collection: (
               if has_and_belongs_to_manys[:klass].respond_to?(:datatables_filter)
                 Proc.new { has_and_belongs_to_manys[:klass].datatables_filter }
+              elsif has_and_belongs_to_manys[:klass].respond_to?(:sorted)
+                Proc.new { has_and_belongs_to_manys[:klass].sorted }
               else
                 Proc.new { has_and_belongs_to_manys[:klass].all.map { |obj| [obj.to_s, obj.id] }.sort { |x, y| x[0] <=> y[0] } }
               end
