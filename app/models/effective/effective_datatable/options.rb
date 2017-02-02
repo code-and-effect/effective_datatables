@@ -29,7 +29,10 @@ module Effective
 
       def _initialize_attributes(args)
         args.compact.each do |arg|
-          arg = arg.to_unsafe_h if arg.respond_to?(:permit) # ActionController::Parameters / Rails 5 hack. TODO.
+          # ActionController::Parameters / Rails 5 hack. TODO.
+          if arg.respond_to?(:permit)
+            arg = (arg.respond_to?(:to_unsafe_h) ? arg.to_unsafe_h : arg.to_h)
+          end
 
           raise "#{self.class.name}.new() can only be initialized with a Hash like arguments" unless arg.kind_of?(Hash)
 
@@ -86,7 +89,7 @@ module Effective
         # We set some memoized helper values
         @collection_class = (collection.respond_to?(:klass) ? collection.klass : self.class)
         @active_record_collection = (collection.ancestors.include?(ActiveRecord::Base) rescue false)
-        @array_collection = (collection.kind_of?(Array) && collection.first.kind_of?(Array))
+        @array_collection = (collection.kind_of?(Array) && (collection.length == 0 || collection.first.kind_of?(Array)))
 
         # And then parse all the colums
         sql_table = (collection.table rescue nil)
@@ -255,8 +258,8 @@ module Effective
             collection: (
               if has_many[:klass].respond_to?(:datatables_filter)
                 Proc.new { has_many[:klass].datatables_filter }
-              elsif belongs_to[:klass].respond_to?(:sorted)
-                Proc.new { belongs_to[:klass].sorted }
+              elsif has_many[:klass].respond_to?(:sorted)
+                Proc.new { has_many[:klass].sorted }
               else
                 Proc.new { has_many[:klass].all.map { |obj| [obj.to_s, obj.id] }.sort { |x, y| x[0] <=> y[0] } }
               end

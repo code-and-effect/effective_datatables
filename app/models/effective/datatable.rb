@@ -22,13 +22,10 @@ module Effective
     include Effective::EffectiveDatatable::Rendering
 
     def initialize(*args)
-      if respond_to?(:initialize_scopes) # There was at least one scope defined in the scopes do .. end block
-        initialize_scopes
-      end
-
       initialize_attributes(args)
 
-      if respond_to?(:initialize_scopes)  # There was at least one scope defined in the scopes do .. end block
+      if respond_to?(:initialize_scopes) # There was at least one scope defined in the scopes do .. end block
+        initialize_scopes
         initialize_scope_options
       end
 
