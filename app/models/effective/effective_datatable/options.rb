@@ -121,7 +121,7 @@ module Effective
           end
         end
 
-        table_columns = cols.each_with_index do |(name, _), index|
+        table_columns = (cols || {}).each_with_index do |(name, _), index|
           sql_column = (collection.columns rescue []).find do |column|
             column.name == name.to_s || (belong_tos.key?(name) && column.name == belong_tos[name][:foreign_key])
           end

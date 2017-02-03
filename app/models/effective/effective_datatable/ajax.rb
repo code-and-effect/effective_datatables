@@ -27,7 +27,7 @@ module Effective
             (params[:columns][order_by_column_index] || {})[:name]
           elsif @default_order.present?
             @default_order.keys.first
-          end || table_columns.find { |col, opts| opts[:type] != :bulk_actions_column }.first
+          end || table_columns.find { |col, opts| opts[:type] != :bulk_actions_column }.try(:first)
         end
       end
 
