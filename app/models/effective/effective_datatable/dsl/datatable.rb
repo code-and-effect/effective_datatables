@@ -4,15 +4,19 @@ module Effective
       module Datatable
         # Instance Methods inside the datatable do .. end block
         def default_order(name, direction = :asc)
-          datatable.state[:order_col] ||= name
-          datatable.state[:order_dir] ||= direction
+          raise 'default_order direction must be :asc or :desc' unless [:asc, :desc].include?(direction)
+
+          datatable.state[:order_name] = name
+          datatable.state[:order_dir] = direction
         end
 
-        def default_entries(entries)
-          datatable.state[:entries] ||= entries
+        def default_length(length)
+          raise 'default_length must be 10, 25, 50, 100, 250, 1000, :all' unless [10, 25, 50, 100, 250, 1000, :all].include?(length)
+
+          datatable.state[:length] = (length == :all ? 9999999 : length)
         end
 
-        def table_column(name, as: nil, col_class: nil, filter: {}, format: nil, label: nil, partial: nil, responsive: 10000, sortable: true, visible: true, width: nil, &block)
+        def table_column(name, as: nil, col_class: nil, filter: {}, format: nil, label: nil, partial: nil, responsive: 10000, sortable: true, sql_column: nil, visible: true, width: nil, &block)
           raise 'You cannot use partial: ... with the block syntax' if partial && block_given?
 
           datatable.columns[name] = {
@@ -26,6 +30,7 @@ module Effective
             partial: partial,
             responsive: responsive,
             sortable: sortable,
+            sql_column: sql_column,
             visible: visible,
             width: width
           }
@@ -45,6 +50,7 @@ module Effective
             partial: partial,
             responsive: responsive,
             sortable: sortable,
+            sql_column: sql_column,
             visible: visible,
             width: with
           }

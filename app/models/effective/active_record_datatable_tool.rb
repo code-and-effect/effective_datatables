@@ -2,7 +2,7 @@ module Effective
   class ActiveRecordDatatableTool
     attr_accessor :table_columns
 
-    delegate :state, :search_column, :order_column, :collection_class, :quote_sql, :to => :@datatable
+    delegate :search_column, :order_column, :collection_class, :quote_sql, :page, :per_page, :to => :@datatable
 
     def initialize(datatable, table_columns)
       @datatable = datatable
@@ -34,19 +34,17 @@ module Effective
     end
 
     def search_terms
-      return []
       @search_terms ||= @datatable.search_terms.select { |name, search_term| table_columns.key?(name) }
     end
 
     def order_by_column
-      return nil
       @order_by_column ||= table_columns[@datatable.order_name]
     end
 
     def order(collection)
       return collection unless order_by_column.present?
 
-      column_order = order_column(collection, order_by_column, @datatable.order_direction, order_by_column[:column])
+      column_order = order_column(collection, order_by_column, @datatable.order_direction, order_by_column[:sql_column])
       raise 'order_column must return an ActiveRecord::Relation object' unless column_order.kind_of?(ActiveRecord::Relation)
       column_order
     end
@@ -78,7 +76,7 @@ module Effective
 
     def search(collection)
       search_terms.each do |name, search_term|
-        column_search = search_column(collection, table_columns[name], search_term, table_columns[name][:column])
+        column_search = search_column(collection, table_columns[name], search_term, table_columns[name][:sql_column])
         raise 'search_column must return an ActiveRecord::Relation object' unless column_search.kind_of?(ActiveRecord::Relation)
         collection = column_search
       end
@@ -245,7 +243,7 @@ module Effective
     end
 
     def paginate(collection)
-      collection.page(state[:page]).per(state[:entries])
+      collection.page(page).per(per_page)
     end
 
     protected

@@ -15,6 +15,7 @@ module Effective
 
     def initialize(args = {})
       @attributes = initialize_attributes(args)
+      @state = initialize_state
       @columns = {}
     end
 
@@ -28,11 +29,9 @@ module Effective
         include Effective::EffectiveDatatable::Dsl::Datatable
       end
 
-      initialize_state!
-
       view.attributes = attributes
-      view.state = state
       view.datatable = self
+      view.state = state
 
       # Execute the the DSL methods
       initialize_datatable if respond_to?(:initialize_datatable)
@@ -43,6 +42,7 @@ module Effective
       initialize_collection_class!  # This is the first time the_collection() is called
       initialize_columns!
       initialize_filters!
+      load_state!
     end
 
     def collection
@@ -74,7 +74,7 @@ module Effective
         data = table_data
 
         {
-          draw: (params[:draw] || 0),
+          draw: (view.params[:draw] || 0),
           data: (data || []),
           recordsTotal: (total_records || 0),
           recordsFiltered: (display_records || 0),
@@ -123,10 +123,6 @@ module Effective
 
     def array_tool
       @array_tool ||= ArrayDatatableTool.new(self, columns.select { |_, col| col[:array_column] })
-    end
-
-    def params
-      view.try(:params) || {}
     end
 
   end

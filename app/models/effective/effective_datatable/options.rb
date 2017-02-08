@@ -27,6 +27,7 @@ module Effective
           sql_column = false
 
           opts[:name] = name.to_s
+          opts[:sql_column] = name
 
           opts[:as] ||= (
             if opts[:name].end_with?('_address') && defined?(EffectiveAddresses) && (collection_class.new rescue nil).respond_to?(:effective_addresses)

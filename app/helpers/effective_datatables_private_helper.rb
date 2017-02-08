@@ -2,19 +2,6 @@
 # They are internal datatables methods, but you could still call them on the view.
 module EffectiveDatatablesPrivateHelper
 
-  def datatable_default_order(datatable)
-    thing = [
-      (datatable.columns[datatable.state[:order_col]] || {})[:index],
-      (datatable.state[:order_dir].to_s.downcase)
-    ]
-
-    [0, 'asc'].to_json
-  end
-
-  def datatable_display_entries(datatable)
-    datatable.state[:entries] || 25
-  end
-
   # https://datatables.net/reference/option/columns
   def datatable_columns(datatable)
     form = nil

@@ -3,7 +3,7 @@ module Effective
   class ArrayDatatableTool
     attr_accessor :table_columns
 
-    delegate :state, :search_column, :order_column, :display_table_columns, :convert_to_column_type, :to => :@datatable
+    delegate :search_column, :order_column, :display_table_columns, :convert_to_column_type, :page, :per_page, :to => :@datatable
 
     def initialize(datatable, table_columns)
       @datatable = datatable
@@ -15,12 +15,10 @@ module Effective
     end
 
     def search_terms
-      return []
       @search_terms ||= @datatable.search_terms.select { |name, search_term| table_columns.key?(name) }
     end
 
     def order_by_column
-      return nil
       @order_by_column ||= table_columns[@datatable.order_name]
     end
 
@@ -84,7 +82,7 @@ module Effective
     end
 
     def paginate(collection)
-      Kaminari.paginate_array(collection).page(state[:page]).per(state[:entries])
+      Kaminari.paginate_array(collection).page(page).per(per_page)
     end
 
     private

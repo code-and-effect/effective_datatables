@@ -6,17 +6,15 @@
       'effective-form-inputs' => defined?(EffectiveFormInputs),
       'bulk-actions' => datatable_bulk_actions(datatable),
       'columns' => datatable_columns(datatable),
+      'display-order' => [datatable.order_index, datatable.order_direction].to_json(),
+      'display-length' => datatable.display_length,
+      'display-records' => (datatable.to_json[:recordsFiltered] || 0),
       'input-js-options' => local_assigns[:input_js_options],
       'simple' => datatable.simple?.to_s,
       'source' => effective_datatables.datatable_path(datatable, {format: 'json'}),
-      'default-order' => datatable_default_order(datatable),
-      'display-entries' => datatable.state[:entries],
-      'display-records' => (datatable.to_json[:recordsFiltered] || 0),
       'total-records' => (datatable.to_json[:recordsTotal] || 0)
     }
   }
-
-  Rails.logger.info effective_datatable_params
 
 %table.effective-datatable{effective_datatable_params}
   %thead
