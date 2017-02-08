@@ -4,80 +4,103 @@ module Effective
       module Datatable
         # Instance Methods inside the datatable do .. end block
         def default_order(name, direction = :asc)
-          @default_order = {name => direction}
+          datatable.state[:order_col] ||= name
+          datatable.state[:order_dir] ||= direction
         end
 
         def default_entries(entries)
-          @default_entries = entries
+          datatable.state[:entries] ||= entries
         end
 
-        def table_column(name, options = {}, proc = nil, &block)
-          if block_given?
-            raise "You cannot use partial: ... with the block syntax" if options[:partial] && !options[:type] == :actions
-            raise "You cannot use proc: ... with the block syntax" if options[:proc]
-            options[:block] = block
-          end
-          raise "You cannot use both partial: ... and proc: ..." if options[:partial] && options[:proc]
+        def table_column(name, as: nil, col_class: nil, filter: {}, format: nil, label: nil, partial: nil, responsive: 10000, sortable: true, visible: true, width: nil, &block)
+          raise 'You cannot use partial: ... with the block syntax' if partial && block_given?
 
-          (@table_columns ||= HashWithIndifferentAccess.new)[name] = options
+          datatable.columns[name] = {
+            array_column: false,
+            as: as,
+            col_class: col_class,
+            filter: filter,
+            format: format,
+            label: label,
+            partial: partial,
+            responsive: responsive,
+            sortable: sortable,
+            visible: visible,
+            width: width
+          }
         end
 
-        def array_column(name, options = {}, proc = nil, &block)
-          table_column(name, options.merge!(array_column: true), proc, &block)
+        def array_column(name, as: nil, col_class: nil, filter: {}, format: nil, label: nil, partial: nil, responsive: 10000, sortable: true, visible: true, width: nil, &block)
+          raise 'You cannot use partial: ... with the block syntax' if partial && block_given?
+
+          datatable.columns[name] = {
+            array_column: true,
+            as: as,
+            col_class: col_class,
+            filter: filter,
+            format: format,
+            label: label,
+            partial: partial,
+            responsive: responsive,
+            sortable: sortable,
+            visible: visible,
+            width: with
+          }
         end
 
-        def actions_column(options = {}, proc = nil, &block)
-          raise 'first parameter to actions_column should be a hash' unless options.kind_of?(Hash)
 
-          show = options.fetch(:show, (EffectiveDatatables.actions_column[:show] rescue false))
-          edit = options.fetch(:edit, (EffectiveDatatables.actions_column[:edit] rescue false))
-          destroy = options.fetch(:destroy, (EffectiveDatatables.actions_column[:destroy] rescue false))
-          unarchive = options.fetch(:unarchive, (EffectiveDatatables.actions_column[:unarchive] rescue false))
-          name = options.fetch(:name, 'actions')
+        # def actions_column(options = {}, proc = nil, &block)
+        #   raise 'first parameter to actions_column should be a hash' unless options.kind_of?(Hash)
 
-          opts = {
-            type: :actions,
-            sortable: false,
-            filter: false,
-            responsivePriority: 0,
-            partial_locals: { show_action: show, edit_action: edit, destroy_action: destroy, unarchive_action: unarchive },
-            actions_block: block
-          }.merge(options)
+        #   show = options.fetch(:show, (EffectiveDatatables.actions_column[:show] rescue false))
+        #   edit = options.fetch(:edit, (EffectiveDatatables.actions_column[:edit] rescue false))
+        #   destroy = options.fetch(:destroy, (EffectiveDatatables.actions_column[:destroy] rescue false))
+        #   unarchive = options.fetch(:unarchive, (EffectiveDatatables.actions_column[:unarchive] rescue false))
+        #   name = options.fetch(:name, 'actions')
 
-          opts[:partial_local] ||= :resource unless opts[:partial].present?
-          opts[:partial] ||= '/effective/datatables/actions_column' unless proc.present?
+        #   opts = {
+        #     type: :actions,
+        #     sortable: false,
+        #     filter: false,
+        #     responsivePriority: 0,
+        #     partial_locals: { show_action: show, edit_action: edit, destroy_action: destroy, unarchive_action: unarchive },
+        #     actions_block: block
+        #   }.merge(options)
 
-          table_column(name, opts, proc)
-        end
+        #   opts[:partial_local] ||= :resource unless opts[:partial].present?
+        #   opts[:partial] ||= '/effective/datatables/actions_column' unless proc.present?
 
-        def bulk_actions_column(options = {}, proc = nil, &block)
-          raise 'first parameter to bulk_actions_column should be a hash' unless options.kind_of?(Hash)
+        #   table_column(name, opts, proc)
+        # end
 
-          name = options.fetch(:name, 'bulk_actions')
-          resource_method = options.fetch(:resource_method, :to_param)
+        # def bulk_actions_column(options = {}, proc = nil, &block)
+        #   raise 'first parameter to bulk_actions_column should be a hash' unless options.kind_of?(Hash)
 
-          opts = {
-            bulk_actions_column: true,
-            label: '',
-            partial_local: :resource,
-            partial: '/effective/datatables/bulk_actions_column',
-            partial_locals: { resource_method: resource_method },
-            sortable: false,
-            dropdown_partial: '/effective/datatables/bulk_actions_dropdown',
-            dropdown_block: block
-          }.merge(options)
+        #   name = options.fetch(:name, 'bulk_actions')
+        #   resource_method = options.fetch(:resource_method, :to_param)
 
-          table_column(name, opts, proc)
-        end
+        #   opts = {
+        #     bulk_actions_column: true,
+        #     label: '',
+        #     partial_local: :resource,
+        #     partial: '/effective/datatables/bulk_actions_column',
+        #     partial_locals: { resource_method: resource_method },
+        #     sortable: false,
+        #     dropdown_partial: '/effective/datatables/bulk_actions_dropdown',
+        #     dropdown_block: block
+        #   }.merge(options)
 
-        def aggregate(name, options = {}, &block)
-          if block_given?
-            raise "You cannot use proc: ... with the block syntax" if options[:proc]
-            options[:block] = block
-          end
+        #   table_column(name, opts, proc)
+        # end
 
-          (@aggregates ||= HashWithIndifferentAccess.new)[name] = options
-        end
+        # def aggregate(name, options = {}, &block)
+        #   if block_given?
+        #     raise "You cannot use proc: ... with the block syntax" if options[:proc]
+        #     options[:block] = block
+        #   end
+
+        #   (@aggregates ||= HashWithIndifferentAccess.new)[name] = options
+        # end
       end
     end
   end

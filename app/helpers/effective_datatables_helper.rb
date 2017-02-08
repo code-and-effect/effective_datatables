@@ -20,7 +20,7 @@ module EffectiveDatatablesHelper
     raise 'expected datatable to be present' unless datatable
 
     datatable.view ||= self
-    datatable.simple = true
+    datatable.attributes[:simple] = true
 
     begin
       EffectiveDatatables.authorized?(controller, :index, datatable.collection_class) || raise('unauthorized')

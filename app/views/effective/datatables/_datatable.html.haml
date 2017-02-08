@@ -1,6 +1,6 @@
 :ruby
   effective_datatable_params = {
-    id: "#{datatable.to_param}-table-#{Time.zone.now.nsec}",
+    id: "#{datatable.to_param}-table",
     class: "#{datatable.table_html_class}",
     data: {
       'effective-form-inputs' => defined?(EffectiveFormInputs),
@@ -8,9 +8,9 @@
       'columns' => datatable_columns(datatable),
       'input-js-options' => local_assigns[:input_js_options],
       'simple' => datatable.simple?.to_s,
-      'source' => effective_datatables.datatable_path(datatable, {format: 'json'}.merge(attributes: datatable.attributes)).chomp('?'),
+      'source' => effective_datatables.datatable_path(datatable, {format: 'json'}),
       'default-order' => datatable_default_order(datatable),
-      'display-entries' => datatable.display_entries,
+      'display-entries' => datatable.state[:entries],
       'display-records' => (datatable.to_json[:recordsFiltered] || 0),
       'total-records' => (datatable.to_json[:recordsTotal] || 0)
     }

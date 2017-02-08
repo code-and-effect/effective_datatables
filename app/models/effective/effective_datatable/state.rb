@@ -2,93 +2,18 @@
 
 module Effective
   module EffectiveDatatable
-    module Options
+    module State
 
-      def initialize_attributes(args)
-        raise "#{self.class.name}.new() expected Hash like arguments" unless args.kind_of?(Hash)
-        args
-      end
-
-      def initialize_collection_class!
-        @collection_class = (the_collection.respond_to?(:klass) ? the_collection.klass : self.class)
-        @active_record_collection = (the_collection.ancestors.include?(ActiveRecord::Base) rescue false)
-        @array_collection = (the_collection.kind_of?(Array) && (the_collection.length == 0 || the_collection.first.kind_of?(Array)))
-
-        unless active_record_collection? || array_collection?
-          raise "Unsupported collection type. Expecting an ActiveRecord class, ActiveRecord relation, or an Array of Arrays [[1, 'something'], [2, 'something else']]"
-        end
-      end
-
-      def initialize_columns!
-        # And then parse all the colums
-        sql_table = (the_collection.table if active_record_collection?)
-
-        columns.each_with_index do |(name, opts), index|
-          sql_column = false
-
-          opts[:name] = name.to_s
-
-          opts[:as] ||= (
-            if opts[:name].end_with?('_address') && defined?(EffectiveAddresses) && (collection_class.new rescue nil).respond_to?(:effective_addresses)
-              :effective_address
-            elsif name == :id && defined?(EffectiveObfuscation) && collection.respond_to?(:deobfuscate)
-              :obfuscated_id
-            elsif name == :roles && defined?(EffectiveRoles) && collection.respond_to?(:with_role)
-              :effective_roles
-            elsif sql_column && sql_column.type
-              sql_column.type
-            elsif opts[:name].end_with?('_id')
-              :integer
-            else
-              :string # When in doubt
-            end
-          )
-
-          opts[:class] = "col-#{opts[:as]} col-#{opts[:name].parameterize} #{opts[:col_class]}".strip
-          opts[:label] ||= opts[:name].titleize
-
-          opts[:index] = index  # The index of this column in the collection, regardless of hidden table_columns
-        end
-      end
-
-      def initialize_filters!
-        columns.each do |name, opts|
-          filter = opts[:filter]
-          (opts[:filter] = {as: :null} and next) unless filter
-
-          if filter.key?(:collection)
-            filter[:as] ||= :select
-          end
-
-          unless filter.key?(:fuzzy)
-            filter[:fuzzy] = true
-          end
-
-          filter_type = case opts[:type]
-          when :belongs_to
-          when :belongs_to_polymorphic
-          when :has_many
-          when :has_and_belongs_to_many
-          when :effective_address
-            {as: :string}
-          when :effective_roles
-            {as: :select, collection: EffectiveRoles.roles}
-          when :obfuscated_id
-            {as: :obfuscated_id}
-          when :integer
-            {as: :number}
-          when :boolean
-            {as: :boolean, collection: [['true', true], ['false', false]] }
-          when :datetime
-            {as: :datetime}
-          when :date
-            {as: :date}
-          else
-            {as: :string}
-          end
-
-          opts[:filter] = filter.merge(filter_type)
-        end
+      def initialize_state!
+        @state = {
+          entries: nil,
+          order_col: nil,
+          order_dir: nil,
+          page: nil,
+          scope: nil,
+          search: {},
+          visible: {}
+        }
       end
 
 

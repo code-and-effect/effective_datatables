@@ -5,15 +5,15 @@ module Effective
     module Dsl
 
       def datatable(&block)
-        define_method('initialize_datatable') { instance_exec(&block) }
+        define_method('initialize_datatable') { view.instance_exec(&block) }
       end
 
       def scopes(&block)
-        define_method('initialize_scopes') { instance_exec(&block) }
+        define_method('initialize_scopes') { view.instance_exec(&block) }
       end
 
       def charts(&block)
-        define_method('initialize_charts') { instance_exec(&block) }
+        define_method('initialize_charts') { view.instance_exec(&block) }
       end
 
     end
