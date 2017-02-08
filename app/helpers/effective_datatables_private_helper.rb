@@ -3,14 +3,16 @@
 module EffectiveDatatablesPrivateHelper
 
   def datatable_default_order(datatable)
-    [
+    thing = [
       (datatable.columns[datatable.state[:order_col]] || {})[:index],
       (datatable.state[:order_dir].to_s.downcase)
-    ].to_json()
+    ]
+
+    [0, 'asc'].to_json
   end
 
   def datatable_display_entries(datatable)
-    datatable.state[:entries]
+    datatable.state[:entries] || 25
   end
 
   # https://datatables.net/reference/option/columns
@@ -30,7 +32,7 @@ module EffectiveDatatablesPrivateHelper
         filterHtml: (datatable_header_filter(form, name, nil, opts) unless datatable.simple?), #(datatable_header_filter(form, name, datatable.search_terms[name], opts) unless datatable.simple?),
         filterSelectedValue: opts[:filter][:selected]
       }
-    end.to_json()
+    end.to_json
   end
 
   def datatable_bulk_actions(datatable)

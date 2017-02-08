@@ -2,18 +2,44 @@ module Effective
   class ActiveRecordDatatableTool
     attr_accessor :table_columns
 
-    delegate :page, :per_page, :search_column, :order_column, :collection_class, :quote_sql, :to => :@datatable
+    delegate :state, :search_column, :order_column, :collection_class, :quote_sql, :to => :@datatable
 
     def initialize(datatable, table_columns)
       @datatable = datatable
       @table_columns = table_columns
     end
 
+    # Not every ActiveRecord query will work when calling the simple .count
+    # Custom selects:
+    #   User.select(:email, :first_name).count will throw an error
+    #   .count(:all) and .size seem to work
+    # Grouped Queries:
+    #   User.all.group(:email).count will return a Hash
+    def size(collection)
+      count = (collection.size rescue nil)
+
+      case count
+      when Integer
+        count
+      when Hash
+        count.size  # This represents the number of displayed datatable rows, not the sum all groups (which might be more)
+      else
+        if collection.klass.connection.respond_to?(:unprepared_statement)
+          collection_sql = collection.klass.connection.unprepared_statement { collection.to_sql }
+          (collection.klass.connection.exec_query("SELECT COUNT(*) FROM (#{collection_sql}) AS datatables_total_count").rows[0][0] rescue 1)
+        else
+          (collection.klass.connection.exec_query("SELECT COUNT(*) FROM (#{collection.to_sql}) AS datatables_total_count").rows[0][0] rescue 1)
+        end.to_i
+      end
+    end
+
     def search_terms
+      return []
       @search_terms ||= @datatable.search_terms.select { |name, search_term| table_columns.key?(name) }
     end
 
     def order_by_column
+      return nil
       @order_by_column ||= table_columns[@datatable.order_name]
     end
 
@@ -219,7 +245,7 @@ module Effective
     end
 
     def paginate(collection)
-      collection.page(page).per(per_page)
+      collection.page(state[:page]).per(state[:entries])
     end
 
     protected

@@ -18,6 +18,7 @@ module Effective
           datatable.columns[name] = {
             array_column: false,
             as: as,
+            block: (block if block_given?),
             col_class: col_class,
             filter: filter,
             format: format,
@@ -36,6 +37,7 @@ module Effective
           datatable.columns[name] = {
             array_column: true,
             as: as,
+            block: (block if block_given?),
             col_class: col_class,
             filter: filter,
             format: format,

@@ -56,15 +56,10 @@ module Effective
           filter = opts[:filter]
           (opts[:filter] = {as: :null} and next) unless filter
 
-          if filter.key?(:collection)
-            filter[:as] ||= :select
-          end
+          filter[:as] ||= :select if filter.key?(:collection)
+          filter[:fuzzy] = true unless filter.key?(:fuzzy)
 
-          unless filter.key?(:fuzzy)
-            filter[:fuzzy] = true
-          end
-
-          filter_type = case opts[:type]
+          type_opts = case opts[:type]
           when :belongs_to
           when :belongs_to_polymorphic
           when :has_many
@@ -87,7 +82,7 @@ module Effective
             {as: :string}
           end
 
-          opts[:filter] = filter.merge(filter_type)
+          opts[:filter] = filter.merge(type_opts)
         end
       end
 

@@ -17,13 +17,13 @@ module Effective
           col = table_tool.search(col)
 
           if table_tool.search_terms.present? && array_tool.search_terms.blank?
-            self.display_records = active_record_collection_size(col)
+            @display_records = table_tool.size(col)
           end
 
           if array_tool.search_terms.present?
             col = self.arrayize(col)
             col = array_tool.search(col)
-            self.display_records = col.size
+            @display_records = array_tool.size(col)
           end
 
           if array_tool.order_by_column.present?
@@ -37,7 +37,7 @@ module Effective
           col = array_tool.search(col)
         end
 
-        self.display_records ||= total_records
+        @display_records ||= total_records
 
         if col.kind_of?(Array)
           col = array_tool.paginate(col)
@@ -57,7 +57,7 @@ module Effective
 
         # We want to use the render :collection for each column that renders partials
         rendered = {}
-        (display_table_columns || table_columns).each do |name, opts|
+        (display_table_columns || columns).each do |name, opts|
           if opts[:partial] && opts[:visible]
             locals = HashWithIndifferentAccess.new(
               datatable: self,
@@ -88,7 +88,7 @@ module Effective
         end
 
         collection.each_with_index.map do |obj, index|
-          (display_table_columns || table_columns).map do |name, opts|
+          (display_table_columns || columns).map do |name, opts|
             begin
               if opts[:visible] == false && (name != order_name.to_s) # Sort by invisible array column
                 BLANK
@@ -148,7 +148,7 @@ module Effective
 
       def format(collection)
         collection.each do |row|
-          (display_table_columns || table_columns).each_with_index do |(name, opts), index|
+          (display_table_columns || columns).each_with_index do |(name, opts), index|
             value = row[index]
             next if value == nil || value == BLANK || opts[:visible] == false
             next if opts[:block] || opts[:partial] || opts[:proc]
