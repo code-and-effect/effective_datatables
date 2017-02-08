@@ -57,8 +57,8 @@ module Effective
 
         # We want to use the render :collection for each column that renders partials
         rendered = {}
-        (display_table_columns || columns).each do |name, opts|
-          if opts[:partial] && opts[:visible]
+        columns.each do |name, opts|
+          if opts[:partial] && state[:visible][name]
             locals = HashWithIndifferentAccess.new(
               datatable: self,
               table_column: table_columns[name],
@@ -88,9 +88,9 @@ module Effective
         end
 
         collection.each_with_index.map do |obj, index|
-          (display_table_columns || columns).map do |name, opts|
+          columns.map do |name, opts|
             begin
-              if opts[:visible] == false && (name != order_name.to_s) # Sort by invisible array column
+              if state[:visible][name] == false && (name != order_name.to_s) # Sort by invisible array column
                 BLANK
               elsif opts[:block]
                 begin
@@ -148,9 +148,9 @@ module Effective
 
       def format(collection)
         collection.each do |row|
-          (display_table_columns || columns).each_with_index do |(name, opts), index|
+          columns.each_with_index do |(name, opts), index|
             value = row[index]
-            next if value == nil || value == BLANK || opts[:visible] == false
+            next if value == nil || value == BLANK || state[:visible][name] == false
             next if opts[:block] || opts[:partial] || opts[:proc]
 
             if opts[:sql_as_column]
@@ -218,9 +218,9 @@ module Effective
         values = table_data.transpose
 
         aggregates.map do |name, options|
-          (display_table_columns || table_columns).map.with_index do |(name, column), index|
+          columns.map.with_index do |(name, column), index|
 
-            if column[:visible] != true
+            if state[:visible][name] != true
               ''
             elsif (options[:block] || options[:proc]).respond_to?(:call)
               view.instance_exec(column, (values[index] || []), values, &(options[:block] || options[:proc]))

@@ -4,10 +4,6 @@ module Effective
   module EffectiveDatatable
     module State
 
-      def display_columns
-        columns.select { |name, _| state[:visible][name] }
-      end
-
       def display_length
         state[:length]
       end
@@ -59,7 +55,6 @@ module Effective
         else
           load_default_state!
         end
-
       end
 
       def load_ajax_state!

@@ -3,7 +3,7 @@ module Effective
   class ArrayDatatableTool
     attr_accessor :table_columns
 
-    delegate :search_column, :order_column, :display_table_columns, :convert_to_column_type, :page, :per_page, :to => :@datatable
+    delegate :search_column, :order_column, :display_columns, :convert_to_column_type, :page, :per_page, :to => :@datatable
 
     def initialize(datatable, table_columns)
       @datatable = datatable
@@ -88,7 +88,7 @@ module Effective
     private
 
     def display_index(column)
-      display_table_columns.present? ? display_table_columns.keys.index(column[:name]) : column[:index]
+      display_columns.present? ? display_columns.keys.index(column[:name]) : column[:index]
     end
 
   end

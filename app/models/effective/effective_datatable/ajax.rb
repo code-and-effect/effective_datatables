@@ -4,10 +4,6 @@ module Effective
   module EffectiveDatatable
     module Ajax
 
-      def display_table_columns
-        nil
-      end
-
       # # This is for the ColReorder plugin
       # # It sends us a list of columns that are different than our table_columns order
       # # So this method just returns an array of column names, as per ColReorder
