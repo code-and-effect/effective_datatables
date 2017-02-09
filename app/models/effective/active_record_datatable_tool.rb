@@ -65,7 +65,7 @@ module Effective
         before = "ISNULL(#{sql_column}), "
       end
 
-      if table_column[:type] == :belongs_to_polymorphic
+      if table_column[:as] == :belongs_to_polymorphic
         collection.order("#{before}#{sql_column.sub('_id', '_type')} #{sql_direction}, #{sql_column} #{sql_direction}#{after}")
       elsif table_column[:sql_as_column] == true
         collection.order("#{sql_column} #{sql_direction}")
@@ -86,7 +86,7 @@ module Effective
     def search_column_with_defaults(collection, table_column, term, sql_column)
       sql_op = table_column[:filter][:sql_operation] || :where # only other option is :having
 
-      case table_column[:type]
+      case table_column[:as]
       when :string, :text
         if sql_op != :where
           collection.public_send(sql_op, "#{sql_column} = :term", term: term)

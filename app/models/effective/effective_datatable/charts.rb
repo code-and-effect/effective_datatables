@@ -7,7 +7,7 @@ module Effective
           (charts || {}).each do |name, chart|
             retval[name] = {
               name: chart[:name],
-              type: chart[:type],
+              as: chart[:as],
               options: chart[:options],
               data: (instance_exec(&chart[:block]) if chart[:block])
             }

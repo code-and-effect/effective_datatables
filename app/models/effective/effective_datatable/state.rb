@@ -1,11 +1,13 @@
-# This is extended as class level into Datatable
-
 module Effective
   module EffectiveDatatable
     module State
 
       def display_length
         state[:length]
+      end
+
+      def display_start
+        state[:start]
       end
 
       def order_direction
@@ -34,9 +36,8 @@ module Effective
 
       private
 
-      def initialize_state
+      def initial_state
         {
-          attributes: attributes,
           length: nil,
           order_name: nil,
           order_dir: nil,
@@ -48,12 +49,14 @@ module Effective
       end
 
       def load_state!
-        if view.params[:draw] && view.params[:columns]  # This is an AJAX action, do what datatables says.
+        if datatables_ajax_request?
           load_ajax_state!
-        elsif view.cookies[to_param].present?
-          load_cookie_state!
+          save_state!
+        elsif state_cookie.present?
+          load_saved_state!
         else
           load_default_state!
+          save_state!
         end
       end
 
@@ -79,7 +82,10 @@ module Effective
         end
       end
 
-      def load_cookie_state!
+      def load_saved_state!
+        state = Marshal.load(state_cookie)
+        raise 'invalid cookie' unless state.kind_of?(Hash)
+        @state = state
       end
 
       def load_default_state!
@@ -96,6 +102,29 @@ module Effective
           state[:search][name] = opts[:filter][:selected] if opts[:filter][:selected]
           state[:visible][name] = opts[:visible]
         end
+
+        # This parses the URL for any param passed searches
+        view.params.each do |key, value|
+          name = key.to_sym
+          next unless columns.key?(name)
+
+          state[:search][name] = value
+        end
+      end
+
+      def save_state!
+        view.cookies.signed[state_cookie_name] = Marshal.dump(state)
+      end
+
+      def state_cookie
+        @state_cookie ||= view.cookies.signed[state_cookie_name]
+      end
+
+      def state_cookie_name
+        @state_cookie_name ||= (
+          uri = URI(view.request.referer || view.request.url)
+          Base64.encode64(['state', to_param, uri.path, uri.query].join)
+        )
       end
 
     end

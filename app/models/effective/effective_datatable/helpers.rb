@@ -9,7 +9,7 @@ module Effective
           value = ActionView::Base.full_sanitizer.sanitize(value)
         end
 
-        case table_column[:type]
+        case table_column[:as]
         when :number, :price, :decimal, :float, :percentage
           (value.to_s.gsub(/[^0-9|\.]/, '').to_f rescue 0.00) unless value.kind_of?(Numeric)
         when :integer

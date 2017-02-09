@@ -71,7 +71,7 @@ module Effective
 
             locals.merge!(opts[:partial_locals]) if opts[:partial_locals]
 
-            if opts[:type] == :actions
+            if opts[:as] == :actions
               add_actions_column_locals(locals)
               locals[:actions_block] = opts[:actions_block]
             end
@@ -100,7 +100,7 @@ module Effective
                     view.instance_exec(obj, obj[opts[:index]], collection, self, &opts[:block])
                   end
                 rescue NoMethodError => e
-                  if opts[:type] == :actions && e.message == 'super called outside of method'
+                  if opts[:as] == :actions && e.message == 'super called outside of method'
                     rendered[name][index]
                   else
                     raise(e)
@@ -114,23 +114,23 @@ module Effective
                 end
               elsif opts[:partial]
                 rendered[name][index]
-              elsif opts[:type] == :belongs_to
+              elsif opts[:as] == :belongs_to
                 (obj.send(name) rescue nil).to_s
-              elsif opts[:type] == :belongs_to_polymorphic
+              elsif opts[:as] == :belongs_to_polymorphic
                 (obj.send(name) rescue nil).to_s
-              elsif opts[:type] == :has_many
+              elsif opts[:as] == :has_many
                 (obj.send(name).map { |obj| obj.to_s }.join('<br>') rescue BLANK)
-              elsif opts[:type] == :has_and_belongs_to_many
+              elsif opts[:as] == :has_and_belongs_to_many
                 (obj.send(name).map { |obj| obj.to_s }.join('<br>') rescue BLANK)
-              elsif opts[:type] == :bulk_actions_column
+              elsif opts[:as] == :bulk_actions_column
                 BLANK
-              elsif opts[:type] == :year
+              elsif opts[:as] == :year
                 obj.send(name).try(:year)
-              elsif opts[:type] == :obfuscated_id
+              elsif opts[:as] == :obfuscated_id
                 (obj.send(:to_param) rescue nil).to_s
-              elsif opts[:type] == :effective_address
+              elsif opts[:as] == :effective_address
                 (Array(obj.send(name)) rescue [])
-              elsif opts[:type] == :effective_roles
+              elsif opts[:as] == :effective_roles
                 (obj.send(:roles) rescue [])
               elsif obj.kind_of?(Array) # Array backed collection
                 obj[opts[:index]]
@@ -157,7 +157,7 @@ module Effective
               row[index] = value.to_s
             end
 
-            case (opts[:format] || opts[:type])
+            case (opts[:format] || opts[:as])
             when :belongs_to, :belongs_to_polymorphic
               row[index] = value.to_s
             when :has_many

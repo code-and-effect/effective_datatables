@@ -7,16 +7,16 @@ module Effective
 
     extend Effective::EffectiveDatatable::Dsl
 
-    include Effective::EffectiveDatatable::Ajax
+    include Effective::EffectiveDatatable::Attributes
     include Effective::EffectiveDatatable::Hooks
-    include Effective::EffectiveDatatable::Options
+    include Effective::EffectiveDatatable::Columns
     include Effective::EffectiveDatatable::Rendering
     include Effective::EffectiveDatatable::State
 
     def initialize(args = {})
-      @attributes = initialize_attributes(args)
-      @state = initialize_state
-      @columns = {}
+      @attributes = initial_attributes(args)
+      @columns = initial_columns
+      @state = initial_state
     end
 
     # Once the view is assigned, we initialize everything
@@ -28,6 +28,10 @@ module Effective
         attr_accessor :attributes, :state, :datatable
         include Effective::EffectiveDatatable::Dsl::Datatable
       end
+
+      load_cookie!
+
+      load_attributes!
 
       view.attributes = attributes
       view.datatable = self
@@ -115,6 +119,10 @@ module Effective
 
     def array_collection?
       @array_collection == true
+    end
+
+    def datatables_ajax_request?
+      view.params[:draw] && view.params[:columns] && view.params[:id] == to_param
     end
 
     def table_tool

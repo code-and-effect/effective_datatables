@@ -2,11 +2,10 @@
 
 module Effective
   module EffectiveDatatable
-    module Options
+    module Columns
 
-      def initialize_attributes(args)
-        raise "#{self.class.name}.new() expected Hash like arguments" unless args.kind_of?(Hash)
-        args
+      def initial_columns
+        {}
       end
 
       def initialize_collection_class!
@@ -60,7 +59,7 @@ module Effective
           filter[:as] ||= :select if filter.key?(:collection)
           filter[:fuzzy] = true unless filter.key?(:fuzzy)
 
-          type_opts = case opts[:type]
+          type_opts = case opts[:as]
           when :belongs_to
           when :belongs_to_polymorphic
           when :has_many
