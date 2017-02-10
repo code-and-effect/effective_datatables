@@ -52,15 +52,12 @@ module Effective
       def initialize_state!
         if datatables_ajax_request?
           load_ajax_state!
-          state[:params] = cookie[:state][:params]
         elsif cookie.present? && cookie[:state][:params] == search_params.length
           load_cookie_state!
           load_params_state!
-          state[:params] = search_params.length
         else
           load_default_state!
           load_params_state!
-          state[:params] = search_params.length
         end
       end
 
@@ -84,6 +81,8 @@ module Effective
           state[:search][name] = params[:search][:value] if params[:search][:value].present? # TODO deal with false/true/nil
           state[:visible][name] = (params[:visible] == 'true')
         end
+
+        state[:params] = cookie[:state][:params]
       end
 
       def load_cookie_state!
@@ -101,7 +100,7 @@ module Effective
         state[:start] = 0
 
         columns.each do |name, opts|
-          state[:search][name] = opts[:filter][:selected] if opts[:filter][:selected]
+          state[:search][name] = opts[:filter][:selected] if opts[:filter].key?(:selected)
           state[:visible][name] = opts[:visible]
         end
       end
@@ -109,6 +108,7 @@ module Effective
       # Overrides any state params set from the cookie
       def load_params_state!
         search_params.each { |name, value| state[:search][name] = value }
+        state[:params] = search_params.length
       end
 
       def search_params

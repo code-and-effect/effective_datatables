@@ -30,6 +30,7 @@ module Effective
         include Effective::EffectiveDatatable::Dsl::Datatable
       end
 
+      initialize_cookie!
       initialize_attributes!
 
       view.attributes = attributes

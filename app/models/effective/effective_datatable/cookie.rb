@@ -2,7 +2,9 @@ module Effective
   module EffectiveDatatable
     module Cookie
 
-      def cookie
+      attr_reader :cookie
+
+      def initialize_cookie!
         @cookie ||= (
           cookie = view.cookies.signed[cookie_name]
 
