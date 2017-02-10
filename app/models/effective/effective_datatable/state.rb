@@ -52,7 +52,7 @@ module Effective
       def initialize_state!
         if datatables_ajax_request?
           load_ajax_state!
-        elsif cookie.present? && cookie[:state][:params] == search_params.length
+        elsif cookie.present? && cookie[:state][:params] == search_params.length && cookie[:state][:visible].length == columns.length
           load_cookie_state!
           load_params_state!
         else
@@ -93,7 +93,7 @@ module Effective
         # These 3 might already be set by DSL methods
         state[:length] ||= 25
         state[:order_dir] ||= :asc
-        state[:order_name] ||= columns.first[0]
+        state[:order_name] ||= columns.find { |name, opts| opts[:sortable] }.first
 
         # Must compute and apply defaults
         state[:order_index] = columns[order_name][:index]

@@ -19,7 +19,7 @@ module Effective
         def table_column(name, as: nil, col_class: nil, filter: {}, format: nil, label: nil, partial: nil, responsive: 10000, sortable: true, sql_column: nil, visible: true, width: nil, &block)
           raise 'You cannot use partial: ... with the block syntax' if partial && block_given?
 
-          datatable.columns[name] = {
+          datatable.columns[name.to_sym] = {
             array_column: false,
             as: as,
             block: (block if block_given?),
@@ -39,7 +39,7 @@ module Effective
         def array_column(name, as: nil, col_class: nil, filter: {}, format: nil, label: nil, partial: nil, responsive: 10000, sortable: true, visible: true, width: nil, &block)
           raise 'You cannot use partial: ... with the block syntax' if partial && block_given?
 
-          datatable.columns[name] = {
+          datatable.columns[name.to_sym] = {
             array_column: true,
             as: as,
             block: (block if block_given?),
@@ -53,6 +53,26 @@ module Effective
             sql_column: sql_column,
             visible: visible,
             width: with
+          }
+        end
+
+        def bulk_actions_column(col_class: nil, format: nil, partial: nil, responsive: 10000)
+          raise 'You can only have one bulk actions column' if datatable.columns[:bulk_actions].present?
+
+          datatable.columns[:bulk_actions] = {
+            array_column: false,
+            as: :bulk_actions,
+            block: nil,
+            col_class: col_class,
+            filter: {as: :bulk_actions},
+            format: format,
+            label: '',
+            partial: partial || '/effective/datatables/bulk_actions_column',
+            responsive: responsive,
+            sortable: false,
+            sql_column: nil,
+            visible: true,
+            width: nil
           }
         end
 

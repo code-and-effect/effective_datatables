@@ -23,17 +23,7 @@ module EffectiveDatatablesPrivateHelper
   end
 
   def datatable_bulk_actions(datatable)
-    return {}.to_json()
-
-    bulk_actions_column = datatable.table_columns.find { |_, options| options[:bulk_actions_column] }.try(:second)
-    return false unless bulk_actions_column
-
-    {
-      dropdownHtml: render(
-        partial: bulk_actions_column[:dropdown_partial],
-        locals: { datatable: datatable, dropdown_block: bulk_actions_column[:dropdown_block] }.merge(bulk_actions_column[:partial_locals])
-      )
-    }.to_json()
+    render(partial: '/effective/datatables/bulk_actions_dropdown') if datatable.bulk_actions.present?
   end
 
   def datatable_header_filter(form, name, value, opts)
@@ -106,7 +96,7 @@ module EffectiveDatatablesPrivateHelper
         wrapper_html: wrapper_html,
         input_html: input_html,
         input_js: { placeholder: placeholder }
-    when :bulk_actions_column
+    when :bulk_actions
       input_html[:data]['role'] = 'bulk-actions-all'
 
       form.input name, label: false, required: false, value: nil,

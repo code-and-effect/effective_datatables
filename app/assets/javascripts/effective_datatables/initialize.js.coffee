@@ -88,11 +88,9 @@ initializeDataTables = ->
     # Copies the bulk actions html, stored in a data attribute on the table, into the buttons area
     initializeBulkActions = (api) ->
       $table = $(api.table().node())
-      bulkActions = $table.data('bulk-actions')
 
-      if bulkActions
-        $table.closest('.dataTables_wrapper').children().first()
-          .find('.dt-buttons').first().prepend(bulkActions['dropdownHtml'])
+      if $table.data('bulk-actions')
+        $table.closest('.dataTables_wrapper').children().first().find('.dt-buttons').prepend($table.data('bulk-actions'))
 
     # After we perform a bulk action, we have to re-select the checkboxes manually and do a bit of house keeping
     drawBulkActions = ($table) ->

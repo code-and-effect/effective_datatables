@@ -59,15 +59,15 @@ module Effective
         rendered = {}
         columns.each do |name, opts|
           if opts[:partial] && state[:visible][name]
-            locals = HashWithIndifferentAccess.new(
+            locals = {
               datatable: self,
-              table_column: table_columns[name],
+              column: columns[name],
               controller_namespace: controller_namespace,
               show_action: (opts[:partial_locals] || {})[:show_action],
               edit_action: (opts[:partial_locals] || {})[:edit_action],
               destroy_action: (opts[:partial_locals] || {})[:destroy_action],
               unarchive_action: (opts[:partial_locals] || {})[:unarchive_action]
-            )
+            }
 
             locals.merge!(opts[:partial_locals]) if opts[:partial_locals]
 
@@ -76,13 +76,13 @@ module Effective
               locals[:actions_block] = opts[:actions_block]
             end
 
-            rendered[name] = (render(
-              :partial => opts[:partial],
-              :as => opts[:partial_local],
-              :collection => collection,
-              :formats => :html,
-              :locals => locals,
-              :spacer_template => '/effective/datatables/spacer_template',
+            rendered[name] = (view.render(
+              partial: opts[:partial],
+              as: :resource,
+              collection: collection,
+              formats: :html,
+              locals: locals,
+              spacer_template: '/effective/datatables/spacer_template',
             ) || '').split('EFFECTIVEDATATABLESSPACER')
           end
         end
@@ -122,7 +122,7 @@ module Effective
                 (obj.send(name).map { |obj| obj.to_s }.join('<br>') rescue BLANK)
               elsif opts[:as] == :has_and_belongs_to_many
                 (obj.send(name).map { |obj| obj.to_s }.join('<br>') rescue BLANK)
-              elsif opts[:as] == :bulk_actions_column
+              elsif opts[:as] == :bulk_actions
                 BLANK
               elsif opts[:as] == :year
                 obj.send(name).try(:year)

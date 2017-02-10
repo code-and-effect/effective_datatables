@@ -4,6 +4,10 @@ module Effective
   module EffectiveDatatable
     module Dsl
 
+      def bulk_actions(&block)
+        define_method('initialize_bulk_actions') { view.instance_exec(&block) }
+      end
+
       def datatable(&block)
         define_method('initialize_datatable') { view.instance_exec(&block) }
       end

@@ -4,10 +4,6 @@ module Effective
   module EffectiveDatatable
     module Columns
 
-      def initial_columns
-        {}
-      end
-
       def initialize_collection_class!
         @collection_class = (the_collection.respond_to?(:klass) ? the_collection.klass : self.class)
         @active_record_collection = (the_collection.ancestors.include?(ActiveRecord::Base) rescue false)
@@ -54,7 +50,11 @@ module Effective
       def initialize_filters!
         columns.each do |name, opts|
           filter = opts[:filter]
-          (opts[:filter] = {as: :null} and next) unless filter
+
+          if filter == false
+            opts[:filter] = {as: :null}
+            next
+          end
 
           filter[:as] ||= :select if filter.key?(:collection)
           filter[:fuzzy] = true unless filter.key?(:fuzzy)
@@ -82,7 +82,7 @@ module Effective
             {as: :string}
           end
 
-          opts[:filter] = filter.merge(type_opts)
+          opts[:filter] = filter.reverse_merge(type_opts)
         end
       end
 

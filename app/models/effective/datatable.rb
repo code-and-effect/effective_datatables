@@ -1,13 +1,15 @@
 module Effective
   class Datatable
-    attr_reader :columns  # All defined columns
     attr_reader :attributes     # Anything that we initialize our table with. That's it.
-    attr_reader :state          # Any selected values
+    attr_reader :bulk_actions
+    attr_reader :columns
+    attr_reader :state
     attr_reader :view
 
     extend Effective::EffectiveDatatable::Dsl
 
     include Effective::EffectiveDatatable::Attributes
+    include Effective::EffectiveDatatable::BulkActions
     include Effective::EffectiveDatatable::Cookie
     include Effective::EffectiveDatatable::Hooks
     include Effective::EffectiveDatatable::Columns
@@ -16,7 +18,8 @@ module Effective
 
     def initialize(args = {})
       @attributes = initial_attributes(args)
-      @columns = initial_columns
+      @bulk_actions = []
+      @columns = {}
       @state = initial_state
     end
 
@@ -27,6 +30,7 @@ module Effective
       # Any datatable specific functions we want available in the DSL blocks need to be defined on the view
       view.class_eval do
         attr_accessor :attributes, :state, :datatable
+        include Effective::EffectiveDatatable::Dsl::BulkActions
         include Effective::EffectiveDatatable::Dsl::Datatable
       end
 
@@ -38,6 +42,7 @@ module Effective
       view.state = state
 
       # Execute the the DSL methods
+      initialize_bulk_actions if respond_to?(:initialize_bulk_actions)
       initialize_datatable if respond_to?(:initialize_datatable)
       initialize_charts if respond_to?(:initialize_charts)
       initialize_scopes if respond_to?(:initialize_scopes)
