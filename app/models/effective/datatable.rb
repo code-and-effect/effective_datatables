@@ -9,7 +9,6 @@ module Effective
     extend Effective::EffectiveDatatable::Dsl
 
     include Effective::EffectiveDatatable::Attributes
-    include Effective::EffectiveDatatable::BulkActions
     include Effective::EffectiveDatatable::Cookie
     include Effective::EffectiveDatatable::Hooks
     include Effective::EffectiveDatatable::Columns

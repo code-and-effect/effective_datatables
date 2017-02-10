@@ -71,6 +71,7 @@ initializeDataTables = ->
       scrollCollapse: true
       pagingType: 'simple_numbers'
       initComplete: (settings) ->
+        initializeReset(this.api())
         initializeBulkActions(this.api())
         initializeFilters(this.api())
       drawCallback: (settings) ->
@@ -91,6 +92,12 @@ initializeDataTables = ->
 
       if $table.data('bulk-actions')
         $table.closest('.dataTables_wrapper').children().first().find('.dt-buttons').prepend($table.data('bulk-actions'))
+
+    initializeReset = (api) ->
+      $table = $(api.table().node())
+
+      if $table.data('reset')
+        $table.closest('.dataTables_wrapper').children().first().find('.dt-buttons').prepend($table.data('reset'))
 
     # After we perform a bulk action, we have to re-select the checkboxes manually and do a bit of house keeping
     drawBulkActions = ($table) ->

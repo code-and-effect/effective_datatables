@@ -36,7 +36,7 @@ module Effective
           }
         end
 
-        def array_column(name, as: nil, col_class: nil, filter: {}, format: nil, label: nil, partial: nil, responsive: 10000, sortable: true, visible: true, width: nil, &block)
+        def array_column(name, as: nil, col_class: nil, filter: {}, format: nil, label: nil, partial: nil, responsive: 10000, sortable: true, sql_column: nil, visible: true, width: nil, &block)
           raise 'You cannot use partial: ... with the block syntax' if partial && block_given?
 
           datatable.columns[name.to_sym] = {
@@ -52,7 +52,7 @@ module Effective
             sortable: sortable,
             sql_column: sql_column,
             visible: visible,
-            width: with
+            width: width
           }
         end
 

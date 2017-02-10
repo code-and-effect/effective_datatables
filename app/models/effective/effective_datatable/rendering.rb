@@ -106,12 +106,6 @@ module Effective
                     raise(e)
                   end
                 end
-              elsif opts[:proc]
-                if active_record_collection?
-                  view.instance_exec(obj, collection, self, &opts[:proc])
-                else
-                  view.instance_exec(obj, obj[opts[:index]], collection, self, &opts[:proc])
-                end
               elsif opts[:partial]
                 rendered[name][index]
               elsif opts[:as] == :belongs_to

@@ -23,10 +23,15 @@ module EffectiveDatatablesPrivateHelper
   end
 
   def datatable_bulk_actions(datatable)
-    render(partial: '/effective/datatables/bulk_actions_dropdown') if datatable.bulk_actions.present?
+    render(partial: '/effective/datatables/bulk_actions_dropdown', locals: { datatable: datatable }) if datatable.bulk_actions.present?
+  end
+
+  def datatable_reset(datatable)
+    render(partial: '/effective/datatables/reset', locals: { datatable: datatable })
   end
 
   def datatable_header_filter(form, name, value, opts)
+    include_blank = opts[:filter].key?(:include_blank) ? opts[:filter][:include_blank] : (opts[:label] || name.titleize)
     pattern = opts[:filter][:pattern]
     placeholder = opts[:filter][:placeholder] || ''
     title = opts[:filter][:title] || opts[:label] || opts[:name]
