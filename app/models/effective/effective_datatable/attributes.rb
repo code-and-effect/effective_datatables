@@ -9,24 +9,11 @@ module Effective
         args
       end
 
-      def load_attributes!
+      def initialize_attributes!
         if datatables_ajax_request?
-          attributes = Marshal.load(view.cookies.signed[attributes_cookie_name])
-          raise 'invalid attributes cookie' unless attributes.kind_of?(Hash)
-          @attributes = attributes
-        else
-          save_attributes!
+          raise 'Expected attributes cookie to be present' unless cookie
+          @attributes = cookie[:attributes]
         end
-      end
-
-      def save_attributes!
-        view.cookies.signed[attributes_cookie_name] = Marshal.dump(attributes)
-      end
-
-      def attributes_cookie_name
-        @attributes_cookie_name ||= (
-          Base64.encode64(['attributes', to_param, URI(view.request.referer || view.request.url).path].join)
-        )
       end
 
     end

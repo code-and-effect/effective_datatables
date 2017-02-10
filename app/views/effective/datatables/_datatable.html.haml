@@ -8,12 +8,12 @@
       'columns' => datatable_columns(datatable),
       'display-order' => [datatable.order_index, datatable.order_direction].to_json(),
       'display-length' => datatable.display_length,
-      'display-records' => (datatable.to_json[:recordsFiltered] || 0),
+      'display-records' => datatable.to_json[:recordsFiltered],
       'display-start' => datatable.display_start,
       'input-js-options' => local_assigns[:input_js_options],
       'simple' => datatable.simple?.to_s,
       'source' => effective_datatables.datatable_path(datatable, {format: 'json'}),
-      'total-records' => (datatable.to_json[:recordsTotal] || 0)
+      'total-records' => datatable.to_json[:recordsTotal]
     }
   }
 

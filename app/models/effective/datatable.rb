@@ -8,6 +8,7 @@ module Effective
     extend Effective::EffectiveDatatable::Dsl
 
     include Effective::EffectiveDatatable::Attributes
+    include Effective::EffectiveDatatable::Cookie
     include Effective::EffectiveDatatable::Hooks
     include Effective::EffectiveDatatable::Columns
     include Effective::EffectiveDatatable::Rendering
@@ -29,9 +30,7 @@ module Effective
         include Effective::EffectiveDatatable::Dsl::Datatable
       end
 
-      load_cookie!
-
-      load_attributes!
+      initialize_attributes!
 
       view.attributes = attributes
       view.datatable = self
@@ -46,7 +45,9 @@ module Effective
       initialize_collection_class!  # This is the first time the_collection() is called
       initialize_columns!
       initialize_filters!
-      load_state!
+      initialize_state!
+
+      save_cookie!
     end
 
     def collection
@@ -122,7 +123,7 @@ module Effective
     end
 
     def datatables_ajax_request?
-      view.params[:draw] && view.params[:columns] && view.params[:id] == to_param
+      view && view.params[:draw] && view.params[:columns] && view.params[:id] == to_param
     end
 
     def table_tool

@@ -17,7 +17,7 @@ module EffectiveDatatablesPrivateHelper
         sortable: (opts[:sortable] && !datatable.simple?),
         visible: datatable.state[:visible][name],
         filterHtml: (datatable_header_filter(form, name, datatable.state[:search][name], opts) unless datatable.simple?),
-        filterSelectedValue: opts[:filter][:selected]
+        filterSelectedValue: (datatable.state[:search][name] if datatable.state[:search].key?(name))
       }
     end.to_json
   end

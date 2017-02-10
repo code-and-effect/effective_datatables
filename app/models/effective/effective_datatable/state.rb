@@ -42,21 +42,25 @@ module Effective
           order_name: nil,
           order_dir: nil,
           order_index: nil,
+          params: 0,
           start: nil,
-          search: {},
+          search: {}, # {email: 'something@', user_id: 3}
           visible: {}
         }
       end
 
-      def load_state!
+      def initialize_state!
         if datatables_ajax_request?
           load_ajax_state!
-          save_state!
-        elsif state_cookie.present?
-          load_saved_state!
+          state[:params] = cookie[:state][:params]
+        elsif cookie.present? && cookie[:state][:params] == search_params.length
+          load_cookie_state!
+          load_params_state!
+          state[:params] = search_params.length
         else
           load_default_state!
-          save_state!
+          load_params_state!
+          state[:params] = search_params.length
         end
       end
 
@@ -70,26 +74,24 @@ module Effective
 
         state[:start] = params[:start].to_i
 
-        state[:visible] = {}
         state[:search] = {}
+        state[:visible] = {}
 
         params[:columns].values.each do |params|
           name = params[:name].to_sym
           raise "unexpected column name: #{name}" unless columns.key?(name)
 
+          state[:search][name] = params[:search][:value] if params[:search][:value].present? # TODO deal with false/true/nil
           state[:visible][name] = (params[:visible] == 'true')
-          state[:search][name] = params[:search][:value] if params[:search][:value].present?
         end
       end
 
-      def load_saved_state!
-        state = Marshal.load(state_cookie)
-        raise 'invalid cookie' unless state.kind_of?(Hash)
-        @state = state
+      def load_cookie_state!
+        @state = cookie[:state]
       end
 
       def load_default_state!
-        # Might already be set by DSL methods
+        # These 3 might already be set by DSL methods
         state[:length] ||= 25
         state[:order_dir] ||= :asc
         state[:order_name] ||= columns.first[0]
@@ -102,28 +104,18 @@ module Effective
           state[:search][name] = opts[:filter][:selected] if opts[:filter][:selected]
           state[:visible][name] = opts[:visible]
         end
-
-        # This parses the URL for any param passed searches
-        view.params.each do |key, value|
-          name = key.to_sym
-          next unless columns.key?(name)
-
-          state[:search][name] = value
-        end
       end
 
-      def save_state!
-        view.cookies.signed[state_cookie_name] = Marshal.dump(state)
+      # Overrides any state params set from the cookie
+      def load_params_state!
+        search_params.each { |name, value| state[:search][name] = value }
       end
 
-      def state_cookie
-        @state_cookie ||= view.cookies.signed[state_cookie_name]
-      end
-
-      def state_cookie_name
-        @state_cookie_name ||= (
-          uri = URI(view.request.referer || view.request.url)
-          Base64.encode64(['state', to_param, uri.path, uri.query].join)
+      def search_params
+        @search_params ||= (
+          {}.tap do |params|
+            view.params.each { |name, value| name = name.to_sym; params[name] = value if columns.key?(name) }
+          end
         )
       end
 
