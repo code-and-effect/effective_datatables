@@ -3,13 +3,6 @@ module Effective
     module Filters
 
       def initialize_filters!
-        filters.each do |name, opts|
-          opts[:label] ||= name.to_s.titleize
-        end
-
-        scopes.each do |name, opts|
-          opts[:label] ||= name.to_s.titleize
-        end
       end
 
       # The datatable has just passed the string value of any filters
