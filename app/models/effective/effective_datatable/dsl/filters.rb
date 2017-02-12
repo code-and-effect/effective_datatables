@@ -8,7 +8,7 @@ module Effective
           datatable.filters[name.to_sym] = {
             value: value,
             as: as,
-            label: label,
+            label: label || name.to_s.titleize,
             name: name.to_sym,
             parse: parse,
             required: required,
@@ -20,7 +20,7 @@ module Effective
         def scope(name, default: nil, label: nil, &block)
           datatable.scopes[name.to_sym] = {
             default: default,
-            label: label,
+            label: label || name.to_s.titleize,
             block: (block if block_given?)
           }
         end
