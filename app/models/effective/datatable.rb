@@ -3,6 +3,8 @@ module Effective
     attr_reader :attributes     # Anything that we initialize our table with. That's it.
     attr_reader :bulk_actions
     attr_reader :columns
+    attr_reader :filters
+    attr_reader :scopes
     attr_reader :state
     attr_reader :view
 
@@ -12,6 +14,7 @@ module Effective
     include Effective::EffectiveDatatable::Cookie
     include Effective::EffectiveDatatable::Hooks
     include Effective::EffectiveDatatable::Columns
+    include Effective::EffectiveDatatable::Filters
     include Effective::EffectiveDatatable::Rendering
     include Effective::EffectiveDatatable::State
 
@@ -19,6 +22,8 @@ module Effective
       @attributes = initial_attributes(args)
       @bulk_actions = []
       @columns = {}
+      @filters = {}
+      @scopes = {}
       @state = initial_state
     end
 
@@ -28,9 +33,10 @@ module Effective
 
       # Any datatable specific functions we want available in the DSL blocks need to be defined on the view
       view.class_eval do
-        attr_accessor :attributes, :state, :datatable
+        attr_accessor :attributes, :datatable, :state
         include Effective::EffectiveDatatable::Dsl::BulkActions
         include Effective::EffectiveDatatable::Dsl::Datatable
+        include Effective::EffectiveDatatable::Dsl::Filters
       end
 
       initialize_cookie!
@@ -44,14 +50,16 @@ module Effective
       initialize_bulk_actions if respond_to?(:initialize_bulk_actions)
       initialize_datatable if respond_to?(:initialize_datatable)
       initialize_charts if respond_to?(:initialize_charts)
-      initialize_scopes if respond_to?(:initialize_scopes)
+      initialize_filters if respond_to?(:initialize_filters)
 
       # Normalize and validate all the options
+
       initialize_collection_class!  # This is the first time the_collection() is called
       initialize_columns!
+      initialize_column_filters!
       initialize_filters!
-      initialize_state!
 
+      initialize_state!
       save_cookie!
     end
 
@@ -106,11 +114,7 @@ module Effective
     end
 
     def to_param
-      self.class.name.underscore
-    end
-
-    def scopes
-      nil
+      @to_param ||= self.class.name.underscore.parameterize
     end
 
     protected

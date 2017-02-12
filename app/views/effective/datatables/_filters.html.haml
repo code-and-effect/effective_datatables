@@ -1,0 +1,20 @@
+.row
+  .col-sm-12.effective-datatable-filters
+    = simple_form_for :filters, url: '#', html: { class: 'form-inline', 'aria-controls' => datatable.to_param } do |form|
+
+      - if datatable.scopes.present?
+        = form.input :scope, label: false, as: (defined?(EffectiveFormInputs) ? :effective_radio_buttons : :radio_buttons),
+          collection: datatable.scopes.map { |name, opts| [opts[:label], name] },
+          checked: datatable.state[:scope],
+          input_html: { name: 'scope' },
+          buttons: true
+
+      - datatable.filters.each do |name, opts|
+        = form.input name, label: opts[:label], value: opts[:value],
+          as: opts[:as],
+          required: opts[:required],
+          input_html: opts[:input_html]
+
+      = link_to 'Apply', '#', class: 'btn btn-primary', 'data-apply-datatable-filters' => true
+      = link_to 'Reset', '#', 'data-reset-datatable-filters' => true
+

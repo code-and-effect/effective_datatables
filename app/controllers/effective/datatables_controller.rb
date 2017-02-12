@@ -25,6 +25,7 @@ module Effective
     private
 
     def find_datatable(id)
+      id = id.gsub('-', '/')
       id.classify.safe_constantize || id.classify.pluralize.safe_constantize
     end
 

@@ -64,9 +64,20 @@ initializeDataTables = ->
       processing: true
       responsive: true
       serverParams: (params) ->
-        table = this.api()
-        table.columns().flatten().each (index) =>
-          params['columns'][index]['visible'] = table.column(index).visible()
+        api = this.api()
+        api.columns().flatten().each (index) => params['columns'][index]['visible'] = api.column(index).visible()
+
+        $table = $(api.table().node())
+        $form = $("form[aria-controls='#{$table.attr('id')}']").first()
+
+        if $form.length > 0
+          params['scope'] = $form.find("input[name='scope']:checked").val() || ''
+          params['filters'] = {}
+
+          $form.find("input[name^='filter']").each ->
+            $input = $(this)
+            params['filters'][$input.attr('name').substring(8, $input.attr('name').length-1)] = $input.val()
+
       serverSide: true
       scrollCollapse: true
       pagingType: 'simple_numbers'

@@ -32,20 +32,20 @@ module EffectiveDatatablesHelper
       locals: {datatable: datatable, input_js_options: input_js_options.try(:to_json) }
   end
 
-  def render_datatable_scopes(datatable)
+  def render_datatable_filters(datatable)
     raise 'expected datatable to be present' unless datatable
 
-    return unless datatable.scopes.present?
     datatable.view ||= self
+    return unless datatable.scopes.present? || datatable.filters.present?
 
-    render partial: 'effective/datatables/scopes', locals: { datatable: datatable }
+    render partial: 'effective/datatables/filters', locals: { datatable: datatable }
   end
 
   def render_datatable_charts(datatable)
     raise 'expected datatable to be present' unless datatable
 
-    return unless datatable.charts.present?
     datatable.view ||= self
+    return unless datatable.charts.present?
 
     datatable.charts.map { |name, _| render_datatable_chart(datatable, name) }.join.html_safe
   end

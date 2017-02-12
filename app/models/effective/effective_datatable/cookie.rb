@@ -9,7 +9,7 @@ module Effective
           cookie = view.cookies.signed[cookie_name]
 
           if cookie.present?
-            data = Marshal.load(cookie)
+            data = Marshal.load(Base64.decode64(cookie))
             raise 'invalid cookie' unless [data, data[:attributes], data[:state]].all? { |obj| obj.kind_of?(Hash) }
             data
           end
@@ -17,7 +17,7 @@ module Effective
       end
 
       def save_cookie!
-        view.cookies.signed[cookie_name] = Marshal.dump(attributes: attributes, state: state)
+        view.cookies.signed[cookie_name] = Base64.encode64(Marshal.dump(attributes: attributes, state: state))
       end
 
       def cookie_name

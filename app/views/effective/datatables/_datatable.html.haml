@@ -1,7 +1,7 @@
 :ruby
   effective_datatable_params = {
-    id: "#{datatable.to_param}-table",
-    class: "#{datatable.table_html_class}",
+    id: datatable.to_param,
+    class: datatable.table_html_class,
     data: {
       'effective-form-inputs' => defined?(EffectiveFormInputs),
       'bulk-actions' => datatable_bulk_actions(datatable),

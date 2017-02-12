@@ -47,7 +47,7 @@ module Effective
         end
       end
 
-      def initialize_filters!
+      def initialize_column_filters!
         columns.each do |name, opts|
           filter = opts[:filter]
 

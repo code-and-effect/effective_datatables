@@ -12,8 +12,8 @@ module Effective
         define_method('initialize_datatable') { view.instance_exec(&block) }
       end
 
-      def scopes(&block)
-        define_method('initialize_scopes') { view.instance_exec(&block) }
+      def filters(&block)
+        define_method('initialize_filters') { view.instance_exec(&block) }
       end
 
       def charts(&block)

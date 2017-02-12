@@ -16,9 +16,9 @@
 
 //= require effective_datatables/bulk_actions
 //= require effective_datatables/events
+//= require effective_datatables/filters
 //= require effective_datatables/reset
 //= require effective_datatables/responsive
-//= require effective_datatables/scopes
 
 //= require effective_datatables/charts
 //= require effective_datatables/initialize

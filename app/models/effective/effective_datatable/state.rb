@@ -10,6 +10,10 @@ module Effective
         state[:start]
       end
 
+      def filters
+        state[:filter]
+      end
+
       def order_direction
         state[:order_dir]
       end
@@ -20,6 +24,10 @@ module Effective
 
       def order_name
         state[:order_name]
+      end
+
+      def scope
+        state[:scope]
       end
 
       def search_terms
@@ -38,11 +46,13 @@ module Effective
 
       def initial_state
         {
+          filter: {},
           length: nil,
           order_name: nil,
           order_dir: nil,
           order_index: nil,
           params: 0,
+          scope: nil,
           start: nil,
           search: {}, # {email: 'something@', user_id: 3}
           visible: {}
@@ -69,6 +79,7 @@ module Effective
         state[:order_index] = params[:order]['0'][:column].to_i
         state[:order_name] = columns.find { |name, opts| opts[:index] == state[:order_index] }.first
 
+        state[:scope] = scopes.keys.find { |name| params['scope'] == name.to_s }
         state[:start] = params[:start].to_i
 
         state[:search] = {}
@@ -80,6 +91,15 @@ module Effective
 
           state[:search][name] = params[:search][:value] if params[:search][:value].present? # TODO deal with false/true/nil
           state[:visible][name] = (params[:visible] == 'true')
+        end
+
+        state[:filters] = {}
+
+        params[:filters].each do |name, value|
+          name = name.to_sym
+          raise "unexpected filter name: #{name}" unless filters.key?(name)
+
+          state[:filters][name] = parse_filter(filters[name], value)
         end
 
         state[:params] = cookie[:state][:params]
@@ -97,11 +117,16 @@ module Effective
 
         # Must compute and apply defaults
         state[:order_index] = columns[order_name][:index]
+        state[:scope] = scopes.find { |_, opts| opts[:default] }.try(:first) || scopes.keys.first
         state[:start] = 0
 
         columns.each do |name, opts|
           state[:search][name] = opts[:filter][:selected] if opts[:filter].key?(:selected)
           state[:visible][name] = opts[:visible]
+        end
+
+        filters.each do |name, opts|
+          state[:filter][name] = opts[:value]
         end
       end
 
