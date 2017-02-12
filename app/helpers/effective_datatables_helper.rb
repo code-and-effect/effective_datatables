@@ -36,7 +36,7 @@ module EffectiveDatatablesHelper
     raise 'expected datatable to be present' unless datatable
 
     datatable.view ||= self
-    return unless datatable.scopes.present? || datatable.filters.present?
+    return unless datatable.scopes.present? || datatable.filterdefs.present?
 
     render partial: 'effective/datatables/filters', locals: { datatable: datatable }
   end

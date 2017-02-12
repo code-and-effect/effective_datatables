@@ -5,7 +5,7 @@ module Effective
         def filter(name, value, as: nil, label: nil, parse: nil, required: false, **input_html, &block)
           raise 'parse must be a Proc' if parse.present? && !parse.kind_of?(Proc)
 
-          datatable.filters[name.to_sym] = {
+          datatable.filterdefs[name.to_sym] = {
             value: value,
             as: as,
             label: label || name.to_s.titleize,

@@ -3,7 +3,7 @@ module Effective
     attr_reader :attributes     # Anything that we initialize our table with. That's it.
     attr_reader :bulk_actions
     attr_reader :columns
-    attr_reader :filters
+    attr_reader :filterdefs
     attr_reader :scopes
     attr_reader :state
     attr_reader :view
@@ -22,7 +22,7 @@ module Effective
       @attributes = initial_attributes(args)
       @bulk_actions = []
       @columns = {}
-      @filters = {}
+      @filterdefs = {}
       @scopes = {}
       @state = initial_state
     end
