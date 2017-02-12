@@ -75,6 +75,8 @@ module Effective
             responsive: responsive,
             sortable: false,
             sql_column: nil,
+            th: nil,
+            th_append: nil,
             visible: true,
             width: nil
           }

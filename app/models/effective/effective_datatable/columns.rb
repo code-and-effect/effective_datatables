@@ -27,9 +27,9 @@ module Effective
           opts[:as] ||= (
             if opts[:name].end_with?('_address') && defined?(EffectiveAddresses) && (collection_class.new rescue nil).respond_to?(:effective_addresses)
               :effective_address
-            elsif name == :id && defined?(EffectiveObfuscation) && collection.respond_to?(:deobfuscate)
+            elsif name == :id && defined?(EffectiveObfuscation) && the_collection.respond_to?(:deobfuscate)
               :obfuscated_id
-            elsif name == :roles && defined?(EffectiveRoles) && collection.respond_to?(:with_role)
+            elsif name == :roles && defined?(EffectiveRoles) && the_collection.respond_to?(:with_role)
               :effective_roles
             elsif sql_column && sql_column.type
               sql_column.type
