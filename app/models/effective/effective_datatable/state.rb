@@ -10,10 +10,6 @@ module Effective
         state[:start]
       end
 
-      def filters
-        state[:filter]
-      end
-
       def order_direction
         state[:order_dir]
       end
@@ -93,13 +89,13 @@ module Effective
           state[:visible][name] = (params[:visible] == 'true')
         end
 
-        state[:filters] = {}
+        state[:filter] = {}
 
-        params[:filters].each do |name, value|
+        params[:filter].each do |name, value|
           name = name.to_sym
           raise "unexpected filter name: #{name}" unless filters.key?(name)
 
-          state[:filters][name] = parse_filter(filters[name], value)
+          state[:filter][name] = parse_filter(filters[name], value)
         end
 
         state[:params] = cookie[:state][:params]

@@ -44,7 +44,6 @@ module Effective
 
       view.attributes = attributes
       view.datatable = self
-      view.state = state
 
       # Execute the the DSL methods
       initialize_bulk_actions if respond_to?(:initialize_bulk_actions)
@@ -52,15 +51,22 @@ module Effective
       initialize_charts if respond_to?(:initialize_charts)
       initialize_filters if respond_to?(:initialize_filters)
 
-      # Normalize and validate all the options
+      initialize_state!
+      view.state = state
 
-      initialize_collection_class!  # This is the first time the_collection() is called
+      # Normalize and validate all the options
+      initialize_collection!
+
+      initialize_collection_class!
       initialize_columns!
       initialize_column_filters!
       initialize_filters!
 
-      initialize_state!
       save_cookie!
+    end
+
+    def initialize_collection!
+      @memoized_collection ||= collection
     end
 
     def collection
