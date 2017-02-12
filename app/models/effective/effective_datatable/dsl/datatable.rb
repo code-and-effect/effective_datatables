@@ -16,7 +16,7 @@ module Effective
           datatable.state[:length] = (length == :all ? 9999999 : length)
         end
 
-        def table_column(name, as: nil, col_class: nil, filter: {}, format: nil, label: nil, partial: nil, responsive: 10000, sortable: true, sql_column: nil, visible: true, width: nil, &block)
+        def table_column(name, as: nil, col_class: nil, filter: {}, format: nil, label: nil, partial: nil, responsive: 10000, sortable: true, sql_column: nil, th: nil, th_append: nil, visible: true, width: nil, &block)
           raise 'You cannot use partial: ... with the block syntax' if partial && block_given?
 
           datatable.columns[name.to_sym] = {
@@ -31,12 +31,14 @@ module Effective
             responsive: responsive,
             sortable: sortable,
             sql_column: sql_column,
+            th: th,
+            th_append: th_append,
             visible: visible,
             width: width
           }
         end
 
-        def array_column(name, as: nil, col_class: nil, filter: {}, format: nil, label: nil, partial: nil, responsive: 10000, sortable: true, sql_column: nil, visible: true, width: nil, &block)
+        def array_column(name, as: nil, col_class: nil, filter: {}, format: nil, label: nil, partial: nil, responsive: 10000, sortable: true, sql_column: nil, th: nil, th_append: nil, visible: true, width: nil, &block)
           raise 'You cannot use partial: ... with the block syntax' if partial && block_given?
 
           datatable.columns[name.to_sym] = {
@@ -51,6 +53,8 @@ module Effective
             responsive: responsive,
             sortable: sortable,
             sql_column: sql_column,
+            th: th,
+            th_append: th_append,
             visible: visible,
             width: width
           }

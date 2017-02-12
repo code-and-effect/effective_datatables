@@ -32,7 +32,7 @@
           - columns.each do |name, opts|
             %th{(opts[:th] || {}).merge(title: (opts[:label] || name))}
               = opts[:label] || name
-            - (opts[:append_th] || []).each do |faux_col|
+            - (opts[:th_append] || []).each do |faux_col|
               %th{(faux_col[:th] || {}).merge(title: faux_col[:label])}
                 = faux_col[:label]
 
