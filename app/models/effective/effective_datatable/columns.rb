@@ -42,8 +42,6 @@ module Effective
 
           opts[:class] = "col-#{opts[:as]} col-#{opts[:name].parameterize} #{opts[:col_class]}".strip
           opts[:label] ||= opts[:name].titleize
-
-          opts[:index] = index  # The index of this column in the collection, regardless of hidden table_columns
         end
       end
 

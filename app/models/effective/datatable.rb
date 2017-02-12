@@ -1,12 +1,17 @@
 module Effective
   class Datatable
-    attr_reader :attributes     # Anything that we initialize our table with. That's it.
+    # Anything that we initialize our table with. That's it.
+    attr_reader :attributes
+
+    # Hashes of DSL options
     attr_reader :bulk_actions
     attr_reader :columns
     attr_reader :filterdefs
     attr_reader :scopes
-    attr_reader :state
+
+    # The view, and the ajax/cookie/default state
     attr_reader :view
+    attr_reader :state
 
     extend Effective::EffectiveDatatable::Dsl
 
@@ -24,7 +29,6 @@ module Effective
       @columns = {}
       @filterdefs = {}
       @scopes = {}
-      @state = initial_state
     end
 
     # Once the view is assigned, we initialize everything
@@ -40,27 +44,35 @@ module Effective
       end
 
       initialize_cookie!
-      initialize_attributes!
-
-      view.attributes = attributes
       view.datatable = self
 
-      # Execute the the DSL methods
-      initialize_bulk_actions if respond_to?(:initialize_bulk_actions)
-      initialize_datatable if respond_to?(:initialize_datatable)
-      initialize_charts if respond_to?(:initialize_charts)
+      initialize_attributes!
+      view.attributes = attributes
+
+      # We need early access to filter and scope, to define defaults from the model first
+      # This means filters do knows about attributes but not about columns.
       initialize_filters if respond_to?(:initialize_filters)
 
       initialize_state!
       view.state = state
 
+      # Now we initialize all the columns
+      # columns knows about attributes and filters and scope
+      initialize_datatable if respond_to?(:initialize_datatable)
+
+      # We call this again, after the column defaults are populated
+      initialize_state!
+      view.state = state
+
+      # Execute any additional DSL methods
+      initialize_bulk_actions if respond_to?(:initialize_bulk_actions)
+      initialize_charts if respond_to?(:initialize_charts)
+
       # Normalize and validate all the options
       initialize_collection!
-
       initialize_collection_class!
       initialize_columns!
       initialize_column_filters!
-      initialize_filters!
 
       save_cookie!
     end

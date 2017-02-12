@@ -2,9 +2,6 @@ module Effective
   module EffectiveDatatable
     module Filters
 
-      def initialize_filters!
-      end
-
       # The datatable has just passed the string value of any filters
       # We need to convert it into the correct datatype
       def parse_filter(filter, filter_term)
