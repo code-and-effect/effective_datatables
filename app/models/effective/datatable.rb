@@ -43,34 +43,31 @@ module Effective
         include Effective::EffectiveDatatable::Dsl::Filters
       end
 
-      initialize_cookie!
       view.datatable = self
-
+      initialize_cookie!
       initialize_attributes!
-      view.attributes = attributes
 
       # We need early access to filter and scope, to define defaults from the model first
       # This means filters do knows about attributes but not about columns.
       initialize_filters if respond_to?(:initialize_filters)
-
       initialize_state!
-      view.state = state
 
       # Now we initialize all the columns
       # columns knows about attributes and filters and scope
       initialize_datatable if respond_to?(:initialize_datatable)
-
-      # We call this again, after the column defaults are populated
-      initialize_state!
-      view.state = state
+      load_columns_state!
 
       # Execute any additional DSL methods
       initialize_bulk_actions if respond_to?(:initialize_bulk_actions)
       initialize_charts if respond_to?(:initialize_charts)
 
-      # Normalize and validate all the options
+      binding.pry
+
+      # Load the collection. This is the first time def collection is called on the Datatable itself
       initialize_collection!
       initialize_collection_class!
+
+      # Figure out the class, and if it's activerecord, do all the resource discovery on it
       initialize_columns!
       initialize_column_filters!
 

@@ -11,9 +11,11 @@ module Effective
 
       def initialize_attributes!
         if datatables_ajax_request?
-          raise 'Expected attributes cookie to be present' unless cookie && cookies[:attribute].kind_of?(Hash)
+          raise 'Expected attributes cookie to be present' unless cookie && cookie[:attributes].kind_of?(Hash)
           @attributes = cookie[:attributes]
         end
+
+        view.attributes = attributes
       end
 
     end
