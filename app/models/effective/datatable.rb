@@ -1,6 +1,6 @@
 module Effective
   class Datatable
-    # Anything that we initialize our table with. That's it.
+    # Anything that we initialize our table with. That's it. Can't be changed by state.
     attr_reader :attributes
 
     # Hashes of DSL options
@@ -18,13 +18,15 @@ module Effective
     include Effective::EffectiveDatatable::Attributes
     include Effective::EffectiveDatatable::Cookie
     include Effective::EffectiveDatatable::Hooks
-    include Effective::EffectiveDatatable::Columns
+    include Effective::EffectiveDatatable::Collection
     include Effective::EffectiveDatatable::Filters
     include Effective::EffectiveDatatable::Rendering
     include Effective::EffectiveDatatable::State
 
     def initialize(args = {})
       @attributes = initial_attributes(args)
+      @state = initial_state
+
       @bulk_actions = []
       @columns = {}
       @filterdefs = {}
@@ -44,37 +46,36 @@ module Effective
       end
 
       view.datatable = self
-      initialize_cookie!
-      initialize_attributes!
+      load_cookie!
+      load_attributes!
 
       # We need early access to filter and scope, to define defaults from the model first
       # This means filters do knows about attributes but not about columns.
       initialize_filters if respond_to?(:initialize_filters)
-      initialize_state!
+      load_filters!
+      load_state!
 
-      # Now we initialize all the columns
-      # columns knows about attributes and filters and scope
+      # Now we initialize all the columns. columns knows about attributes and filters and scope
       initialize_datatable if respond_to?(:initialize_datatable)
-      load_columns_state!
+      load_columns!
+      load_params!
 
       # Execute any additional DSL methods
       initialize_bulk_actions if respond_to?(:initialize_bulk_actions)
       initialize_charts if respond_to?(:initialize_charts)
-
-      binding.pry
 
       # Load the collection. This is the first time def collection is called on the Datatable itself
       initialize_collection!
       initialize_collection_class!
 
       # Figure out the class, and if it's activerecord, do all the resource discovery on it
-      initialize_columns!
-      initialize_column_filters!
+      initialize_collection_columns!
+      initialize_collection_column_filters!
 
       save_cookie!
     end
 
-    def initialize_collection!
+    def the_collection
       @memoized_collection ||= collection
     end
 
@@ -133,10 +134,6 @@ module Effective
     end
 
     protected
-
-    def the_collection
-      @memoized_collection ||= collection
-    end
 
     def active_record_collection?
       @active_record_collection == true

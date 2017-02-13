@@ -4,7 +4,7 @@ module Effective
 
       attr_reader :cookie
 
-      def initialize_cookie!
+      def load_cookie!
         @cookie ||= (
           cookie = view.cookies.signed[cookie_name]
 

@@ -2,7 +2,11 @@
 
 module Effective
   module EffectiveDatatable
-    module Columns
+    module Collection
+
+      def initialize_collection!
+        @memoized_collection ||= collection
+      end
 
       def initialize_collection_class!
         @collection_class = (the_collection.respond_to?(:klass) ? the_collection.klass : self.class)
@@ -14,7 +18,7 @@ module Effective
         end
       end
 
-      def initialize_columns!
+      def initialize_collection_columns!
         # And then parse all the colums
         sql_table = (the_collection.table if active_record_collection?)
 
@@ -45,7 +49,7 @@ module Effective
         end
       end
 
-      def initialize_column_filters!
+      def initialize_collection_column_filters!
         columns.each do |name, opts|
           filter = opts[:filter]
 

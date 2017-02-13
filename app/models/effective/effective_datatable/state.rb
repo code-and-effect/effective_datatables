@@ -6,7 +6,7 @@ module Effective
         state[:scope]
       end
 
-      def filters
+      def current_filters
         state[:filter]
       end
 
@@ -23,7 +23,7 @@ module Effective
       end
 
       def order_index
-        state[:order_index] || raise('no order index')
+        state[:order_index]
       end
 
       def order_name
@@ -44,24 +44,31 @@ module Effective
 
       private
 
+      # This is called first.  Our initial state is set.
       def initial_state
         {
-          filter: filterdefs.inject({}) { |h, (name, opts)| h[name] = opts[:value]; h },
+          filter: {},
           length: 25,
           order_name: nil,
           order_dir: nil,
           order_index: nil,
           params: 0,
-          scope: scopes.find { |_, opts| opts[:default] }.try(:first) || scopes.keys.first,
+          scope: nil,
           start: 0,
-          search: {}, # {email: 'something@', user_id: 3}
+          search: {},
           visible: {}
         }
       end
 
-      def initialize_state!
-        @state ||= initial_state
+      def load_filters!
+        state[:filter] = filterdefs.inject({}) { |h, (name, opts)| h[name] = opts[:value]; h }
+        state[:scope] = scopes.find { |_, opts| opts[:default] }.try(:first) || scopes.keys.first
 
+        filter_params.each { |name, value| state[:filter][name] = value }
+        state[:scope] = scope_param if scope_param
+      end
+
+      def load_state!
         if datatables_ajax_request?
           Rails.logger.info('AJAX')
           load_ajax_state!
@@ -112,7 +119,7 @@ module Effective
         @state = cookie[:state]
       end
 
-      def load_columns_state!
+      def load_columns!
         # These 3 might already be set by DSL methods
         state[:order_dir] ||= :asc
 
@@ -123,19 +130,21 @@ module Effective
           state[:order_index] = columns[order_name][:index]
         end
 
-        if state[:visible].blank? && state[:search].blank?
+        if state[:search].blank?
           columns.each do |name, opts|
             state[:search][name] = opts[:filter][:selected] if opts[:filter].key?(:selected)
-            state[:visible][name] = opts[:visible]
           end
         end
 
-        # Now that we know about the columns, we can ensure only column name params are being set
-        load_params_state!
+        columns.each do |name, opts|
+          state[:visible][name] = opts[:visible] unless state[:visible].key?(name)
+        end
       end
 
       # Overrides any state params set from the cookie
-      def load_params_state!
+      def load_params!
+        return if datatables_ajax_request?
+
         search_params.each { |name, value| state[:search][name] = value }
         state[:params] = search_params.length
       end
@@ -147,6 +156,21 @@ module Effective
             view.params.each { |name, value| name = name.to_sym; params[name] = value if (columns.key?(name) && name != :id) }
           end
         )
+      end
+
+      def filter_params
+        @filter_params ||= (
+          {}.tap do |params|
+            # TODO FIX search for id ID
+            view.params.each { |name, value| name = name.to_sym; params[name] = value if filterdefs.key?(name) }
+          end
+        )
+      end
+
+      def scope_param
+        return nil unless view.params['scope']
+        scope = view.params['scope'].to_sym
+        scope if scopes.key?(scope)
       end
 
     end

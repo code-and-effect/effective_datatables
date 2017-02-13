@@ -9,9 +9,9 @@ module Effective
         args
       end
 
-      def initialize_attributes!
+      def load_attributes!
         if datatables_ajax_request?
-          raise 'Expected attributes cookie to be present' unless cookie && cookie[:attributes].kind_of?(Hash)
+          raise 'Expected attributes cookie to be present' unless cookie
           @attributes = cookie[:attributes]
         end
 
