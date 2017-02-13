@@ -6,13 +6,13 @@ module Effective
         def order(name, dir = :asc)
           raise 'order direction must be :asc or :desc' unless [:asc, :desc].include?(dir)
 
-          datatable.state[:order_name] = name
-          datatable.state[:order_dir] = dir
+          datatable.state[:order_name] ||= name
+          datatable.state[:order_dir] ||= dir
         end
 
         def length(length)
           raise 'length must be 10, 25, 50, 100, 250, 1000, :all' unless [10, 25, 50, 100, 250, 1000, :all].include?(length)
-          datatable.state[:length] = (length == :all ? 9999999 : length)
+          datatable.state[:length] ||= (length == :all ? 9999999 : length)
         end
 
         def col(name, as: nil, col_class: nil, format: nil, label: nil, partial: nil, responsive: 10000, search: {}, sort: true, sql_column: nil, th: nil, th_append: nil, visible: true, width: nil, &block)

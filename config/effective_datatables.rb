@@ -34,7 +34,7 @@ EffectiveDatatables.setup do |config|
 
   # Default number of entries shown per page
   # Valid options are: 10, 25, 50, 100, 250, 1000, :all
-  config.default_entries = 25
+  config.default_length = 25
 
   # When using the actions_column DSL method, apply the following behavior
   # Valid values for each action are:

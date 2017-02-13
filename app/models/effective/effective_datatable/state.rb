@@ -48,7 +48,7 @@ module Effective
       def initial_state
         {
           filter: {},
-          length: 25,
+          length: nil,
           order_name: nil,
           order_dir: nil,
           order_index: nil,
@@ -80,7 +80,8 @@ module Effective
 
       def load_ajax_state!
         state[:length] = params[:length].to_i
-        state[:order_dir] = params[:order]['0'][:dir] == 'desc' ? :desc : :asc
+
+        state[:order_dir] = (params[:order]['0'][:dir] == 'desc' ? :desc : :asc)
         state[:order_index] = params[:order]['0'][:column].to_i
 
         state[:scope] = scopes.keys.find { |name| params[:scope] == name.to_s }
@@ -112,7 +113,7 @@ module Effective
       end
 
       def load_columns!
-        state[:order_dir] ||= :asc
+        state[:length] ||= EffectiveDatatables.default_length
 
         if order_index.present?
           state[:order_name] = columns.keys[order_index]
@@ -120,6 +121,8 @@ module Effective
           state[:order_name] ||= columns.find { |name, opts| opts[:sort] }.first
           state[:order_index] = columns[order_name][:index]
         end
+
+        state[:order_dir] ||= :asc
 
         if state[:search].blank?
           columns.each do |name, opts|

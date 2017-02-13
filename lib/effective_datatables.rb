@@ -11,7 +11,7 @@ module EffectiveDatatables
   mattr_accessor :integer_format
   mattr_accessor :boolean_format
 
-  mattr_accessor :default_entries
+  mattr_accessor :default_length
   mattr_accessor :actions_column # A Hash
 
   mattr_accessor :google_chart_packages
