@@ -9,8 +9,8 @@
           input_html: { name: 'scope' },
           buttons: true
 
-      - datatable.filterdefs.each do |name, opts|
-        = form.input name, label: opts[:label], value: opts[:value],
+      - datatable.filters.each do |name, opts|
+        = form.input name, label: opts[:label], value: datatable.state[:filter][name],
           as: opts[:as],
           required: opts[:required],
           input_html: opts[:input_html]

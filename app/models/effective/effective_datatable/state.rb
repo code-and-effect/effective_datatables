@@ -6,7 +6,7 @@ module Effective
         state[:scope]
       end
 
-      def filters
+      def filter
         state[:filter]
       end
 
@@ -61,10 +61,10 @@ module Effective
       end
 
       def load_filters!
-        state[:filter] = filterdefs.inject({}) { |h, (name, opts)| h[name] = opts[:value]; h }
+        state[:filter] = filters.inject({}) { |h, (name, opts)| h[name] = opts[:value]; h }
         state[:scope] = scopes.find { |_, opts| opts[:default] }.try(:first) || scopes.keys.first
 
-        filter_params.each { |name, value| state[:filter][name] = value }
+        filter_params.each { |name, value| state[:filter][name] = parse_filter(filters[name], value) }
         state[:scope] = scope_param if scope_param
       end
 
@@ -105,9 +105,9 @@ module Effective
 
         params[:filter].each do |name, value|
           name = name.to_sym
-          raise "unexpected filter name: #{name}" unless filterdefs.key?(name)
+          raise "unexpected filter name: #{name}" unless filters.key?(name)
 
-          state[:filter][name] = parse_filter(filterdefs[name], value)
+          state[:filter][name] = parse_filter(filters[name], value)
         end
 
         state[:params] = cookie[:state][:params]
@@ -160,7 +160,7 @@ module Effective
         @filter_params ||= (
           {}.tap do |params|
             # TODO FIX search for id ID
-            view.params.each { |name, value| name = name.to_sym; params[name] = value if filterdefs.key?(name) }
+            view.params.each { |name, value| name = name.to_sym; params[name] = value if filters.key?(name) }
           end
         )
       end

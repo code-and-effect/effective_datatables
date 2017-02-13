@@ -2,10 +2,13 @@ module Effective
   module EffectiveDatatable
     module Dsl
       module Filters
-        def filter(name, value, as: nil, label: nil, parse: nil, required: false, **input_html, &block)
+        def filter(name = nil, value = :_no_value, as: nil, label: nil, parse: nil, required: false, **input_html, &block)
+          return datatable.state[:filter] unless (name || value)
+
+          raise 'expected second argument to be a value' if value == :_no_value
           raise 'parse must be a Proc' if parse.present? && !parse.kind_of?(Proc)
 
-          datatable.filterdefs[name.to_sym] = {
+          datatable.filters[name.to_sym] = {
             value: value,
             as: as,
             label: label || name.to_s.titleize,
@@ -22,11 +25,15 @@ module Effective
         end
 
         def filters
-          datatable.filters
+          datatable.state[:filter]
+        end
+
+        def search
+          datatable.state[:search]
         end
 
         def scope(name = nil, default: nil, label: nil, &block)
-          return datatable.scope unless name
+          return datatable.state[:scope] unless name
 
           datatable.scopes[name.to_sym] = {
             default: default,

@@ -6,7 +6,7 @@ module Effective
     # Hashes of DSL options
     attr_reader :bulk_actions
     attr_reader :columns
-    attr_reader :filterdefs
+    attr_reader :filters
     attr_reader :scopes
 
     # The collection itself. Only evaluated once.
@@ -32,7 +32,7 @@ module Effective
 
       @bulk_actions = []
       @columns = {}
-      @filterdefs = {}
+      @filters = {}
       @scopes = {}
     end
 
