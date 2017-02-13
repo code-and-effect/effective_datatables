@@ -72,7 +72,7 @@ module Effective
         if datatables_ajax_request?
           Rails.logger.info('AJAX')
           load_ajax_state!
-        elsif cookie.present? && cookie[:state][:params] == search_params.length && cookie[:state][:visible].length == columns.length
+        elsif cookie.present? && cookie[:state][:params] == view.params.length
           Rails.logger.info('COOKIE')
           load_cookie_state!
         else
@@ -144,7 +144,7 @@ module Effective
         return if datatables_ajax_request?
 
         search_params.each { |name, value| state[:search][name] = value }
-        state[:params] = search_params.length
+        state[:params] = view.params.length
       end
 
       def search_params
