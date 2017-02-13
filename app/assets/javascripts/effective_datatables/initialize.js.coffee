@@ -147,8 +147,8 @@ initializeDataTables = ->
         $th = $(api.column(index).header())
         settings = api.settings()[0].aoColumns[index] # column specific settings
 
-        if settings.filterSelectedValue && ('' + settings.filterSelectedValue).length > 0 # Assign preselected filter values
-          api.settings()[0].aoPreSearchCols[index].sSearch = settings.filterSelectedValue
+        if settings.search && ('' + settings.search).length > 0 # Assign preselected filter values
+          api.settings()[0].aoPreSearchCols[index].sSearch = settings.search
 
         if settings.filterHtml  # Append the html filter HTML and initialize input events
           $th.append('<br>' + settings.filterHtml)

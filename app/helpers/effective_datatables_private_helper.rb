@@ -9,15 +9,15 @@ module EffectiveDatatablesPrivateHelper
 
     datatable.columns.map do |name, opts|
       {
-        name: opts[:name],
+        name: name,
         title: content_tag(:span, opts[:label], class: 'filter-label'),
         className: opts[:class],
-        width: opts[:width],
+        filterHtml: (datatable_filter_html(form, name, datatable.state[:search][name], opts) unless datatable.simple?),
         responsivePriority: opts[:responsive],
+        search: datatable.state[:search][name],
         sortable: (opts[:sortable] && !datatable.simple?),
         visible: datatable.state[:visible][name],
-        filterHtml: (datatable_header_filter(form, name, datatable.state[:search][name], opts) unless datatable.simple?),
-        filterSelectedValue: (datatable.state[:search][name] if datatable.state[:search].key?(name))
+        width: opts[:width]
       }
     end.to_json
   end
@@ -30,11 +30,11 @@ module EffectiveDatatablesPrivateHelper
     render(partial: '/effective/datatables/reset', locals: { datatable: datatable })
   end
 
-  def datatable_header_filter(form, name, value, opts)
-    include_blank = opts[:filter].key?(:include_blank) ? opts[:filter][:include_blank] : (opts[:label] || name.titleize)
+  def datatable_filter_html(form, name, value, opts)
+    include_blank = opts[:filter].key?(:include_blank) ? opts[:filter][:include_blank] : opts[:label]
     pattern = opts[:filter][:pattern]
     placeholder = opts[:filter][:placeholder] || ''
-    title = opts[:filter][:title] || opts[:label] || opts[:name]
+    title = opts[:filter][:title] || opts[:label]
     wrapper_html = { class: 'datatable_filter' }
 
     input_html = {
@@ -43,7 +43,7 @@ module EffectiveDatatablesPrivateHelper
       title: title,
       pattern: pattern,
       autocomplete: 'off',
-      data: {'column-name' => opts[:name], 'column-index' => opts[:index]}
+      data: {'column-name' => name, 'column-index' => opts[:index]}
     }.delete_if { |_, v| v.blank? }
 
     case opts[:filter][:as]
