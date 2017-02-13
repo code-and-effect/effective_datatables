@@ -2,7 +2,7 @@
 
 module Effective
   module EffectiveDatatable
-    module Rendering
+    module Render
       BLANK = ''.freeze
 
       private

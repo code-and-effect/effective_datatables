@@ -26,28 +26,28 @@ initializeDataTables = ->
           extend: 'copy',
           exportOptions:
             format:
-              header: (str) -> $("<div>#{str}</div>").children('.filter-label').first().text()
+              header: (str) -> $("<div>#{str}</div>").children('.search-label').first().text()
             columns: buttons_export_columns
         },
         {
           extend: 'csv',
           exportOptions:
             format:
-              header: (str) -> $("<div>#{str}</div>").children('.filter-label').first().text()
+              header: (str) -> $("<div>#{str}</div>").children('.search-label').first().text()
             columns: buttons_export_columns
         },
         {
           extend: 'excel',
           exportOptions:
             format:
-              header: (str) -> $("<div>#{str}</div>").children('.filter-label').first().text()
+              header: (str) -> $("<div>#{str}</div>").children('.search-label').first().text()
             columns: buttons_export_columns
         },
         {
           extend: 'print',
           exportOptions:
             format:
-              header: (str) -> $("<div>#{str}</div>").children('.filter-label').first().text()
+              header: (str) -> $("<div>#{str}</div>").children('.search-label').first().text()
             columns: ':visible:not(.col-actions)'
         },
       ]
@@ -84,7 +84,7 @@ initializeDataTables = ->
       initComplete: (settings) ->
         initializeReset(this.api())
         initializeBulkActions(this.api())
-        initializeFilters(this.api())
+        initializeSearch(this.api())
       drawCallback: (settings) ->
         $table = $(this.api().table().node())
 
@@ -141,21 +141,21 @@ initializeDataTables = ->
           chart = new google.visualization[data['type']](obj)
           chart.draw(google.visualization.arrayToDataTable(data['data']), data['options'])
 
-    # Appends the filter html, stored in the column definitions, into each column header
-    initializeFilters = (api) ->
+    # Appends the search html, stored in the column definitions, into each column header
+    initializeSearch = (api) ->
       api.columns().flatten().each (index) =>
         $th = $(api.column(index).header())
         settings = api.settings()[0].aoColumns[index] # column specific settings
 
-        if settings.search && ('' + settings.search).length > 0 # Assign preselected filter values
+        if settings.search && ('' + settings.search).length > 0 # Assign preselected values
           api.settings()[0].aoPreSearchCols[index].sSearch = settings.search
 
-        if settings.filterHtml  # Append the html filter HTML and initialize input events
-          $th.append('<br>' + settings.filterHtml)
-          initializeFilterEvents($th)
+        if settings.searchHtml  # Append the search html and initialize input events
+          $th.append('<br>' + settings.searchHtml)
+          initializeSearchEvents($th)
 
     # Sets up the proper events for each input
-    initializeFilterEvents = ($th) ->
+    initializeSearchEvents = ($th) ->
       $th.find('input,select').each (_, input) ->
         $input = $(input)
 

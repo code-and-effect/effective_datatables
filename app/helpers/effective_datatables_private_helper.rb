@@ -5,14 +5,14 @@ module EffectiveDatatablesPrivateHelper
   # https://datatables.net/reference/option/columns
   def datatable_columns(datatable)
     form = nil
-    simple_form_for(:datatable_filter, url: '#', html: {id: "#{datatable.to_param}-form"}) { |f| form = f }
+    simple_form_for(:datatable_search, url: '#', html: {id: "#{datatable.to_param}-form"}) { |f| form = f }
 
     datatable.columns.map do |name, opts|
       {
         name: name,
-        title: content_tag(:span, opts[:label], class: 'filter-label'),
+        title: content_tag(:span, opts[:label], class: 'search-label'),
         className: opts[:class],
-        filterHtml: (datatable_filter_html(form, name, datatable.state[:search][name], opts) unless datatable.simple?),
+        searchHtml: (datatable_search_html(form, name, datatable.state[:search][name], opts) unless datatable.simple?),
         responsivePriority: opts[:responsive],
         search: datatable.state[:search][name],
         sortable: (opts[:sortable] && !datatable.simple?),
@@ -30,12 +30,12 @@ module EffectiveDatatablesPrivateHelper
     render(partial: '/effective/datatables/reset', locals: { datatable: datatable })
   end
 
-  def datatable_filter_html(form, name, value, opts)
-    include_blank = opts[:filter].key?(:include_blank) ? opts[:filter][:include_blank] : opts[:label]
-    pattern = opts[:filter][:pattern]
-    placeholder = opts[:filter][:placeholder] || ''
-    title = opts[:filter][:title] || opts[:label]
-    wrapper_html = { class: 'datatable_filter' }
+  def datatable_search_html(form, name, value, opts)
+    include_blank = opts[:search].key?(:include_blank) ? opts[:search][:include_blank] : opts[:label]
+    pattern = opts[:search][:pattern]
+    placeholder = opts[:search][:placeholder] || ''
+    title = opts[:search][:title] || opts[:label]
+    wrapper_html = { class: 'datatable_search' }
 
     input_html = {
       name: nil,
@@ -46,7 +46,7 @@ module EffectiveDatatablesPrivateHelper
       data: {'column-name' => name, 'column-index' => opts[:index]}
     }.delete_if { |_, v| v.blank? }
 
-    case opts[:filter][:as]
+    case opts[:search][:as]
     when :string, :text, :number
       form.input name, label: false, required: false, value: value,
         as: :string,
@@ -77,13 +77,13 @@ module EffectiveDatatablesPrivateHelper
         wrapper_html: wrapper_html,
         input_group: false,
         input_html: input_html,
-        input_js: { useStrict: true, keepInvalid: true } # Keep invalid format like "2015-11" so we can still filter by year, month or day
+        input_js: { useStrict: true, keepInvalid: true } # Keep invalid format like "2015-11" so we can still search by year, month or day
     when :select, :boolean
       form.input name, label: false, required: false, value: value,
         as: (ActionView::Helpers::FormBuilder.instance_methods.include?(:effective_select) ? :effective_select : :select),
-        collection: opts[:filter][:collection],
-        selected: opts[:filter][:selected],
-        multiple: opts[:filter][:multiple] == true,
+        collection: opts[:search][:collection],
+        selected: opts[:search][:selected],
+        multiple: opts[:search][:multiple] == true,
         include_blank: include_blank,
         wrapper_html: wrapper_html,
         input_html: input_html,
@@ -91,13 +91,13 @@ module EffectiveDatatablesPrivateHelper
     when :grouped_select
       form.input name, label: false, required: false, value: value,
         as: (ActionView::Helpers::FormBuilder.instance_methods.include?(:effective_select) ? :effective_select : :grouped_select),
-        collection: opts[:filter][:collection],
-        selected: opts[:filter][:selected],
-        multiple: opts[:filter][:multiple] == true,
+        collection: opts[:search][:collection],
+        selected: opts[:search][:selected],
+        multiple: opts[:search][:multiple] == true,
         grouped: true,
-        polymorphic: opts[:filter][:polymorphic] == true,
-        group_label_method: opts[:filter][:group_label_method] || :first,
-        group_method: opts[:filter][:group_method] || :last,
+        polymorphic: opts[:search][:polymorphic] == true,
+        group_label_method: opts[:search][:group_label_method] || :first,
+        group_method: opts[:search][:group_method] || :last,
         wrapper_html: wrapper_html,
         input_html: input_html,
         input_js: { placeholder: placeholder }

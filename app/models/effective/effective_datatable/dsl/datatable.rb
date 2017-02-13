@@ -16,7 +16,7 @@ module Effective
           datatable.state[:length] = (length == :all ? 9999999 : length)
         end
 
-        def table_column(name, as: nil, col_class: nil, filter: {}, format: nil, label: nil, partial: nil, responsive: 10000, sortable: true, sql_column: nil, th: nil, th_append: nil, visible: true, width: nil, &block)
+        def table_column(name, as: nil, col_class: nil, format: nil, label: nil, partial: nil, responsive: 10000, search: {}, sort: true, sql_column: nil, th: nil, th_append: nil, visible: true, width: nil, &block)
           raise 'You cannot use partial: ... with the block syntax' if partial && block_given?
 
           datatable.columns[name.to_sym] = {
@@ -24,13 +24,13 @@ module Effective
             as: as,
             block: (block if block_given?),
             col_class: col_class,
-            filter: filter,
             format: format,
             index: datatable.columns.length,
             label: label || name.to_s.titleize,
             partial: partial,
             responsive: responsive,
-            sortable: sortable,
+            search: search,
+            sort: sort,
             sql_column: sql_column,
             th: th,
             th_append: th_append,
@@ -39,7 +39,7 @@ module Effective
           }
         end
 
-        def array_column(name, as: nil, col_class: nil, filter: {}, format: nil, label: nil, partial: nil, responsive: 10000, sortable: true, sql_column: nil, th: nil, th_append: nil, visible: true, width: nil, &block)
+        def array_column(name, as: nil, col_class: nil, format: nil, label: nil, partial: nil, responsive: 10000, search: {}, sort: true, sql_column: nil, th: nil, th_append: nil, visible: true, width: nil, &block)
           raise 'You cannot use partial: ... with the block syntax' if partial && block_given?
 
           datatable.columns[name.to_sym] = {
@@ -47,13 +47,13 @@ module Effective
             as: as,
             block: (block if block_given?),
             col_class: col_class,
-            filter: filter,
             format: format,
             index: datatable.columns.length,
             label: label || name.to_s.titleize,
             partial: partial,
             responsive: responsive,
-            sortable: sortable,
+            search: search,
+            sort: sort,
             sql_column: sql_column,
             th: th,
             th_append: th_append,
@@ -70,13 +70,13 @@ module Effective
             as: :bulk_actions,
             block: nil,
             col_class: col_class,
-            filter: {as: :bulk_actions},
             format: format,
             index: datatable.columns.length,
             label: '',
             partial: partial || '/effective/datatables/bulk_actions_column',
             responsive: responsive,
-            sortable: false,
+            search: {as: :bulk_actions},
+            sort: false,
             sql_column: nil,
             th: nil,
             th_append: nil,

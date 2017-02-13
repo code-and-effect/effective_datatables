@@ -84,7 +84,7 @@ module Effective
     end
 
     def search_column_with_defaults(collection, table_column, term, sql_column)
-      sql_op = table_column[:filter][:sql_operation] || :where # only other option is :having
+      sql_op = table_column[:search][:sql_operation] || :where # only other option is :having
 
       case table_column[:as]
       when :string, :text
@@ -92,7 +92,7 @@ module Effective
           collection.public_send(sql_op, "#{sql_column} = :term", term: term)
         elsif ['null', 'nil', nil].include?(term)
           collection.public_send(sql_op, "#{sql_column} = :term OR #{sql_column} IS NULL", term: '')
-        elsif table_column[:filter][:fuzzy]
+        elsif table_column[:search][:fuzzy]
           collection.public_send(sql_op, "#{sql_column} #{ilike} :term", term: "%#{term}%")
         else
           collection.public_send(sql_op, "#{sql_column} = :term", term: term)
@@ -121,7 +121,7 @@ module Effective
 
         raise "unable to find #{klass.name} has_many :#{collection.table_name} or belongs_to :#{collection.table_name.singularize} associations" unless inverse
 
-        ids = if [:select, :grouped_select].include?(table_column[:filter][:as])
+        ids = if [:select, :grouped_select].include?(table_column[:search][:as])
           # Treat the search term as one or more IDs
           inverse_ids = term.split(',').map { |term| (term = term.to_i) == 0 ? nil : term }.compact
           return collection unless inverse_ids.present?
@@ -164,7 +164,7 @@ module Effective
         inverse = reflection.inverse_of || klass.reflect_on_association(collection.table_name) || obj.class.reflect_on_association(collection.table_name.singularize)
         raise "unable to find #{klass.name} has_and_belongs_to_many :#{collection.table_name} or belongs_to :#{collection.table_name.singularize} associations" unless inverse
 
-        ids = if [:select, :grouped_select].include?(table_column[:filter][:as])
+        ids = if [:select, :grouped_select].include?(table_column[:search][:as])
           # Treat the search term as one or more IDs
           inverse_ids = term.split(',').map { |term| (term = term.to_i) == 0 ? nil : term }.compact
           return collection unless inverse_ids.present?
