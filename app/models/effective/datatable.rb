@@ -9,7 +9,7 @@ module Effective
     attr_reader :filterdefs
     attr_reader :scopes
 
-    # The collection itself
+    # The collection itself. Only evaluated once.
     attr_accessor :collection
 
     # The view, and the ajax/cookie/default state
