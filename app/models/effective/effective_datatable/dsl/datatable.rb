@@ -3,20 +3,19 @@ module Effective
     module Dsl
       module Datatable
         # Instance Methods inside the datatable do .. end block
-        def default_order(name, direction = :asc)
-          raise 'default_order direction must be :asc or :desc' unless [:asc, :desc].include?(direction)
+        def order(name, dir = :asc)
+          raise 'order direction must be :asc or :desc' unless [:asc, :desc].include?(dir)
 
           datatable.state[:order_name] = name
-          datatable.state[:order_dir] = direction
+          datatable.state[:order_dir] = dir
         end
 
-        def default_length(length)
-          raise 'default_length must be 10, 25, 50, 100, 250, 1000, :all' unless [10, 25, 50, 100, 250, 1000, :all].include?(length)
-
+        def length(length)
+          raise 'length must be 10, 25, 50, 100, 250, 1000, :all' unless [10, 25, 50, 100, 250, 1000, :all].include?(length)
           datatable.state[:length] = (length == :all ? 9999999 : length)
         end
 
-        def table_column(name, as: nil, col_class: nil, format: nil, label: nil, partial: nil, responsive: 10000, search: {}, sort: true, sql_column: nil, th: nil, th_append: nil, visible: true, width: nil, &block)
+        def col(name, as: nil, col_class: nil, format: nil, label: nil, partial: nil, responsive: 10000, search: {}, sort: true, sql_column: nil, th: nil, th_append: nil, visible: true, width: nil, &block)
           raise 'You cannot use partial: ... with the block syntax' if partial && block_given?
 
           datatable.columns[name.to_sym] = {
@@ -27,6 +26,7 @@ module Effective
             format: format,
             index: datatable.columns.length,
             label: label || name.to_s.titleize,
+            name: name.to_sym,
             partial: partial,
             responsive: responsive,
             search: search,
@@ -39,7 +39,7 @@ module Effective
           }
         end
 
-        def array_column(name, as: nil, col_class: nil, format: nil, label: nil, partial: nil, responsive: 10000, search: {}, sort: true, sql_column: nil, th: nil, th_append: nil, visible: true, width: nil, &block)
+        def val(name, as: nil, col_class: nil, format: nil, label: nil, partial: nil, responsive: 10000, search: {}, sort: true, sql_column: nil, th: nil, th_append: nil, visible: true, width: nil, &block)
           raise 'You cannot use partial: ... with the block syntax' if partial && block_given?
 
           datatable.columns[name.to_sym] = {
@@ -50,6 +50,7 @@ module Effective
             format: format,
             index: datatable.columns.length,
             label: label || name.to_s.titleize,
+            name: name.to_sym,
             partial: partial,
             responsive: responsive,
             search: search,
@@ -62,7 +63,7 @@ module Effective
           }
         end
 
-        def bulk_actions_column(col_class: nil, format: nil, partial: nil, responsive: 10000)
+        def bulk_actions_col(col_class: nil, format: nil, partial: nil, responsive: 10000)
           raise 'You can only have one bulk actions column' if datatable.columns[:bulk_actions].present?
 
           datatable.columns[:bulk_actions] = {
@@ -73,6 +74,7 @@ module Effective
             format: format,
             index: datatable.columns.length,
             label: '',
+            name: :bulk_actions,
             partial: partial || '/effective/datatables/bulk_actions_column',
             responsive: responsive,
             search: {as: :bulk_actions},
