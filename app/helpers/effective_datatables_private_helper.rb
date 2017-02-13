@@ -15,7 +15,7 @@ module EffectiveDatatablesPrivateHelper
         searchHtml: (datatable_search_html(form, name, datatable.state[:search][name], opts) unless datatable.simple?),
         responsivePriority: opts[:responsive],
         search: datatable.state[:search][name],
-        sortable: (opts[:sortable] && !datatable.simple?),
+        sortable: (opts[:sort] && !datatable.simple?),
         visible: datatable.state[:visible][name],
         width: opts[:width]
       }

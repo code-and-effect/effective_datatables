@@ -103,7 +103,7 @@ module Effective
         data = table_data
 
         {
-          draw: (view.params[:draw] || 0),
+          draw: (params[:draw] || 0),
           data: (data || []),
           recordsTotal: (total_records || 0),
           recordsFiltered: (display_records || 0),

@@ -70,13 +70,10 @@ module Effective
 
       def load_state!
         if datatables_ajax_request?
-          Rails.logger.info('AJAX')
           load_ajax_state!
         elsif cookie.present? && cookie[:state][:params] == params.length
-          Rails.logger.info('COOKIE')
           load_cookie_state!
         else
-          Rails.logger.info('DEFAULT')
           # Nothing to do for default state
         end
       end
@@ -94,7 +91,6 @@ module Effective
 
         params[:columns].values.each do |params|
           name = params[:name].to_sym
-
           state[:search][name] = params[:search][:value] if params[:search][:value].present? # TODO deal with false/true/nil
           state[:visible][name] = (params[:visible] == 'true')
         end
@@ -121,7 +117,7 @@ module Effective
         if order_index.present?
           state[:order_name] = columns.keys[order_index]
         else
-          state[:order_name] ||= columns.find { |name, opts| opts[:sortable] }.first
+          state[:order_name] ||= columns.find { |name, opts| opts[:sort] }.first
           state[:order_index] = columns[order_name][:index]
         end
 
