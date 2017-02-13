@@ -77,7 +77,7 @@ module Effective
 
       # Figure out the class, and if it's activerecord, do all the resource discovery on it
       load_collection_columns!
-      load_collection_column_filters!
+      load_collection_columns_search!
 
       save_cookie!
     end

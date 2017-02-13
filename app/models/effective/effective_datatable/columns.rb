@@ -11,11 +11,10 @@ module Effective
         columns.each_with_index do |(name, opts), index|
           sql_column = false
 
-          opts[:name] = name.to_s
           opts[:sql_column] = name
 
           opts[:as] ||= (
-            if opts[:name].end_with?('_address') && defined?(EffectiveAddresses) && (collection_class.new rescue nil).respond_to?(:effective_addresses)
+            if name.to_s.end_with?('_address') && defined?(EffectiveAddresses) && (collection_class.new rescue nil).respond_to?(:effective_addresses)
               :effective_address
             elsif name == :id && defined?(EffectiveObfuscation) && collection.respond_to?(:deobfuscate)
               :obfuscated_id
@@ -23,19 +22,18 @@ module Effective
               :effective_roles
             elsif sql_column && sql_column.type
               sql_column.type
-            elsif opts[:name].end_with?('_id')
+            elsif name.to_s.end_with?('_id')
               :integer
             else
               :string # When in doubt
             end
           )
 
-          opts[:class] = "col-#{opts[:as]} col-#{opts[:name].parameterize} #{opts[:col_class]}".strip
-          opts[:label] ||= opts[:name].titleize
+          opts[:col_class] = "col-#{opts[:as]} col-#{name.to_s.parameterize} #{opts[:col_class]}".strip
         end
       end
 
-      def load_collection_column_filters!
+      def load_collection_columns_search!
         columns.each do |name, opts|
           search = opts[:search]
 
