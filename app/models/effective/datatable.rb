@@ -9,6 +9,9 @@ module Effective
     attr_reader :filterdefs
     attr_reader :scopes
 
+    # The collection itself
+    attr_accessor :collection
+
     # The view, and the ajax/cookie/default state
     attr_reader :view
     attr_reader :state
@@ -39,7 +42,7 @@ module Effective
 
       # Any datatable specific functions we want available in the DSL blocks need to be defined on the view
       view.class_eval do
-        attr_accessor :attributes, :datatable, :state
+        attr_accessor :datatable
         include Effective::EffectiveDatatable::Dsl::BulkActions
         include Effective::EffectiveDatatable::Dsl::Datatable
         include Effective::EffectiveDatatable::Dsl::Filters
@@ -65,22 +68,15 @@ module Effective
       initialize_charts if respond_to?(:initialize_charts)
 
       # Load the collection. This is the first time def collection is called on the Datatable itself
-      initialize_collection!
-      initialize_collection_class!
+      initialize_collection if respond_to?(:initialize_collection)
+
+      load_collection_class!
 
       # Figure out the class, and if it's activerecord, do all the resource discovery on it
-      initialize_collection_columns!
-      initialize_collection_column_filters!
+      load_collection_columns!
+      load_collection_column_filters!
 
       save_cookie!
-    end
-
-    def the_collection
-      @memoized_collection ||= collection
-    end
-
-    def collection
-      raise "You must define a collection. Something like an ActiveRecord User.all or an Array of Arrays [[1, 'something'], [2, 'something else']]"
     end
 
     def collection_class
@@ -100,7 +96,7 @@ module Effective
     end
 
     def total_records
-      @total_records ||= (active_record_collection? ? table_tool.size(the_collection) : array_tool.size(the_collection))
+      @total_records ||= (active_record_collection? ? table_tool.size(collection) : array_tool.size(collection))
     end
 
     def to_json

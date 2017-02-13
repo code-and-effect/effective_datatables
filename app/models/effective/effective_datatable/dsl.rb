@@ -8,6 +8,10 @@ module Effective
         define_method('initialize_bulk_actions') { view.instance_exec(&block) }
       end
 
+      def collection(&block)
+        define_method('initialize_collection') { view.datatable.collection = view.instance_exec(&block) }
+      end
+
       def datatable(&block)
         define_method('initialize_datatable') { view.instance_exec(&block) }
       end

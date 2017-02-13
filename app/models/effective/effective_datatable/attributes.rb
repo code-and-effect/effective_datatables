@@ -14,8 +14,6 @@ module Effective
           raise 'Expected attributes cookie to be present' unless cookie
           @attributes = cookie[:attributes]
         end
-
-        view.attributes = attributes
       end
 
     end

@@ -2,11 +2,11 @@ module Effective
   module EffectiveDatatable
     module State
 
-      def current_scope
+      def scope
         state[:scope]
       end
 
-      def current_filters
+      def filters
         state[:filter]
       end
 
@@ -79,8 +79,6 @@ module Effective
           Rails.logger.info('DEFAULT')
           # Nothing to do in default state
         end
-
-        view.state = state
       end
 
       def load_ajax_state!

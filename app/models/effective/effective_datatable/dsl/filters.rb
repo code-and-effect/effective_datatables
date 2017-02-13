@@ -17,7 +17,17 @@ module Effective
           }
         end
 
-        def scope(name, default: nil, label: nil, &block)
+        def attributes
+          datatable.attributes
+        end
+
+        def filters
+          datatable.filters
+        end
+
+        def scope(name = nil, default: nil, label: nil, &block)
+          return datatable.scope unless name
+
           datatable.scopes[name.to_sym] = {
             default: default,
             label: label || name.to_s.titleize,

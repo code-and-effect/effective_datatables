@@ -10,7 +10,7 @@ module Effective
       # So the idea here is that we want to do as much as possible on the database in ActiveRecord
       # And then run any array_columns through in post-processed results
       def table_data
-        col = the_collection
+        col = collection
 
         if active_record_collection?
           col = table_tool.order(col)

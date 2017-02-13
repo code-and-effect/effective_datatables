@@ -4,23 +4,19 @@ module Effective
   module EffectiveDatatable
     module Collection
 
-      def initialize_collection!
-        @memoized_collection ||= collection
-      end
-
-      def initialize_collection_class!
-        @collection_class = (the_collection.respond_to?(:klass) ? the_collection.klass : self.class)
-        @active_record_collection = (the_collection.ancestors.include?(ActiveRecord::Base) rescue false)
-        @array_collection = (the_collection.kind_of?(Array) && (the_collection.length == 0 || the_collection.first.kind_of?(Array)))
+      def load_collection_class!
+        @collection_class = (collection.respond_to?(:klass) ? collection.klass : self.class)
+        @active_record_collection = (collection.ancestors.include?(ActiveRecord::Base) rescue false)
+        @array_collection = (collection.kind_of?(Array) && (collection.length == 0 || collection.first.kind_of?(Array)))
 
         unless active_record_collection? || array_collection?
           raise "Unsupported collection type. Expecting an ActiveRecord class, ActiveRecord relation, or an Array of Arrays [[1, 'something'], [2, 'something else']]"
         end
       end
 
-      def initialize_collection_columns!
+      def load_collection_columns!
         # And then parse all the colums
-        sql_table = (the_collection.table if active_record_collection?)
+        sql_table = (collection.table if active_record_collection?)
 
         columns.each_with_index do |(name, opts), index|
           sql_column = false
@@ -31,9 +27,9 @@ module Effective
           opts[:as] ||= (
             if opts[:name].end_with?('_address') && defined?(EffectiveAddresses) && (collection_class.new rescue nil).respond_to?(:effective_addresses)
               :effective_address
-            elsif name == :id && defined?(EffectiveObfuscation) && the_collection.respond_to?(:deobfuscate)
+            elsif name == :id && defined?(EffectiveObfuscation) && collection.respond_to?(:deobfuscate)
               :obfuscated_id
-            elsif name == :roles && defined?(EffectiveRoles) && the_collection.respond_to?(:with_role)
+            elsif name == :roles && defined?(EffectiveRoles) && collection.respond_to?(:with_role)
               :effective_roles
             elsif sql_column && sql_column.type
               sql_column.type
@@ -49,7 +45,7 @@ module Effective
         end
       end
 
-      def initialize_collection_column_filters!
+      def load_collection_column_filters!
         columns.each do |name, opts|
           filter = opts[:filter]
 
