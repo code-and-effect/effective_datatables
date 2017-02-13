@@ -2,6 +2,7 @@ module Effective
   module EffectiveDatatable
     module Collection
 
+      # Used for authorization.  We authorize with authorized?(:index, collection_class)
       def collection_class
         @collection_class  # Will be either User/Post/etc or Array
       end
@@ -17,9 +18,7 @@ module Effective
       end
 
       def load_collection!
-        if collection.nil?
-          raise "No collection defined. Please add a collection with collection do ... end"
-        end
+        raise "No collection defined. Please add a collection with collection do ... end" if collection.nil?
 
         @collection_class = (collection.respond_to?(:klass) ? collection.klass : self.class)
         @active_record_collection = (collection.ancestors.include?(ActiveRecord::Base) rescue false)

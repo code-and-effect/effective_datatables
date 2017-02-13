@@ -77,7 +77,7 @@ module Effective
           load_cookie_state!
         else
           Rails.logger.info('DEFAULT')
-          # Nothing to do in default state
+          # Nothing to do for default state
         end
       end
 
@@ -86,7 +86,7 @@ module Effective
         state[:order_dir] = params[:order]['0'][:dir] == 'desc' ? :desc : :asc
         state[:order_index] = params[:order]['0'][:column].to_i
 
-        state[:scope] = scopes.keys.find { |name| params['scope'] == name.to_s }
+        state[:scope] = scopes.keys.find { |name| params[:scope] == name.to_s }
         state[:start] = params[:start].to_i
 
         state[:search] = {}
@@ -116,7 +116,6 @@ module Effective
       end
 
       def load_columns!
-        # These 3 might already be set by DSL methods
         state[:order_dir] ||= :asc
 
         if order_index.present?
@@ -135,16 +134,15 @@ module Effective
         columns.each do |name, opts|
           state[:visible][name] = opts[:visible] unless state[:visible].key?(name)
         end
+
+        unless datatables_ajax_request?
+          search_params.each { |name, value| state[:search][name] = value }
+          state[:params] = params.length
+        end
+
+        state[:visible].delete_if { |name, _| columns.key?(name) == false }
+        state[:search].delete_if { |name, _| columns.key?(name) == false }
       end
-
-      # Overrides any state params set from the cookie
-      def load_params!
-        return if datatables_ajax_request?
-
-        search_params.each { |name, value| state[:search][name] = value }
-        state[:params] = params.length
-      end
-
     end
   end
 end

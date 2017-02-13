@@ -8,6 +8,10 @@ module Effective
         define_method('initialize_bulk_actions') { view.instance_exec(&block) }
       end
 
+      def charts(&block)
+        define_method('initialize_charts') { view.instance_exec(&block) }
+      end
+
       def collection(&block)
         define_method('initialize_collection') { view.datatable.collection = view.instance_exec(&block) }
       end
@@ -18,10 +22,6 @@ module Effective
 
       def filters(&block)
         define_method('initialize_filters') { view.instance_exec(&block) }
-      end
-
-      def charts(&block)
-        define_method('initialize_charts') { view.instance_exec(&block) }
       end
 
     end

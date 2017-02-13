@@ -65,7 +65,6 @@ module Effective
       # Now we initialize all the columns. columns knows about attributes and filters and scope
       initialize_datatable if respond_to?(:initialize_datatable)
       load_columns!
-      load_params!
 
       # Execute any additional DSL methods
       initialize_bulk_actions if respond_to?(:initialize_bulk_actions)
@@ -73,7 +72,6 @@ module Effective
 
       # Load the collection. This is the first time def collection is called on the Datatable itself
       initialize_collection if respond_to?(:initialize_collection)
-
       load_collection!
 
       # Figure out the class, and if it's activerecord, do all the resource discovery on it
@@ -129,11 +127,7 @@ module Effective
       @to_param ||= self.class.name.underscore.parameterize
     end
 
-    protected
-
-    def datatables_ajax_request?
-      view && view.params[:draw] && view.params[:columns] && view.params[:id] == to_param
-    end
+    private
 
     def table_tool
       @table_tool ||= ActiveRecordDatatableTool.new(self, columns.reject { |_, col| col[:array_column] })
