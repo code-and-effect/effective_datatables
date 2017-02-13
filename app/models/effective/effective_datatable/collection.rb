@@ -6,7 +6,7 @@ module Effective
         @collection_class  # Will be either User/Post/etc or Array
       end
 
-      protected
+      private
 
       def active_record_collection?
         @active_record_collection == true
@@ -15,8 +15,6 @@ module Effective
       def array_collection?
         @array_collection == true
       end
-
-      private
 
       def load_collection!
         if collection.nil?

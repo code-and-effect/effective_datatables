@@ -72,7 +72,7 @@ module Effective
         if datatables_ajax_request?
           Rails.logger.info('AJAX')
           load_ajax_state!
-        elsif cookie.present? && cookie[:state][:params] == view.params.length
+        elsif cookie.present? && cookie[:state][:params] == params.length
           Rails.logger.info('COOKIE')
           load_cookie_state!
         else
@@ -82,8 +82,6 @@ module Effective
       end
 
       def load_ajax_state!
-        params = view.params
-
         state[:length] = params[:length].to_i
         state[:order_dir] = params[:order]['0'][:dir] == 'desc' ? :desc : :asc
         state[:order_index] = params[:order]['0'][:column].to_i
@@ -144,31 +142,7 @@ module Effective
         return if datatables_ajax_request?
 
         search_params.each { |name, value| state[:search][name] = value }
-        state[:params] = view.params.length
-      end
-
-      def search_params
-        @search_params ||= (
-          {}.tap do |params|
-            # TODO FIX search for id ID
-            view.params.each { |name, value| name = name.to_sym; params[name] = value if (columns.key?(name) && name != :id) }
-          end
-        )
-      end
-
-      def filter_params
-        @filter_params ||= (
-          {}.tap do |params|
-            # TODO FIX search for id ID
-            view.params.each { |name, value| name = name.to_sym; params[name] = value if filters.key?(name) }
-          end
-        )
-      end
-
-      def scope_param
-        return nil unless view.params['scope']
-        scope = view.params['scope'].to_sym
-        scope if scopes.key?(scope)
+        state[:params] = params.length
       end
 
     end
