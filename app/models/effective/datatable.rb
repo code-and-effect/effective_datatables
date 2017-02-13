@@ -13,8 +13,9 @@ module Effective
     attr_accessor :collection
 
     # The view, and the ajax/cookie/default state
-    attr_reader :view
+    attr_reader :cookie
     attr_reader :state
+    attr_reader :view
 
     extend Effective::EffectiveDatatable::Dsl
 
@@ -28,12 +29,13 @@ module Effective
 
     def initialize(args = {})
       @attributes = initial_attributes(args)
-      @state = initial_state
 
       @bulk_actions = []
       @columns = {}
       @filters = {}
       @scopes = {}
+
+      @state = initial_state
     end
 
     # Once the view is assigned, we initialize everything
@@ -46,6 +48,7 @@ module Effective
         include Effective::EffectiveDatatable::Dsl::BulkActions
         include Effective::EffectiveDatatable::Dsl::Datatable
         include Effective::EffectiveDatatable::Dsl::Filters
+        include Effective::EffectiveDatatable::Dsl::View
       end
 
       view.datatable = self
@@ -70,17 +73,13 @@ module Effective
       # Load the collection. This is the first time def collection is called on the Datatable itself
       initialize_collection if respond_to?(:initialize_collection)
 
-      load_collection_class!
+      load_collection!
 
       # Figure out the class, and if it's activerecord, do all the resource discovery on it
       load_collection_columns!
       load_collection_column_filters!
 
       save_cookie!
-    end
-
-    def collection_class
-      @collection_class  # Will be either User/Post/etc or Array
     end
 
     def present?
@@ -92,7 +91,7 @@ module Effective
     end
 
     def display_records
-      @display_records
+      @display_records || 0
     end
 
     def total_records
@@ -130,14 +129,6 @@ module Effective
     end
 
     protected
-
-    def active_record_collection?
-      @active_record_collection == true
-    end
-
-    def array_collection?
-      @array_collection == true
-    end
 
     def datatables_ajax_request?
       view && view.params[:draw] && view.params[:columns] && view.params[:id] == to_param

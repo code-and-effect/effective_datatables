@@ -5,7 +5,7 @@ module Effective
     module Rendering
       BLANK = ''.freeze
 
-      protected
+      private
 
       # So the idea here is that we want to do as much as possible on the database in ActiveRecord
       # And then run any array_columns through in post-processed results
@@ -45,10 +45,10 @@ module Effective
           col = table_tool.paginate(col)
         end
 
-        col = self.arrayize(col)
+        col = arrayize(col)
 
-        self.format(col)
-        col = self.finalize(col)
+        format(col)
+        col = finalize(col)
       end
 
       def arrayize(collection)

@@ -2,6 +2,8 @@ module Effective
   module EffectiveDatatable
     module Charts
 
+      private
+
       def charts_data
         HashWithIndifferentAccess.new().tap do |retval|
           (charts || {}).each do |name, chart|

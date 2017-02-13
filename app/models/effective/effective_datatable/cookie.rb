@@ -2,7 +2,11 @@ module Effective
   module EffectiveDatatable
     module Cookie
 
-      attr_reader :cookie
+      def cookie_name
+        @cookie_name ||= "datatable-#{URI(datatables_ajax_request? ? view.request.referer : view.request.url).path}-#{to_param}".parameterize
+      end
+
+      private
 
       def load_cookie!
         @cookie ||= (
@@ -18,10 +22,6 @@ module Effective
 
       def save_cookie!
         view.cookies.signed[cookie_name] = Base64.encode64(Marshal.dump(attributes: attributes, state: state))
-      end
-
-      def cookie_name
-        @cookie_name ||= "datatable-#{URI(datatables_ajax_request? ? view.request.referer : view.request.url).path}-#{to_param}".parameterize
       end
 
     end
