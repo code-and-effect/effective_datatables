@@ -24,7 +24,7 @@ module Effective
     def order(collection)
       return collection unless order_column.present?
 
-      ordered = order_column(collection, order_column, datatable.order_direction, display_index(order_column))
+      ordered = datatable.order_column(collection, order_column, datatable.order_direction, display_index(order_column))
       raise 'order_column must return an Array' unless ordered.kind_of?(Array)
       ordered
     end
@@ -61,18 +61,18 @@ module Effective
 
     def search(collection)
       search_terms.each do |name, search_term|
-        searched = search_column(collection, columns[name], search_term, display_index(columns[name]))
+        searched = datatable.search_column(collection, columns[name], search_term, display_index(columns[name]))
         raise 'search_column must return an Array object' unless searched.kind_of?(Array)
         collection = searched
       end
       collection
     end
 
-    def search_column(collection, table_column, search_term, index)
-      search_term = search_term.downcase if table_column[:search][:fuzzy]
+    def search_column(collection, column, search_term, index)
+      search_term = search_term.downcase if column[:search][:fuzzy]
 
       collection.select! do |row|
-        if table_column[:search][:fuzzy]
+        if column[:search][:fuzzy]
           row[index].to_s.downcase.include?(search_term)
         else
           row[index] == search_term

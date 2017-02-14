@@ -183,7 +183,7 @@ module Effective
         end
 
         collection.public_send(sql_op, id: ids)
-      when :obfuscated_id
+      when :effective_obfuscation
         if (deobfuscated_id = collection.deobfuscate(term)) == term # We weren't able to deobfuscate it, so this is an Invalid ID
           collection.public_send(sql_op, "#{sql_column} = :term", term: 0)
         else

@@ -12,6 +12,7 @@ module Effective
           columns.each do |name, opts|
             opts[:as] ||= resource.sql_type(name)
             opts[:sql_column] ||= (resource.sql_column(name) || name)
+            opts[:sql_as_column] = true if (resource.table && resource.column(name).blank? && opts[:array_column] != true)
           end
         end
 
