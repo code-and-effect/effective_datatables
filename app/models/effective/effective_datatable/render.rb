@@ -145,7 +145,7 @@ module Effective
           columns.each_with_index do |(name, opts), index|
             value = row[index]
             next if value == nil || value == BLANK || state[:visible][name] == false
-            next if opts[:block] || opts[:partial] || opts[:proc]
+            next if opts[:block] || opts[:partial]
 
             if opts[:sql_as_column]
               row[index] = value.to_s
