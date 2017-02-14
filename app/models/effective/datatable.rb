@@ -11,6 +11,7 @@ module Effective
 
     # The collection itself. Only evaluated once.
     attr_accessor :collection
+    attr_reader :resource # An Effective::Resource
 
     # The view, and the ajax/cookie/default state
     attr_reader :cookie
@@ -23,10 +24,10 @@ module Effective
     include Effective::EffectiveDatatable::Cookie
     include Effective::EffectiveDatatable::Hooks
     include Effective::EffectiveDatatable::Collection
-    include Effective::EffectiveDatatable::Columns
     include Effective::EffectiveDatatable::Filters
     include Effective::EffectiveDatatable::Params
     include Effective::EffectiveDatatable::Render
+    include Effective::EffectiveDatatable::Resource
     include Effective::EffectiveDatatable::State
 
     def initialize(args = {})
@@ -76,8 +77,7 @@ module Effective
       load_collection!
 
       # Figure out the class, and if it's activerecord, do all the resource discovery on it
-      load_collection_columns!
-      load_collection_columns_search!
+      load_resource!
 
       save_cookie!
     end

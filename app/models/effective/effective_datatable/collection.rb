@@ -18,7 +18,7 @@ module Effective
       end
 
       def load_collection!
-        raise "No collection defined. Please add a collection with collection do ... end" if collection.nil?
+        raise 'No collection defined. Please add a collection with collection do ... end' if collection.nil?
 
         @collection_class = (collection.respond_to?(:klass) ? collection.klass : self.class)
         @active_record_collection = (collection.ancestors.include?(ActiveRecord::Base) rescue false)

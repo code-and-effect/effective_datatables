@@ -53,7 +53,7 @@ module EffectiveDatatablesPrivateHelper
         placeholder: placeholder,
         wrapper_html: wrapper_html,
         input_html: input_html
-    when :obfuscated_id
+    when :effective_obfuscation
       input_html[:pattern] ||= '[0-9]{3}-?[0-9]{4}-?[0-9]{3}'
       input_html[:title] = 'Expected format: XXX-XXXX-XXX'
 
