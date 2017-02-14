@@ -2,6 +2,8 @@ module Effective
   class Datatable
     # Anything that we initialize our table with. That's it. Can't be changed by state.
     attr_reader :attributes
+    attr_reader :resource
+    attr_reader :state
 
     # Hashes of DSL options
     attr_reader :bulk_actions
@@ -11,11 +13,9 @@ module Effective
 
     # The collection itself. Only evaluated once.
     attr_accessor :collection
-    attr_reader :resource # An Effective::Resource
 
     # The view, and the ajax/cookie/default state
     attr_reader :cookie
-    attr_reader :state
     attr_reader :view
 
     extend Effective::EffectiveDatatable::Dsl
@@ -131,11 +131,11 @@ module Effective
     private
 
     def table_tool
-      @table_tool ||= ActiveRecordDatatableTool.new(self, columns.reject { |_, col| col[:array_column] })
+      @table_tool ||= ActiveRecordDatatableTool.new(self)
     end
 
     def array_tool
-      @array_tool ||= ArrayDatatableTool.new(self, columns.select { |_, col| col[:array_column] })
+      @array_tool ||= ArrayDatatableTool.new(self)
     end
 
   end

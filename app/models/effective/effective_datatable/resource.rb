@@ -33,7 +33,7 @@ module Effective
 
           search[:as] ||= :select if (search.key?(:collection) && opts[:as] != :belongs_to_polymorphic)
           search[:fuzzy] = true unless search.key?(:fuzzy)
-          search[:sql_operation] = :having if ['SUM(', 'COUNT(', 'MAX(', 'MIN(', 'AVG('].any? { |str| (opts[:sql_column] || '').include?(str) }
+          search[:sql_operation] = :having if ['SUM(', 'COUNT(', 'MAX(', 'MIN(', 'AVG('].any? { |str| (opts[:sql_column] || '').to_s.include?(str) }
 
           opts[:search] = search.reverse_merge(
             case opts[:as]

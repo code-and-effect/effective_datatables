@@ -1,13 +1,12 @@
 module Effective
   # The collection is an Array of Arrays
   class ArrayDatatableTool
-    attr_accessor :table_columns
+    attr_reader :datatable
+    attr_reader :columns
 
-    delegate :search_column, :order_column, :display_columns, :convert_to_column_type, :page, :per_page, :to => :@datatable
-
-    def initialize(datatable, table_columns)
+    def initialize(datatable)
       @datatable = datatable
-      @table_columns = table_columns
+      @columns = datatable.columns.select { |_, col| col[:array_column] }
     end
 
     def size(collection)
@@ -15,22 +14,22 @@ module Effective
     end
 
     def search_terms
-      @search_terms ||= @datatable.search_terms.select { |name, search_term| table_columns.key?(name) }
+      @search_terms ||= datatable.search_terms.select { |name, _| columns.key?(name) }
     end
 
-    def order_by_column
-      @order_by_column ||= table_columns[@datatable.order_name]
+    def order_column
+      @order_column ||= columns[datatable.order_name]
     end
 
     def order(collection)
-      return collection unless order_by_column.present?
+      return collection unless order_column.present?
 
-      column_order = order_column(collection, order_by_column, @datatable.order_direction, display_index(order_by_column))
-      raise 'order_column must return an Array' unless column_order.kind_of?(Array)
-      column_order
+      ordered = order_column(collection, order_column, datatable.order_direction, display_index(order_column))
+      raise 'order_column must return an Array' unless ordered.kind_of?(Array)
+      ordered
     end
 
-    def order_column_with_defaults(collection, table_column, direction, index)
+    def order_column(collection, column, direction, index)
       if direction == :asc
         collection.sort! do |x, y|
           if (x[index] && y[index])
@@ -62,14 +61,14 @@ module Effective
 
     def search(collection)
       search_terms.each do |name, search_term|
-        column_search = search_column(collection, table_columns[name], search_term, display_index(table_columns[name]))
-        raise 'search_column must return an Array object' unless column_search.kind_of?(Array)
-        collection = column_search
+        searched = search_column(collection, columns[name], search_term, display_index(columns[name]))
+        raise 'search_column must return an Array object' unless searched.kind_of?(Array)
+        collection = searched
       end
       collection
     end
 
-    def search_column_with_defaults(collection, table_column, search_term, index)
+    def search_column(collection, table_column, search_term, index)
       search_term = search_term.downcase if table_column[:search][:fuzzy]
 
       collection.select! do |row|
@@ -82,7 +81,7 @@ module Effective
     end
 
     def paginate(collection)
-      Kaminari.paginate_array(collection).page(page).per(per_page)
+      Kaminari.paginate_array(collection).page(datatable.page).per(datatable.per_page)
     end
 
     private

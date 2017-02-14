@@ -26,7 +26,7 @@ module Effective
             @display_records = array_tool.size(col)
           end
 
-          if array_tool.order_by_column.present?
+          if array_tool.order_column.present?
             col = self.arrayize(col)
             col = array_tool.order(col)
           end

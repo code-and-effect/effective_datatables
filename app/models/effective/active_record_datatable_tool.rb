@@ -1,18 +1,16 @@
 module Effective
   class ActiveRecordDatatableTool
-    attr_accessor :table_columns
+    attr_reader :datatable
+    attr_reader :columns
 
-    delegate :search_column, :order_column, :collection_class, :quote_sql, :page, :per_page, :to => :@datatable
-
-    def initialize(datatable, table_columns)
+    def initialize(datatable)
       @datatable = datatable
-      @table_columns = table_columns
+      @columns = datatable.columns.reject { |_, opts| opts[:array_column] }
     end
 
     # Not every ActiveRecord query will work when calling the simple .count
     # Custom selects:
     #   User.select(:email, :first_name).count will throw an error
-    #   .count(:all) and .size seem to work
     # Grouped Queries:
     #   User.all.group(:email).count will return a Hash
     def size(collection)
@@ -34,29 +32,29 @@ module Effective
     end
 
     def search_terms
-      @search_terms ||= @datatable.search_terms.select { |name, search_term| table_columns.key?(name) }
+      @search_terms ||= datatable.search_terms.select { |name, _| columns.key?(name) }
     end
 
-    def order_by_column
-      @order_by_column ||= table_columns[@datatable.order_name]
+    def order_column
+      @order_column ||= columns[datatable.order_name]
     end
 
     def order(collection)
-      return collection unless order_by_column.present?
+      return collection unless order_column.present?
 
-      column_order = order_column(collection, order_by_column, @datatable.order_direction, order_by_column[:sql_column])
-      raise 'order_column must return an ActiveRecord::Relation object' unless column_order.kind_of?(ActiveRecord::Relation)
-      column_order
+      ordered = datatable.order_column(collection, order_column, datatable.order_direction, order_column[:sql_column])
+      raise 'order_column must return an ActiveRecord::Relation object' unless ordered.kind_of?(ActiveRecord::Relation)
+      ordered
     end
 
-    def order_column_with_defaults(collection, table_column, direction, sql_column)
+    def order_column(collection, column, direction, sql_column)
       before = ''; after = ''
       sql_direction = (direction == :desc ? 'DESC' : 'ASC')
 
       if postgres?
-        after = if table_column[:nulls] == :first
+        after = if column[:nulls] == :first
           ' NULLS FIRST'
-        elsif table_column[:nulls] == :last
+        elsif column[:nulls] == :last
           ' NULLS LAST'
         else
           " NULLS #{direction == :desc ? 'FIRST' : 'LAST' }"
@@ -65,9 +63,9 @@ module Effective
         before = "ISNULL(#{sql_column}), "
       end
 
-      if table_column[:as] == :belongs_to_polymorphic
+      if column[:as] == :belongs_to_polymorphic
         collection.order("#{before}#{sql_column.sub('_id', '_type')} #{sql_direction}, #{sql_column} #{sql_direction}#{after}")
-      elsif table_column[:sql_as_column] == true
+      elsif column[:sql_as_column] == true
         collection.order("#{sql_column} #{sql_direction}")
       else
         collection.order("#{before}#{sql_column} #{sql_direction}#{after}")
@@ -76,23 +74,23 @@ module Effective
 
     def search(collection)
       search_terms.each do |name, search_term|
-        column_search = search_column(collection, table_columns[name], search_term, table_columns[name][:sql_column])
-        raise 'search_column must return an ActiveRecord::Relation object' unless column_search.kind_of?(ActiveRecord::Relation)
-        collection = column_search
+        searched = datatable.search_column(collection, columns[name], search_term, columns[name][:sql_column])
+        raise 'search_column must return an ActiveRecord::Relation object' unless searched.kind_of?(ActiveRecord::Relation)
+        collection = searched
       end
       collection
     end
 
-    def search_column_with_defaults(collection, table_column, term, sql_column)
-      sql_op = table_column[:search][:sql_operation] || :where # only other option is :having
+    def search_column(collection, column, term, sql_column)
+      sql_op = column[:search][:sql_operation] || :where # only other option is :having
 
-      case table_column[:as]
+      case column[:as]
       when :string, :text
         if sql_op != :where
           collection.public_send(sql_op, "#{sql_column} = :term", term: term)
         elsif ['null', 'nil', nil].include?(term)
           collection.public_send(sql_op, "#{sql_column} = :term OR #{sql_column} IS NULL", term: '')
-        elsif table_column[:search][:fuzzy]
+        elsif column[:search][:fuzzy]
           collection.public_send(sql_op, "#{sql_column} #{ilike} :term", term: "%#{term}%")
         else
           collection.public_send(sql_op, "#{sql_column} = :term", term: term)
@@ -107,8 +105,8 @@ module Effective
           collection
         end
       when :has_many
-        reflection = collection.klass.reflect_on_association(table_column[:name].to_sym)
-        raise "unable to find #{collection.klass.name} :has_many :#{table_column[:name]} association" unless reflection
+        reflection = collection.klass.reflect_on_association(column[:name].to_sym)
+        raise "unable to find #{collection.klass.name} :has_many :#{column[:name]} association" unless reflection
 
         obj = reflection.build_association({})
         klass = obj.class
@@ -121,7 +119,7 @@ module Effective
 
         raise "unable to find #{klass.name} has_many :#{collection.table_name} or belongs_to :#{collection.table_name.singularize} associations" unless inverse
 
-        ids = if [:select, :grouped_select].include?(table_column[:search][:as])
+        ids = if [:select, :grouped_select].include?(column[:search][:as])
           # Treat the search term as one or more IDs
           inverse_ids = term.split(',').map { |term| (term = term.to_i) == 0 ? nil : term }.compact
           return collection unless inverse_ids.present?
@@ -136,7 +134,7 @@ module Effective
           klass_columns = if (sql_column == klass.table_name) # No custom column has been defined
             klass.columns.map { |col| col.name if col.text? }.compact  # Search all database text? columns
           else
-            [sql_column.gsub("#{klass.table_name}.", '')] # table_column :order_items, column: 'order_items.title'
+            [sql_column.gsub("#{klass.table_name}.", '')] # column :order_items, column: 'order_items.title'
           end
 
           if polymorphic
@@ -155,8 +153,8 @@ module Effective
         collection.public_send(sql_op, id: ids)
 
       when :has_and_belongs_to_many
-        reflection = collection.klass.reflect_on_association(table_column[:name].to_sym)
-        raise "unable to find #{collection.klass.name} :has_and_belongs_to_many :#{table_column[:name]} association" unless reflection
+        reflection = collection.klass.reflect_on_association(column[:name].to_sym)
+        raise "unable to find #{collection.klass.name} :has_and_belongs_to_many :#{column[:name]} association" unless reflection
 
         obj = reflection.build_association({})
         klass = obj.class
@@ -164,7 +162,7 @@ module Effective
         inverse = reflection.inverse_of || klass.reflect_on_association(collection.table_name) || obj.class.reflect_on_association(collection.table_name.singularize)
         raise "unable to find #{klass.name} has_and_belongs_to_many :#{collection.table_name} or belongs_to :#{collection.table_name.singularize} associations" unless inverse
 
-        ids = if [:select, :grouped_select].include?(table_column[:search][:as])
+        ids = if [:select, :grouped_select].include?(column[:search][:as])
           # Treat the search term as one or more IDs
           inverse_ids = term.split(',').map { |term| (term = term.to_i) == 0 ? nil : term }.compact
           return collection unless inverse_ids.present?
@@ -176,7 +174,7 @@ module Effective
           klass_columns = if (sql_column == klass.table_name) # No custom column has been defined
             klass.columns.map { |col| col.name if col.text? }.compact  # Search all database text? columns
           else
-            [sql_column.gsub("#{klass.table_name}.", '')] # table_column :order_items, column: 'order_items.title'
+            [sql_column.gsub("#{klass.table_name}.", '')] # column :order_items, column: 'order_items.title'
           end
 
           conditions = klass_columns.map { |col_name| "#{klass.table_name}.#{col_name} #{ilike} :term" }
@@ -193,7 +191,7 @@ module Effective
         end
       when :effective_address
         ids = Effective::Address
-          .where('addressable_type = ?', collection_class.name)
+          .where('addressable_type = ?', datatable.collection_class.name)
           .where("address1 #{ilike} :term OR address2 #{ilike} :term OR city #{ilike} :term OR postal_code #{ilike} :term OR state_code = :code OR country_code = :code", term: "%#{term}%", code: term)
           .pluck(:addressable_id)
 
@@ -243,19 +241,19 @@ module Effective
     end
 
     def paginate(collection)
-      collection.page(page).per(per_page)
+      collection.page(datatable.page).per(datatable.per_page)
     end
 
     protected
 
     def postgres?
       return @postgres unless @postgres.nil?
-      @postgres ||= (collection_class.connection.kind_of?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter) rescue false)
+      @postgres ||= (datatable.collection_class.connection.kind_of?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter) rescue false)
     end
 
     def mysql?
       return @mysql unless @mysql.nil?
-      @mysql ||= (collection_class.connection.kind_of?(ActiveRecord::ConnectionAdapters::Mysql2Adapter) rescue false)
+      @mysql ||= (datatable.collection_class.connection.kind_of?(ActiveRecord::ConnectionAdapters::Mysql2Adapter) rescue false)
     end
 
     def ilike
