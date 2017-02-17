@@ -63,10 +63,30 @@ module Effective
         before = "ISNULL(#{sql_column}), "
       end
 
-      if column[:as] == :belongs_to_polymorphic
+      if column[:sql_as_column]
+        return collection.order("#{sql_column} #{sql_direction}")
+      end
+
+      associated = Effective::Resource.new(column[:name])
+
+      case column[:as]
+      when :belongs_to
+        before = postgres? ? "#{sql_column} IS NULL ASC" : "ISNULL(#{sql_column}) ASC"
+
+        sort_by = (column[:sort] == true ? associated.sort_column : column[:sort])
+        foreign_ids = associated.klass.order(sort_by => sql_direction).pluck(:id)
+        conditions = foreign_ids.map { |value| "#{sql_column}=#{value} DESC" }.join(',')
+
+        collection.order("#{before},#{conditions}")
+      when :has_many
+        sort_by = (column[:sort] == true ? res.sort_column : column[:sort])
+
+        binding.pry
+
+        collection.joins(column[:name]).merge(res.klass.order(sort_by => sql_direction))
+
+      when :belongs_to_polymorphic
         collection.order("#{before}#{sql_column.sub('_id', '_type')} #{sql_direction}, #{sql_column} #{sql_direction}#{after}")
-      elsif column[:sql_as_column] == true
-        collection.order("#{sql_column} #{sql_direction}")
       else
         collection.order("#{before}#{sql_column} #{sql_direction}#{after}")
       end

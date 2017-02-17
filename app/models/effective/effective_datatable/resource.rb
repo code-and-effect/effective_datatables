@@ -6,13 +6,16 @@ module Effective
 
       # This looks at all the columns and figures out the as:
       def load_resource!
-        if active_record_collection?
-          @resource = Effective::Resource.new(collection_class)
+        @resource = Effective::Resource.new(collection_class)
 
+        if active_record_collection?
           columns.each do |name, opts|
             opts[:as] ||= resource.sql_type(name)
             opts[:sql_column] ||= (resource.sql_column(name) || name)
-            opts[:sql_as_column] = true if (resource.table && resource.column(name).blank? && opts[:array_column] != true)
+
+            unless [:belongs_to, :belongs_to_polymorphic, :has_and_belongs_to_many, :has_many, :has_one, :effective_addresses].include?(opts[:as])
+              opts[:sql_as_column] = true if (resource.table && resource.column(name).blank? && opts[:array_column] != true)
+            end
           end
         end
 
