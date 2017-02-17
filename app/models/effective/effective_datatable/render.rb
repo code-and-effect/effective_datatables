@@ -16,17 +16,17 @@ module Effective
           col = table_tool.order(col)
           col = table_tool.search(col)
 
-          if table_tool.search_terms.present? && array_tool.search_terms.blank?
+          if table_tool.searched.present? && array_tool.searched.blank?
             @display_records = table_tool.size(col)
           end
 
-          if array_tool.search_terms.present?
+          if array_tool.searched.present?
             col = self.arrayize(col)
             col = array_tool.search(col)
             @display_records = array_tool.size(col)
           end
 
-          if array_tool.order_column.present?
+          if array_tool.ordered.present?
             col = self.arrayize(col)
             col = array_tool.order(col)
           end
