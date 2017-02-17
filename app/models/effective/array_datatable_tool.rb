@@ -13,20 +13,20 @@ module Effective
       collection.size
     end
 
-    def search_terms
-      @search_terms ||= datatable.search_terms.select { |name, _| columns.key?(name) }
+    def searched
+      @searched ||= datatable.search_terms.select { |name, _| columns.key?(name) }
     end
 
-    def order_column
-      @order_column ||= columns[datatable.order_name]
+    def ordered
+      @ordered ||= columns[datatable.order_name]
     end
 
     def order(collection)
-      return collection unless order_column.present?
+      return collection unless ordered.present?
 
-      ordered = datatable.order_column(collection, order_column, datatable.order_direction, display_index(order_column))
-      raise 'order_column must return an Array' unless ordered.kind_of?(Array)
-      ordered
+      collection = datatable.order_column(collection, ordered, datatable.order_direction, display_index(ordered))
+      raise 'order_column must return an Array' unless collection.kind_of?(Array)
+      collection
     end
 
     def order_column(collection, column, direction, index)
@@ -60,10 +60,9 @@ module Effective
     end
 
     def search(collection)
-      search_terms.each do |name, search_term|
-        searched = datatable.search_column(collection, columns[name], search_term, display_index(columns[name]))
-        raise 'search_column must return an Array object' unless searched.kind_of?(Array)
-        collection = searched
+      searched.each do |name, search_term|
+        collection = datatable.search_column(collection, columns[name], search_term, display_index(columns[name]))
+        raise 'search_column must return an Array object' unless collection.kind_of?(Array)
       end
       collection
     end

@@ -48,7 +48,7 @@ module Effective
         col = arrayize(col)
 
         format(col)
-        col = finalize(col)
+        finalize(col)
       end
 
       def arrayize(collection)
