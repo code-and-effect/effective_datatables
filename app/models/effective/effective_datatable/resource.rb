@@ -29,64 +29,16 @@ module Effective
           search = opts[:search]
 
           if search == false
-            opts[:search] = {as: :null}; next
+            opts[:search] = { as: :null }; next
           end
 
           search[:as] ||= :select if (search.key?(:collection) && opts[:as] != :belongs_to_polymorphic)
           search[:fuzzy] = true unless search.key?(:fuzzy)
           search[:sql_operation] = :having if ['SUM(', 'COUNT(', 'MAX(', 'MIN(', 'AVG('].any? { |str| (opts[:sql_column] || '').to_s.include?(str) }
 
-          opts[:search] = search.reverse_merge(
-            case opts[:as]
-            when :belongs_to
-              { as: :select }.merge(association_search_collection(resource.belongs_to(name)))
-            when :belongs_to_polymorphic
-              { as: :grouped_select, polymorphic: true, collection: nil}
-            when :has_and_belongs_to_many
-              { as: :select }.merge(association_search_collection(resource.has_and_belongs_to_many(name)))
-            when :has_many
-              { as: :select, multiple: true }.merge(association_search_collection(resource.has_many(name)))
-            when :has_one
-              { as: :select, multiple: true }.merge(association_search_collection(resource.has_one(name)))
-            when :effective_addresses
-              { as: :string }
-            when :effective_roles
-              { as: :select, collection: EffectiveRoles.roles }
-            when :effective_obfuscation
-              { as: :effective_obfuscation }
-            when :boolean
-              { as: :boolean, collection: [['true', true], ['false', false]] }
-            when :datetime
-              { as: :datetime }
-            when :date
-              { as: :date }
-            when :integer
-              { as: :number }
-            else
-              { as: :string }
-            end
-          )
+          search.reverse_merge!(resource.search_field(name, opts[:as]))
         end
       end
-
-      private
-
-      def association_search_collection(association, max_id = 500)
-        res = Effective::Resource.new(association)
-
-        if res.max_id > max_id
-          {as: :string}
-        else
-          if res.klass.unscoped.respond_to?(:datatables_filter)
-            {collection: res.klass.datatables_filter}
-          elsif res.klass.unscoped.respond_to?(:sorted)
-            {collection: res.klass.sorted}
-          else
-            {collection: res.klass.all.map { |obj| [obj.to_s, obj.to_param] }.sort { |x, y| x[0] <=> y[0] }}
-          end
-        end
-      end
-
     end
   end
 end
