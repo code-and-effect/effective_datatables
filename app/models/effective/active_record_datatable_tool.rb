@@ -52,13 +52,7 @@ module Effective
       sql_direction = (direction == :desc ? 'DESC' : 'ASC')
 
       if postgres?
-        after = if column[:nulls] == :first
-          ' NULLS FIRST'
-        elsif column[:nulls] == :last
-          ' NULLS LAST'
-        else
-          " NULLS #{direction == :desc ? 'FIRST' : 'LAST' }"
-        end
+        after = " NULLS #{direction == :desc ? 'FIRST' : 'LAST' }"
       elsif mysql?
         before = "ISNULL(#{sql_column}), "
       end
@@ -67,24 +61,15 @@ module Effective
         return collection.order("#{sql_column} #{sql_direction}")
       end
 
-      associated = Effective::Resource.new(column[:name])
-
       case column[:as]
       when :belongs_to
         before = postgres? ? "#{sql_column} IS NULL ASC" : "ISNULL(#{sql_column}) ASC"
-
-        sort_by = (column[:sort] == true ? associated.sort_column : column[:sort])
-        foreign_ids = associated.klass.order(sort_by => sql_direction).pluck(:id)
-        conditions = foreign_ids.map { |value| "#{sql_column}=#{value} DESC" }.join(',')
-
+        conditions = datatable.resource.order_by_associated_conditions(column[:name], sort: column[:sort], direction: direction)
         collection.order("#{before},#{conditions}")
       when :has_many
-        sort_by = (column[:sort] == true ? res.sort_column : column[:sort])
-
-        binding.pry
-
-        collection.joins(column[:name]).merge(res.klass.order(sort_by => sql_direction))
-
+        after = " #{datatable.resource.sql_column(datatable.resource.klass.primary_key)} #{direction}"
+        conditions = datatable.resource.order_by_associated_conditions(column[:name], sort: column[:sort], direction: direction)
+        collection.order("#{conditions},#{after}")
       when :belongs_to_polymorphic
         collection.order("#{before}#{sql_column.sub('_id', '_type')} #{sql_direction}, #{sql_column} #{sql_direction}#{after}")
       else
