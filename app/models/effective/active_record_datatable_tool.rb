@@ -2,10 +2,12 @@ module Effective
   class ActiveRecordDatatableTool
     attr_reader :datatable
     attr_reader :columns
+    attr_reader :resource
 
     def initialize(datatable)
-      @datatable = datatable
       @columns = datatable.columns.reject { |_, opts| opts[:array_column] }
+      @datatable = datatable
+      @resource = datatable.resource
     end
 
     # Not every ActiveRecord query will work when calling the simple .count
@@ -65,11 +67,11 @@ module Effective
       when :belongs_to
         collection
           .order(postgres? ? "#{sql_column} IS NULL ASC" : "ISNULL(#{sql_column}) ASC")
-          .order(datatable.resource.order_by_associated_conditions(column[:name], sort: column[:sort], direction: direction))
+          .order(resource.order_by_associated_conditions(column[:name], sort: column[:sort], direction: direction))
       when :has_many
         collection
-          .order(datatable.resource.order_by_associated_conditions(column[:name], sort: column[:sort], direction: direction))
-          .order("#{datatable.resource.sql_column(datatable.resource.klass.primary_key)} #{direction}")
+          .order(resource.order_by_associated_conditions(column[:name], sort: column[:sort], direction: direction))
+          .order("#{resource.sql_column(resource.klass.primary_key)} #{direction}")
       when :belongs_to_polymorphic
         collection
           .order("#{before}#{sql_column.sub('_id', '_type')} #{sql_direction}")
