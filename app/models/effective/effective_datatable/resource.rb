@@ -6,7 +6,7 @@ module Effective
 
       # This looks at all the columns and figures out the as:
       def load_resource!
-        @resource = Effective::Resource.new(collection_class)
+        @resource = Effective::Resource.new(collection)
 
         if active_record_collection?
           columns.each do |name, opts|

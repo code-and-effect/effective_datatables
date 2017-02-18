@@ -50,36 +50,11 @@ module Effective
     end
 
     def order_column(collection, column, direction, sql_column)
-      before = ''; after = ''
-      sql_direction = (direction == :desc ? 'DESC' : 'ASC')
-
-      if postgres?
-        after = " NULLS #{direction == :desc ? 'FIRST' : 'LAST' }"
-      elsif mysql?
-        before = "ISNULL(#{sql_column}), "
-      end
-
       if column[:sql_as_column]
-        return collection.order("#{sql_column} #{sql_direction}")
-      end
-
-      case column[:as]
-      when :belongs_to
-        collection
-          .order(postgres? ? "#{sql_column} IS NULL ASC" : "ISNULL(#{sql_column}) ASC")
-          .order(resource.order_by_associated_conditions(column[:name], sort: column[:sort], direction: direction))
-      when :has_many
-        collection
-          .order(resource.order_by_associated_conditions(column[:name], sort: column[:sort], direction: direction))
-          .order("#{resource.sql_column(resource.klass.primary_key)} #{direction}")
-      when :belongs_to_polymorphic
-        collection
-          .order("#{before}#{sql_column.sub('_id', '_type')} #{sql_direction}")
-          .order("#{sql_column} #{sql_direction}")
-          .order(after)
+        collection.order("#{sql_column} #{resource.sql_direction(direction)}")
       else
-        collection
-          .order("#{before}#{sql_column} #{sql_direction}#{after}")
+        Effective::Resource.new(collection)
+          .order(column[:name], sort: column[:sort], direction: direction, sql_column: sql_column)
       end
     end
 
