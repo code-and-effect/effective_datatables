@@ -63,17 +63,21 @@ module Effective
 
       case column[:as]
       when :belongs_to
-        before = postgres? ? "#{sql_column} IS NULL ASC" : "ISNULL(#{sql_column}) ASC"
-        conditions = datatable.resource.order_by_associated_conditions(column[:name], sort: column[:sort], direction: direction)
-        collection.order("#{before},#{conditions}")
+        collection
+          .order(postgres? ? "#{sql_column} IS NULL ASC" : "ISNULL(#{sql_column}) ASC")
+          .order(datatable.resource.order_by_associated_conditions(column[:name], sort: column[:sort], direction: direction))
       when :has_many
-        after = " #{datatable.resource.sql_column(datatable.resource.klass.primary_key)} #{direction}"
-        conditions = datatable.resource.order_by_associated_conditions(column[:name], sort: column[:sort], direction: direction)
-        collection.order("#{conditions},#{after}")
+        collection
+          .order(datatable.resource.order_by_associated_conditions(column[:name], sort: column[:sort], direction: direction))
+          .order("#{datatable.resource.sql_column(datatable.resource.klass.primary_key)} #{direction}")
       when :belongs_to_polymorphic
-        collection.order("#{before}#{sql_column.sub('_id', '_type')} #{sql_direction}, #{sql_column} #{sql_direction}#{after}")
+        collection
+          .order("#{before}#{sql_column.sub('_id', '_type')} #{sql_direction}")
+          .order("#{sql_column} #{sql_direction}")
+          .order(after)
       else
-        collection.order("#{before}#{sql_column} #{sql_direction}#{after}")
+        collection
+          .order("#{before}#{sql_column} #{sql_direction}#{after}")
       end
     end
 
