@@ -86,7 +86,7 @@ module Effective
       total_records > 0
     end
 
-    def empty?
+    def blank?
       total_records == 0
     end
 
