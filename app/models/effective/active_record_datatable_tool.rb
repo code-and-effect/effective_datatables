@@ -60,7 +60,6 @@ module Effective
 
     def search(collection)
       searched.each do |name, value|
-        value = datatable.parse_search_value(columns[name], value)
         collection = datatable.search_column(collection, columns[name], value, columns[name][:sql_column])
         raise 'search_column must return an ActiveRecord::Relation object' unless collection.kind_of?(ActiveRecord::Relation)
       end
@@ -69,7 +68,7 @@ module Effective
 
     def search_column(collection, column, value, sql_column)
       Effective::Resource.new(collection)
-        .search(column[:name], parsed_value: value, as: column[:as], fuzzy: column[:search][:fuzzy], sql_column: column[:sql_column])
+        .search(column[:name], value, as: column[:as], fuzzy: column[:search][:fuzzy], sql_column: column[:sql_column])
     end
 
     def search_column222(collection, column, term, sql_column)

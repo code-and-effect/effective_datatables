@@ -33,11 +33,6 @@ module Effective
         Effective::Attribute.new(filter[:value]).parse(value, name: filter[:name])
       end
 
-      def parse_search_value(column, value)
-        return column[:search][:parse].call(value) if (column[:search].kind_of?(Hash) && column[:search][:parse])
-        Effective::Attribute.new(column[:as]).parse(value, name: column[:name])
-      end
-
     end
   end
 end
