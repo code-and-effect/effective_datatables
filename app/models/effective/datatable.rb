@@ -24,7 +24,6 @@ module Effective
     include Effective::EffectiveDatatable::Cookie
     include Effective::EffectiveDatatable::Hooks
     include Effective::EffectiveDatatable::Collection
-    include Effective::EffectiveDatatable::Filters
     include Effective::EffectiveDatatable::Params
     include Effective::EffectiveDatatable::Render
     include Effective::EffectiveDatatable::Resource
