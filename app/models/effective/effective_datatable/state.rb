@@ -64,7 +64,7 @@ module Effective
         state[:filter] = filters.inject({}) { |h, (name, opts)| h[name] = opts[:value]; h }
         state[:scope] = scopes.find { |_, opts| opts[:default] }.try(:first) || scopes.keys.first
 
-        filter_params.each { |name, value| state[:filter][name] = parse_filter(filters[name], value) }
+        filter_params.each { |name, value| state[:filter][name] = parse_filter_value(filters[name], value) }
         state[:scope] = scope_param if scope_param
       end
 
@@ -102,7 +102,7 @@ module Effective
           name = name.to_sym
           raise "unexpected filter name: #{name}" unless filters.key?(name)
 
-          state[:filter][name] = parse_filter(filters[name], value)
+          state[:filter][name] = parse_filter_value(filters[name], value)
         end
 
         state[:params] = cookie[:state][:params]
