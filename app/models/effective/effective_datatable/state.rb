@@ -130,7 +130,7 @@ module Effective
 
         if state[:search].blank?
           columns.each do |name, opts|
-            state[:search][name] = opts[:search][:value] if opts[:search].key?(:value)
+            state[:search][name] = opts[:search][:value] if opts[:search].kind_of?(Hash) && opts[:search].key?(:value)
           end
         end
 
