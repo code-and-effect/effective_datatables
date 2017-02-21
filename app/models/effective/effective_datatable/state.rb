@@ -92,7 +92,11 @@ module Effective
 
         params[:columns].values.each do |params|
           name = params[:name].to_sym
-          state[:search][name] = params[:search][:value] if params[:search][:value].present? # TODO deal with false/true/nil
+
+          if params[:search][:value].present? && !['null'].include?(params[:search][:value])
+            state[:search][name] = params[:search][:value]
+          end
+
           state[:visible][name] = (params[:visible] == 'true')
         end
 
