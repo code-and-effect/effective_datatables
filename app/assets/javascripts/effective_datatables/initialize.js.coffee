@@ -44,7 +44,6 @@ initializeDataTables = ->
             columns: ':visible:not(.col-actions)'
         },
       ]
-      colReorder: !simple
       columns: datatable.data('columns')
       deferLoading: [datatable.data('display-records'), datatable.data('total-records')]
       deferRender: true
