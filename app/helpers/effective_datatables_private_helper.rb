@@ -59,7 +59,7 @@ module EffectiveDatatablesPrivateHelper
 
       form.input name, label: false, required: false, value: value,
         as: :string,
-        placeholder: placeholder.presence || '###-####-###',
+        placeholder: placeholder,
         wrapper_html: wrapper_html,
         input_html: input_html
     when :date, :datetime
