@@ -13,7 +13,7 @@ module Effective
             opts[:as] ||= resource.sql_type(name)
             opts[:sql_column] ||= (resource.sql_column(name) || name)
 
-            unless [:belongs_to, :belongs_to_polymorphic, :has_and_belongs_to_many, :has_many, :has_one, :effective_addresses].include?(opts[:as])
+            unless [:belongs_to, :belongs_to_polymorphic, :has_and_belongs_to_many, :has_many, :has_one, :effective_addresses, :effective_roles].include?(opts[:as])
               opts[:sql_as_column] = true if (resource.table && resource.column(name).blank? && opts[:array_column] != true)
             end
           end
@@ -37,9 +37,9 @@ module Effective
 
           search[:as] ||= :select if (search.key?(:collection) && opts[:as] != :belongs_to_polymorphic)
           search[:fuzzy] = true unless search.key?(:fuzzy)
-          search[:sql_operation] = :having if ['SUM(', 'COUNT(', 'MAX(', 'MIN(', 'AVG('].any? { |str| (opts[:sql_column] || '').to_s.include?(str) }
+          #search[:sql_operation] = :having if ['SUM(', 'COUNT(', 'MAX(', 'MIN(', 'AVG('].any? { |str| (opts[:sql_column] || '').to_s.include?(str) }
 
-          search.reverse_merge!(resource.search_field(name, opts[:as]))
+          search.reverse_merge!(resource.search_form_field(name, opts[:as]))
         end
       end
     end

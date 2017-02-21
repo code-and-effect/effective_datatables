@@ -102,7 +102,7 @@ module Effective
 
         state[:filter] = {}
 
-        params[:filter].each do |name, value|
+        (params[:filter] || {}).each do |name, value|
           name = name.to_sym
           raise "unexpected filter name: #{name}" unless filters.key?(name)
 
