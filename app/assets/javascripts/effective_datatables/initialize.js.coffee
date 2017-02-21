@@ -16,7 +16,7 @@ initializeDataTables = ->
       buttons: [
         {
           extend: 'colvis',
-          text: 'Show / hide columns',
+          text: 'Show / Hide',
           postfixButtons: [
             { extend: 'colvisGroup', text: 'Show all', show: ':hidden'},
             { extend: 'colvisRestore', text: 'Show default'}
@@ -31,13 +31,6 @@ initializeDataTables = ->
         },
         {
           extend: 'csv',
-          exportOptions:
-            format:
-              header: (str) -> $("<div>#{str}</div>").children('.search-label').first().text()
-            columns: buttons_export_columns
-        },
-        {
-          extend: 'excel',
           exportOptions:
             format:
               header: (str) -> $("<div>#{str}</div>").children('.search-label').first().text()
