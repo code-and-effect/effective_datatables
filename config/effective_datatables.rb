@@ -38,27 +38,16 @@ EffectiveDatatables.setup do |config|
 
   # When using the actions_column DSL method, apply the following behavior
   # Valid values for each action are:
-  # true (always include a link to this action)
-  # false (never include a link to this action)
-  # :authorize (include link only if authorized to show/edit/destroy the resource class)
-  # :authorize_each (include link only if authorized to show/edit/destroy the resource)
-  # Proc.new { |resource| can?(:edit, resource.parent) }
-  #
-  # When :authorize, a single check will be made via the above config.authorization_method
-  # to see if the current_user has permission to :show/:edit/:destroy the collection class, i.e. Post
-  # EffectiveDatatables.authorized? (:show || :edit || :destroy), Post
-  # This is a faster permission check, because it only checks the class once
-  #
-  # If you want to authorize each individual resource, use :authorize_each
-  # EffectiveDatatables.authorized? (:show || :edit || :destroy), Post.find(1)
+  # true - display this action if authorized?(:show, Post)
+  # false - do not display this action
+  # :authorize - display this action if authorized?(:show, Post<3>)  (every instance is checked)
   #
   # You can override these defaults on a per-table basis
   # by calling `actions_column(show: false, edit: true, destroy: :authorize)`
   config.actions_column = {
-    show: :authorize,
-    edit: :authorize,
-    destroy: :authorize,
-    unarchive: :authorize
+    show: true,
+    edit: true,
+    destroy: true,
   }
 
   # Which packages to load when using the charts DSL

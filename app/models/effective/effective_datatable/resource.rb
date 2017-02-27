@@ -4,9 +4,15 @@ module Effective
 
       private
 
+      def controller_namespace
+        @controller_namespace ||= (
+          (attributes[:referer] ? URI(attributes[:referer]).path : view.controller_path).split('/')[0...-1].join('/').presence
+        )
+      end
+
       # This looks at all the columns and figures out the as:
       def load_resource!
-        @resource = Effective::Resource.new(collection)
+        @resource = Effective::Resource.new([controller_namespace, collection_class.name].compact.join('/'))
 
         if active_record_collection?
           columns.each do |name, opts|
@@ -37,7 +43,6 @@ module Effective
 
           search[:as] ||= :select if (search.key?(:collection) && opts[:as] != :belongs_to_polymorphic)
           search[:fuzzy] = true unless search.key?(:fuzzy)
-          #search[:sql_operation] = :having if ['SUM(', 'COUNT(', 'MAX(', 'MIN(', 'AVG('].any? { |str| (opts[:sql_column] || '').to_s.include?(str) }
 
           search.reverse_merge!(resource.search_form_field(name, opts[:as]))
         end

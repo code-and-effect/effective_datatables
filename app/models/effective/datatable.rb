@@ -1,7 +1,6 @@
 module Effective
   class Datatable
-    # Anything that we initialize our table with. That's it. Can't be changed by state.
-    attr_reader :attributes
+    attr_reader :attributes # Anything that we initialize our table with. That's it. Can't be changed by state.
     attr_reader :resource
     attr_reader :state
 
@@ -54,6 +53,7 @@ module Effective
       end
 
       view.datatable = self
+
       load_cookie!
       load_attributes!
 

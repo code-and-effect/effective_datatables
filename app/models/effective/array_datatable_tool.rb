@@ -24,7 +24,7 @@ module Effective
     def order(collection)
       return collection unless ordered.present?
 
-      collection = datatable.order_column(collection, ordered, datatable.order_direction, display_index(ordered))
+      collection = datatable.order_column(collection, ordered, datatable.order_direction, ordered[:index])
       raise 'order_column must return an Array' unless collection.kind_of?(Array)
       collection
     end
@@ -81,12 +81,6 @@ module Effective
 
     def paginate(collection)
       Kaminari.paginate_array(collection).page(datatable.page).per(datatable.per_page)
-    end
-
-    private
-
-    def display_index(column)
-      display_columns.present? ? display_columns.keys.index(column[:name]) : column[:index]
     end
 
   end

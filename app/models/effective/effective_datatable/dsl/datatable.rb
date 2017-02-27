@@ -63,7 +63,7 @@ module Effective
           }
         end
 
-        def bulk_actions_col(col_class: nil, format: nil, partial: nil, responsive: 10000)
+        def bulk_actions_col(col_class: nil, format: nil, partial: nil, responsive: 5000)
           raise 'You can only have one bulk actions column' if datatable.columns[:bulk_actions].present?
 
           datatable.columns[:bulk_actions] = {
@@ -87,50 +87,33 @@ module Effective
           }
         end
 
+        def actions_col(show: true, edit: true, destroy: true, col_class: nil, partial: nil, responsive: 5000, &block)
+          raise 'You can only have one actions column' if datatable.columns[:actions].present?
 
-        # def actions_column(options = {}, proc = nil, &block)
-        #   raise 'first parameter to actions_column should be a hash' unless options.kind_of?(Hash)
+          datatable.columns[:actions] = {
+            array_column: false,
+            as: :actions,
+            block: (block if block_given?),
+            col_class: col_class,
+            format: nil,
+            index: datatable.columns.length,
+            label: '',
+            name: :actions,
+            partial: partial || '/effective/datatables/actions_column',
+            responsive: responsive,
+            search: false,
+            sort: false,
+            sql_column: nil,
+            th: nil,
+            th_append: nil,
+            visible: true,
+            width: nil,
 
-        #   show = options.fetch(:show, (EffectiveDatatables.actions_column[:show] rescue false))
-        #   edit = options.fetch(:edit, (EffectiveDatatables.actions_column[:edit] rescue false))
-        #   destroy = options.fetch(:destroy, (EffectiveDatatables.actions_column[:destroy] rescue false))
-        #   unarchive = options.fetch(:unarchive, (EffectiveDatatables.actions_column[:unarchive] rescue false))
-        #   name = options.fetch(:name, 'actions')
-
-        #   opts = {
-        #     type: :actions,
-        #     sortable: false,
-        #     filter: false,
-        #     responsivePriority: 0,
-        #     partial_locals: { show_action: show, edit_action: edit, destroy_action: destroy, unarchive_action: unarchive },
-        #     actions_block: block
-        #   }.merge(options)
-
-        #   opts[:partial_local] ||= :resource unless opts[:partial].present?
-        #   opts[:partial] ||= '/effective/datatables/actions_column' unless proc.present?
-
-        #   table_column(name, opts, proc)
-        # end
-
-        # def bulk_actions_column(options = {}, proc = nil, &block)
-        #   raise 'first parameter to bulk_actions_column should be a hash' unless options.kind_of?(Hash)
-
-        #   name = options.fetch(:name, 'bulk_actions')
-        #   resource_method = options.fetch(:resource_method, :to_param)
-
-        #   opts = {
-        #     bulk_actions_column: true,
-        #     label: '',
-        #     partial_local: :resource,
-        #     partial: '/effective/datatables/bulk_actions_column',
-        #     partial_locals: { resource_method: resource_method },
-        #     sortable: false,
-        #     dropdown_partial: '/effective/datatables/bulk_actions_dropdown',
-        #     dropdown_block: block
-        #   }.merge(options)
-
-        #   table_column(name, opts, proc)
-        # end
+            show: show,
+            edit: edit,
+            destroy: destroy
+          }
+        end
 
         # def aggregate(name, options = {}, &block)
         #   if block_given?
