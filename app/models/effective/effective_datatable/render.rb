@@ -21,13 +21,13 @@ module Effective
           end
 
           if array_tool.searched.present?
-            col = self.arrayize(col)
+            col = arrayize(col)
             col = array_tool.search(col)
             @display_records = array_tool.size(col)
           end
 
           if array_tool.ordered.present?
-            col = self.arrayize(col)
+            col = arrayize(col)
             col = array_tool.order(col)
           end
         end

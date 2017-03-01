@@ -63,6 +63,8 @@ module Effective
       load_filters!
       load_state!
 
+      initialize_helpers if respond_to?(:initialize_helpers)
+
       # Now we initialize all the columns. columns knows about attributes and filters and scope
       initialize_datatable if respond_to?(:initialize_datatable)
       load_columns!

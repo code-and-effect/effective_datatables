@@ -24,6 +24,10 @@ module Effective
         define_method('initialize_filters') { view.instance_exec(&block) }
       end
 
+      def helpers(&block)
+        define_method('initialize_helpers') { view.instance_exec(&block) }
+      end
+
     end
   end
 end
