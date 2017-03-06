@@ -6,7 +6,12 @@ module Effective
 
     def initialize(datatable)
       @datatable = datatable
-      @columns = datatable.columns.select { |_, col| col[:array_column] }
+
+      if datatable.array_collection?
+        @columns = datatable.columns
+      else
+        @columns = datatable.columns.select { |_, col| col[:sql_column].blank? }
+      end
     end
 
     def size(collection)

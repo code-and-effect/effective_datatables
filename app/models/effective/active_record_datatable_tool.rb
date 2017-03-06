@@ -5,9 +5,14 @@ module Effective
     attr_reader :resource
 
     def initialize(datatable)
-      @columns = datatable.columns.reject { |_, opts| opts[:array_column] }
       @datatable = datatable
       @resource = datatable.resource
+
+      if datatable.active_record_collection?
+        @columns = datatable.columns.select { |_, col| col[:sql_column].present? }
+      else
+        @columns = {}
+      end
     end
 
     # Not every ActiveRecord query will work when calling the simple .count

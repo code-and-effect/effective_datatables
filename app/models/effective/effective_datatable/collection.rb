@@ -7,8 +7,6 @@ module Effective
         @collection_class  # Will be either User/Post/etc or Array
       end
 
-      private
-
       def active_record_collection?
         @active_record_collection == true
       end
@@ -16,6 +14,8 @@ module Effective
       def array_collection?
         @array_collection == true
       end
+
+      private
 
       def load_collection!
         raise 'No collection defined. Please add a collection with collection do ... end' if collection.nil?

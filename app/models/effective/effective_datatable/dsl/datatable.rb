@@ -15,13 +15,35 @@ module Effective
           datatable.state[:length] ||= (length == :all ? 9999999 : length)
         end
 
-        def col(name, as: nil, col_class: nil, format: nil, label: nil, partial: nil, responsive: 10000, search: {}, sort: true, sql_column: nil, th: nil, th_append: nil, visible: true, width: nil, &block)
+        def col(name, as: nil, col_class: nil, label: nil, partial: nil, responsive: 10000, search: {}, sort: true, sql_column: nil, th: nil, th_append: nil, visible: true, width: nil, &format)
           raise 'You cannot use partial: ... with the block syntax' if partial && block_given?
 
-          datatable.columns[name.to_sym] = {
-            array_column: false,
+          datatable.columns[name.to_sym] = Effective::DatatableColumn.new(
             as: as,
-            block: (block if block_given?),
+            compute: nil,
+            col_class: col_class,
+            format: (format if block_given?),
+            index: datatable.columns.length,
+            label: label || name.to_s.titleize,
+            name: name.to_sym,
+            partial: partial,
+            responsive: responsive,
+            search: (search.kind_of?(Hash) ? search.symbolize_keys : (search == false ? false : {})),
+            sort: sort,
+            sql_column: sql_column,
+            th: th,
+            th_append: th_append,
+            visible: visible,
+            width: width
+          )
+        end
+
+        def val(name, as: nil, col_class: nil, format: nil, label: nil, partial: nil, responsive: 10000, search: {}, sort: true, sql_column: nil, th: nil, th_append: nil, visible: true, width: nil, &compute)
+          raise 'You cannot use partial: ... with the block syntax' if partial && block_given?
+
+          datatable.columns[name.to_sym] = Effective::DatatableColumn.new(
+            as: as,
+            compute: (compute if block_given?),
             col_class: col_class,
             format: format,
             index: datatable.columns.length,
@@ -36,42 +58,17 @@ module Effective
             th_append: th_append,
             visible: visible,
             width: width
-          }
+          )
         end
 
-        def val(name, as: nil, col_class: nil, format: nil, label: nil, partial: nil, responsive: 10000, search: {}, sort: true, sql_column: nil, th: nil, th_append: nil, visible: true, width: nil, &block)
-          raise 'You cannot use partial: ... with the block syntax' if partial && block_given?
-
-          datatable.columns[name.to_sym] = {
-            array_column: true,
-            as: as,
-            block: (block if block_given?),
-            col_class: col_class,
-            format: format,
-            index: datatable.columns.length,
-            label: label || name.to_s.titleize,
-            name: name.to_sym,
-            partial: partial,
-            responsive: responsive,
-            search: (search.kind_of?(Hash) ? search.symbolize_keys : (search == false ? false : {})),
-            sort: sort,
-            sql_column: sql_column,
-            th: th,
-            th_append: th_append,
-            visible: visible,
-            width: width
-          }
-        end
-
-        def bulk_actions_col(col_class: nil, format: nil, partial: nil, responsive: 5000)
+        def bulk_actions_col(col_class: nil, partial: nil, responsive: 5000)
           raise 'You can only have one bulk actions column' if datatable.columns[:bulk_actions].present?
 
-          datatable.columns[:bulk_actions] = {
-            array_column: false,
+          datatable.columns[:bulk_actions] = Effective::DatatableColumn.new(
             as: :bulk_actions,
-            block: nil,
+            compute: nil,
             col_class: col_class,
-            format: format,
+            format: nil,
             index: datatable.columns.length,
             label: '',
             name: :bulk_actions,
@@ -84,18 +81,17 @@ module Effective
             th_append: nil,
             visible: true,
             width: nil
-          }
+          )
         end
 
-        def actions_col(show: true, edit: true, destroy: true, col_class: nil, partial: nil, responsive: 5000, &block)
+        def actions_col(show: true, edit: true, destroy: true, col_class: nil, partial: nil, responsive: 5000, &format)
           raise 'You can only have one actions column' if datatable.columns[:actions].present?
 
-          datatable.columns[:actions] = {
-            array_column: false,
+          datatable.columns[:actions] = Effective::DatatableColumn.new(
             as: :actions,
-            block: (block if block_given?),
+            compute: nil,
             col_class: col_class,
-            format: nil,
+            format: (format if block_given?),
             index: datatable.columns.length,
             label: '',
             name: :actions,
@@ -112,7 +108,7 @@ module Effective
             show: show,
             edit: edit,
             destroy: destroy
-          }
+          )
         end
 
         # def aggregate(name, options = {}, &block)

@@ -55,6 +55,107 @@ module Effective
         return collection if @arrayized  # Prevent the collection from being arrayized more than once
         @arrayized = true
 
+        retval = collection.map do |obj|
+          columns.map do |name, opts|
+            if state[:visible][name] == false && (name != order_name.to_s)  # Sort by invisible array column
+              BLANK
+            elsif opts[:compute]
+              if active_record_collection?
+                view.instance_exec(obj, collection, self, &opts[:compute])
+              else
+                view.instance_exec(obj, obj[opts[:index]], collection, self, &opts[:compute])
+              end
+            elsif [:bulk_actions, :actions].include?(opts[:as])
+              obj
+            elsif array_collection?
+              obj[opts[:index]]
+            elsif opts[:sql_as_column]
+              obj[name] || obj.send(name)
+            else
+              obj.send(name)
+            end
+          end
+        end
+
+        retval
+
+      end
+
+      def format(collection)
+        # We want to use the render :collection for each column that renders partials
+        rendered = {}
+
+        columns.each do |name, opts|
+          if opts[:partial] && state[:visible][name]
+            locals = {
+              datatable: self,
+              column: columns[name],
+              controller_namespace: controller_namespace
+            }.merge(actions_col_locals(opts))
+
+            rendered[name] = view.render(
+              partial: opts[:partial],
+              as: :resource,
+              collection: collection,
+              formats: :html,
+              locals: locals,
+              spacer_template: '/effective/datatables/spacer_template',
+            ).split('EFFECTIVEDATATABLESSPACER')
+          end
+        end
+
+        collection.each do |row|
+          columns.each do |name, opts|
+            next if state[:visible][name] == false
+
+            index = opts[:index]
+            value = row[index]
+
+            row[index] = (
+              if opts[:partial]
+                rendered[name][index]
+              elsif opts[:format]
+                view.instance_exec(*value, collection, self, &opts[:format])
+              elsif opts[:as] == :belongs_to
+                value.to_s
+              elsif opts[:as] == :has_many
+                value.map { |v| v.to_s }.join('<br>')
+              elsif opts[:as] == :effective_addresses
+                value.map { |addr| addr.to_html }.join('<br>')
+              elsif opts[:as] == :effective_roles
+                value.join(', ')
+              elsif opts[:as] == :datetime
+                value.strftime(EffectiveDatatables.datetime_format) rescue BLANK
+              elsif opts[:as] == :date
+                value.strftime(EffectiveDatatables.date_format) rescue BLANK
+              elsif opts[:as] == :price
+                raise 'column type: price expects an Integer representing the number of cents' unless value.kind_of?(Integer)
+                number_to_currency(value / 100.0)
+              elsif opts[:as] == :currency
+                number_to_currency(value || 0)
+              elsif opts[:as] == :percentage
+                number_to_percentage(value || 0)
+              elsif opts[:as] == :integer
+                #EffectiveDatatables.integer_format.send(value)
+                value
+              elsif opts[:as] == :boolean
+                value == true ? 'Yes' : 'No'
+              elsif opts[:as] == :string
+                value
+              else
+                raise 'unsupported type'
+              end
+            )
+          end
+        end
+      end
+
+
+
+      def arrayize22(collection)
+        return collection if @arrayized  # Prevent the collection from being arrayized more than once
+        @arrayized = true
+
         # We want to use the render :collection for each column that renders partials
         rendered = {}
 
@@ -124,7 +225,7 @@ module Effective
         end
       end
 
-      def format(collection)
+      def format22(collection)
         collection.each do |row|
           columns.each_with_index do |(name, opts), index|
             value = row[index]
