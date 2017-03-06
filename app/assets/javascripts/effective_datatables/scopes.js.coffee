@@ -5,4 +5,5 @@ $(document).on 'click', 'a[data-clear-form]', (event) ->
 $(document).on 'clear', '.effective-datatable-scopes form', (event) ->
   $(this).find('.radio.active').removeClass('active');
   $(this).find(':radio').prop('checked', false);
+  $('form.form-inline input:not([type=submit])').val('');
   $(this).submit()
