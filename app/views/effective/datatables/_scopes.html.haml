@@ -16,6 +16,6 @@
         - else
           = form.input name, options[:filter]
 
-      = form.submit 'Submit', class: 'btn btn-primary', 'data-disable-with' => 'Submitting...'
-      = link_to 'Reset', '#', 'data-reset-form' => true
-
+      .btn-group
+        = form.submit 'Filter', class: 'btn btn-primary', 'data-disable-with' => 'Submitting...'
+        = link_to 'Clear', '#', class: 'btn btn-default', 'data-clear-form' => true
