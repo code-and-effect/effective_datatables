@@ -933,8 +933,14 @@ config.authorization_method = :my_authorization_method
 and then in your application_controller.rb:
 
 ```ruby
-def my_authorization_method(action, resource)
+def authorize!(action, resource)
   current_user.is?(:admin) || EffectivePunditPolicy.new(current_user, resource).send('#{action}?')
+end
+
+# Or:
+
+def my_authorization_method
+  Your logic here
 end
 ```
 
