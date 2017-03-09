@@ -1,16 +1,16 @@
-// Use asset_data_uri to prevent 3 additional GET requests for icons
+// Use asset-data-url to prevent 3 additional GET requests for icons
 table.dataTable thead .sorting {
-  background-image: url(<%= asset_data_uri('dataTables/sort_both.png') %>);
+  background-image: asset-data-url('dataTables/sort_both.png');
   background-position: 100% 70%;
 }
 
 table.dataTable thead .sorting_asc {
-  background-image: url(<%= asset_data_uri('dataTables/sort_asc.png') %>);
+  background-image: asset-data-url('dataTables/sort_asc.png');
   background-position: 100% 70%;
 }
 
 table.dataTable thead .sorting_desc {
-  background-image: url(<%= asset_data_uri('dataTables/sort_desc.png') %>);
+  background-image: asset-data-url('dataTables/sort_desc.png');
   background-position: 100% 70%;
 }
 
