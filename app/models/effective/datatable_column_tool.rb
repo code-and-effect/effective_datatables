@@ -39,7 +39,7 @@ module Effective
     end
 
     def searched
-      @searched ||= datatable.search_terms.select { |name, _| columns.key?(name) }
+      @searched ||= datatable.search.select { |name, _| columns.key?(name) }
     end
 
     def ordered

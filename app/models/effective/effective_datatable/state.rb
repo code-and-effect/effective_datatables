@@ -5,10 +5,12 @@ module Effective
       def scope
         state[:scope]
       end
+      alias_method :current_scope, :scope
 
       def filter
         state[:filter]
       end
+      alias_method :filters, :filter
 
       def display_length
         state[:length]
@@ -30,7 +32,7 @@ module Effective
         state[:order_name]
       end
 
-      def search_terms
+      def search
         state[:search]
       end
 
@@ -61,8 +63,8 @@ module Effective
       end
 
       def load_filters!
-        state[:filter] = filters.inject({}) { |h, (name, opts)| h[name] = opts[:value]; h }
-        state[:scope] = scopes.find { |_, opts| opts[:default] }.try(:first) || scopes.keys.first
+        state[:filter] = _filters.inject({}) { |h, (name, opts)| h[name] = opts[:value]; h }
+        state[:scope] = _scopes.find { |_, opts| opts[:default] }.try(:first) || _scopes.keys.first
 
         filter_params.each { |name, value| state[:filter][name] = parse_filter_value(filters[name], value) }
         state[:scope] = scope_param if scope_param
@@ -84,7 +86,7 @@ module Effective
         state[:order_dir] = (params[:order]['0'][:dir] == 'desc' ? :desc : :asc)
         state[:order_index] = params[:order]['0'][:column].to_i
 
-        state[:scope] = scopes.keys.find { |name| params[:scope] == name.to_s }
+        state[:scope] = _scopes.keys.find { |name| params[:scope] == name.to_s }
         state[:start] = params[:start].to_i
 
         state[:search] = {}
@@ -104,9 +106,9 @@ module Effective
 
         (params[:filter] || {}).each do |name, value|
           name = name.to_sym
-          raise "unexpected filter name: #{name}" unless filters.key?(name)
+          raise "unexpected filter name: #{name}" unless _filters.key?(name)
 
-          state[:filter][name] = parse_filter_value(filters[name], value)
+          state[:filter][name] = parse_filter_value(_filters[name], value)
         end
 
         state[:params] = cookie[:state][:params]

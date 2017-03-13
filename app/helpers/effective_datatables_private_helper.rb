@@ -23,7 +23,7 @@ module EffectiveDatatablesPrivateHelper
   end
 
   def datatable_bulk_actions(datatable)
-    render(partial: '/effective/datatables/bulk_actions_dropdown', locals: { datatable: datatable }) if datatable.bulk_actions.present?
+    render(partial: '/effective/datatables/bulk_actions_dropdown', locals: { datatable: datatable }) if datatable._bulk_actions.present?
   end
 
   def datatable_reset(datatable)

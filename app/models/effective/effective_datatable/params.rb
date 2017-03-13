@@ -14,7 +14,7 @@ module Effective
       end
 
       def filter_params
-        params.select { |name, value| filters.key?(name) }
+        params.select { |name, value| _filters.key?(name) }
       end
 
       def scope_param
@@ -22,7 +22,7 @@ module Effective
       end
 
       def search_params
-        params.select { |name, value| columns.key?(name) && (name != :id || value != to_param) }
+        params.select { |name, value| _columns.key?(name) && (name != :id || value != to_param) }
       end
 
     end

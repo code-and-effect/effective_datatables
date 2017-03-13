@@ -5,10 +5,10 @@ module Effective
     attr_reader :state
 
     # Hashes of DSL options
-    attr_reader :bulk_actions
-    attr_reader :columns
-    attr_reader :filters
-    attr_reader :scopes
+    attr_reader :_bulk_actions
+    attr_reader :_columns
+    attr_reader :_filters
+    attr_reader :_scopes
 
     # The collection itself. Only evaluated once.
     attr_accessor :collection
@@ -30,29 +30,17 @@ module Effective
 
     def initialize(args = {})
       @attributes = initial_attributes(args)
-
-      @bulk_actions = []
-      @columns = {}
-      @filters = {}
-      @scopes = {}
-
       @state = initial_state
+
+      @_bulk_actions = []
+      @_columns = {}
+      @_filters = {}
+      @_scopes = {}
     end
 
     # Once the view is assigned, we initialize everything
     def view=(view_context)
       @view = view_context
-
-      # Any datatable specific functions we want available in the DSL blocks need to be defined on the view
-      view.class_eval do
-        attr_accessor :datatable
-        include Effective::EffectiveDatatable::Dsl::BulkActions
-        include Effective::EffectiveDatatable::Dsl::Datatable
-        include Effective::EffectiveDatatable::Dsl::Filters
-        include Effective::EffectiveDatatable::Dsl::View
-      end
-
-      view.datatable = self
 
       load_cookie!
       load_attributes!
@@ -141,7 +129,16 @@ module Effective
       @to_param ||= self.class.name.underscore.parameterize
     end
 
+    def dsl_tool
+      @dsl_tool ||= DatatableDslTool.new(self)
+    end
+
+    def columns
+      @_columns
+    end
+
     private
+
 
     def column_tool
       @column_tool ||= DatatableColumnTool.new(self)

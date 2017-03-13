@@ -22,7 +22,7 @@ module Effective
         def col(name, as: nil, col_class: nil, label: nil, partial: nil, responsive: 10000, search: {}, sort: true, sql_column: nil, th: nil, th_append: nil, visible: true, width: nil, &format)
           raise 'You cannot use partial: ... with the block syntax' if partial && block_given?
 
-          datatable.columns[name.to_sym] = Effective::DatatableColumn.new(
+          datatable._columns[name.to_sym] = Effective::DatatableColumn.new(
             as: as,
             compute: nil,
             col_class: col_class,
@@ -47,7 +47,7 @@ module Effective
         def val(name, as: nil, col_class: nil, format: nil, label: nil, partial: nil, responsive: 10000, search: {}, sort: true, sql_column: nil, th: nil, th_append: nil, visible: true, width: nil, &compute)
           raise 'You cannot use partial: ... with the block syntax' if partial && block_given?
 
-          datatable.columns[name.to_sym] = Effective::DatatableColumn.new(
+          datatable._columns[name.to_sym] = Effective::DatatableColumn.new(
             as: as,
             compute: (compute if block_given?),
             col_class: col_class,
@@ -70,7 +70,7 @@ module Effective
         def bulk_actions_col(col_class: nil, partial: nil, responsive: 5000)
           raise 'You can only have one bulk actions column' if datatable.columns[:bulk_actions].present?
 
-          datatable.columns[:bulk_actions] = Effective::DatatableColumn.new(
+          datatable._columns[:bulk_actions] = Effective::DatatableColumn.new(
             as: :bulk_actions,
             compute: nil,
             col_class: col_class,
@@ -93,7 +93,7 @@ module Effective
         def actions_col(show: true, edit: true, destroy: true, col_class: nil, partial: nil, responsive: 5000, &format)
           raise 'You can only have one actions column' if datatable.columns[:actions].present?
 
-          datatable.columns[:actions] = Effective::DatatableColumn.new(
+          datatable._columns[:actions] = Effective::DatatableColumn.new(
             as: :actions,
             compute: nil,
             col_class: col_class,
