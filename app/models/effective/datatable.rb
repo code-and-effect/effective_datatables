@@ -83,12 +83,24 @@ module Effective
       save_cookie!
     end
 
-    def present?
-      total_records > 0
+    def present?(view_context = nil)
+      self.view ||= view_context
+
+      if view.nil?
+        raise 'unable to call present? without an assigned view. In your view, either call render_datatable(@datatable) first, or use @datatable.present?(self)'
+      end
+
+      to_json[:recordsTotal] > 0
     end
 
-    def blank?
-      total_records == 0
+    def blank?(view_context = nil)
+      self.view ||= view_context
+
+      if view.nil?
+        raise 'unable to call blank? without an assigned view. In your view, either call render_datatable(@datatable) first, or use @datatable.blank?(self)'
+      end
+
+      to_json[:recordsTotal] == 0
     end
 
     def display_records
@@ -96,7 +108,7 @@ module Effective
     end
 
     def total_records
-      @total_records || 0
+      @total_records
     end
 
     def to_json

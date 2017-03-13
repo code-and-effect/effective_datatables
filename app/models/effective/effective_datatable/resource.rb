@@ -5,9 +5,7 @@ module Effective
       private
 
       def controller_namespace
-        @controller_namespace ||= (
-          (attributes[:referer] ? URI(attributes[:referer]).path : view.controller_path).split('/')[0...-1].join('/').presence
-        )
+        @attributes[:controller_namespace]
       end
 
       # This looks at all the columns and figures out the as:

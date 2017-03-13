@@ -71,19 +71,6 @@ module EffectiveDatatablesHelper
       locals: { datatable: datatable, chart: chart }
   end
 
-  def datatables_admin_path?
-    @datatables_admin_path ||= (
-      path = request.path.to_s.downcase.chomp('/') + '/'
-      referer = request.referer.to_s.downcase.chomp('/') + '/'
-      (attributes[:admin_path] || referer.include?('/admin/') || path.include?('/admin/')) rescue false
-    )
-  end
-
-  # TODO: Improve on this
-  def datatables_active_admin_path?
-    attributes[:active_admin_path] rescue false
-  end
-
   ### Icon Helpers for actions_column or elsewhere
   def show_icon_to(path, options = {})
     glyphicon_to('eye-open', path, {title: 'Show'}.merge(options))
