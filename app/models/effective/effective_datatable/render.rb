@@ -12,35 +12,44 @@ module Effective
       def table_data
         col = collection
 
-        col = column_tool.search(col) if column_tool.searched?
-        col = column_tool.order(col) if column_tool.ordered?
+        # Assign total records
+        @total_records = (active_record_collection? ? column_tool.size(col) : value_tool.size(col))
 
-        if column_tool.searched? && !value_tool.searched?
-          @display_records = column_tool.size(col)
-        end
+        # Apply column searching
+        col = column_tool.search(col)
+        @display_records = column_tool.size(col) unless value_tool.searched.present?
 
-        if value_tool.ordered? || value_tool.searched?
-          col = arrayize(col)
-          col = value_tool.search(col) if value_tool.searched?
-          col = value_tool.order(col) if value_tool.ordered?
-        end
+        # Apply column ordering
+        col = column_tool.order(col)
 
-        @display_records ||= total_records
+        # Arrayize if we have value tool work to do
+        col = arrayize(col) if value_tool.searched.present? || value_tool.ordered.present?
 
-        if col.kind_of?(Array)
-          col = value_tool.paginate(col)
-        else
-          col = column_tool.paginate(col)
-          col = arrayize(col)
-        end
+        # Apply value searching
+        col = value_tool.search(col)
+        @display_records = value_tool.size(col) if value_tool.searched.present?
 
-        # Do Aggregate data
+        # Apply value ordering
+        col = value_tool.order(col)
 
-        # Always an array at this point
+        # Apply pagination
+        col = col.kind_of?(Array) ? value_tool.paginate(col) : column_tool.paginate(col)
+
+        # Arrayize the searched, ordered, paginated results
+        col = arrayize(col) unless col.kind_of?(Array)
+
+        # Assign display records
+        @display_records ||= @total_records
+
+        # Compute aggregate data
+        # TODO
+
+        # Format all results
         format(col)
+
+        # Finalize hook
         finalize(col)
       end
-
 
       def table_data222
         col = collection

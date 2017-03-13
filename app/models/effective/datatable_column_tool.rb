@@ -38,16 +38,8 @@ module Effective
       end
     end
 
-    def searched?
-      searched.present?
-    end
-
     def searched
       @searched ||= datatable.search_terms.select { |name, _| columns.key?(name) }
-    end
-
-    def ordered?
-      ordered.present?
     end
 
     def ordered

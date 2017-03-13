@@ -18,16 +18,8 @@ module Effective
       collection.size
     end
 
-    def searched?
-      searched.present?
-    end
-
     def searched
       @searched ||= datatable.search_terms.select { |name, _| columns.key?(name) }
-    end
-
-    def ordered?
-      ordered.present?
     end
 
     def ordered
@@ -76,7 +68,7 @@ module Effective
 
     def search(collection)
       searched.each do |name, value|
-        collection = datatable.search_column(collection, columns[name], value, display_index(columns[name]))
+        collection = datatable.search_column(collection, columns[name], value, columns[name][:index])
         raise 'search_column must return an Array object' unless collection.kind_of?(Array)
       end
       collection

@@ -96,7 +96,7 @@ module Effective
     end
 
     def total_records
-      @total_records ||= (active_record_collection? ? column_tool.size(collection) : value_tool.size(collection))
+      @total_records || 0
     end
 
     def to_json
