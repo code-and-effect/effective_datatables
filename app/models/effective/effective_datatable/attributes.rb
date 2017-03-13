@@ -13,6 +13,7 @@ module Effective
         if datatables_ajax_request?
           raise 'Expected attributes cookie to be present' unless cookie
           @attributes = cookie[:attributes]
+          @attributes[:referer] = view.request.referer
         end
       end
 
