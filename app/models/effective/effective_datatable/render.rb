@@ -12,6 +12,39 @@ module Effective
       def table_data
         col = collection
 
+        col = column_tool.search(col) if column_tool.searched?
+        col = column_tool.order(col) if column_tool.ordered?
+
+        if column_tool.searched? && !value_tool.searched?
+          @display_records = column_tool.size(col)
+        end
+
+        if value_tool.ordered? || value_tool.searched?
+          col = arrayize(col)
+          col = value_tool.search(col) if value_tool.searched?
+          col = value_tool.order(col) if value_tool.ordered?
+        end
+
+        @display_records ||= total_records
+
+        if col.kind_of?(Array)
+          col = value_tool.paginate(col)
+        else
+          col = column_tool.paginate(col)
+          col = arrayize(col)
+        end
+
+        # Do Aggregate data
+
+        # Always an array at this point
+        format(col)
+        finalize(col)
+      end
+
+
+      def table_data222
+        col = collection
+
         if active_record_collection?
           col = column_tool.order(col)
           col = column_tool.search(col)
@@ -21,18 +54,21 @@ module Effective
           end
 
           if value_tool.searched.present?
+            puts "AAAAAA"
             col = arrayize(col)
             col = value_tool.search(col)
             @display_records = value_tool.size(col)
           end
 
           if value_tool.ordered.present?
+            puts "BBBB"
             col = arrayize(col)
             col = value_tool.order(col)
           end
         end
 
         if col.kind_of?(Array)
+          puts "CCCC"
           col = value_tool.order(col)
           col = value_tool.search(col)
         end
