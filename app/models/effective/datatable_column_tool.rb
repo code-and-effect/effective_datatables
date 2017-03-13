@@ -55,6 +55,8 @@ module Effective
     end
 
     def order_column(collection, column, direction, sql_column)
+      Rails.logger.info "COLUMN TOOL: order_column #{column} #{direction} #{sql_column}"
+
       if column[:sql_as_column]
         collection.order("#{sql_column} #{resource.sql_direction(direction)}")
       else
@@ -72,6 +74,8 @@ module Effective
     end
 
     def search_column(collection, column, value, sql_column)
+      Rails.logger.info "COLUMN TOOL: search_column #{column} #{value} #{sql_column}"
+
       Effective::Resource.new(collection)
         .search(column[:name], value, as: column[:as], fuzzy: column[:search][:fuzzy], sql_column: column[:sql_column])
     end

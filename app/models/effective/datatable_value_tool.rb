@@ -35,6 +35,8 @@ module Effective
     end
 
     def order_column(collection, column, direction, index)
+      Rails.logger.info "VALUE TOOL: order_column #{column} #{direction} #{index}"
+
       if direction == :asc
         collection.sort! do |x, y|
           if (x[index] && y[index])
@@ -65,21 +67,23 @@ module Effective
     end
 
     def search(collection)
-      searched.each do |name, search_term|
-        collection = datatable.search_column(collection, columns[name], search_term, display_index(columns[name]))
+      searched.each do |name, value|
+        collection = datatable.search_column(collection, columns[name], value, display_index(columns[name]))
         raise 'search_column must return an Array object' unless collection.kind_of?(Array)
       end
       collection
     end
 
-    def search_column(collection, column, search_term, index)
-      search_term = search_term.downcase if column[:search][:fuzzy]
+    def search_column(collection, column, value, index)
+      Rails.logger.info "VALUE TOOL: search_column #{column} #{value} #{index}"
+
+      value = value.downcase if column[:search][:fuzzy]
 
       collection.select! do |row|
         if column[:search][:fuzzy]
-          row[index].to_s.downcase.include?(search_term)
+          row[index].to_s.downcase.include?(value)
         else
-          row[index] == search_term
+          row[index] ==value
         end
       end || collection
     end
