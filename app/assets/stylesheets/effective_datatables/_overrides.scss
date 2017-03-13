@@ -1,16 +1,16 @@
-// Use asset_data_uri to prevent 3 additional GET requests for icons
+// Use asset-data-url to prevent 3 additional GET requests for icons
 table.dataTable thead .sorting {
-  background-image: url(<%= asset_data_uri('dataTables/sort_both.png') %>);
+  background-image: asset-data-url('dataTables/sort_both.png');
   background-position: 100% 70%;
 }
 
 table.dataTable thead .sorting_asc {
-  background-image: url(<%= asset_data_uri('dataTables/sort_asc.png') %>);
+  background-image: asset-data-url('dataTables/sort_asc.png');
   background-position: 100% 70%;
 }
 
 table.dataTable thead .sorting_desc {
-  background-image: url(<%= asset_data_uri('dataTables/sort_desc.png') %>);
+  background-image: asset-data-url('dataTables/sort_desc.png');
   background-position: 100% 70%;
 }
 
@@ -37,11 +37,6 @@ table.dataTable thead tr th {
   .form-group { margin-bottom: 0px; font-weight: normal; }
 }
 
-table.dataTable td ul {
-  list-style: none;
-  padding-left: 0;
-}
-
 // Sorting disabled
 table.dataTable.sort-hidden thead .sorting { background-image: none; }
 table.dataTable.sort-hidden thead .sorting_asc { background-image: none; }
@@ -49,7 +44,6 @@ table.dataTable.sort-hidden thead .sorting_desc { background-image: none; }
 
 // Filter bar
 table.dataTable .form-group { width: 100%; margin-left: 0px; margin-right: 0px; }
-table.dataTable input { width: 100%; }
 table.dataTable select { width: 100%; }
 table.dataTable .form-control { width: 100%;  }
 table.dataTable .form-group.datatable_search_bulk_actions { margin-left: 4px; }
