@@ -92,6 +92,7 @@ module Effective
               controller_namespace: controller_namespace
             }.merge(actions_col_locals(opts))
 
+
             rendered[name] = view.render(
               partial: opts[:partial],
               as: :resource,
@@ -103,14 +104,13 @@ module Effective
           end
         end
 
-        collection.each do |row|
+        collection.each_with_index do |row, index|
           columns.each do |name, opts|
             next if state[:visible][name] == false
 
-            index = opts[:index]
-            value = row[index]
+            value = row[opts[:index]]
 
-            row[index] = (
+            row[opts[:index]] = (
               if opts[:partial]
                 rendered[name][index]
               elsif opts[:format]
