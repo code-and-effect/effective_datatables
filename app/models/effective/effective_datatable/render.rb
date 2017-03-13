@@ -13,36 +13,36 @@ module Effective
         col = collection
 
         if active_record_collection?
-          col = table_tool.order(col)
-          col = table_tool.search(col)
+          col = column_tool.order(col)
+          col = column_tool.search(col)
 
-          if table_tool.searched.present? && array_tool.searched.blank?
-            @display_records = table_tool.size(col)
+          if column_tool.searched.present? && value_tool.searched.blank?
+            @display_records = column_tool.size(col)
           end
 
-          if array_tool.searched.present?
+          if value_tool.searched.present?
             col = arrayize(col)
-            col = array_tool.search(col)
-            @display_records = array_tool.size(col)
+            col = value_tool.search(col)
+            @display_records = value_tool.size(col)
           end
 
-          if array_tool.ordered.present?
+          if value_tool.ordered.present?
             col = arrayize(col)
-            col = array_tool.order(col)
+            col = value_tool.order(col)
           end
         end
 
         if col.kind_of?(Array)
-          col = array_tool.order(col)
-          col = array_tool.search(col)
+          col = value_tool.order(col)
+          col = value_tool.search(col)
         end
 
         @display_records ||= total_records
 
         if col.kind_of?(Array)
-          col = array_tool.paginate(col)
+          col = value_tool.paginate(col)
         else
-          col = table_tool.paginate(col)
+          col = column_tool.paginate(col)
         end
 
         col = arrayize(col)
@@ -59,6 +59,8 @@ module Effective
           columns.map do |name, opts|
             if state[:visible][name] == false && (name != order_name.to_s)  # Sort by invisible array column
               BLANK
+            elsif opts[:format] && !opts[:compute]
+              obj
             elsif opts[:compute]
               if active_record_collection?
                 view.instance_exec(obj, collection, self, &opts[:compute])
@@ -67,6 +69,8 @@ module Effective
               end
             elsif [:bulk_actions, :actions].include?(opts[:as])
               obj
+            elsif opts[:as] == :effective_obfuscation
+              obj.to_param
             elsif array_collection?
               obj[opts[:index]]
             elsif opts[:sql_as_column]
@@ -122,6 +126,8 @@ module Effective
                 value.map { |v| v.to_s }.join('<br>')
               elsif opts[:as] == :effective_addresses
                 value.map { |addr| addr.to_html }.join('<br>')
+              elsif opts[:as] == :effective_obfuscation
+                value
               elsif opts[:as] == :effective_roles
                 value.join(', ')
               elsif opts[:as] == :datetime
@@ -143,7 +149,7 @@ module Effective
               elsif opts[:as] == :string
                 value
               else
-                raise 'unsupported type'
+                raise "unsupported type '#{opts[:as]}' for column #{name}"
               end
             )
           end

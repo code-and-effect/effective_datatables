@@ -15,6 +15,10 @@ module Effective
           datatable.state[:length] ||= (length == :all ? 9999999 : length)
         end
 
+        # A col has its internal values sorted/searched before the block is run
+        # Anything done in the block, is purely a format on the after sorted/ordered value
+        # the original object == the computed value, which is yielded to the format block
+        # You can't do compute with .col
         def col(name, as: nil, col_class: nil, label: nil, partial: nil, responsive: 10000, search: {}, sort: true, sql_column: nil, th: nil, th_append: nil, visible: true, width: nil, &format)
           raise 'You cannot use partial: ... with the block syntax' if partial && block_given?
 
@@ -38,6 +42,8 @@ module Effective
           )
         end
 
+        # A val is a computed value that is then sorted/searched after the block is run
+        # You can have another block by calling .format afterwards to work on the computed value itself
         def val(name, as: nil, col_class: nil, format: nil, label: nil, partial: nil, responsive: 10000, search: {}, sort: true, sql_column: nil, th: nil, th_append: nil, visible: true, width: nil, &compute)
           raise 'You cannot use partial: ... with the block syntax' if partial && block_given?
 
@@ -53,7 +59,7 @@ module Effective
             responsive: responsive,
             search: (search.kind_of?(Hash) ? search.symbolize_keys : (search == false ? false : {})),
             sort: sort,
-            sql_column: sql_column,
+            sql_column: false,
             th: th,
             th_append: th_append,
             visible: visible,

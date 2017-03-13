@@ -10,9 +10,9 @@ module Effective
       # Override this function to perform custom searching on a column
       def search_column(collection, column, search_term, sql_column_or_index)
         if column[:sql_column]
-          table_tool.search_column(collection, column, search_term, sql_column_or_index)
+          column_tool.search_column(collection, column, search_term, sql_column_or_index)
         else
-          array_tool.search_column(collection, column, search_term, sql_column_or_index)
+          value_tool.search_column(collection, column, search_term, sql_column_or_index)
         end
       end
 
@@ -20,9 +20,9 @@ module Effective
       # direction will be :asc or :desc
       def order_column(collection, column, direction, sql_column_or_index)
         if column[:sql_column]
-          table_tool.order_column(collection, column, direction, sql_column_or_index)
+          column_tool.order_column(collection, column, direction, sql_column_or_index)
         else
-          array_tool.order_column(collection, column, direction, sql_column_or_index)
+          value_tool.order_column(collection, column, direction, sql_column_or_index)
         end
       end
 

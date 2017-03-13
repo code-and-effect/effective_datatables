@@ -1,6 +1,6 @@
 module Effective
   # The collection is an Array of Arrays
-  class ArrayDatatableTool
+  class DatatableValueTool
     attr_reader :datatable
     attr_reader :columns
 

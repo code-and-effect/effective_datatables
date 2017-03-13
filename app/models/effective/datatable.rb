@@ -96,7 +96,7 @@ module Effective
     end
 
     def total_records
-      @total_records ||= (active_record_collection? ? table_tool.size(collection) : array_tool.size(collection))
+      @total_records ||= (active_record_collection? ? column_tool.size(collection) : value_tool.size(collection))
     end
 
     def to_json
@@ -131,12 +131,12 @@ module Effective
 
     private
 
-    def table_tool
-      @table_tool ||= ActiveRecordDatatableTool.new(self)
+    def column_tool
+      @column_tool ||= DatatableColumnTool.new(self)
     end
 
-    def array_tool
-      @array_tool ||= ArrayDatatableTool.new(self)
+    def value_tool
+      @value_tool ||= DatatableValueTool.new(self)
     end
 
   end

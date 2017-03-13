@@ -1,5 +1,5 @@
 module Effective
-  class ActiveRecordDatatableTool
+  class DatatableColumnTool
     attr_reader :datatable
     attr_reader :columns
     attr_reader :resource
