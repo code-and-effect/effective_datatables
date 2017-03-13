@@ -20,7 +20,7 @@ module Effective
             opts[:sql_column] = (resource.sql_column(name) || false) if opts[:sql_column].nil?
 
             unless [:belongs_to, :belongs_to_polymorphic, :has_and_belongs_to_many, :has_many, :has_one, :effective_addresses, :effective_roles].include?(opts[:as])
-              opts[:sql_as_column] = true if (resource.table && resource.column(name).blank? && opts[:array_column] != true)
+              opts[:sql_as_column] = true if (resource.table && resource.column(name).blank?)
             end
           end
         end
