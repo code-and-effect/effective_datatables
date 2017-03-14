@@ -151,7 +151,9 @@ module Effective
               elsif opts[:as] == :decimal
                 value
               elsif opts[:as] == :percentage
-                view.number_to_percentage(value, precision: 0) if value.present?
+                if value.present?
+                  value.kind_of?(Integer) ? "#{value}%" : view.number_to_percentage(value, precision: 2)
+                end
               elsif opts[:as] == :integer
                 #EffectiveDatatables.integer_format.send(value)
                 value

@@ -19,12 +19,14 @@ module Effective
           }
         end
 
-        def scope(name = nil, default: nil, label: nil)
+        def scope(name = nil, *args, default: nil, label: nil)
           return datatable.scope unless name # This lets block methods call 'scope' and get the values
 
           datatable._scopes[name.to_sym] = {
             default: default,
             label: label || name.to_s.titleize,
+            name: name.to_sym,
+            args: args.presence
           }
         end
 

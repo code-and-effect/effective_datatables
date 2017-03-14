@@ -38,6 +38,10 @@ module Effective
       end
     end
 
+    def scoped
+      @scoped ||= datatable._scopes[datatable.scope]
+    end
+
     def searched
       @searched ||= datatable.search.select { |name, _| columns.key?(name) }
     end
@@ -66,8 +70,9 @@ module Effective
     end
 
     def scope(collection)
-      return collection unless columns.present? && datatable.scope.present?
-      collection.send(datatable.scope)
+      return collection unless scoped.present?
+
+      collection.send(scoped[:name], *scoped[:args])
     end
 
     def search(collection)
