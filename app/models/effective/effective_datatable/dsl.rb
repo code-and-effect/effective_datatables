@@ -12,9 +12,9 @@ module Effective
         define_method('initialize_charts') { dsl_tool.instance_exec(&block) }
       end
 
-      # def collection(&block)
-      #   define_method('initialize_collection') { dsl_tool.datatable.collection = dsl_tool.instance_exec(&block) }
-      # end
+      def collection(&block)
+        define_method('initialize_collection') { dsl_tool.datatable.collection = dsl_tool.instance_exec(&block) }
+      end
 
       def datatable(&block)
         define_method('initialize_datatable') { dsl_tool.instance_exec(&block) }
