@@ -114,7 +114,16 @@ module Effective
             value = row[index]
 
             row[index] = (
-              if opts[:partial]
+              if opts[:format]
+                result = (
+                  if value.nil?
+                    dsl_tool.instance_exec(value, row, &opts[:format])
+                  else
+                    dsl_tool.instance_exec(*value, row, &opts[:format])
+                  end
+                )
+                opts[:partial].present? ? "#{rendered[name][row_index]}#{result}" : result
+              elsif opts[:partial]
                 rendered[name][row_index]
               elsif opts[:format] && value.nil?
                 dsl_tool.instance_exec(value, row, &opts[:format])
