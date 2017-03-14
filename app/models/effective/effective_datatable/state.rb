@@ -6,6 +6,7 @@ module Effective
         state[:scope]
       end
       alias_method :current_scope, :scope
+      alias_method :scopes, :scope
 
       def filter
         state[:filter]

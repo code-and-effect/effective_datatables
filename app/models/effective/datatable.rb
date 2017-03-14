@@ -11,7 +11,7 @@ module Effective
     attr_reader :_scopes
 
     # The collection itself. Only evaluated once.
-    attr_accessor :collection
+    attr_accessor :_collection
 
     # The view, and the ajax/cookie/default state
     attr_reader :cookie
@@ -20,9 +20,10 @@ module Effective
     extend Effective::EffectiveDatatable::Dsl
 
     include Effective::EffectiveDatatable::Attributes
+    include Effective::EffectiveDatatable::Charts
+    include Effective::EffectiveDatatable::Collection
     include Effective::EffectiveDatatable::Cookie
     include Effective::EffectiveDatatable::Hooks
-    include Effective::EffectiveDatatable::Collection
     include Effective::EffectiveDatatable::Params
     include Effective::EffectiveDatatable::Render
     include Effective::EffectiveDatatable::Resource
@@ -36,10 +37,14 @@ module Effective
       @_columns = {}
       @_filters = {}
       @_scopes = {}
+
+      raise 'collection is defined as a method. Please use the collection do ... end syntax.' unless collection.nil?
     end
 
     # Once the view is assigned, we initialize everything
     def view=(view_context)
+      raise 'expected view to respond to params' unless view_context.respond_to?(:params)
+
       @view = view_context
 
       load_cookie!
@@ -50,8 +55,6 @@ module Effective
       initialize_filters if respond_to?(:initialize_filters)
       load_filters!
       load_state!
-
-      initialize_helpers if respond_to?(:initialize_helpers)
 
       # Now we initialize all the columns. columns knows about attributes and filters and scope
       initialize_datatable if respond_to?(:initialize_datatable)
@@ -72,31 +75,23 @@ module Effective
     end
 
     def present?(view_context = nil)
-      self.view ||= view_context
-
-      if view.nil?
+      unless (view || view_context)
         raise 'unable to call present? without an assigned view. In your view, either call render_datatable(@datatable) first, or use @datatable.present?(self)'
       end
+
+      self.view ||= view_context
 
       to_json[:recordsTotal] > 0
     end
 
     def blank?(view_context = nil)
-      self.view ||= view_context
-
-      if view.nil?
+      unless (view || view_context)
         raise 'unable to call blank? without an assigned view. In your view, either call render_datatable(@datatable) first, or use @datatable.blank?(self)'
       end
 
+      self.view ||= view_context
+
       to_json[:recordsTotal] == 0
-    end
-
-    def display_records
-      @display_records || 0
-    end
-
-    def total_records
-      @total_records
     end
 
     def to_json
@@ -106,8 +101,8 @@ module Effective
         {
           draw: (params[:draw] || 0),
           data: (data || []),
-          recordsTotal: (total_records || 0),
-          recordsFiltered: (display_records || 0),
+          recordsTotal: (@total_records || 0),
+          recordsFiltered: (@display_records || 0),
           aggregates: [], #(aggregate_data(data) || []),
           charts: {} #(charts_data || {})
         }
@@ -118,7 +113,7 @@ module Effective
     # no sorting, no filtering, no export buttons, no pagination, no per page, no colReorder
     # default sorting only, default visibility only, all records returned, and responsive enabled
     def simple?
-      attributes[:simple]
+      attributes[:simple] == true
     end
 
     def table_html_class
@@ -129,16 +124,19 @@ module Effective
       @to_param ||= self.class.name.underscore.parameterize
     end
 
-    def dsl_tool
-      @dsl_tool ||= DatatableDslTool.new(self)
-    end
-
     def columns
       @_columns
     end
 
+    def collection
+      @_collection
+    end
+
     private
 
+    def dsl_tool
+      @dsl_tool ||= DatatableDslTool.new(self)
+    end
 
     def column_tool
       @column_tool ||= DatatableColumnTool.new(self)

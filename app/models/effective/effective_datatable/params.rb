@@ -22,7 +22,7 @@ module Effective
       end
 
       def search_params
-        params.select { |name, value| _columns.key?(name) && (name != :id || value != to_param) }
+        params.select { |name, value| columns.key?(name) && (name != :id || value != to_param) }
       end
 
     end

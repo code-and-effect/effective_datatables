@@ -85,16 +85,6 @@ module EffectiveDatatablesHelper
     glyphicon_to('trash', path, defaults.merge(options))
   end
 
-  def archive_icon_to(path, options = {})
-    defaults = {title: 'Archive', data: {method: :delete, confirm: 'Archive this item?'}}
-    glyphicon_to('trash', path, defaults.merge(options))
-  end
-
-  def unarchive_icon_to(path, options = {})
-    defaults = {title: 'Unarchive', data: {confirm: 'Unarchive this item?'}}
-    glyphicon_to('retweet', path, defaults.merge(options))
-  end
-
   def settings_icon_to(path, options = {})
     glyphicon_to('cog', path, {title: 'Settings'}.merge(options))
   end

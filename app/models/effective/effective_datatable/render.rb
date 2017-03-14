@@ -60,12 +60,12 @@ module Effective
             if state[:visible][name] == false && (name != order_name.to_s)  # Sort by invisible array column
               BLANK
             elsif opts[:partial] || (opts[:format] && !opts[:compute])
-              obj
+              active_record_collection? ? obj : obj[opts[:index]]
             elsif opts[:compute]
               if active_record_collection?
-                view.instance_exec(obj, collection, self, &opts[:compute])
+                dsl_tool.instance_exec(obj, collection, &opts[:compute])
               else
-                view.instance_exec(obj, obj[opts[:index]], collection, self, &opts[:compute])
+                dsl_tool.instance_exec(obj, obj[opts[:index]], &opts[:compute])
               end
             elsif opts[:as] == :effective_obfuscation
               obj.to_param
@@ -92,7 +92,7 @@ module Effective
               controller_namespace: controller_namespace
             }.merge(actions_col_locals(opts))
 
-            rendered[name] = view.render(
+            rendered[name] = dsl_tool.render(
               partial: opts[:partial],
               as: :resource,
               collection: collection.map { |row| row[opts[:index]] },
@@ -114,7 +114,7 @@ module Effective
               if opts[:partial]
                 rendered[name][row_index]
               elsif opts[:format]
-                view.instance_exec(*value, collection, self, &opts[:format])
+                dsl_tool.instance_exec(*value, row, &opts[:format])
               elsif opts[:as] == :belongs_to
                 value.to_s
               elsif opts[:as] == :has_many
@@ -134,6 +134,8 @@ module Effective
                 number_to_currency(value / 100.0)
               elsif opts[:as] == :currency
                 number_to_currency(value || 0)
+              elsif opts[:as] == :decimal
+                value
               elsif opts[:as] == :percentage
                 number_to_percentage(value || 0)
               elsif opts[:as] == :integer

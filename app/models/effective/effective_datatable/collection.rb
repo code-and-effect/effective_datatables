@@ -25,7 +25,7 @@ module Effective
         @array_collection = (collection.kind_of?(Array) && (collection.length == 0 || collection.first.kind_of?(Array)))
 
         unless active_record_collection? || array_collection?
-          raise "Unsupported collection type. Expecting an ActiveRecord class, ActiveRecord relation, or an Array of Arrays [[1, 'something'], [2, 'something else']]"
+          raise "Unsupported collection type. Expecting an ActiveRecord class, ActiveRecord relation, or an Array of Arrays [[1, 'foo'], [2, 'bar']]"
         end
       end
 

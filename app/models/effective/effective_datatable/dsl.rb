@@ -13,7 +13,7 @@ module Effective
       end
 
       def collection(&block)
-        define_method('initialize_collection') { dsl_tool.datatable.collection = dsl_tool.instance_exec(&block) }
+        define_method('initialize_collection') { self._collection = dsl_tool.instance_exec(&block) }
       end
 
       def datatable(&block)
@@ -22,10 +22,6 @@ module Effective
 
       def filters(&block)
         define_method('initialize_filters') { dsl_tool.instance_exec(&block) }
-      end
-
-      def helpers(&block)
-        define_method('initialize_helpers') { dsl_tool.instance_exec(&block) }
       end
 
     end

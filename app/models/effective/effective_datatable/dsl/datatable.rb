@@ -59,7 +59,7 @@ module Effective
             responsive: responsive,
             search: (search.kind_of?(Hash) ? search.symbolize_keys : (search == false ? false : {})),
             sort: sort,
-            sql_column: false,
+            sql_column: (block_given? ? false : sql_column),
             th: th,
             th_append: th_append,
             visible: visible,

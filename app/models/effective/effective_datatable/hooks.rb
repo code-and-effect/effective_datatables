@@ -8,11 +8,11 @@ module Effective
       end
 
       # Override this function to perform custom searching on a column
-      def search_column(collection, column, search_term, sql_column_or_index)
+      def search_column(collection, column, value, sql_column_or_index)
         if column[:sql_column]
-          column_tool.search_column(collection, column, search_term, sql_column_or_index)
+          column_tool.search_column(collection, column, value, sql_column_or_index)
         else
-          value_tool.search_column(collection, column, search_term, sql_column_or_index)
+          value_tool.search_column(collection, column, value, sql_column_or_index)
         end
       end
 
