@@ -3,8 +3,8 @@ module Effective
     module Dsl
       module Datatable
         # Instance Methods inside the datatable do .. end block
-        def order(name, dir = :asc)
-          raise 'order direction must be :asc or :desc' unless [:asc, :desc].include?(dir)
+        def order(name, dir = nil)
+          raise 'order direction must be :asc or :desc' unless [nil, :asc, :desc].include?(dir)
 
           datatable.state[:order_name] ||= name
           datatable.state[:order_dir] ||= dir
