@@ -54,9 +54,9 @@ module Effective
           if (x[index] && y[index])
             y[index] <=> x[index]
           elsif x[index]
-            1
-          elsif y[index]
             -1
+          elsif y[index]
+            1
           else
             0
           end

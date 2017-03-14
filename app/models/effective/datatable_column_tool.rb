@@ -65,6 +65,11 @@ module Effective
       end
     end
 
+    def scope(collection)
+      return collection unless columns.present? && datatable.scope.present?
+      collection.send(datatable.scope)
+    end
+
     def search(collection)
       searched.each do |name, value|
         collection = datatable.search_column(collection, columns[name], value, columns[name][:sql_column])

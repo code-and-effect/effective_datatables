@@ -15,6 +15,9 @@ module Effective
         # Assign total records
         @total_records = (active_record_collection? ? column_tool.size(col) : value_tool.size(col))
 
+        # Apply scope
+        col = column_tool.scope(col)
+
         # Apply column searching
         col = column_tool.search(col)
         @display_records = column_tool.size(col) unless value_tool.searched.present?
@@ -92,14 +95,14 @@ module Effective
               controller_namespace: controller_namespace
             }.merge(actions_col_locals(opts))
 
-            rendered[name] = dsl_tool.render(
+            rendered[name] = (view.render(
               partial: opts[:partial],
               as: :resource,
               collection: collection.map { |row| row[opts[:index]] },
               formats: :html,
               locals: locals,
               spacer_template: '/effective/datatables/spacer_template',
-            ).split('EFFECTIVEDATATABLESSPACER')
+            ) || '').split('EFFECTIVEDATATABLESSPACER')
           end
         end
 
@@ -113,6 +116,8 @@ module Effective
             row[index] = (
               if opts[:partial]
                 rendered[name][row_index]
+              elsif opts[:format] && value.nil?
+                dsl_tool.instance_exec(value, row, &opts[:format])
               elsif opts[:format]
                 dsl_tool.instance_exec(*value, row, &opts[:format])
               elsif opts[:as] == :belongs_to
@@ -131,13 +136,13 @@ module Effective
                 value.strftime(EffectiveDatatables.date_format) rescue BLANK
               elsif opts[:as] == :price
                 raise 'column type: price expects an Integer representing the number of cents' unless value.kind_of?(Integer)
-                number_to_currency(value / 100.0)
+                view.number_to_currency(value / 100.0) if value.present?
               elsif opts[:as] == :currency
-                number_to_currency(value || 0)
+                view.number_to_currency(value) if value.present?
               elsif opts[:as] == :decimal
                 value
               elsif opts[:as] == :percentage
-                number_to_percentage(value || 0)
+                view.number_to_percentage(value, precision: 0) if value.present?
               elsif opts[:as] == :integer
                 #EffectiveDatatables.integer_format.send(value)
                 value

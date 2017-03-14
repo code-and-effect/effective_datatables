@@ -27,6 +27,10 @@ module Effective
         unless active_record_collection? || array_collection?
           raise "Unsupported collection type. Expecting an ActiveRecord class, ActiveRecord relation, or an Array of Arrays [[1, 'foo'], [2, 'bar']]"
         end
+
+        _scopes.each do |scope, _|
+          raise "invalid scope: :#{scope}. The collection must respond to :#{scope}" unless collection.respond_to?(scope)
+        end
       end
 
     end
