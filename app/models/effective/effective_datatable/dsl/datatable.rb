@@ -68,9 +68,9 @@ module Effective
         end
 
         def bulk_actions_col(col_class: nil, partial: nil, responsive: 5000)
-          raise 'You can only have one bulk actions column' if datatable.columns[:bulk_actions].present?
+          raise 'You can only have one bulk actions column' if datatable.columns[:_bulk_actions].present?
 
-          datatable._columns[:bulk_actions] = Effective::DatatableColumn.new(
+          datatable._columns[:_bulk_actions] = Effective::DatatableColumn.new(
             as: :bulk_actions,
             compute: nil,
             col_class: col_class,
@@ -91,9 +91,9 @@ module Effective
         end
 
         def actions_col(show: true, edit: true, destroy: true, col_class: nil, partial: nil, responsive: 5000, &format)
-          raise 'You can only have one actions column' if datatable.columns[:actions].present?
+          raise 'You can only have one actions column' if datatable.columns[:_actions].present?
 
-          datatable._columns[:actions] = Effective::DatatableColumn.new(
+          datatable._columns[:_actions] = Effective::DatatableColumn.new(
             as: :actions,
             compute: nil,
             col_class: col_class,
