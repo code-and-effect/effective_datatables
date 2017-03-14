@@ -29,8 +29,10 @@ module Effective
     include Effective::EffectiveDatatable::Resource
     include Effective::EffectiveDatatable::State
 
-    def initialize(args = {})
-      @attributes = initial_attributes(args)
+    def initialize(view = nil, attributes = {})
+      (attributes = view; view = nil) if view.kind_of?(Hash)
+
+      @attributes = initial_attributes(attributes)
       @state = initial_state
 
       @_bulk_actions = []
@@ -39,13 +41,13 @@ module Effective
       @_scopes = {}
 
       raise 'collection is defined as a method. Please use the collection do ... end syntax.' unless collection.nil?
+      self.view = view if view
     end
 
     # Once the view is assigned, we initialize everything
-    def view=(view_context)
-      raise 'expected view to respond to params' unless view_context.respond_to?(:params)
-
-      @view = view_context
+    def view=(view)
+      @view = (view.respond_to?(:view_context) ? view.view_context : view)
+      raise 'expected view to respond to params' unless @view.respond_to?(:params)
 
       load_cookie!
       load_attributes!
@@ -74,22 +76,22 @@ module Effective
       save_cookie!
     end
 
-    def present?(view_context = nil)
-      unless (view || view_context)
+    def present?(view = nil)
+      unless (@view || view)
         raise 'unable to call present? without an assigned view. In your view, either call render_datatable(@datatable) first, or use @datatable.present?(self)'
       end
 
-      self.view ||= view_context
+      self.view ||= view
 
       to_json[:recordsTotal] > 0
     end
 
-    def blank?(view_context = nil)
-      unless (view || view_context)
+    def blank?(view = nil)
+      unless (@view || view)
         raise 'unable to call blank? without an assigned view. In your view, either call render_datatable(@datatable) first, or use @datatable.blank?(self)'
       end
 
-      self.view ||= view_context
+      self.view ||= view
 
       to_json[:recordsTotal] == 0
     end
