@@ -97,10 +97,20 @@ module Effective
         if column[:search][:fuzzy]
           case column[:as]
           when :duration
-            if term < 0
-              row[index] < term && row[index] > (term - 60)
-            else
+            if term < 0 && (term % 60 == 0) && value.to_s.include?('m') == false
+              row[index] <= term && row[index] > (term - 60)
+            elsif term >= 0 && (term % 60 == 0) && value.to_s.include?('m') == false
               row[index] >= term && row[index] < (term + 60)
+            else
+              row[index] == term
+            end
+          when :currency
+            if term < 0 && term.round(0) == term && value.to_s.include?('.') == false
+              row[index] <= term && row[index] > (term - 1.0)
+            elsif term >= 0 && term.round(0) == term && value.to_s.include?('.') == false
+              row[index] >= term && row[index] < (term + 1.0)
+            else
+              row[index] == term
             end
           when :string, :text
             row[index].to_s.downcase.include?(term.downcase)
