@@ -161,6 +161,8 @@ module Effective
                 value == true ? 'Yes' : 'No'
               elsif opts[:as] == :string
                 value
+              elsif opts[:as] == :text
+                value
               else
                 raise "unsupported type '#{opts[:as]}' for column #{name}"
               end
