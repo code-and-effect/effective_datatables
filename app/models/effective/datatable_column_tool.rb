@@ -77,17 +77,25 @@ module Effective
 
     def search(collection)
       searched.each do |name, value|
-        collection = datatable.search_column(collection, columns[name], value, columns[name][:sql_column])
+        column = columns[name]
+
+        if column[:search_method]
+          collection = datatable.dsl_tool.instance_exec(collection, value, column, column[:sql_column], &column[:search_method])
+        else
+          collection = search_column(collection, value, column, column[:sql_column])
+        end
+
         raise 'search_column must return an ActiveRecord::Relation object' unless collection.kind_of?(ActiveRecord::Relation)
       end
+
       collection
     end
 
-    def search_column(collection, column, value, sql_column)
+    def search_column(collection, value, column, sql_column)
       Rails.logger.info "COLUMN TOOL: search_column #{column} #{value} #{sql_column}"
 
       Effective::Resource.new(collection)
-        .search(column[:name], value, as: column[:as], fuzzy: column[:search][:fuzzy], sql_column: column[:sql_column])
+        .search(column[:name], value, as: column[:as], fuzzy: column[:search][:fuzzy], sql_column: sql_column)
     end
 
     def paginate(collection)

@@ -68,22 +68,37 @@ module Effective
 
     def search(collection)
       searched.each do |name, value|
-        collection = datatable.search_column(collection, columns[name], value, columns[name][:index])
-        raise 'search_column must return an Array object' unless collection.kind_of?(Array)
+        column = columns[name]
+
+        if column[:search_method]
+          collection = datatable.dsl_tool.instance_exec(collection, value, column, column[:index], &column[:search_method])
+        else
+          collection = search_column(collection, value, column, column[:index])
+        end
+
+        raise 'search_ must return an Array object' unless collection.kind_of?(Array)
       end
+
       collection
     end
 
-    def search_column(collection, column, value, index)
+    def search_column(collection, value, column, index)
       Rails.logger.info "VALUE TOOL: search_column #{column} #{value} #{index}"
 
-      value = value.downcase if column[:search][:fuzzy]
+      term = Effective::Attribute.new(column[:as]).parse(value, name: column[:name])
 
       collection.select! do |row|
-        if column[:search][:fuzzy]
-          row[index].to_s.downcase.include?(value)
+        case column[:as]
+        when :duration
+          if column[:search][:fuzzy] && (term % 60) == 0
+            row[index] >= term && row[index] < (term + 60)
+          else
+            row[index] == term
+          end
+        when :string, :text
+          column[:search][:fuzzy] ? row[index].to_s.downcase.include?(term.downcase) : row[index] == term
         else
-          row[index] ==value
+          row[index] == term
         end
       end || collection
     end

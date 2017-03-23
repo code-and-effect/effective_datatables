@@ -134,11 +134,11 @@ module Effective
       @_collection
     end
 
-    private
-
     def dsl_tool
       @dsl_tool ||= DatatableDslTool.new(self)
     end
+
+    private
 
     def column_tool
       @column_tool ||= DatatableColumnTool.new(self)

@@ -44,14 +44,14 @@ module Effective
 
         # A val is a computed value that is then sorted/searched after the block is run
         # You can have another block by calling .format afterwards to work on the computed value itself
-        def val(name, as: nil, col_class: nil, format: nil, label: nil, partial: nil, responsive: 10000, search: {}, sort: true, sql_column: nil, th: nil, th_append: nil, visible: true, width: nil, &compute)
+        def val(name, as: nil, col_class: nil, label: nil, partial: nil, responsive: 10000, search: {}, sort: true, sql_column: nil, th: nil, th_append: nil, visible: true, width: nil, &compute)
           raise 'You cannot use partial: ... with the block syntax' if partial && block_given?
 
           datatable._columns[name.to_sym] = Effective::DatatableColumn.new(
             as: as,
             compute: (compute if block_given?),
             col_class: col_class,
-            format: format,
+            format: nil,
             index: datatable.columns.length,
             label: label || name.to_s.titleize,
             name: name.to_sym,

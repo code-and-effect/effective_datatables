@@ -9,8 +9,15 @@ module Effective
     end
 
     def format(&block)
-      raise 'expecting a block' unless block_given?
-      @attributes[:format] = block
+      @attributes[:format] = block; self
+    end
+
+    def search(&block)
+      @attributes[:search_method] = block; self
+    end
+
+    def sort(&block)
+      @attributes[:sort_method] = block ; self
     end
 
   end
