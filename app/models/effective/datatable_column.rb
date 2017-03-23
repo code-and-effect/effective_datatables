@@ -8,6 +8,10 @@ module Effective
       @attributes = attributes
     end
 
+    def to_s
+      self[:name]
+    end
+
     def format(&block)
       @attributes[:format] = block; self
     end
