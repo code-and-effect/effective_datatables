@@ -53,7 +53,7 @@ module Effective
     def order(collection)
       return collection unless ordered.present?
 
-      if column[:sort_method]
+      if ordered[:sort_method]
         collection = datatable.dsl_tool.instance_exec(collection, datatable.order_direction, ordered, ordered[:sql_column], &ordered[:sort_method])
       else
         collection = order_column(collection, datatable.order_direction, ordered, ordered[:sql_column])

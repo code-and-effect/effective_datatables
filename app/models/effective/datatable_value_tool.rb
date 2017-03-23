@@ -94,20 +94,20 @@ module Effective
       term = Effective::Attribute.new(column[:as]).parse(value, name: column[:name])
 
       collection.select! do |row|
-        case column[:as]
-        when :duration
-          if column[:search][:fuzzy] && (term % 60) == 0
+        if column[:search][:fuzzy]
+          case column[:as]
+          when :duration
             if term < 0
               row[index] < term && row[index] > (term - 60)
             else
               row[index] >= term && row[index] < (term + 60)
             end
+          when :string, :text
+            row[index].to_s.downcase.include?(term.downcase)
           else
             row[index] == term
           end
-        when :string, :text
-          column[:search][:fuzzy] ? row[index].to_s.downcase.include?(term.downcase) : row[index] == term
-        else
+        else # Not fuzzy
           row[index] == term
         end
       end || collection
