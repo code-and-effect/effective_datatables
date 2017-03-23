@@ -7,25 +7,6 @@ module Effective
         collection
       end
 
-      # # Override this function to perform custom searching on a column
-      # def search_column(collection, column, value, sql_column_or_index)
-      #   if column[:sql_column]
-      #     column_tool.search_column(collection, column, value, sql_column_or_index)
-      #   else
-      #     value_tool.search_column(collection, column, value, sql_column_or_index)
-      #   end
-      # end
-
-      # Override this function to perform custom ordering on a column
-      # direction will be :asc or :desc
-      def order_column(collection, column, direction, sql_column_or_index)
-        if column[:sql_column]
-          column_tool.order_column(collection, column, direction, sql_column_or_index)
-        else
-          value_tool.order_column(collection, column, direction, sql_column_or_index)
-        end
-      end
-
       # The incoming value could be from the passed page params or from the AJAX request.
       # When we parse an incoming filter term for this filter.
       def parse_filter_value(filter, value)

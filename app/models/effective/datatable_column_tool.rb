@@ -53,12 +53,18 @@ module Effective
     def order(collection)
       return collection unless ordered.present?
 
-      collection = datatable.order_column(collection, ordered, datatable.order_direction, ordered[:sql_column])
-      raise 'order_column must return an ActiveRecord::Relation object' unless collection.kind_of?(ActiveRecord::Relation)
+      if column[:sort_method]
+        collection = datatable.dsl_tool.instance_exec(collection, datatable.order_direction, ordered, ordered[:sql_column], &ordered[:sort_method])
+      else
+        collection = order_column(collection, datatable.order_direction, ordered, ordered[:sql_column])
+      end
+
+      raise 'sort method must return an ActiveRecord::Relation object' unless collection.kind_of?(ActiveRecord::Relation)
+
       collection
     end
 
-    def order_column(collection, column, direction, sql_column)
+    def order_column(collection, direction, column, sql_column)
       Rails.logger.info "COLUMN TOOL: order_column #{column} #{direction} #{sql_column}"
 
       if column[:sql_as_column]
@@ -85,7 +91,7 @@ module Effective
           collection = search_column(collection, value, column, column[:sql_column])
         end
 
-        raise 'search_column must return an ActiveRecord::Relation object' unless collection.kind_of?(ActiveRecord::Relation)
+        raise 'search method must return an ActiveRecord::Relation object' unless collection.kind_of?(ActiveRecord::Relation)
       end
 
       collection

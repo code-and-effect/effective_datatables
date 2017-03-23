@@ -29,12 +29,18 @@ module Effective
     def order(collection)
       return collection unless ordered.present?
 
-      collection = datatable.order_column(collection, ordered, datatable.order_direction, ordered[:index])
-      raise 'order_column must return an Array' unless collection.kind_of?(Array)
+      if ordered[:sort_method]
+        collection = datatable.dsl_tool.instance_exec(collection, datatable.order_direction, ordered, ordered[:index], &ordered[:sort_method])
+      else
+        collection = order_column(collection, datatable.order_direction, ordered, ordered[:index])
+      end
+
+      raise 'sort method must return an Array' unless collection.kind_of?(Array)
+
       collection
     end
 
-    def order_column(collection, column, direction, index)
+    def order_column(collection, direction, column, index)
       Rails.logger.info "VALUE TOOL: order_column #{column} #{direction} #{index}"
 
       if direction == :asc
@@ -91,7 +97,11 @@ module Effective
         case column[:as]
         when :duration
           if column[:search][:fuzzy] && (term % 60) == 0
-            row[index] >= term && row[index] < (term + 60)
+            if term < 0
+              row[index] < term && row[index] > (term - 60)
+            else
+              row[index] >= term && row[index] < (term + 60)
+            end
           else
             row[index] == term
           end
