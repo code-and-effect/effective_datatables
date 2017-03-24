@@ -183,7 +183,7 @@ module Effective
       def aggregate_column(values, column, aggregate)
         case aggregate[:name]
         when :total
-          (values = values.map { |value| value.presence }.compact)
+          values = values.map { |value| value.presence }.compact
 
           if values.all? { |value| value.kind_of?(Numeric) }
             values.sum
@@ -195,8 +195,17 @@ module Effective
             '-'
           end
         when :average
-          raise 'not implemented'
+          values = values.map { |value| value.presence || 0 }
+
+          if values.all? { |value| value.kind_of?(Numeric) }
+            values.sum / [values.length, 1].max
+          elsif column[:index] == 0
+            aggregate[:label]
+          else
+            '-'
+          end
         else
+          raise 'not implemented'
         end
       end
 
