@@ -20,7 +20,9 @@ module Effective
             case opts[:as]
             when *resource.macros
               opts[:resource] = Effective::Resource.new(resource.associated(name))
-              opts[:partial] ||= '/effective/datatables/resource_column'
+            when ActiveRecord::Base
+              opts[:as] = :resource
+              opts[:resource] = Effective::Resource.new(opts[:as])
             when :effective_roles
               # Nothing
             else
@@ -34,18 +36,22 @@ module Effective
           row = collection.first
 
           columns.each do |name, opts|
-            next if (opts[:as] || :resource) != :resource
-
-            if row[opts[:index]].kind_of?(ActiveRecord::Base)
+            if opts[:as].kind_of?(Class) && opts[:as].ancestors.include?(ActiveRecord::Base)
               opts[:as] = :resource
-              opts[:resource] = Effective::Resource.new(row[opts[:index]])
-              opts[:partial] ||= '/effective/datatables/resource_column'
+              opts[:resource] = Effective::Resource.new(opts[:as])
+            elsif opts[:as] == nil
+              if (value = Array(row[opts[:index]]).first).kind_of?(ActiveRecord::Base)
+                opts[:as] = :resource
+                opts[:resource] = Effective::Resource.new(value)
+              end
             end
           end
         end
 
         columns.each do |name, opts|
           opts[:as] ||= :string
+          opts[:partial] ||= '/effective/datatables/resource_column' if opts[:resource]
+
           opts[:col_class] = "col-#{opts[:as]} col-#{name.to_s.parameterize} #{opts[:col_class]}".strip
         end
 
