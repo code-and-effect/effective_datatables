@@ -37,6 +37,7 @@ module Effective
             next if (opts[:as] || :resource) != :resource
 
             if row[opts[:index]].kind_of?(ActiveRecord::Base)
+              opts[:as] = :resource
               opts[:resource] = Effective::Resource.new(row[opts[:index]])
               opts[:partial] ||= '/effective/datatables/resource_column'
             end

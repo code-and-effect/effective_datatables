@@ -86,7 +86,7 @@ module Effective
           collection = search_column(collection, value, column, column[:index])
         end
 
-        raise 'search_ must return an Array object' unless collection.kind_of?(Array)
+        raise 'search method must return an Array object' unless collection.kind_of?(Array)
       end
 
       collection
@@ -95,33 +95,50 @@ module Effective
     def search_column(collection, value, column, index)
       Rails.logger.info "VALUE TOOL: search_column #{column} #{value} #{index}"
 
+      fuzzy = column[:search][:fuzzy]
       term = Effective::Attribute.new(column[:as]).parse(value, name: column[:name])
+      term_downcased = term.downcase if fuzzy && term.kind_of?(String)
 
+      # See effective_resources gem search() method # relation.rb
       collection.select! do |row|
-        if column[:search][:fuzzy]
-          case column[:as]
-          when :duration
-            if term < 0 && (term % 60 == 0) && value.to_s.include?('m') == false
+        case column[:as]
+        when :duration
+          if fuzzy && (term % 60 == 0) && value.to_s.include?('m') == false
+            if term < 0
               row[index] <= term && row[index] > (term - 60)
-            elsif term >= 0 && (term % 60 == 0) && value.to_s.include?('m') == false
+            else
               row[index] >= term && row[index] < (term + 60)
-            else
-              row[index] == term
             end
-          when :currency
-            if term < 0 && term.round(0) == term && value.to_s.include?('.') == false
-              row[index] <= term && row[index] > (term - 1.0)
-            elsif term >= 0 && term.round(0) == term && value.to_s.include?('.') == false
-              row[index] >= term && row[index] < (term + 1.0)
-            else
-              row[index] == term
-            end
-          when :string, :text
-            row[index].to_s.downcase.include?(term.downcase)
           else
             row[index] == term
           end
-        else # Not fuzzy
+        when :decimal, :currency
+          if fuzzy && (term.round(0) == term) && value.to_s.include?('.') == false
+            if term < 0
+              row[index] <= term && row[index] > (term - 1.0)
+            else
+              row[index] >= term && row[index] < (term + 1.0)
+            end
+          else
+            row[index] == term
+          end
+        when :resource
+          Array(row[index]).any? do |resource|
+            if term.kind_of?(Integer) && resource.respond_to?(:id)
+              resource.id == term || resource.to_param == term
+            elsif term.kind_of?(Array) && resource.respond_to?(:id)
+              term.any? { |term| resource.id == term || resource.to_param == term }
+            else
+              fuzzy ? resource.to_s.downcase == term_downcased : resource.to_s == term
+            end
+          end
+        when :string, :text
+          if fuzzy
+            row[index].to_s.downcase.include?(term_downcased)
+          else
+            row[index] == term
+          end
+        else
           row[index] == term
         end
       end || collection
