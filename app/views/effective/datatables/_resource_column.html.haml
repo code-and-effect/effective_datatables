@@ -1,0 +1,8 @@
+- Array(datatable.array_collection? ? resource : resource.send(name)).each do |associated|
+  %p
+    - if show_path
+      = link_to associated.to_s, send(show_path, associated.to_param), title: associated.to_s
+    - elsif edit_path
+      = link_to associated.to_s, send(edit_path, associated.to_param), title: associated.to_s
+    - else
+      = associated

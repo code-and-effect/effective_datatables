@@ -93,7 +93,7 @@ module Effective
               datatable: self,
               column: columns[name],
               controller_namespace: controller_namespace
-            }.merge(actions_col_locals(opts))
+            }.merge(actions_col_locals(opts)).merge(resource_col_locals(opts))
 
             rendered[name] = (view.render(
               partial: opts[:partial],
@@ -140,185 +140,36 @@ module Effective
       end
 
       def format_column(value, column)
-        if column[:as] == :belongs_to
-          value.to_s
-        elsif column[:as] == :has_many
-          value.map { |v| v.to_s }.join('<br>')
-        elsif column[:as] == :effective_addresses
-          value.map { |addr| addr.to_html }.join('<br>')
-        elsif column[:as] == :effective_obfuscation
+        case column[:as]
+        when :effective_obfuscation
           value
-        elsif column[:as] == :effective_roles
+        when :effective_roles
           value.join(', ')
-        elsif column[:as] == :datetime
+        when :datetime
           value.strftime(EffectiveDatatables.datetime_format) rescue BLANK
-        elsif column[:as] == :date
+        when :date
           value.strftime(EffectiveDatatables.date_format) rescue BLANK
-        elsif column[:as] == :price
+        when :price
           raise 'column type: price expects an Integer representing the number of cents' unless value.kind_of?(Integer)
           view.number_to_currency(value / 100.0) if value.present?
-        elsif column[:as] == :currency
+        when :currency
           view.number_to_currency(value) if value.present?
-        elsif column[:as] == :duration
+        when :duration
           view.number_to_duration(value) if value.present?
-        elsif column[:as] == :decimal
+        when :decimal
           value
-        elsif column[:as] == :percentage
+        when :percentage
           if value.present?
             value.kind_of?(Integer) ? "#{value}%" : view.number_to_percentage(value, precision: 2)
           end
-        elsif column[:as] == :integer
-          #EffectiveDatatables.integer_format.send(value)
+        when :integer
           value
-        elsif column[:as] == :boolean
+        when :boolean
           value == true ? 'Yes' : 'No'
-        elsif column[:as] == :string
-          value.to_s
-        elsif column[:as] == :text
-          value
         else
-          raise "unsupported type '#{column[:as]}' for column #{column[:name]}"
+          value.to_s
         end
       end
-
-
-      # def arrayize22(collection)
-      #   return collection if @arrayized  # Prevent the collection from being arrayized more than once
-      #   @arrayized = true
-
-      #   # We want to use the render :collection for each column that renders partials
-      #   rendered = {}
-
-      #   columns.each do |name, opts|
-      #     if opts[:partial] && state[:visible][name]
-      #       locals = {
-      #         datatable: self,
-      #         column: columns[name],
-      #         controller_namespace: controller_namespace
-      #       }.merge(actions_col_locals(opts))
-
-      #       rendered[name] = view.render(
-      #         partial: opts[:partial],
-      #         as: :resource,
-      #         collection: collection,
-      #         formats: :html,
-      #         locals: locals,
-      #         spacer_template: '/effective/datatables/spacer_template',
-      #       ).split('EFFECTIVEDATATABLESSPACER')
-      #     end
-      #   end
-
-      #   collection.each_with_index.map do |obj, index|
-      #     columns.map do |name, opts|
-      #       begin
-      #         if state[:visible][name] == false && (name != order_name.to_s) # Sort by invisible array column
-      #           BLANK
-      #         elsif opts[:block]
-      #           result = if active_record_collection?
-      #             view.instance_exec(obj, collection, self, &opts[:block])
-      #           else
-      #             view.instance_exec(obj, obj[opts[:index]], collection, self, &opts[:block])
-      #           end
-
-      #           opts[:as] == :actions ? (rendered[name][index] + result) : result
-      #         elsif opts[:partial]
-      #           rendered[name][index]
-      #         elsif opts[:as] == :belongs_to
-      #           (obj.send(name) rescue nil).to_s
-      #         elsif opts[:as] == :belongs_to_polymorphic
-      #           (obj.send(name) rescue nil).to_s
-      #         elsif opts[:as] == :has_many
-      #           (obj.send(name).map { |obj| obj.to_s }.join('<br>') rescue BLANK)
-      #         elsif opts[:as] == :has_and_belongs_to_many
-      #           (obj.send(name).map { |obj| obj.to_s }.join('<br>') rescue BLANK)
-      #         elsif opts[:as] == :bulk_actions
-      #           BLANK
-      #         elsif opts[:as] == :year
-      #           obj.send(name).try(:year)
-      #         elsif opts[:as] == :obfuscated_id
-      #           (obj.send(:to_param) rescue nil).to_s
-      #         elsif opts[:as] == :effective_address
-      #           (Array(obj.send(name)) rescue [])
-      #         elsif opts[:as] == :effective_roles
-      #           (obj.send(:roles) rescue [])
-      #         elsif obj.kind_of?(Array) # Array backed collection
-      #           obj[opts[:index]]
-      #         elsif opts[:sql_as_column]
-      #           obj[name] || obj.send(name)
-      #         else
-      #           obj.send(name)
-      #         end
-      #       rescue => e
-      #         Rails.env.production? ? obj.try(:[], name) : raise(e)
-      #       end
-      #     end
-      #   end
-      # end
-
-      # def format22(collection)
-      #   collection.each do |row|
-      #     columns.each_with_index do |(name, opts), index|
-      #       value = row[index]
-      #       next if value == nil || value == BLANK || state[:visible][name] == false
-      #       next if opts[:block] || opts[:partial]
-
-      #       if opts[:sql_as_column]
-      #         row[index] = value.to_s
-      #       end
-
-      #       case (opts[:format] || opts[:as])
-      #       when :belongs_to, :belongs_to_polymorphic
-      #         row[index] = value.to_s
-      #       when :has_many
-      #         if value.kind_of?(Array)
-      #           if value.length == 0
-      #             row[index] = BLANK
-      #           elsif value.length == 1
-      #             row[index] = value.first.to_s
-      #           elsif opts[:sentence]
-      #             row[index] = value.map { |v| v.to_s }.to_sentence
-      #           else
-      #             row[index] = value.map { |v| v.to_s }.join('<br>')
-      #           end
-      #         end
-      #       when :effective_address
-      #         row[index] = value.map { |addr| addr.to_html }.join('<br>')
-      #       when :effective_roles
-      #         row[index] = value.join(', ')
-      #       when :datetime
-      #         row[index] = value.strftime(EffectiveDatatables.datetime_format) rescue BLANK
-      #       when :date
-      #         row[index] = value.strftime(EffectiveDatatables.date_format) rescue BLANK
-      #       when :price
-      #         # This is an integer value, "number of cents"
-      #         raise 'column type: price expects an Integer representing the number of cents' unless value.kind_of?(Integer)
-      #         row[index] = number_to_currency(value / 100.0)
-      #       when :currency
-      #         row[index] = number_to_currency(value || 0)
-      #       when :percentage
-      #         row[index] = number_to_percentage(value || 0)
-      #       when :integer
-      #         if EffectiveDatatables.integer_format.kind_of?(Symbol)
-      #           row[index] = view.instance_exec { public_send(EffectiveDatatables.integer_format, value) }
-      #         elsif EffectiveDatatables.integer_format.respond_to?(:call)
-      #           row[index] = view.instance_exec { EffectiveDatatables.integer_format.call(value) }
-      #         end
-      #       when :boolean
-      #         if EffectiveDatatables.boolean_format == :yes_no && value == true
-      #           row[index] = 'Yes'
-      #         elsif EffectiveDatatables.boolean_format == :yes_no && value == false
-      #           row[index] = 'No'
-      #         end
-      #       when :string
-      #         row[index] = mail_to(value) if name == 'email'
-      #       else
-      #         ; # Nothing
-      #       end
-      #     end
-      #   end
-
-      #   collection
-      # end
 
       # This should return an Array of values the same length as table_data
       def aggregate_data(table_data)
@@ -365,6 +216,34 @@ module Effective
           locals[:destroy_path] = resource.destroy_path(check: true)
         else
           locals[:destroy_path] = false
+        end
+
+        locals
+      end
+
+      def resource_col_locals(opts)
+        return {} unless (resource = opts[:resource]).present?
+
+        locals = {name: opts[:name], macro: opts[:as], show_path: false, edit_path: false}
+
+        case opts[:action]
+        when :edit
+          if (EffectiveDatatables.authorized?(view.controller, :edit, resource.klass) rescue false)
+            locals[:edit_path] = resource.edit_path(check: true)
+          end
+        when :show
+          if (EffectiveDatatables.authorized?(view.controller, :show, resource.klass) rescue false)
+            locals[:show_path] = resource.show_path(check: true)
+          end
+        when false
+          # Nothing
+        else
+          # Fallback to defaults - check edit then show
+          if (EffectiveDatatables.authorized?(view.controller, :edit, resource.klass) rescue false)
+            locals[:edit_path] = resource.edit_path(check: true)
+          elsif (EffectiveDatatables.authorized?(view.controller, :show, resource.klass) rescue false)
+            locals[:show_path] = resource.show(check: true)
+          end
         end
 
         locals
