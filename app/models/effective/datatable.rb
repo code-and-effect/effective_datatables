@@ -9,6 +9,7 @@ module Effective
     attr_reader :_columns
     attr_reader :_filters
     attr_reader :_scopes
+    attr_reader :_aggregates
 
     # The collection itself. Only evaluated once.
     attr_accessor :_collection

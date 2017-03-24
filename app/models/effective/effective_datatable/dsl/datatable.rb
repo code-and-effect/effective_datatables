@@ -121,14 +121,13 @@ module Effective
           )
         end
 
-        # def aggregate(name, options = {}, &block)
-        #   if block_given?
-        #     raise "You cannot use proc: ... with the block syntax" if options[:proc]
-        #     options[:block] = block
-        #   end
-
-        #   (@aggregates ||= HashWithIndifferentAccess.new)[name] = options
-        # end
+        def aggregate(name, &compute)
+          datatable._aggregates[name.to_sym] = {
+            compute: (compute if block_given?),
+            label: label || name.to_s.titleize,
+            name: name.to_sym,
+          }
+        end
       end
     end
   end
