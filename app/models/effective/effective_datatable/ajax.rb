@@ -49,7 +49,7 @@ module Effective
         @display_entries ||= begin
           entries = (@default_entries.presence || EffectiveDatatables.default_entries)
           entries = -1 if entries.to_s.downcase == 'all'
-          [10, 25, 50, 100, 250, 1000, -1].include?(entries) ? entries : 25
+          [5, 10, 25, 50, 100, 250, 1000, -1].include?(entries) ? entries : 25
         end
       end
 
