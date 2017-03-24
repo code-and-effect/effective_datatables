@@ -45,6 +45,7 @@ module Effective
         @display_records ||= @total_records
 
         # Compute aggregate data
+        @aggregates_data = compute_aggregates(col) if _aggregates.present?
         # TODO
 
         # Format all results
@@ -161,23 +162,41 @@ module Effective
         end
       end
 
-      # This should return an Array of values the same length as table_data
-      def aggregate_data(table_data)
-        return false unless aggregates.present?
+      def compute_aggregates(collection)
+        cols = collection.transpose
 
-        values = table_data.transpose
+        _aggregates.map do |_, aggregate|
+          columns.map do |name, opts|
+            next if state[:visible][name] == false
 
-        aggregates.map do |name, options|
-          columns.map.with_index do |(name, column), index|
+            values = cols[opts[:index]]
 
-            if state[:visible][name] != true
-              ''
-            elsif (options[:block] || options[:proc]).respond_to?(:call)
-              view.instance_exec(column, (values[index] || []), values, &(options[:block] || options[:proc]))
+            if aggregate[:compute]
+              dsl_tool.instance_exec(values, columns[name], &aggregate[:compute])
             else
-              ''
+              format_column(aggregate_column(values, opts, aggregate), opts)
             end
+          end.compact
+        end
+      end
+
+      def aggregate_column(values, column, aggregate)
+        case aggregate[:name]
+        when :total
+          (values = values.map { |value| value.presence }.compact)
+
+          if values.all? { |value| value.kind_of?(Numeric) }
+            values.sum
+          elsif column[:index] == 0
+            aggregate[:label]
+          elsif values.any? { |value| value.kind_of?(String) == false }
+            "#{values.flatten.count} total"
+          else
+            '-'
           end
+        when :average
+          raise 'not implemented'
+        else
         end
       end
 

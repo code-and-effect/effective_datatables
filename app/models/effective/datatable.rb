@@ -5,11 +5,11 @@ module Effective
     attr_reader :state
 
     # Hashes of DSL options
+    attr_reader :_aggregates
     attr_reader :_bulk_actions
     attr_reader :_columns
     attr_reader :_filters
     attr_reader :_scopes
-    attr_reader :_aggregates
 
     # The collection itself. Only evaluated once.
     attr_accessor :_collection
@@ -36,6 +36,7 @@ module Effective
       @attributes = initial_attributes(attributes)
       @state = initial_state
 
+      @_aggregates = {}
       @_bulk_actions = []
       @_columns = {}
       @_filters = {}
@@ -106,7 +107,7 @@ module Effective
           data: (data || []),
           recordsTotal: (@total_records || 0),
           recordsFiltered: (@display_records || 0),
-          aggregates: [], #(aggregate_data(data) || []),
+          aggregates: (@aggregates_data || []),
           charts: {} #(charts_data || {})
         }
       )

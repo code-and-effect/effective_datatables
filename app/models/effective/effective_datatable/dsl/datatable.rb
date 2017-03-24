@@ -121,7 +121,7 @@ module Effective
           )
         end
 
-        def aggregate(name, &compute)
+        def aggregate(name, label: nil, &compute)
           datatable._aggregates[name.to_sym] = {
             compute: (compute if block_given?),
             label: label || name.to_s.titleize,
