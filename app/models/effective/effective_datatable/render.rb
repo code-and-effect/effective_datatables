@@ -125,49 +125,59 @@ module Effective
                 opts[:partial].present? ? "#{rendered[name][row_index]}#{result}" : result
               elsif opts[:partial]
                 rendered[name][row_index]
-              elsif opts[:format] && value.nil?
-                dsl_tool.instance_exec(value, row, &opts[:format])
               elsif opts[:format]
-                dsl_tool.instance_exec(*value, row, &opts[:format])
-              elsif opts[:as] == :belongs_to
-                value.to_s
-              elsif opts[:as] == :has_many
-                value.map { |v| v.to_s }.join('<br>')
-              elsif opts[:as] == :effective_addresses
-                value.map { |addr| addr.to_html }.join('<br>')
-              elsif opts[:as] == :effective_obfuscation
-                value
-              elsif opts[:as] == :effective_roles
-                value.join(', ')
-              elsif opts[:as] == :datetime
-                value.strftime(EffectiveDatatables.datetime_format) rescue BLANK
-              elsif opts[:as] == :date
-                value.strftime(EffectiveDatatables.date_format) rescue BLANK
-              elsif opts[:as] == :price
-                raise 'column type: price expects an Integer representing the number of cents' unless value.kind_of?(Integer)
-                view.number_to_currency(value / 100.0) if value.present?
-              elsif opts[:as] == :currency
-                view.number_to_currency(value) if value.present?
-              elsif opts[:as] == :decimal
-                value
-              elsif opts[:as] == :percentage
-                if value.present?
-                  value.kind_of?(Integer) ? "#{value}%" : view.number_to_percentage(value, precision: 2)
+                if value.nil?
+                  dsl_tool.instance_exec(value, row, &opts[:format])
+                else
+                  dsl_tool.instance_exec(*value, row, &opts[:format])
                 end
-              elsif opts[:as] == :integer
-                #EffectiveDatatables.integer_format.send(value)
-                value
-              elsif opts[:as] == :boolean
-                value == true ? 'Yes' : 'No'
-              elsif opts[:as] == :string
-                value
-              elsif opts[:as] == :text
-                value
               else
-                raise "unsupported type '#{opts[:as]}' for column #{name}"
+                format_column(value, opts)
               end
             )
           end
+        end
+      end
+
+      def format_column(value, column)
+        if column[:as] == :belongs_to
+          value.to_s
+        elsif column[:as] == :has_many
+          value.map { |v| v.to_s }.join('<br>')
+        elsif column[:as] == :effective_addresses
+          value.map { |addr| addr.to_html }.join('<br>')
+        elsif column[:as] == :effective_obfuscation
+          value
+        elsif column[:as] == :effective_roles
+          value.join(', ')
+        elsif column[:as] == :datetime
+          value.strftime(EffectiveDatatables.datetime_format) rescue BLANK
+        elsif column[:as] == :date
+          value.strftime(EffectiveDatatables.date_format) rescue BLANK
+        elsif column[:as] == :price
+          raise 'column type: price expects an Integer representing the number of cents' unless value.kind_of?(Integer)
+          view.number_to_currency(value / 100.0) if value.present?
+        elsif column[:as] == :currency
+          view.number_to_currency(value) if value.present?
+        elsif column[:as] == :duration
+          view.number_to_duration(value) if value.present?
+        elsif column[:as] == :decimal
+          value
+        elsif column[:as] == :percentage
+          if value.present?
+            value.kind_of?(Integer) ? "#{value}%" : view.number_to_percentage(value, precision: 2)
+          end
+        elsif column[:as] == :integer
+          #EffectiveDatatables.integer_format.send(value)
+          value
+        elsif column[:as] == :boolean
+          value == true ? 'Yes' : 'No'
+        elsif column[:as] == :string
+          value.to_s
+        elsif column[:as] == :text
+          value
+        else
+          raise "unsupported type '#{column[:as]}' for column #{column[:name]}"
         end
       end
 

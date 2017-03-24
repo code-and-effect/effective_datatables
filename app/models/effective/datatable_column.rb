@@ -21,7 +21,7 @@ module Effective
     end
 
     def sort(&block)
-      @attributes[:sort_method] = block ; self
+      @attributes[:sort_method] = block; self
     end
 
   end
