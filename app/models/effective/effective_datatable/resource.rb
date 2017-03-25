@@ -20,9 +20,11 @@ module Effective
             case opts[:as]
             when *resource.macros
               opts[:resource] = Effective::Resource.new(resource.associated(name))
-            when ActiveRecord::Base
-              opts[:as] = :resource
-              opts[:resource] = Effective::Resource.new(opts[:as])
+            when Class
+              if opts[:as].ancestors.include?(ActiveRecord::Base)
+                opts[:resource] = Effective::Resource.new(opts[:as])
+                opts[:as] = :resource
+              end
             when :effective_roles
               # Nothing
             else
@@ -37,12 +39,12 @@ module Effective
 
           columns.each do |name, opts|
             if opts[:as].kind_of?(Class) && opts[:as].ancestors.include?(ActiveRecord::Base)
-              opts[:as] = :resource
               opts[:resource] = Effective::Resource.new(opts[:as])
+              opts[:as] = :resource
             elsif opts[:as] == nil
               if (value = Array(row[opts[:index]]).first).kind_of?(ActiveRecord::Base)
-                opts[:as] = :resource
                 opts[:resource] = Effective::Resource.new(value)
+                opts[:as] = :resource
               end
             end
           end
