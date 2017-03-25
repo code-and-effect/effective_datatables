@@ -67,7 +67,7 @@ module Effective
         state[:filter] = _filters.inject({}) { |h, (name, opts)| h[name] = opts[:value]; h }
         state[:scope] = _scopes.find { |_, opts| opts[:default] }.try(:first) || _scopes.keys.first
 
-        filter_params.each { |name, value| state[:filter][name] = parse_filter_value(filters[name], value) }
+        filter_params.each { |name, value| state[:filter][name] = parse_filter_value(_filters[name], value) }
         state[:scope] = scope_param if scope_param
       end
 
