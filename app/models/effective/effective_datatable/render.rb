@@ -171,11 +171,13 @@ module Effective
 
         _aggregates.map do |_, aggregate|
           columns.map do |name, opts|
-            next if state[:visible][name] == false
+            next if state[:visible][name] == false && datatables_ajax_request?
 
             values = cols[opts[:index]]
 
-            if aggregate[:compute]
+            if state[:visible][name] == false
+              BLANK
+            elsif aggregate[:compute]
               dsl_tool.instance_exec(values, columns[name], &aggregate[:compute])
             else
               format_column(aggregate_column(values, opts, aggregate), opts)
