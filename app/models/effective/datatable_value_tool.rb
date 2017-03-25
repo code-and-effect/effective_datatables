@@ -41,11 +41,13 @@ module Effective
     end
 
     def order_column(collection, direction, column, index)
-      Rails.logger.info "VALUE TOOL: order_column #{column} #{direction} #{index}"
+      Rails.logger.info "VALUE TOOL: order_column :#{column.to_s} :#{direction} #{index}"
 
       if direction == :asc
         collection.sort! do |x, y|
           if (x[index] === y[index])
+            x[index] <=> y[index]
+          elsif (x.kind_of?(Array) && y.kind_of?(Array))
             x[index] <=> y[index]
           elsif (x[index] && y[index])
             x[index].to_s <=> y[index].to_s
@@ -60,6 +62,8 @@ module Effective
       else
         collection.sort! do |x, y|
           if (x[index] === y[index])
+            y[index] <=> x[index]
+          elsif (x.kind_of?(Array) && y.kind_of?(Array))
             y[index] <=> x[index]
           elsif (x[index] && y[index])
             y[index].to_s <=> x[index].to_s
