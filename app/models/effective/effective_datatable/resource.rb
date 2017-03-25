@@ -64,6 +64,8 @@ module Effective
 
           if search == false
             opts[:search] = { as: :null }; next
+          elsif search.kind_of?(Symbol)
+            opts[:search] = { as: search }
           end
 
           search[:as] ||= :select if (search.key?(:collection) && opts[:as] != :belongs_to_polymorphic)

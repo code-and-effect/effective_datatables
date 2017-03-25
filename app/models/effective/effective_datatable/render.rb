@@ -45,7 +45,7 @@ module Effective
         @display_records ||= @total_records
 
         # Compute aggregate data
-        @aggregates_data = compute_aggregates(col) if _aggregates.present?
+        @aggregates_data = aggregate(col) if _aggregates.present?
         # TODO
 
         # Format all results
@@ -109,7 +109,7 @@ module Effective
 
         collection.each_with_index do |row, row_index|
           columns.each do |name, opts|
-            next if state[:visible][name] == false
+            next unless state[:visible][name]
 
             index = opts[:index]
             value = row[index]
@@ -156,13 +156,17 @@ module Effective
         when :integer
           value
         when :boolean
-          value == true ? 'Yes' : 'No'
+          case value
+          when true   ; 'Yes'
+          when false  ; 'No'
+          when String ; value
+          end
         else
           value.to_s
         end
       end
 
-      def compute_aggregates(collection)
+      def aggregate(collection)
         cols = collection.transpose
 
         _aggregates.map do |_, aggregate|
@@ -181,18 +185,24 @@ module Effective
       end
 
       def aggregate_column(values, column, aggregate)
+        labeled = false
+
         case aggregate[:name]
         when :total
-          values = values.map { |value| value.presence }.compact
+          values = values.reject { |value| value.nil? }
 
-          if values.all? { |value| value.kind_of?(Numeric) }
+          if [:bulk_actions, :actions].include?(column[:as]) || values.length == 0
+            BLANK
+          elsif values.all? { |value| value.kind_of?(Numeric) }
             values.sum
-          elsif column[:index] == 0
-            aggregate[:label]
+          elsif values.all? { |value| value == true || value == false }
+            "#{values.count { |val| val == true }} / #{values.count { |val| val == false}}"
+          elsif !labeled
+            labeled = aggregate[:label]
           elsif values.any? { |value| value.kind_of?(String) == false }
             "#{values.flatten.count} total"
           else
-            '-'
+            BLANK
           end
         when :average
           values = values.map { |value| value.presence || 0 }
