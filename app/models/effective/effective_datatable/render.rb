@@ -61,7 +61,7 @@ module Effective
 
         collection.map do |obj|
           columns.map do |name, opts|
-            if state[:visible][name] == false && (name != order_name.to_s)  # Sort by invisible array column
+            if state[:visible][name] == false && (name != order_name)  # Sort by invisible array column
               BLANK
             elsif opts[:partial] || (opts[:format] && !opts[:compute])
               active_record_collection? ? obj : obj[opts[:index]]
