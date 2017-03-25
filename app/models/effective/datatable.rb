@@ -9,6 +9,7 @@ module Effective
     attr_reader :_bulk_actions
     attr_reader :_columns
     attr_reader :_filters
+    attr_reader :_form
     attr_reader :_scopes
 
     # The collection itself. Only evaluated once.
@@ -40,6 +41,7 @@ module Effective
       @_bulk_actions = []
       @_columns = {}
       @_filters = {}
+      @_form = {}
       @_scopes = {}
 
       raise 'collection is defined as a method. Please use the collection do ... end syntax.' unless collection.nil?

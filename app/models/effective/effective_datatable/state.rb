@@ -66,7 +66,9 @@ module Effective
       def load_filters!
         state[:filter] = _filters.inject({}) { |h, (name, opts)| h[name] = opts[:value]; h }
         state[:scope] = _scopes.find { |_, opts| opts[:default] }.try(:first) || _scopes.keys.first
+      end
 
+      def load_filter_params!
         filter_params.each { |name, value| state[:filter][name] = parse_filter_value(_filters[name], value) }
         state[:scope] = scope_param if scope_param
       end
@@ -79,6 +81,8 @@ module Effective
         else
           # Nothing to do for default state
         end
+
+        load_filter_params! unless datatables_ajax_request?
       end
 
       def load_ajax_state!
