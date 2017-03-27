@@ -24,10 +24,11 @@ module Effective
 
     include Effective::EffectiveDatatable::Attributes
     include Effective::EffectiveDatatable::Collection
+    include Effective::EffectiveDatatable::Compute
     include Effective::EffectiveDatatable::Cookie
+    include Effective::EffectiveDatatable::Format
     include Effective::EffectiveDatatable::Hooks
     include Effective::EffectiveDatatable::Params
-    include Effective::EffectiveDatatable::Render
     include Effective::EffectiveDatatable::Resource
     include Effective::EffectiveDatatable::State
 
@@ -103,7 +104,7 @@ module Effective
 
     def to_json
       @json ||= (
-        data = table_data
+        data = compute
 
         {
           draw: (params[:draw] || 0),

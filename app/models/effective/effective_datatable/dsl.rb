@@ -1,5 +1,3 @@
-# These are Class level methods.
-
 module Effective
   module EffectiveDatatable
     module Dsl
