@@ -1,5 +1,5 @@
 initializeCharts = ->
-  $('.effective-datatables-chart').each ->
+  $('.effective-datatables-chart:not(.initialized)').each ->
     $chart = $(this)
 
     data = $chart.data('data') || []
@@ -9,6 +9,8 @@ initializeCharts = ->
     if google
       chart = new google.visualization[as](document.getElementById($chart.attr('id')))
       chart.draw(google.visualization.arrayToDataTable(data), options)
+
+    $chart.addClass('initialized')
 
 $ -> initializeCharts()
 $(document).on 'page:change', -> initializeCharts()
