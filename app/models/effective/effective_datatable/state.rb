@@ -75,6 +75,7 @@ module Effective
 
       def load_state!
         if datatables_ajax_request?
+          load_filter_params!
           load_ajax_state!
         elsif cookie.present? && cookie[:state][:params] == params.length
           load_cookie_state!
@@ -106,8 +107,6 @@ module Effective
 
           state[:visible][name] = (params[:visible] == 'true')
         end
-
-        state[:filter] = {}
 
         (params[:filter] || {}).each do |name, value|
           name = name.to_sym
