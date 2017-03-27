@@ -50,12 +50,12 @@ module Effective
 
         # Format all results
         format(col)
+
+        # Finalize hook
+        finalize(col)
       end
 
       def arrayize(collection)
-        return collection if @arrayized  # Prevent the collection from being arrayized more than once
-        @arrayized = true
-
         collection.map do |obj|
           columns.map do |name, opts|
             if state[:visible][name] == false && (name != order_name)  # Sort by invisible array column

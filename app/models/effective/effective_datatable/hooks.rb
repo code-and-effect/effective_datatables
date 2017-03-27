@@ -7,13 +7,6 @@ module Effective
         collection
       end
 
-      # The incoming value could be from the passed page params or from the AJAX request.
-      # When we parse an incoming filter term for this filter.
-      def parse_filter_value(filter, value)
-        return filter[:parse].call(value) if filter[:parse]
-        Effective::Attribute.new(filter[:value]).parse(value, name: filter[:name])
-      end
-
     end
   end
 end
