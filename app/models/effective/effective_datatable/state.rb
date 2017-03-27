@@ -126,14 +126,17 @@ module Effective
       def load_columns!
         state[:length] ||= EffectiveDatatables.default_length
 
-        if order_index.present?
-          state[:order_name] = columns.keys[order_index]
-          raise "invalid order index #{order_index}" unless columns.keys[order_index]
-        else
-          state[:order_name] ||= columns.find { |name, opts| opts[:sort] }.first
-          raise "order column :#{order_name} must exist as a col or val" unless columns[order_name]
 
-          state[:order_index] = columns[order_name][:index]
+        if columns.present?
+          if order_index.present?
+            state[:order_name] = columns.keys[order_index]
+            raise "invalid order index #{order_index}" unless columns.keys[order_index]
+          else
+            state[:order_name] ||= columns.find { |name, opts| opts[:sort] }.first
+            raise "order column :#{order_name} must exist as a col or val" unless columns[order_name]
+
+            state[:order_index] = columns[order_name][:index]
+          end
         end
 
         # Set default order direction
