@@ -15,9 +15,13 @@ module Effective
           @attributes = cookie[:attributes]
         end
 
-        @attributes[:controller_namespace] ||= (
-          (datatables_ajax_request? ? URI(view.request.referer).path : view.controller_path).split('/')[0...-1].join('/').presence
-        )
+        unless datatables_ajax_request?
+          @attributes[:controller_namespace] ||= view.controller_path.split('/')[0...-1].join('/').presence
+        end
+
+        # @attributes[:controller_namespace] ||= (
+        #   (datatables_ajax_request? ? URI(view.request.referer).path : view.controller_path).split('/')[0...-1].join('/').presence
+        # )
       end
 
     end
