@@ -107,7 +107,7 @@ module Effective
             if term.kind_of?(Integer) && resource.respond_to?(:id)
               resource.id == term || resource.to_param == term
             elsif term.kind_of?(Array) && resource.respond_to?(:id)
-              term.any? { |term| resource.id == term || resource.to_param == term }
+              term.any? { |term| resource.id == term || resource.to_param == term || resource.to_param == value }
             else
               fuzzy ? resource.to_s.downcase == term_downcased : resource.to_s == term
             end
