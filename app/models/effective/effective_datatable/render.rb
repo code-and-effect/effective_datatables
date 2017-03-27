@@ -132,35 +132,37 @@ module Effective
 
       def format_column(value, column)
         case column[:as]
-        when :effective_obfuscation
-          value
-        when :effective_roles
-          value.join(', ')
-        when :datetime
-          value.strftime(EffectiveDatatables.datetime_format) rescue BLANK
-        when :date
-          value.strftime(EffectiveDatatables.date_format) rescue BLANK
-        when :price
-          raise 'column type: price expects an Integer representing the number of cents' unless value.kind_of?(Integer)
-          view.number_to_currency(value / 100.0) if value.present?
-        when :currency
-          view.number_to_currency(value) if value.present?
-        when :duration
-          view.number_to_duration(value) if value.present?
-        when :decimal
-          value
-        when :percentage
-          if value.present?
-            value.kind_of?(Integer) ? "#{value}%" : view.number_to_percentage(value, precision: 2)
-          end
-        when :integer
-          value
         when :boolean
           case value
           when true   ; 'Yes'
           when false  ; 'No'
           when String ; value
           end
+        when :currency
+          view.number_to_currency(value) if value.present?
+        when :date
+          value.strftime(EffectiveDatatables.date_format) rescue BLANK
+        when :datetime
+          value.strftime(EffectiveDatatables.datetime_format) rescue BLANK
+        when :decimal
+          value
+        when :duration
+          view.number_to_duration(value) if value.present?
+        when :effective_obfuscation
+          value
+        when :effective_roles
+          value.join(', ')
+        when :email
+          view.mail_to(value) if value.present?
+        when :integer
+          value
+        when :percentage
+          if value.present?
+            value.kind_of?(Integer) ? "#{value}%" : view.number_to_percentage(value, precision: 2)
+          end
+        when :price
+          raise 'column type: price expects an Integer representing the number of cents' unless value.kind_of?(Integer)
+          view.number_to_currency(value / 100.0) if value.present?
         else
           value.to_s
         end

@@ -136,7 +136,7 @@ module Effective
               fuzzy ? resource.to_s.downcase == term_downcased : resource.to_s == term
             end
           end
-        when :string, :text
+        when :string, :text, :email
           if fuzzy
             row[index].to_s.downcase.include?(term_downcased)
           else
