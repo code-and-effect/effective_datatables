@@ -10,7 +10,10 @@ module Effective
 
       def params
         return {} unless view.present?
-        @params ||= {}.tap { |params| view.params.each { |k, v| params[k.to_sym] = v } }
+        @params ||= {}.tap do |params|
+          Rack::Utils.parse_query(URI(view.request.referer.presence || '/').query).each { |k, v| params[k.to_sym] = v }
+          view.params.each { |k, v| params[k.to_sym] = v }
+        end
       end
 
       def filter_params
