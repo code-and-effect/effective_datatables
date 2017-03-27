@@ -45,35 +45,11 @@ module Effective
 
       if direction == :asc
         collection.sort! do |x, y|
-          if (x[index] === y[index])
-            x[index] <=> y[index]
-          elsif (x[index].kind_of?(Array) && y[index].kind_of?(Array))
-            x[index] <=> y[index]
-          elsif (x[index] && y[index])
-            x[index].to_s <=> y[index].to_s
-          elsif x[index]
-            -1
-          elsif y[index]
-            1
-          else
-            0
-          end
+          x[index] <=> y[index] || x[index].to_s <=> y[index].to_s || 0
         end
       else
         collection.sort! do |x, y|
-          if (x[index] === y[index])
-            y[index] <=> x[index]
-          elsif (x[index].kind_of?(Array) && y[index].kind_of?(Array))
-            y[index] <=> x[index]
-          elsif (x[index] && y[index])
-            y[index].to_s <=> x[index].to_s
-          elsif x[index]
-            -1
-          elsif y[index]
-            1
-          else
-            0
-          end
+          y[index] <=> x[index] || y[index].to_s <=> x[index].to_s || 0
         end
       end
 
