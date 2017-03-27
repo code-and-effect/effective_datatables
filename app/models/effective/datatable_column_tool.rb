@@ -87,6 +87,8 @@ module Effective
 
         if column[:search_method]
           collection = datatable.dsl_tool.instance_exec(collection, value, column, column[:sql_column], &column[:search_method])
+        elsif column[:as] == :effective_roles
+          collection = collection.with_role(value)
         else
           collection = search_column(collection, value, column, column[:sql_column])
         end

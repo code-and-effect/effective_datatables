@@ -26,7 +26,7 @@ module Effective
                 opts[:as] = :resource
               end
             when :effective_roles
-              # Nothing
+              opts[:sql_column] = :effective_roles
             else
               # Anything that doesn't belong to the model or the sql table, we assume is a SELECT SUM|AVG|RANK() as fancy
               opts[:sql_as_column] = true if (resource.table && resource.column(name).blank?)
