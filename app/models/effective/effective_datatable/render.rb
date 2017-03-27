@@ -157,8 +157,10 @@ module Effective
         when :integer
           value
         when :percentage
-          if value.present?
-            value.kind_of?(Integer) ? "#{value}%" : view.number_to_percentage(value, precision: 2)
+          case value
+          when Integer    ; "#{value}%"
+          when Numeric    ; view.number_to_percentage(value * 100, precision: 2)
+          when String     ; value
           end
         when :price
           raise 'column type: price expects an Integer representing the number of cents' unless value.kind_of?(Integer)
