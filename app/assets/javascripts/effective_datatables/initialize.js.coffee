@@ -66,7 +66,7 @@ initializeDataTables = ->
           params['scope'] = $form.find("input[name='scope']:checked").val() || ''
           params['filter'] = {}
 
-          $form.find("input[name^='filter']").each ->
+          $form.find("[name^='filter']").each ->
             $input = $(this)
             params['filter'][$input.attr('name').substring(8, $input.attr('name').length-1)] = $input.val()
 

@@ -13,6 +13,8 @@
         = form.input name, label: opts[:label], value: datatable.state[:filter][name],
           as: opts[:as],
           required: opts[:required],
+          collection: opts[:input_html].delete(:collection),
+          multiple: opts[:input_html].delete(:multiple),
           input_html: (datatable._form[:verb] ? {name: name} : {}).merge(opts[:input_html])
 
       - if datatable._form[:verb]
