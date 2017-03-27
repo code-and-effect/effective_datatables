@@ -88,7 +88,7 @@ module Effective
           columns.map do |name, opts|
             next if state[:visible][name] == false && datatables_ajax_request?
 
-            values = cols[opts[:index]]
+            values = cols[opts[:index]] || []
 
             if state[:visible][name] == false
               BLANK
