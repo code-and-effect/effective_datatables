@@ -3,11 +3,11 @@ initializeCharts = ->
     $chart = $(this)
 
     data = $chart.data('data') || []
-    type = $chart.data('type') || 'BarChart'
+    as = $chart.data('as') || 'BarChart'
     options = $chart.data('options') || {}
 
     if google
-      chart = new google.visualization[type](document.getElementById($chart.attr('id')))
+      chart = new google.visualization[as](document.getElementById($chart.attr('id')))
       chart.draw(google.visualization.arrayToDataTable(data), options)
 
 $ -> initializeCharts()

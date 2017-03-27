@@ -46,7 +46,9 @@ module Effective
 
         # Compute aggregate data
         @aggregates_data = aggregate(col) if _aggregates.present?
-        # TODO
+
+        # Charts too
+        @charts_data = chart(col) if _charts.present?
 
         # Format all results
         format(col)
@@ -223,6 +225,23 @@ module Effective
         else
           raise 'not implemented'
         end || BLANK
+      end
+
+      def chart(collection)
+        _charts.inject({}) do |retval, (name, chart)|
+          retval[name] = {
+            as: chart[:as],
+            data: dsl_tool.instance_exec(collection, &chart[:compute]),
+            name: chart[:name],
+            options: chart[:options]
+          }
+
+          unless retval[name][:data].kind_of?(Array) && retval[name][:data].first.kind_of?(Array)
+            raise "expected chart #{name} block to return an Array of Arrays"
+          end
+
+          retval
+        end
       end
 
       def actions_col_locals(opts)

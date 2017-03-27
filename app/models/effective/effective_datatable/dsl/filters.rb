@@ -31,11 +31,16 @@ module Effective
         end
 
         # This changes the filters from using an AJAX, to a POST or GET
-        def changes_columns_count(url: url, verb: nil)
-          verb ||= (Rails.application.routes.recognize_path(request.path, method: :post).present? rescue false) ? :post : :get
+        def form(url: nil, verb: nil)
+          url ||= request.path
+          verb ||= (Rails.application.routes.recognize_path(url, method: :post).present? rescue false) ? :post : :get
 
-          datatable._form[:url] = url || request.path
+          datatable._form[:url] = url
           datatable._form[:verb] = verb
+        end
+
+        def changes_columns_count
+          form()
         end
         alias_method :changes_column_count, :changes_columns_count
 

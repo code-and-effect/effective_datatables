@@ -45,17 +45,16 @@ module EffectiveDatatablesHelper
     raise 'expected datatable to be present' unless datatable
 
     datatable.view ||= self
-    return unless datatable.charts.present?
+    return unless datatable._charts.present?
 
-    datatable.charts.map { |name, _| render_datatable_chart(datatable, name) }.join.html_safe
+    datatable._charts.map { |name, _| render_datatable_chart(datatable, name) }.join.html_safe
   end
 
   def render_datatable_chart(datatable, name)
     raise 'expected datatable to be present' unless datatable
 
-    return unless datatable.charts.present?
-    return unless datatable.charts[name].present?
     datatable.view ||= self
+    return unless datatable._charts[name].present?
 
     unless @effective_datatables_chart_javascript_rendered
       concat javascript_include_tag('https://www.google.com/jsapi')
@@ -64,11 +63,10 @@ module EffectiveDatatablesHelper
       @effective_datatables_chart_javascript_rendered = true
     end
 
-    options = datatable.charts[name]
-    chart = datatable.to_json[:charts][name]
+    chart = datatable._charts[name]
+    chart_data = datatable.to_json[:charts][name][:data]
 
-    render partial: (options[:partial] || 'effective/datatables/chart'),
-      locals: { datatable: datatable, chart: chart }
+    render partial: chart[:partial], locals: { datatable: datatable, chart: chart, chart_data: chart_data }
   end
 
 end

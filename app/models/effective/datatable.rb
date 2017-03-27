@@ -7,6 +7,7 @@ module Effective
     # Hashes of DSL options
     attr_reader :_aggregates
     attr_reader :_bulk_actions
+    attr_reader :_charts
     attr_reader :_columns
     attr_reader :_filters
     attr_reader :_form
@@ -22,7 +23,6 @@ module Effective
     extend Effective::EffectiveDatatable::Dsl
 
     include Effective::EffectiveDatatable::Attributes
-    include Effective::EffectiveDatatable::Charts
     include Effective::EffectiveDatatable::Collection
     include Effective::EffectiveDatatable::Cookie
     include Effective::EffectiveDatatable::Hooks
@@ -39,6 +39,7 @@ module Effective
 
       @_aggregates = {}
       @_bulk_actions = []
+      @_charts = {}
       @_columns = {}
       @_filters = {}
       @_form = {}
@@ -110,7 +111,7 @@ module Effective
           recordsTotal: (@total_records || 0),
           recordsFiltered: (@display_records || 0),
           aggregates: (@aggregates_data || []),
-          charts: {} #(charts_data || {})
+          charts: (@charts_data || {})
         }
       )
     end
