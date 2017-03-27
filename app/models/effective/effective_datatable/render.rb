@@ -190,14 +190,16 @@ module Effective
 
       def aggregate_column(values, column, aggregate)
         labeled = false
+        length = values.length
+        values = values.reject { |value| value.nil? }
+
+        if [:bulk_actions, :actions].include?(column[:as]) || length == 0
+          return BLANK
+        end
 
         case aggregate[:name]
         when :total
-          values = values.reject { |value| value.nil? }
-
-          if [:bulk_actions, :actions].include?(column[:as]) || values.length == 0
-            BLANK
-          elsif values.all? { |value| value.kind_of?(Numeric) }
+          if values.all? { |value| value.kind_of?(Numeric) }
             values.sum
           elsif values.all? { |value| value == true || value == false }
             "#{values.count { |val| val == true }} / #{values.count { |val| val == false}}"
@@ -205,22 +207,20 @@ module Effective
             labeled = aggregate[:label]
           elsif values.any? { |value| value.kind_of?(String) == false }
             "#{values.flatten.count} total"
-          else
-            BLANK
           end
         when :average
-          values = values.map { |value| value.presence || 0 }
-
           if values.all? { |value| value.kind_of?(Numeric) }
-            values.sum / [values.length, 1].max
-          elsif column[:index] == 0
-            aggregate[:label]
-          else
+            values.sum / [length, 1].max
+          elsif values.all? { |value| value == true || value == false }
+            values.count { |val| val == true } >= (length / 2) ? true : false
+          elsif !labeled
+            labeled = aggregate[:label]
+          elsif values.any? { |value| value.kind_of?(String) == false }
             '-'
           end
         else
           raise 'not implemented'
-        end
+        end || BLANK
       end
 
       def actions_col_locals(opts)

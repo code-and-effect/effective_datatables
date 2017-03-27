@@ -47,7 +47,7 @@ module Effective
         collection.sort! do |x, y|
           if (x[index] === y[index])
             x[index] <=> y[index]
-          elsif (x.kind_of?(Array) && y.kind_of?(Array))
+          elsif (x[index].kind_of?(Array) && y[index].kind_of?(Array))
             x[index] <=> y[index]
           elsif (x[index] && y[index])
             x[index].to_s <=> y[index].to_s
@@ -63,7 +63,7 @@ module Effective
         collection.sort! do |x, y|
           if (x[index] === y[index])
             y[index] <=> x[index]
-          elsif (x.kind_of?(Array) && y.kind_of?(Array))
+          elsif (x[index].kind_of?(Array) && y[index].kind_of?(Array))
             y[index] <=> x[index]
           elsif (x[index] && y[index])
             y[index].to_s <=> x[index].to_s
