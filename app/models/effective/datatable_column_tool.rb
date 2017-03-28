@@ -2,11 +2,9 @@ module Effective
   class DatatableColumnTool
     attr_reader :datatable
     attr_reader :columns
-    attr_reader :resource
 
     def initialize(datatable)
       @datatable = datatable
-      @resource = datatable.resource
 
       if datatable.active_record_collection?
         @columns = datatable.columns.select { |_, col| col[:sql_column].present? }
@@ -65,10 +63,10 @@ module Effective
     end
 
     def order_column(collection, direction, column, sql_column)
-      Rails.logger.info "COLUMN TOOL: order_column #{column} #{direction} #{sql_column}"
+      Rails.logger.info "COLUMN TOOL: order_column #{column.to_s} #{direction} #{sql_column}"
 
       if column[:sql_as_column]
-        collection.order("#{sql_column} #{resource.sql_direction(direction)}")
+        collection.order("#{sql_column} #{datatable.resource.sql_direction(direction)}")
       else
         Effective::Resource.new(collection)
           .order(column[:name], direction, as: column[:as], sort: column[:sort], sql_column: column[:sql_column])
@@ -98,7 +96,7 @@ module Effective
     end
 
     def search_column(collection, value, column, sql_column)
-      Rails.logger.info "COLUMN TOOL: search_column #{column} #{value} #{sql_column}"
+      Rails.logger.info "COLUMN TOOL: search_column #{column.to_s} #{value} #{sql_column}"
 
       Effective::Resource.new(collection)
         .search(column[:name], value, as: column[:as], fuzzy: column[:search][:fuzzy], sql_column: sql_column)

@@ -73,7 +73,7 @@ module Effective
     end
 
     def search_column(collection, value, column, index)
-      Rails.logger.info "VALUE TOOL: search_column #{column} #{value} #{index}"
+      Rails.logger.info "VALUE TOOL: search_column #{column.to_s} #{value} #{index}"
 
       fuzzy = column[:search][:fuzzy]
       term = Effective::Attribute.new(column[:as]).parse(value, name: column[:name])
