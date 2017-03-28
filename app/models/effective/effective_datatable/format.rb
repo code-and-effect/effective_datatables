@@ -62,9 +62,9 @@ module Effective
         when :currency
           view.number_to_currency(value) if value.present?
         when :date
-          value.strftime(EffectiveDatatables.date_format) rescue BLANK
+          (value.strftime(EffectiveDatatables.date_format) rescue BLANK) if value.present?
         when :datetime
-          value.strftime(EffectiveDatatables.datetime_format) rescue BLANK
+          (value.strftime(EffectiveDatatables.datetime_format) rescue BLANK) if value.present?
         when :decimal
           value
         when :duration

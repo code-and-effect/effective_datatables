@@ -63,11 +63,7 @@ module Effective
             elsif opts[:partial] || (opts[:format] && !opts[:compute])
               active_record_collection? ? obj : obj[opts[:index]]
             elsif opts[:compute]
-              if active_record_collection?
-                dsl_tool.instance_exec(obj, collection, &opts[:compute])
-              else
-                dsl_tool.instance_exec(obj, obj[opts[:index]], &opts[:compute])
-              end
+              dsl_tool.instance_exec(obj, (active_record_collection? ? collection : obj[opts[:index]]), &opts[:compute])
             elsif opts[:as] == :effective_obfuscation
               obj.to_param
             elsif array_collection?
@@ -146,7 +142,7 @@ module Effective
           }
 
           unless retval[name][:data].kind_of?(Array) && retval[name][:data].first.kind_of?(Array)
-            raise "expected chart #{name} block to return an Array of Arrays"
+            raise "invalid chart :#{name}. The block must return an Array of Arrays"
           end
 
           retval

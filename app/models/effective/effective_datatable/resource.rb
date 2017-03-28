@@ -67,12 +67,20 @@ module Effective
 
       def load_resource_search!
         columns.each do |name, opts|
+
+          case opts[:search]
+          when false
+            opts[:search] = { as: :null }; next
+          when Symbol
+            opts[:search] = { as: search }
+          when Array, ActiveRecord::Relation
+            opts[:search] = { collection: search }
+          end
+
           search = opts[:search]
 
-          if search == false
-            opts[:search] = { as: :null }; next
-          elsif search.kind_of?(Symbol)
-            opts[:search] = { as: search }
+          if search[:collection].kind_of?(ActiveRecord::Relation)
+            search[:collection] = search[:collection].map { |obj| [obj.to_s, obj.to_param] }
           end
 
           search[:as] ||= :select if (search.key?(:collection) && opts[:as] != :belongs_to_polymorphic)
@@ -83,7 +91,6 @@ module Effective
           else
             search.reverse_merge!(resource.search_form_field(name, opts[:as]))
           end
-
         end
       end
     end
