@@ -125,7 +125,6 @@ module Effective
       def load_columns!
         state[:length] ||= EffectiveDatatables.default_length
 
-
         if columns.present?
           if order_index.present?
             state[:order_name] = columns.keys[order_index]

@@ -4,7 +4,7 @@ module Effective
       module Charts
         # Instance Methods inside the charts do .. end block
         def chart(name, as = 'BarChart', label: nil, legend: true, partial: nil, **options, &compute)
-          raise 'expected a block' unless block_given?
+          raise 'expected a block returning an Array of Arrays' unless block_given?
 
           datatable._charts[name.to_sym] = {
             as: as,

@@ -104,11 +104,9 @@ module Effective
 
     def to_json
       @json ||= (
-        data = compute
-
         {
+          data: (compute || []),
           draw: (params[:draw] || 0),
-          data: (data || []),
           recordsTotal: (@total_records || 0),
           recordsFiltered: (@display_records || 0),
           aggregates: (@aggregates_data || []),

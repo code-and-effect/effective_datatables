@@ -124,7 +124,7 @@ module Effective
       def resource_col_locals(opts)
         return {} unless (resource = opts[:resource]).present?
 
-        locals = {name: opts[:name], macro: opts[:as], show_path: false, edit_path: false}
+        locals = { name: opts[:name], macro: opts[:as], show_path: false, edit_path: false }
 
         case opts[:action]
         when :edit

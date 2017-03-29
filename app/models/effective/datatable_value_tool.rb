@@ -14,10 +14,6 @@ module Effective
       end
     end
 
-    def size(collection)
-      collection.size
-    end
-
     def searched
       @searched ||= datatable.search.select { |name, _| columns.key?(name) }
     end
@@ -29,10 +25,10 @@ module Effective
     def order(collection)
       return collection unless ordered.present?
 
-      if ordered[:sort_method]
-        collection = datatable.dsl_tool.instance_exec(collection, datatable.order_direction, ordered, ordered[:index], &ordered[:sort_method])
+      collection = if ordered[:sort_method]
+        datatable.dsl_tool.instance_exec(collection, datatable.order_direction, ordered, ordered[:index], &ordered[:sort_method])
       else
-        collection = order_column(collection, datatable.order_direction, ordered, ordered[:index])
+        order_column(collection, datatable.order_direction, ordered, ordered[:index])
       end
 
       raise 'sort method must return an Array' unless collection.kind_of?(Array)
@@ -60,10 +56,10 @@ module Effective
       searched.each do |name, value|
         column = columns[name]
 
-        if column[:search_method]
-          collection = datatable.dsl_tool.instance_exec(collection, value, column, column[:index], &column[:search_method])
+        collection = if column[:search_method]
+          datatable.dsl_tool.instance_exec(collection, value, column, column[:index], &column[:search_method])
         else
-          collection = search_column(collection, value, column, column[:index])
+          search_column(collection, value, column, column[:index])
         end
 
         raise 'search method must return an Array object' unless collection.kind_of?(Array)
@@ -126,6 +122,10 @@ module Effective
 
     def paginate(collection)
       Kaminari.paginate_array(collection).page(datatable.page).per(datatable.per_page)
+    end
+
+    def size(collection)
+      collection.size
     end
 
   end
