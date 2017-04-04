@@ -93,7 +93,7 @@ module Effective
           )
         end
 
-        def actions_col(show: true, edit: true, destroy: true, col_class: nil, partial: nil, responsive: 5000, &format)
+        def actions_col(show: true, edit: true, destroy: true, col_class: nil, partial: nil, responsive: 5000, visible: true, &format)
           raise 'You can only have one actions column' if datatable.columns[:_actions].present?
 
           datatable._columns[:_actions] = Effective::DatatableColumn.new(
@@ -112,7 +112,7 @@ module Effective
             sql_column: nil,
             th: nil,
             th_append: nil,
-            visible: true,
+            visible: visible,
             width: nil,
 
             show: show,

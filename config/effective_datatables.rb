@@ -51,6 +51,6 @@ EffectiveDatatables.setup do |config|
   }
 
   # Which packages to load when using the charts DSL
-  config.google_chart_packages = ['corechart', 'gauge', 'geochart']
+  config.google_chart_packages = ['corechart']
 
 end

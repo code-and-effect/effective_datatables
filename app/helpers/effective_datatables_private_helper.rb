@@ -1,5 +1,4 @@
-# These aren't expected to be called by a developer.
-# They are internal datatables methods, but you could still call them on the view.
+# These aren't expected to be called by a developer. THey are internal methods.
 module EffectiveDatatablesPrivateHelper
 
   # https://datatables.net/reference/option/columns
