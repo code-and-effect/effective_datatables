@@ -23,13 +23,14 @@ This is the 3.0 release of effective_datatables.  It's a complete rewrite, with 
 Previous versions of the gem were excellent, but the 3.0 release has stepped things up.
 
 Internally, all columns now have separate compute and format methods, removing the need for a ton of internal parsing and type conversions.
-This allows things like filters, aggregates and searching/sorting to work with the pre-formatted data.
+This allows things like filters, aggregates and searching/sorting to work effectively.
 
-Column rendering has been improved so all datatables and view methods from available from everywhere.
-This allows you to include/exclude/configure columns based on the current_user, filters and attributes with regular ifs instead of procs.
+Column rendering has been improved so all datatable and view methods are callable from anywhere in the DSL.
+This allows the developer to do things like: include/exclude/configure columns based on the current_user, apply logic around current filters
+to change columns dynamically, to use regular ifs instead of procs in toggling visibility, and generally removes all weirdness.
 
 This release adds a dependency on [effective_resources](https://github.com/code-and-effect/effective_resources) for ActiveRecord resource discovery,
-full sql table fuzzy searching/sorting, attribute parsing, and linking to edit/show actions.
+full sql table fuzzy searching/sorting, attribute parsing, and checking availability & authorization of edit/show actions.
 
 A cookie has been added to persist the user's selected filters, search, sort, length, column visibility and pagination settings.
 
@@ -67,11 +68,9 @@ Require the stylesheet on the asset pipeline by adding the following to your app
 *= require effective_datatables
 ```
 
-# Usage
+# Quick Start
 
-Below is a minimal example, which we will expand upon later.
-
-We create a datatable model, initialize it within our controller, then render it from a view.
+All logic for the table exists in its own model file.  Once that's built, we initialize in the controller, render in the view.
 
 ## The Model
 
@@ -98,7 +97,7 @@ end
 
 ## The Controller
 
-We're going to display this DataTable on the posts#index action
+We're going to display this DataTable on the posts#index action.
 
 ```ruby
 class PostsController < ApplicationController
@@ -131,30 +130,30 @@ This model exists at `/app/datatables/posts_datatable.rb`:
 class PostsDatatable < Effective::Datatable
 
   # The collection block is the only required section in a datatable
-  # It has access to the attributes and filters Hashes, representing the current state.
+  # It has access to the attributes and filters Hashes, representing the current state
   # It must return an ActiveRecord::Relation or an Array of Arrays
   collection do
-    scope = Post.includes(:post_category, :user).where(created_at: filters[:start_date]...filters[:end_date])
+    scope = Post.all.where(created_at: filters[:start_date]...filters[:end_date])
     scope = scope.where(user_id: attributes[:user_id]) if attributes[:user_id]
     scope
   end
 
-  # Everything in the filters block ends up in a single form.
+  # Everything in the filters block ends up in a single form
   # The form is submitted by datatables javascript as an AJAX post
   filters do
-    # Scopes are rendered as a single radio button form field. Works well with effective_form_inputs gem.
-    # The scopes only work when your collection is an ActiveRecord class. They must exist on the model.
-    # The current scope is automatically applied by effective_datatables to your collection.
-    # You don't have to consider the current scope when writing your collection block.
+    # Scopes are rendered as a single radio button form field (works well with effective_form_inputs gem)
+    # The scopes only work when your collection is an ActiveRecord class, and they must exist on the model
+    # The current scope is automatically applied by effective_datatables to your collection
+    # You don't have to consider the current scope when writing your collection block
     scope :all, default: true
     scope :approved
     scope :draft
     scope :for_user, (attributes[:user_id] ? User.find(attributes[:user_id]) : current_user)
 
-    # Each filter has a name and a default value.  The default can be nil.
-    # Each filter is displayed on the front end form as a single field.
-    # The filters are NOT automatically applied to your collection.
-    # You are responsible for considering filters in your collection block.
+    # Each filter has a name and a default value and the default can be nil
+    # Each filter is displayed on the front end form as a single field
+    # The filters are NOT automatically applied to your collection
+    # You are responsible for considering filters in your collection block
     filter :start_date, Time.zone.now-3.months, required: true
     filter :end_date, Time.zone.now.end_of_day
   end
@@ -258,9 +257,9 @@ end
 
 ## The Controller
 
-Pass in a hash of attributes when initializing the datatable to configure behaviour.
+Any options used to initialize a datatable become the `attributes`.  Use these to configure datatables behavior.
 
-In the above example, when a `user_id` attribute is present, the table displays information for just that one user.
+In the above example, when `attributes[:user_id]` is present, the table displays information for just that user.
 
 ```ruby
 class PostsController < ApplicationController
@@ -285,17 +284,15 @@ The datatable, filter form and all all charts are rendered individually.  To ren
 
 The effective_datatables DSL is made up of 5 sections: `collection`, `datatable`, `filters` `bulk_actions`, `charts`
 
-Each section has 3 or 4 different commands.
-
 As well, a datatable can be initialized with `attributes`.
 
 ## attributes
 
 When initialized with a Hash, that hash is available throughout the entire datatable as `attributes`.
 
-These attributes are serialized and stored in a cookie. Objects won't work. Keep it simple.
+These attributes are serialized and stored in an encrypted cookie. Objects won't work. Keep it simple.
 
-Attributes cannot be changed by search, filter, or state in any way.
+Attributes cannot be changed by search, filter, or state in any way. They're guaranteed to be the same as when first initialized.
 
 ```ruby
 class PostsController < ApplicationController
@@ -326,8 +323,6 @@ class PostsDatatable < Effective::Datatable
 
     col :post_category
     col :comments
-
-    actions_col show: true, edit: attributes[:admin]
   end
 end
 ```
@@ -339,6 +334,16 @@ The `collection do ... end` block must return an ActiveRecord relation or an Arr
 ```ruby
 collection do
   Post.all
+end
+```
+
+or
+
+```ruby
+collection do
+  scope = Post.includes(:user).where(created_at: filters[:start_date]...filters[:end_date])
+  scope = scope.where(user_id: attributes[:user_id]) if attributes[:user_id]
+  scope
 end
 ```
 
@@ -374,15 +379,15 @@ collection do
 end
 ```
 
-The collection block is responsible for applying any `attribute` and `filter` logic.
+The collection block is responsible for applying any `attribute` and `filters` logic.
 
-When an ActiveRecord collection, the `current_scope`, will be applied by effective_datatables.
+When an ActiveRecord collection, the `current_scope`, will be applied automatically by effective_datatables.
 
 All searching and ordering is also done by effective_datatables.
 
 Your collection method should not contain a `.order()`, or implement search in any way.
 
-(Although you could totally get at that information if you wanted by calling `state`)
+Sometimes it's handy to call `.reorder(nil)` on a scope.
 
 ## datatable
 
@@ -396,45 +401,40 @@ This is the main DSL method that you will interact with.
 
 `col` defines a 1:1 mapping between the underlying SQL database table column or Array index to a frontend jQuery Datatables table column. It creates a column.
 
-Each column's search and ordering is performed on its underlying value, as per the collection.
+Each column's search and sorting is performed on its underlying value, as per the collection.
 
-It accepts one optional block used to format the value after any search or ordering is done.
+It accepts one optional block used to format the value after any search or sorting is done.
 
 The following options are available:
 
 ```ruby
 action: :show|:edit|false  # :resource and relation columns only. generate links to this action. edit -> show by default
-as: :string|:integer|etc   # Sets the type of column
+as: :string|:integer|etc   # Sets the type of column initializing defaults for search, sort and format
 col_class: 'col-green'     # Sets the html class to use on this column's td and th
 label: 'My label'          # The label for this column
 partial: 'posts/category'  # Render this column with a partial. The local will be named resource
-responsive: 500            # Controls how columns collapse https://datatables.net/reference/option/columns.responsivePriority
+responsive: 10000          # Controls how columns collapse https://datatables.net/reference/option/columns.responsivePriority
 
-# Configure the search behavior
+# Configure the search behavior. Autodetects by default.
 search: false
 search: :string
 search: { as: :string, fuzzy: true }
 search: { as: :select, collection: User.all, multiple: true }
 
-sort: true|false           # Should this column be orderable
-sql_column: 'posts.rating' # The sql column to search/order on. Only needed when selecting values not on the underlying table.
+sort: true|false           # Should this column be orderable. true by default
+sql_column: 'posts.rating' # The sql column to search/sort on. Only needed when doing custom selects or tricky joins.
 visible: true|false        # Show/Hide this column by default
-width: 50%|100%|300px      # Sets the width property on this column's td.  Don't actually use this.
 ```
 
-The `:as` setting determines a column's search, order and format behaviour.
+The `:as` setting determines a column's search, sort and format behaviour.
 
 It is auto-detected from an ActiveRecord collection's SQL datatype, and set to `:string` for any Array-based collections.
 
 Valid options for `:as` are as follows:
 
-`:belongs_to`, `:belongs_to_polymorphic`, `:has_and_belongs_to_many`, `:has_many`, `:has_one`, `:resource`
+`:boolean`, `:currency`, `:datetime`, `:date`, `:decimal`, `:duration`, `:email`, `:float`, `:integer`, `:percentage`, `:price`, `:resource`, `:string`, `:text`
 
-and
-
-`:boolean`, `:currency`, `:datetime`, `:date`, `:decimal`, `:duration`, `:email`, `:float`, `:integer`, `:percentage`, `:price`, `:string`, `:text`
-
-These settings are loosely based on the regular datatypes, with some exceptions:
+These settings are loosely based on the regular datatypes, with some custom effective types thrown in:
 
 - `:currency` expects the underlying datatype to be a Float.
 - `:duration` expects the underlying datatype to be an Integer representing the number of minutes. 120 == 2 hours
@@ -443,7 +443,7 @@ These settings are loosely based on the regular datatypes, with some exceptions:
 - `:price` expects the underlying datatype to be an Integer representing the number of cents. 5000 == $50.00
 - `:resource` can be used for an Array based collection which includes an ActiveRecord object
 
-The column will be formatted as per its `as:` setting, unless a format block is included:
+The column will be formatted as per its `as:` setting, unless a custom format block is present:
 
 ```ruby
 col :approved do |post|
@@ -473,26 +473,28 @@ end
 
 So, `val` yields the object from the collection to the first/compute block, and stores the result.
 
-All searching and ordering for this column will be performed on this computed value. (Note: Yep, this is done as an Array search/order and is much slower than a regular SQL query)
+All searching and sorting for this column will be performed on this computed value.
 
-The `.format do ... end` block can be used to apply custom formatting.
+This is implemented as a full Array search/sort and is much slower for large datasets than a paginated SQL query
+
+The `.format do ... end` block can then be used to apply custom formatting.
 
 ### bulk_actions_col
 
 Creates a column of checkboxes for use with the `bulk_actions` section.
 
-Each checkbox will submit a value equal to its row `object.to_param` and can be Select All / Select None'd
+Each input checkbox has a value equal to its row `object.to_param` and gets submitted as an Array of ids, `params[:ids]`
 
-Use these checkboxes to select one or more rows for the `bulk_actions do ... end` section (below).
+Use these checkboxes to select all / none / one or more rows for the `bulk_actions do ... end` section (below).
 
 You can only have one `bulk_actions_col` per datatable.
 
 ### actions_col
 
 When working with an ActiveRecord based collection, this column will consider the `current_user`'s authorization, and generate
-icon links to edit, show and destroy actions for the collection class.
+glyphicon links to edit, show and destroy actions for any collection class.
 
-The authorization method should be configured in the `config/initializers/effective_datatables.rb` initializer file.
+The authorization method is configured via the `config/initializers/effective_datatables.rb` initializer file.
 
 There are just a few options:
 
@@ -504,7 +506,7 @@ destroy: true|false|:auth
 visible: true|false
 ```
 
-When the show, edit and destroy actions are `true`, the permission check will be made just once, on the class.
+When the show, edit and destroy actions are `true` (default), the permission check will be made just once, authorizing the class.
 When set to `:auth`, permission to each individual object will be checked.
 
 Use the block syntax to add additional actions
@@ -887,7 +889,7 @@ The search and sort for each column will be merged together to form the final re
 
 There are some extra steps to be taken if you want to change the number of columns based on `filters`.
 
-Unfortunatley, the datatable javascript doesn't support dynamic columns, so submitting filters needs to be done via POST instead of AJAX.
+Unfortunately, the DataTables jQuery doesn't support changing columns, so submitting filters needs to be done via POST instead of AJAX.
 
 The following example displays a client column, and one column per month for each month in a date range:
 

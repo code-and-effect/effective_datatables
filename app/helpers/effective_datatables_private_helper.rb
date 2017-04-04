@@ -16,7 +16,6 @@ module EffectiveDatatablesPrivateHelper
         search: datatable.state[:search][name],
         sortable: (opts[:sort] && !datatable.simple?),
         visible: datatable.state[:visible][name],
-        width: opts[:width]
       }
     end.to_json
   end
