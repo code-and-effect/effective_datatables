@@ -1,6 +1,6 @@
 # Effective DataTables
 
-Use a high level DSL and just one ruby file to create a [jQuery datatable](http://datatables.net/) for any ActiveRecord class or Array.
+Use a high level DSL and just one ruby file to create a [Datatables jQuery table](http://datatables.net/) for any ActiveRecord class or Array.
 
 Powerful server-side searching, sorting and filtering of ActiveRecord classes, with `belongs_to` and `has_many` relationships.
 
@@ -23,10 +23,10 @@ This is the 3.0 release of effective_datatables.  It's a complete rewrite, with 
 Previous versions of the gem were excellent, but the 3.0 release has stepped things up.
 
 Internally, all columns now have separate compute and format methods, removing the need for a ton of internal parsing and type conversions.
-This allows things like filters, aggregates and searching/sorting to work correctly, always with the before-formatted data.
+This allows things like filters, aggregates and searching/sorting to work with the pre-formatted data.
 
-The mechanism by which columns are rendered has been improved, now all view methods from available from anywhere in the DSL.
-This allows you to include/exclude columns based on the current_user, filters and attributes with regular ifs instead of procs.
+Column rendering has been improved so all datatables and view methods from available from everywhere.
+This allows you to include/exclude/configure columns based on the current_user, filters and attributes with regular ifs instead of procs.
 
 This release adds a dependency on [effective_resources](https://github.com/code-and-effect/effective_resources) for ActiveRecord resource discovery,
 full sql table fuzzy searching/sorting, attribute parsing, and linking to edit/show actions.
@@ -69,13 +69,13 @@ Require the stylesheet on the asset pipeline by adding the following to your app
 
 # Usage
 
-We create a model, initialize it within our controller, then render it from a view.
+Below is a minimal example, which we will expand upon later.
+
+We create a datatable model, initialize it within our controller, then render it from a view.
 
 ## The Model
 
 Start by creating a new datatable.
-
-Below is a minimal example, which we will expand upon later.
 
 This model exists at `/app/datatables/posts_datatable.rb`:
 
@@ -131,7 +131,7 @@ This model exists at `/app/datatables/posts_datatable.rb`:
 class PostsDatatable < Effective::Datatable
 
   # The collection block is the only required section in a datatable
-  # You have access to the attributes and filters Hashes, representing the current state.
+  # It has access to the attributes and filters Hashes, representing the current state.
   # It must return an ActiveRecord::Relation or an Array of Arrays
   collection do
     scope = Post.includes(:post_category, :user).where(created_at: filters[:start_date]...filters[:end_date])
@@ -247,7 +247,7 @@ class PostsDatatable < Effective::Datatable
     # Puts in icons to show/edit/destroy actions, if authorized to those actions.
     # Use the actions_col block to add additional actions
     actions_col show: false do |post|
-      unless post.approved? && can?(:approve, Post)
+      if !post.approved? && can?(:approve, Post)
         link_to 'Approve', approve_post_path(post) data: { method: :post, confirm: 'Really approve?'}
       end
     end
@@ -360,7 +360,7 @@ or
 ```ruby
 collection do
   time_entries = TimeEntry.where(date: filter[:start_date].beginning_of_year...filter[:end_date].end_of_year)
-    .group_by { |time_entry| "#{time_entry.client_id}_#{time_entry.created_at.beginning_of_month.strftime('%b').downcase}" }
+    .group_by { |time_entry| "#{time_entry.client_id}_#{time_entry.created_at.strftime('%b').downcase}" }
 
   Client.all.map do |client|
     [client] + [:jan, :feb, :mar, :apr, :may, :jun, :jul, :aug, :sep, :oct, :nov, :dec].map do |month|
@@ -605,7 +605,11 @@ end
 
 Each filter has a name and a default/fallback value. If the form is submitted blank, the default values are used.
 
+effective_datatables looks at the default value, and tries to cast the incoming (String) value into that datatype.
+
 This ensures that calling `filters[:name]` always return a value. The default can be nil.
+
+You can override the parsing on a per-filter basis.
 
 Unlike `scope`s, the filters are NOT automatically applied to your collection. You are responsible for considering `filters` in your collection block.
 
@@ -838,7 +842,7 @@ datatable do
     categories = current_user.post_categories.where(id: term.to_i)
 
     collection.where(post_category_id: categories)  # Must return an ActiveRecord scope
-  end.order do |collection, direction, column, sql_column|
+  end.sort do |collection, direction, column, sql_column|
     collection.joins(:post_category).order(:post_category => :title, direction)
   end
 end
