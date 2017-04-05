@@ -413,6 +413,7 @@ as: :string|:integer|etc   # Sets the type of column initializing defaults for s
 col_class: 'col-green'     # Sets the html class to use on this column's td and th
 label: 'My label'          # The label for this column
 partial: 'posts/category'  # Render this column with a partial. The local will be named resource
+partial_as: 'category'     # The name of the object's local variable, otherwise resource
 responsive: 10000          # Controls how columns collapse https://datatables.net/reference/option/columns.responsivePriority
 
 # Configure the search behavior. Autodetects by default.

@@ -19,7 +19,7 @@ module Effective
 
             rendered[name] = (view.render(
               partial: opts[:partial],
-              as: :resource,
+              as: (opts[:partial_as] || :resource),
               collection: collection.map { |row| row[opts[:index]] },
               formats: :html,
               locals: locals,

@@ -19,7 +19,7 @@ module Effective
         # Anything done in the block, is purely a format on the after sorted/ordered value
         # the original object == the computed value, which is yielded to the format block
         # You can't do compute with .col
-        def col(name, action: nil, as: nil, col_class: nil, label: nil, partial: nil, responsive: 10000, search: {}, sort: true, sql_column: nil, th: nil, th_append: nil, visible: true, &format)
+        def col(name, action: nil, as: nil, col_class: nil, label: nil, partial: nil, partial_as: nil, responsive: 10000, search: {}, sort: true, sql_column: nil, th: nil, th_append: nil, visible: true, &format)
           raise 'You cannot use partial: ... with the block syntax' if partial && block_given?
 
           datatable._columns[name.to_sym] = Effective::DatatableColumn.new(
@@ -32,6 +32,7 @@ module Effective
             label: label || name.to_s.titleize,
             name: name.to_sym,
             partial: partial,
+            partial_as: partial_as,
             responsive: responsive,
             search: search,
             sort: sort,
@@ -44,7 +45,7 @@ module Effective
 
         # A val is a computed value that is then sorted/searched after the block is run
         # You can have another block by calling .format afterwards to work on the computed value itself
-        def val(name, action: nil, as: nil, col_class: nil, label: nil, partial: nil, responsive: 10000, search: {}, sort: true, sql_column: nil, th: nil, th_append: nil, visible: true, &compute)
+        def val(name, action: nil, as: nil, col_class: nil, label: nil, partial: nil, partial_as: nil, responsive: 10000, search: {}, sort: true, sql_column: nil, th: nil, th_append: nil, visible: true, &compute)
           raise 'You cannot use partial: ... with the block syntax' if partial && block_given?
 
           datatable._columns[name.to_sym] = Effective::DatatableColumn.new(
@@ -57,6 +58,7 @@ module Effective
             label: label || name.to_s.titleize,
             name: name.to_sym,
             partial: partial,
+            partial_as: partial_as,
             responsive: responsive,
             search: search,
             sort: sort,
@@ -67,7 +69,7 @@ module Effective
           )
         end
 
-        def bulk_actions_col(col_class: nil, partial: nil, responsive: 5000)
+        def bulk_actions_col(col_class: nil, partial: nil, partial_as: nil, responsive: 5000)
           raise 'You can only have one bulk actions column' if datatable.columns[:_bulk_actions].present?
 
           datatable._columns[:_bulk_actions] = Effective::DatatableColumn.new(
@@ -80,6 +82,7 @@ module Effective
             label: '',
             name: :bulk_actions,
             partial: partial || '/effective/datatables/bulk_actions_column',
+            partial_as: partial_as,
             responsive: responsive,
             search: { as: :bulk_actions },
             sort: false,
@@ -90,7 +93,7 @@ module Effective
           )
         end
 
-        def actions_col(show: true, edit: true, destroy: true, col_class: nil, partial: nil, responsive: 5000, visible: true, &format)
+        def actions_col(show: true, edit: true, destroy: true, col_class: nil, partial: nil, partial_as: nil, responsive: 5000, visible: true, &format)
           raise 'You can only have one actions column' if datatable.columns[:_actions].present?
 
           datatable._columns[:_actions] = Effective::DatatableColumn.new(
@@ -103,6 +106,7 @@ module Effective
             label: '',
             name: :actions,
             partial: partial || '/effective/datatables/actions_column',
+            partial_as: partial_as,
             responsive: responsive,
             search: false,
             sort: false,
