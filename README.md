@@ -499,15 +499,15 @@ The authorization method is configured via the `config/initializers/effective_da
 There are just a few options:
 
 ```ruby
-show: true|false|:auth
-edit: true|false|:auth
-destroy: true|false|:auth
+show: true|false|:authorize
+edit: true|false|:authorize
+destroy: true|false|:authorize
 
 visible: true|false
 ```
 
 When the show, edit and destroy actions are `true` (default), the permission check will be made just once, authorizing the class.
-When set to `:auth`, permission to each individual object will be checked.
+When set to `:authorize`, permission to each individual object will be checked.
 
 Use the block syntax to add additional actions
 

@@ -20,20 +20,8 @@ EffectiveDatatables.setup do |config|
   # config.authorization_method = false
   config.authorization_method = Proc.new { |controller, action, resource| authorize!(action, resource) } # CanCanCan
 
-  # Date & DateTime Format
-  # By default, format Date and DateTime values with the following
-  config.date_format = '%Y-%m-%d'
-  config.datetime_format = '%Y-%m-%d %H:%M'
-
-  # Boolean format
-  # If :yes_no, display as yes_no instead of true/false
-  config.boolean_format = :yes_no
-
-  # Format integer columns with the following proc or function
-  config.integer_format = :number_with_delimiter
-
   # Default number of entries shown per page
-  # Valid options are: 10, 25, 50, 100, 250, 1000, :all
+  # Valid options are: 5, 10, 25, 50, 100, 250, 1000, :all
   config.default_length = 25
 
   # When using the actions_column DSL method, apply the following behavior
