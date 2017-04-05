@@ -2,11 +2,15 @@ module Effective
   module EffectiveDatatable
     module Resource
 
-      private
+      def admin_namespace?
+        controller_namespace == 'admin'
+      end
 
       def controller_namespace
         @attributes[:controller_namespace]
       end
+
+      private
 
       # This looks at all the columns and figures out the as:
       def load_resource!

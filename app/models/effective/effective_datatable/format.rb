@@ -92,7 +92,8 @@ module Effective
       end
 
       def actions_col_locals(opts)
-        return {} unless opts[:as] == :actions && active_record_collection?
+        return {} unless opts[:as] == :actions
+        return { show_path: false, edit_path: false, destroy_path: false } unless active_record_collection?
 
         locals = {}
 
