@@ -116,7 +116,7 @@ Here we just render the datatable:
 <%= render_datatable(@datatable) %>
 ```
 
-# Advanced Usage
+# Usage
 
 Once your controller and view are set up to render a datatable, the model is the central point to configure all behaviour.
 

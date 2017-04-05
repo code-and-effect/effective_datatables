@@ -19,7 +19,7 @@ module Effective
         # Anything done in the block, is purely a format on the after sorted/ordered value
         # the original object == the computed value, which is yielded to the format block
         # You can't do compute with .col
-        def col(name, action: nil, as: nil, col_class: nil, label: nil, partial: nil, responsive: 10000, search: {}, sort: true, sql_column: nil, th: nil, th_append: nil, visible: true, width: nil, &format)
+        def col(name, action: nil, as: nil, col_class: nil, label: nil, partial: nil, responsive: 10000, search: {}, sort: true, sql_column: nil, th: nil, th_append: nil, visible: true, &format)
           raise 'You cannot use partial: ... with the block syntax' if partial && block_given?
 
           datatable._columns[name.to_sym] = Effective::DatatableColumn.new(
@@ -39,13 +39,12 @@ module Effective
             th: th,
             th_append: th_append,
             visible: visible,
-            width: width
           )
         end
 
         # A val is a computed value that is then sorted/searched after the block is run
         # You can have another block by calling .format afterwards to work on the computed value itself
-        def val(name, action: nil, as: nil, col_class: nil, label: nil, partial: nil, responsive: 10000, search: {}, sort: true, sql_column: nil, th: nil, th_append: nil, visible: true, width: nil, &compute)
+        def val(name, action: nil, as: nil, col_class: nil, label: nil, partial: nil, responsive: 10000, search: {}, sort: true, sql_column: nil, th: nil, th_append: nil, visible: true, &compute)
           raise 'You cannot use partial: ... with the block syntax' if partial && block_given?
 
           datatable._columns[name.to_sym] = Effective::DatatableColumn.new(
@@ -65,7 +64,6 @@ module Effective
             th: th,
             th_append: th_append,
             visible: visible,
-            width: width
           )
         end
 
@@ -89,7 +87,6 @@ module Effective
             th: nil,
             th_append: nil,
             visible: true,
-            width: nil
           )
         end
 
@@ -113,7 +110,6 @@ module Effective
             th: nil,
             th_append: nil,
             visible: visible,
-            width: nil,
 
             show: show,
             edit: edit,
