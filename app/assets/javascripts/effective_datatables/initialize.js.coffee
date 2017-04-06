@@ -119,10 +119,11 @@ initializeDataTables = ->
           $.each values, (col, value) => $row.children().eq(col).html(value)
 
     drawCharts = ($table, charts) ->
-      $.each charts, (name, data) =>
-        $(".effective-datatables-chart[data-name='#{name}']").each (_, obj) =>
-          chart = new google.visualization[data['type']](obj)
-          chart.draw(google.visualization.arrayToDataTable(data['data']), data['options'])
+      if typeof(google) != 'undefined' && typeof(google.visualization) != 'undefined'
+        $.each charts, (name, data) =>
+          $(".effective-datatables-chart[data-name='#{name}']").each (_, obj) =>
+            chart = new google.visualization[data['type']](obj)
+            chart.draw(google.visualization.arrayToDataTable(data['data']), data['options'])
 
     # Appends the filter html, stored in the column definitions, into each column header
     initializeFilters = (api) ->
