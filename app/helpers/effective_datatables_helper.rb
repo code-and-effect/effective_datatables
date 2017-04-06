@@ -57,8 +57,7 @@ module EffectiveDatatablesHelper
     return unless datatable._charts[name].present?
 
     unless @effective_datatables_chart_javascript_rendered
-      concat javascript_include_tag('https://www.google.com/jsapi')
-      concat javascript_tag("if(google && google.visualization === undefined) { google.load('visualization', '1', {packages:#{EffectiveDatatables.google_chart_packages}}); }")
+      concat javascript_include_tag('https://www.gstatic.com/charts/loader.js', data: { 'turbolinks-track' => :reload, 'turbolinks-eval' => false })
 
       @effective_datatables_chart_javascript_rendered = true
     end
