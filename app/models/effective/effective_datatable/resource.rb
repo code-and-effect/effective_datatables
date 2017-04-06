@@ -24,26 +24,25 @@ module Effective
             case opts[:as]
             when *resource.macros
               opts[:resource] = Effective::Resource.new(resource.associated(name), namespace: controller_namespace)
+              opts[:sql_column] ||= name
             when Class
               if opts[:as].ancestors.include?(ActiveRecord::Base)
                 opts[:resource] = Effective::Resource.new(opts[:as], namespace: controller_namespace)
                 opts[:as] = :resource
+                opts[:sql_column] ||= name
               end
             when :effective_addresses
               opts[:resource] = Effective::Resource.new(resource.associated(name), namespace: controller_namespace)
+              opts[:sql_column] = :effective_addresses
             when :effective_roles
               opts[:sql_column] = :effective_roles
             when :string  # This is the fallback
               # Anything that doesn't belong to the model or the sql table, we assume is a SELECT SUM|AVG|RANK() as fancy
               if (resource.table && resource.column(name).blank?)
                 opts[:sql_as_column] = true
-                opts[:sql_column] = name
               end
             end
-
-            opts[:sql_column] ||= name if opts[:resource]
           end
-
         end
 
         if array_collection?
@@ -66,7 +65,7 @@ module Effective
           opts[:as] ||= :string
           opts[:as] = :email if (opts[:as] == :string && name == :email)
 
-          opts[:partial] ||= '/effective/datatables/resource_column' if opts[:resource]
+          opts[:partial] ||= '/effective/datatables/resource_column' if opts[:resource] && !opts[:as] == :effective_addresses
 
           opts[:col_class] = "col-#{opts[:as]} col-#{name.to_s.parameterize} #{opts[:col_class]}".strip
         end

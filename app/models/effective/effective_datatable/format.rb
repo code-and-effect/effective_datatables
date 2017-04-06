@@ -69,6 +69,8 @@ module Effective
           value
         when :duration
           view.number_to_duration(value) if value.present?
+        when :effective_addresses
+          value.to_html if value.present?
         when :effective_obfuscation
           value
         when :effective_roles
