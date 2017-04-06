@@ -65,7 +65,7 @@ module Effective
           opts[:as] ||= :string
           opts[:as] = :email if (opts[:as] == :string && name == :email)
 
-          opts[:partial] ||= '/effective/datatables/resource_column' if opts[:resource] && !opts[:as] == :effective_addresses
+          opts[:partial] ||= '/effective/datatables/resource_column' if (opts[:resource] && opts[:as] != :effective_addresses)
 
           opts[:col_class] = "col-#{opts[:as]} col-#{name.to_s.parameterize} #{opts[:col_class]}".strip
         end
