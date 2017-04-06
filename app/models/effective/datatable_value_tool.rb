@@ -75,6 +75,10 @@ module Effective
       term = Effective::Attribute.new(column[:as]).parse(value, name: column[:name])
       term_downcased = term.downcase if fuzzy && term.kind_of?(String)
 
+      if term == 'nil'
+        return (collection.select! { |row| row[index].nil? } || collection)
+      end
+
       # See effective_resources gem search() method # relation.rb
       collection.select! do |row|
         case column[:as]

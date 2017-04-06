@@ -14,7 +14,7 @@ module Effective
 
       # This looks at all the columns and figures out the as:
       def load_resource!
-        @resource = Effective::Resource.new([controller_namespace, collection_class.name].compact.join('/'))
+        @resource = Effective::Resource.new(collection_class, namespace: controller_namespace)
 
         if active_record_collection?
           columns.each do |name, opts|
@@ -23,12 +23,14 @@ module Effective
 
             case opts[:as]
             when *resource.macros
-              opts[:resource] = Effective::Resource.new(resource.associated(name))
+              opts[:resource] = Effective::Resource.new(resource.associated(name), namespace: controller_namespace)
             when Class
               if opts[:as].ancestors.include?(ActiveRecord::Base)
-                opts[:resource] = Effective::Resource.new(opts[:as])
+                opts[:resource] = Effective::Resource.new(opts[:as], namespace: controller_namespace)
                 opts[:as] = :resource
               end
+            when :effective_addresses
+              opts[:resource] = Effective::Resource.new(resource.associated(name), namespace: controller_namespace)
             when :effective_roles
               opts[:sql_column] = :effective_roles
             when :string  # This is the fallback
@@ -38,7 +40,10 @@ module Effective
                 opts[:sql_column] = name
               end
             end
+
+            opts[:sql_column] ||= name if opts[:resource]
           end
+
         end
 
         if array_collection?
@@ -46,11 +51,11 @@ module Effective
 
           columns.each do |name, opts|
             if opts[:as].kind_of?(Class) && opts[:as].ancestors.include?(ActiveRecord::Base)
-              opts[:resource] = Effective::Resource.new(opts[:as])
+              opts[:resource] = Effective::Resource.new(opts[:as], namespace: controller_namespace)
               opts[:as] = :resource
             elsif opts[:as] == nil
               if (value = Array(row[opts[:index]]).first).kind_of?(ActiveRecord::Base)
-                opts[:resource] = Effective::Resource.new(value)
+                opts[:resource] = Effective::Resource.new(value, namespace: controller_namespace)
                 opts[:as] = :resource
               end
             end
@@ -76,15 +81,17 @@ module Effective
           when false
             opts[:search] = { as: :null }; next
           when Symbol
-            opts[:search] = { as: search }
+            opts[:search] = { as: opts[:search] }
           when Array, ActiveRecord::Relation
-            opts[:search] = { collection: search }
+            opts[:search] = { collection: opts[:search] }
           end
 
           search = opts[:search]
 
           if search[:collection].kind_of?(ActiveRecord::Relation)
             search[:collection] = search[:collection].map { |obj| [obj.to_s, obj.to_param] }
+          elsif search[:collection].kind_of?(Array)
+            search[:collection].each { |obj| obj[1] = 'nil' if obj[1] == nil }
           end
 
           search[:as] ||= :select if (search.key?(:collection) && opts[:as] != :belongs_to_polymorphic)

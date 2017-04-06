@@ -5,4 +5,4 @@
     - elsif edit_path
       = link_to associated.to_s, send(edit_path, associated.to_param), title: associated.to_s
     - else
-      = associated
+      = associated.to_s.html_safe
