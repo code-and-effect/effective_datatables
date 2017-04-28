@@ -271,13 +271,34 @@ end
 
 ## The View
 
-The datatable, filter form and all all charts are rendered individually.  To render them all:
+Render the datatable with its filters and charts, all together:
 
 ```
 <h1>All Posts</h1>
-<%= render_datatable_charts(@datatable) %>
-<%= render_datatable_filters(@datatable) %>
 <%= render_datatable(@datatable) %>
+```
+
+or, the datatable, filter and charts may be rendered individually:
+
+```
+<h1>All Posts</h1>
+<p>
+  <%= render_datatable_filters(@datatable) %>
+</p>
+
+<p>
+  <%= render_datatable_charts(@datatable) %>
+</p>
+
+<p>
+<%= render_datatable(@datatable, charts: false, filters: false) %>
+</p>
+```
+
+or, to render a simple table, (without filters, charts, pagination, sorting, searching, export buttons, per page, or default visibility):
+
+```
+<%= render_datatable(@datatable, simple: true) %>
 ```
 
 # DSL
@@ -578,7 +599,7 @@ Creates a single form with fields for each `filter` and a single radio input fie
 
 The form is submitted by an AJAX POST action, or, in some advanced circumstances (see Dynamic Columns below) as a regular POST or even GET.
 
-Initialize the datatable in your controller or view, `@datatable = PostsDatatable.new(self)`, and render its filters anywhere by `<%= render_datatable_filters(@datatable) %>`.
+Initialize the datatable in your controller or view, `@datatable = PostsDatatable.new(self)`, and render its filters anywhere with `<%= render_datatable_filters(@datatable) %>`.
 
 ### scope
 
@@ -804,7 +825,7 @@ The following commands don't quite fit into the DSL, but are present nonetheless
 To render a simple table, without pagination, sorting, filtering, export buttons, per page, and default visibility:
 
 ```
-<%= render_simple_datatable(@datatable) %>
+<%= render_datatable(@datatable, simple: true) %>
 ```
 
 ### index
@@ -886,6 +907,22 @@ end
 
 The search and sort for each column will be merged together to form the final results.
 
+### Default search collection
+
+When using a `col :user` type belongs_to or has_many column, a search collection for that class will be loaded.
+
+Add the following to your related model to customize the search collection:
+
+```ruby
+class Comment < ApplicationRecord
+  scope :datatables_filter, -> { Comment.includes(:user) }
+end
+```
+
+Datatables will look for a `datatables_filter` scope, or `sorted` scope, or fallback to `all`.
+
+If there are more than 500 max records, the filter will fallback to a `as: :string`.
+
 ## Dynamic Column Count
 
 There are some extra steps to be taken if you want to change the number of columns based on `filters`.
@@ -961,11 +998,11 @@ Check whether the datatable has records by calling `@datatable.empty?` and `@dat
 The javascript options used to initialize a datatable can be overriden as follows:
 
 ```ruby
-render_datatable(@datatable, {dom: "<'row'<'col-sm-12'tr>>", autoWidth: true})
+render_datatable(@datatable, input_js: {dom: "<'row'<'col-sm-12'tr>>", autoWidth: true})
 ```
 
 ```ruby
-render_datatable(@datatable, { buttons_export_columns: ':visible:not(.col-actions)' })
+render_datatable(@datatable, input_js: { buttons_export_columns: ':visible:not(.col-actions)' })
 ```
 
 Please see [datatables options](https://datatables.net/reference/option/) for a list of initialization options.

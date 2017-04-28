@@ -1,7 +1,7 @@
 # These are expected to be called by a developer.  They are part of the datatables DSL.
 module EffectiveDatatablesHelper
 
-  def render_datatable(datatable, input_js_options = nil)
+  def render_datatable(datatable, input_js: {}, charts: true, filters: true, simple: false)
     raise 'expected datatable to be present' unless datatable
 
     datatable.view ||= self
@@ -12,24 +12,30 @@ module EffectiveDatatablesHelper
       return content_tag(:p, "You are not authorized to view this datatable. (cannot :index, #{datatable.collection_class})")
     end
 
-    render partial: 'effective/datatables/datatable',
-      locals: { datatable: datatable, input_js_options: input_js_options.try(:to_json) }
-  end
+    charts = charts && datatable._charts.present?
+    filters = filters && (datatable._scopes.present? || datatable._filters.present?)
 
-  def render_simple_datatable(datatable, input_js_options = nil)
-    raise 'expected datatable to be present' unless datatable
+    if (charts || filters) && !simple
+      output = ''.html_safe
 
-    datatable.view ||= self
-    datatable.attributes[:simple] = true
+      if charts
+        datatable._charts.each { |name, _| output += render_datatable_chart(datatable, name) }
+      end
 
-    begin
-      EffectiveDatatables.authorized?(controller, :index, datatable.collection_class) || raise(Effective::AccessDenied)
-    rescue Effective::AccessDenied => e
-      return content_tag(:p, "You are not authorized to view this datatable. (cannot :index, #{datatable.collection_class})})")
+      if filters
+        output += render_datatable_filters(datatable)
+      end
+
+      output + render(partial: 'effective/datatables/datatable',
+        locals: { datatable: datatable, input_js_options: (input_js || {}).to_json }
+      )
+    else
+      datatable.attributes[:simple] = true if simple
+
+      render(partial: 'effective/datatables/datatable',
+        locals: { datatable: datatable, input_js_options: (input_js || {}).to_json }
+      )
     end
-
-    render partial: 'effective/datatables/datatable',
-      locals: {datatable: datatable, input_js_options: input_js_options.try(:to_json) }
   end
 
   def render_datatable_filters(datatable)
