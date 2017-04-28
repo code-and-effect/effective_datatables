@@ -915,7 +915,7 @@ class TimeEntriesPerClientReport < Effective::Datatable
       col month.strftime('%b %Y'), as: :duration
     end
 
-    actions_column
+    actions_col
   end
 
   collection do

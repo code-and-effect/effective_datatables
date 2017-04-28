@@ -73,6 +73,13 @@ module Effective
         state[:scope] = scope_param if scope_param
       end
 
+      def fill_empty_filters!
+        state[:filter].each do |name, value|
+          next unless (value.nil? && _filters[name][:required])
+          state[:filter][name] = _filters[name][:value]
+        end
+      end
+
       def load_state!
         if datatables_ajax_request?
           load_filter_params!
@@ -84,6 +91,7 @@ module Effective
         end
 
         load_filter_params! unless datatables_ajax_request?
+        fill_empty_filters!
       end
 
       def load_ajax_state!
