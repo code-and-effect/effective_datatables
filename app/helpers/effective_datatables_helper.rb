@@ -19,16 +19,18 @@ module EffectiveDatatablesHelper
       output = ''.html_safe
 
       if charts
-        datatable._charts.each { |name, _| output += render_datatable_chart(datatable, name) }
+        datatable._charts.each { |name, _| output << render_datatable_chart(datatable, name) }
       end
 
       if filters
         output += render_datatable_filters(datatable)
       end
 
-      output + render(partial: 'effective/datatables/datatable',
+      output << render(partial: 'effective/datatables/datatable',
         locals: { datatable: datatable, input_js_options: (input_js || {}).to_json }
       )
+
+      output
     else
       datatable.attributes[:simple] = true if simple
 
