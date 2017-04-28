@@ -23,7 +23,7 @@ module EffectiveDatatablesHelper
       end
 
       if filters
-        output += render_datatable_filters(datatable)
+        output << render_datatable_filters(datatable)
       end
 
       output << render(partial: 'effective/datatables/datatable',
@@ -46,7 +46,12 @@ module EffectiveDatatablesHelper
     datatable.view ||= self
     return unless datatable._scopes.present? || datatable._filters.present?
 
-    render partial: 'effective/datatables/filters', locals: { datatable: datatable }
+    if datatable._filters_form_required?
+      render partial: 'effective/datatables/filters', locals: { datatable: datatable }
+    else
+      render(partial: 'effective/datatables/filters', locals: { datatable: datatable }).gsub('<form', '<div').gsub('/form>', '/div>').html_safe
+    end
+
   end
 
   def render_datatable_charts(datatable)

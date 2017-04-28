@@ -122,6 +122,11 @@ module Effective
       attributes[:simple] == true
     end
 
+    # Whether the filters must be rendered as a <form> or we can keep the normal <div> behaviour
+    def _filters_form_required?
+      _form[:verb].present?
+    end
+
     def table_html_class
       attributes[:class] || 'table table-bordered table-striped'
     end

@@ -60,15 +60,15 @@ initializeDataTables = ->
         api.columns().flatten().each (index) => params['columns'][index]['visible'] = api.column(index).visible()
 
         $table = $(api.table().node())
-        $form = $("form[aria-controls='#{$table.attr('id')}']").first()
+        $form = $(".effective-datatable-filters[aria-controls='#{$table.attr('id')}']").first()
 
         if $form.length > 0
-          params['scope'] = $form.find("input[name='scope']:checked").val() || ''
+          params['scope'] = $form.find("input[id^='filters_scope']:checked").val() || ''
           params['filter'] = {}
 
-          $form.find("[name^='filter']").each ->
+          $form.find("[id^='filters_']:not(input[id^='filters_scope'])").each ->
             $input = $(this)
-            params['filter'][$input.attr('name').substring(8, $input.attr('name').length-1)] = $input.val()
+            params['filter'][$input.attr('id').substring(8, $input.attr('id').length)] = $input.val()
 
       serverSide: true
       scrollCollapse: true
