@@ -3,20 +3,18 @@
     = simple_form_for :filters, url: (datatable._form[:url] || '#'), method: datatable._form[:verb], html: { class: 'form-inline' } do |form|
 
       - if datatable._scopes.present?
-        = form.input :scope, label: false, as: (defined?(EffectiveFormInputs) ? :effective_radio_buttons : :radio_buttons),
+        = form.input :scope, label: false, required: false, checked: datatable.state[:scope],
+          as: (defined?(EffectiveFormInputs) ? :effective_radio_buttons : :radio_buttons),
           collection: datatable._scopes.map { |name, opts| [opts[:label], name] },
-          checked: datatable.state[:scope],
           buttons: true,
-          required: false,
-          input_html: (datatable._filters_form_required? ? {name: name} : {name: nil})
+          input_html: ({name: nil} unless datatable._filters_form_required?)
 
       - datatable._filters.each do |name, opts|
-        = form.input name, label: opts[:label], value: datatable.state[:filter][name],
+        = form.input name, label: opts[:label], required: false, value: datatable.state[:filter][name],
           as: opts[:as],
-          required: false,
           collection: opts[:input_html].delete(:collection),
           multiple: opts[:input_html].delete(:multiple),
-          input_html: (datatable._filters_form_required? ? {name: name} : {name: nil}).merge(opts[:input_html])
+          input_html: (({name: nil} unless datatable._filters_form_required?) || {}).merge(opts[:input_html])
 
       - if datatable._filters_form_required?
         = form.button :submit, 'Apply', 'data-disable-with' => 'Applying...'

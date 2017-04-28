@@ -42,7 +42,7 @@ module EffectiveDatatablesPrivateHelper
       pattern: pattern,
       autocomplete: 'off',
       data: {'column-name' => name, 'column-index' => opts[:index]}
-    }.delete_if { |_, v| v.blank? }
+    }.delete_if { |k, v| v.blank? && k != :name }
 
     case opts[:search][:as]
     when :string, :text, :number

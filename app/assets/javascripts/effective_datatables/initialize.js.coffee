@@ -178,7 +178,7 @@ initializeDataTables = ->
 
     # Apply EffectiveFormInputs to the Show x per page dropdown
     if datatable.data('effective-form-inputs')
-      try table.closest('.dataTables_wrapper').find('.dataTables_length select').select2()
+      try table.closest('.dataTables_wrapper').find('.dataTables_length select').removeAttr('name').select2()
 
 destroyDataTables = ->
   $('table.effective-datatable').each ->
