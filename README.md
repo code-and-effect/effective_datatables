@@ -809,7 +809,7 @@ And then render each chart in your view:
 or all together
 
 ```
-<%= render_datatable_charts %>
+<%= render_datatable_charts(@datatable) %>
 ```
 
 All options passed to `chart` are used to initialize the chart javascript.
@@ -998,7 +998,7 @@ Check whether the datatable has records by calling `@datatable.empty?` and `@dat
 The javascript options used to initialize a datatable can be overriden as follows:
 
 ```ruby
-render_datatable(@datatable, input_js: {dom: "<'row'<'col-sm-12'tr>>", autoWidth: true})
+render_datatable(@datatable, input_js: { dom: "<'row'<'col-sm-12'tr>>", autoWidth: true })
 ```
 
 ```ruby
@@ -1006,6 +1006,8 @@ render_datatable(@datatable, input_js: { buttons_export_columns: ':visible:not(.
 ```
 
 Please see [datatables options](https://datatables.net/reference/option/) for a list of initialization options.
+
+You don't want to actually do this!
 
 ## Get access to the raw results
 
