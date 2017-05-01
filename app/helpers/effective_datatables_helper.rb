@@ -5,7 +5,6 @@ module EffectiveDatatablesHelper
     raise 'expected datatable to be present' unless datatable
 
     datatable.view ||= self
-    datatable.attributes[:simple] = true if simple
 
     begin
       EffectiveDatatables.authorized?(controller, :index, datatable.collection_class) || raise(Effective::AccessDenied)
@@ -15,6 +14,25 @@ module EffectiveDatatablesHelper
 
     charts = charts && datatable._charts.present?
     filters = filters && (datatable._scopes.present? || datatable._filters.present?)
+
+    effective_datatable_params = {
+      id: datatable.to_param,
+      class: datatable.table_html_class,
+      data: {
+        'effective-form-inputs' => defined?(EffectiveFormInputs),
+        'bulk-actions' => datatable_bulk_actions(datatable),
+        'columns' => datatable_columns(datatable),
+        'display-length' => datatable.display_length,
+        'display-order' => [datatable.order_index, datatable.order_direction].to_json(),
+        'display-records' => datatable.to_json[:recordsFiltered],
+        'display-start' => datatable.display_start,
+        'input-js-options' => (input_js || {}).to_json,
+        'reset' => datatable_reset(datatable),
+        'simple' => datatable.simple?.to_s,
+        'source' => effective_datatables.datatable_path(datatable, {format: 'json'}),
+        'total-records' => datatable.to_json[:recordsTotal]
+      }
+    }
 
     if (charts || filters) && !simple
       output = ''.html_safe
@@ -28,30 +46,12 @@ module EffectiveDatatablesHelper
       end
 
       output << render(partial: 'effective/datatables/datatable',
-        locals: { datatable: datatable, input_js_options: (input_js || {}).to_json }
+        locals: { datatable: datatable, effective_datatable_params: effective_datatable_params }
       )
 
       output
     else
-
-      effective_datatable_params = {
-        id: datatable.to_param,
-        class: datatable.table_html_class,
-        data: {
-          'effective-form-inputs' => defined?(EffectiveFormInputs),
-          'bulk-actions' => datatable_bulk_actions(datatable),
-          'columns' => datatable_columns(datatable),
-          'display-length' => datatable.display_length,
-          'display-order' => [datatable.order_index, datatable.order_direction].to_json(),
-          'display-records' => datatable.to_json[:recordsFiltered],
-          'display-start' => datatable.display_start,
-          'input-js-options' => (input_js || {}).to_json,
-          'reset' => datatable_reset(datatable),
-          'simple' => datatable.simple?.to_s,
-          'source' => effective_datatables.datatable_path(datatable, {format: 'json'}),
-          'total-records' => datatable.to_json[:recordsTotal]
-        }
-      }
+      datatable.attributes[:simple] = true if simple
 
       render(partial: 'effective/datatables/datatable',
         locals: { datatable: datatable, effective_datatable_params: effective_datatable_params }
