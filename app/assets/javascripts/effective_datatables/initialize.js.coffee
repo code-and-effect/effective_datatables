@@ -185,16 +185,10 @@ destroyDataTables = ->
     if $.fn.DataTable.fnIsDataTable(this)
       $(this).DataTable().destroy()
 
-anotherDestroy = ->
-  for settings in $.fn.dataTable.settings
-    $(settings.nTableWrapper).unbind('.DT').find(':not(tbody *)').unbind('.DT')
-    $(window).unbind('.DT-'+settings.sInstance)
-
-  $.fn.dataTable.settings.length = 0
-
 $ -> initializeDataTables()
 $(document).on 'page:change', -> initializeDataTables()
 $(document).on 'turbolinks:load', -> initializeDataTables()
+$(document).on 'turbolinks:render', -> initializeDataTables()
 $(document).on 'turbolinks:before-cache', -> destroyDataTables()
 
 
