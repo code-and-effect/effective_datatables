@@ -25,9 +25,10 @@ module Effective
       end
 
       def search_params
-        params.select { |name, value| columns.key?(name) && (name != :id) }
+        params.select do |name, value|
+          columns.key?(name) && (name != :id) && !value.kind_of?(Hash) && value.class.name != 'ActionController::Parameters'.freeze
+        end
       end
-
     end
   end
 end
