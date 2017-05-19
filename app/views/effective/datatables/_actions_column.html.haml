@@ -1,44 +1,11 @@
-:ruby
-  if show_action == :authorize_each
-    show_action = (EffectiveDatatables.authorized?(controller, :show, resource) rescue false)
-  elsif show_action.respond_to?(:call)
-    show_action = instance_exec(resource, &show_action)
-  end
+- if show_path
+  - if show_action == true || (EffectiveDatatables.authorized?(controller, :show, resource) rescue false)
+    = show_icon_to send(show_path, resource.to_param)
 
-  if edit_action == :authorize_each
-    edit_action = (EffectiveDatatables.authorized?(controller, :edit, resource) rescue false)
-  elsif edit_action.respond_to?(:call)
-    edit_action = instance_exec(resource, &edit_action)
-  end
+- if edit_path
+  - if edit_action == true || (EffectiveDatatables.authorized?(controller, :edit, resource) rescue false)
+    = edit_icon_to send(edit_path, resource.to_param)
 
-  if destroy_action == :authorize_each
-    destroy_action = (EffectiveDatatables.authorized?(controller, :destroy, resource) rescue false)
-  elsif destroy_action.respond_to?(:call)
-    destroy_action = instance_exec(resource, &destroy_action)
-  end
-
-  if unarchive_action == :authorize_each
-    unarchive_action = (EffectiveDatatables.authorized?(controller, :unarchive, resource) rescue false)
-  elsif unarchive_action.respond_to?(:call)
-    unarchive_action = instance_exec(resource, &unarchive_action)
-  end
-
-- if show_action && defined?(show_path)
-  = show_icon_to show_path.gsub(':to_param', resource.to_param)
-
-- if edit_action && defined?(edit_path)
-  = edit_icon_to edit_path.gsub(':to_param', resource.to_param)
-
-- if destroy_action && defined?(destroy_path)
-  - if resource.respond_to?(:archived?) && !resource.archived?
-    = archive_icon_to destroy_path.gsub(':to_param', resource.to_param)
-  - elsif resource.respond_to?(:archived?) == false
-    = destroy_icon_to destroy_path.gsub(':to_param', resource.to_param)
-
-- if unarchive_action && defined?(unarchive_path)
-  - if resource.respond_to?(:archived?) && resource.archived?
-    = unarchive_icon_to unarchive_path.gsub(':to_param', resource.to_param)
-
-- if actions_block
-  = capture do
-    - instance_exec(resource, &actions_block)
+- if destroy_path
+  - if destroy_action == true || (EffectiveDatatables.authorized?(controller, :destroy, resource) rescue false)
+    = destroy_icon_to send(destroy_path, resource.to_param)

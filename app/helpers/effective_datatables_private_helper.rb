@@ -1,112 +1,103 @@
-# These aren't expected to be called by a developer.
-# They are internal datatables methods, but you could still call them on the view.
+# These aren't expected to be called by a developer. They are internal methods.
 module EffectiveDatatablesPrivateHelper
-
-  def datatable_default_order(datatable)
-    [datatable.order_index, datatable.order_direction.downcase].to_json()
-  end
 
   # https://datatables.net/reference/option/columns
   def datatable_columns(datatable)
     form = nil
-    simple_form_for(:datatable_filter, url: '#', html: {id: "#{datatable.to_param}-form"}) { |f| form = f }
+    simple_form_for(:datatable_search, url: '#', html: {id: "#{datatable.to_param}-form"}) { |f| form = f }
 
-    datatable.table_columns.map do |name, options|
+    datatable.columns.map do |name, opts|
       {
-        name: options[:name],
-        title: content_tag(:span, options[:label], class: 'filter-label'),
-        className: options[:class],
-        width: options[:width],
-        responsivePriority: (options[:responsivePriority] || 10000),  # 10,000 is datatables default
-        sortable: (options[:sortable] && !datatable.simple?),
-        visible: (options[:visible].respond_to?(:call) ? datatable.instance_exec(&options[:visible]) : options[:visible]),
-        filterHtml: (datatable_header_filter(form, name, datatable.search_terms[name], options) unless datatable.simple?),
-        filterSelectedValue: options[:filter][:selected]
+        name: name,
+        title: content_tag(:span, opts[:label], class: 'search-label'),
+        className: opts[:col_class],
+        searchHtml: (datatable_search_html(form, name, datatable.state[:search][name], opts) unless datatable.simple?),
+        responsivePriority: opts[:responsive],
+        search: datatable.state[:search][name],
+        sortable: (opts[:sort] && !datatable.simple?),
+        visible: datatable.state[:visible][name],
       }
-    end.to_json()
+    end.to_json
   end
 
   def datatable_bulk_actions(datatable)
-    bulk_actions_column = datatable.table_columns.find { |_, options| options[:bulk_actions_column] }.try(:second)
-    return false unless bulk_actions_column
-
-    {
-      dropdownHtml: render(
-        partial: bulk_actions_column[:dropdown_partial],
-        locals: { datatable: datatable, dropdown_block: bulk_actions_column[:dropdown_block] }.merge(bulk_actions_column[:partial_locals])
-      )
-    }.to_json()
+    render(partial: '/effective/datatables/bulk_actions_dropdown', locals: { datatable: datatable }) if datatable._bulk_actions.present?
   end
 
-  def datatable_header_filter(form, name, value, opts)
-    return render(partial: opts[:header_partial], locals: {form: form, name: (opts[:label] || name), column: opts}) if opts[:header_partial].present?
+  def datatable_reset(datatable)
+    render(partial: '/effective/datatables/reset', locals: { datatable: datatable })
+  end
 
-    include_blank = opts[:filter].key?(:include_blank) ? opts[:filter][:include_blank] : (opts[:label] || name.titleize)
-    pattern = opts[:filter].key?(:pattern) ? opts[:filter][:pattern] : nil
-    placeholder = (opts[:filter][:placeholder] || '')
-    title = opts[:filter].key?(:title) ? opts[:filter][:title] : (opts[:label] || name.titleize)
-    wrapper_html = { class: 'datatable_filter' }
+  def datatable_search_html(form, name, value, opts)
+    include_blank = opts[:search].key?(:include_blank) ? opts[:search][:include_blank] : opts[:label]
+    pattern = opts[:search][:pattern]
+    placeholder = opts[:search][:placeholder] || ''
+    title = opts[:search][:title] || opts[:label]
+    wrapper_html = { class: 'datatable_search' }
 
-    case opts[:filter][:as]
+    input_html = {
+      name: nil,
+      value: value,
+      title: title,
+      pattern: pattern,
+      autocomplete: 'off',
+      data: {'column-name' => name, 'column-index' => opts[:index]}
+    }.delete_if { |k, v| v.blank? && k != :name }
+
+    case opts[:search][:as]
     when :string, :text, :number
       form.input name, label: false, required: false, value: value,
         as: :string,
         placeholder: placeholder,
         wrapper_html: wrapper_html,
-        input_html: { name: nil, value: value, title: title, pattern: pattern, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} }
-    when :obfuscated_id
-      pattern ||= '[0-9]{3}-?[0-9]{4}-?[0-9]{3}'
-      title = opts[:filter].key?(:title) ? opts[:filter][:title] : 'Expected format: XXX-XXXX-XXX'
+        input_html: input_html
+    when :effective_obfuscation
+      input_html[:pattern] ||= '[0-9]{3}-?[0-9]{4}-?[0-9]{3}'
+      input_html[:title] = 'Expected format: XXX-XXXX-XXX'
 
       form.input name, label: false, required: false, value: value,
         as: :string,
-        placeholder: placeholder.presence || '###-####-###',
+        placeholder: placeholder,
         wrapper_html: wrapper_html,
-        input_html: { name: nil, value: value, title: title, pattern: pattern, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} }
-    when :date
+        input_html: input_html
+    when :date, :datetime
       form.input name, label: false, required: false, value: value,
         as: (ActionView::Helpers::FormBuilder.instance_methods.include?(:effective_date_picker) ? :effective_date_picker : :string),
         placeholder: placeholder,
         wrapper_html: wrapper_html,
         input_group: false,
-        input_html: { name: nil, value: value, title: title, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} },
+        input_html: input_html,
         input_js: { useStrict: true, keepInvalid: true }
-    when :datetime
-      form.input name, label: false, required: false, value: value,
-        as: (ActionView::Helpers::FormBuilder.instance_methods.include?(:effective_date_time_picker) ? :effective_date_time_picker : :string),
-        placeholder: placeholder,
-        wrapper_html: wrapper_html,
-        input_group: false,
-        input_html: { name: nil, value: value, title: title, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} },
-        input_js: { useStrict: true, keepInvalid: true } # Keep invalid format like "2015-11" so we can still filter by year, month or day
+        # Keep invalid format like "2015-11" so we can still search by year, month or day
     when :select, :boolean
       form.input name, label: false, required: false, value: value,
         as: (ActionView::Helpers::FormBuilder.instance_methods.include?(:effective_select) ? :effective_select : :select),
-        collection: opts[:filter][:collection],
-        selected: opts[:filter][:selected],
-        multiple: opts[:filter][:multiple] == true,
+        collection: opts[:search][:collection],
+        selected: opts[:search][:value],
+        multiple: opts[:search][:multiple] == true,
         include_blank: include_blank,
         wrapper_html: wrapper_html,
-        input_html: { name: nil, value: value, title: title, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} },
+        input_html: input_html,
         input_js: { placeholder: placeholder }
     when :grouped_select
       form.input name, label: false, required: false, value: value,
         as: (ActionView::Helpers::FormBuilder.instance_methods.include?(:effective_select) ? :effective_select : :grouped_select),
-        collection: opts[:filter][:collection],
-        selected: opts[:filter][:selected],
-        multiple: opts[:filter][:multiple] == true,
-        include_blank: include_blank,
+        collection: opts[:search][:collection],
+        selected: opts[:search][:value],
+        multiple: opts[:search][:multiple] == true,
         grouped: true,
-        polymorphic: opts[:filter][:polymorphic] == true,
-        group_label_method: opts[:filter][:group_label_method] || :first,
-        group_method: opts[:filter][:group_method] || :last,
+        polymorphic: opts[:search][:polymorphic] == true,
+        group_label_method: opts[:search][:group_label_method] || :first,
+        group_method: opts[:search][:group_method] || :last,
         wrapper_html: wrapper_html,
-        input_html: { name: nil, value: value, title: title, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index]} },
+        input_html: input_html,
         input_js: { placeholder: placeholder }
-    when :bulk_actions_column
+    when :bulk_actions
+      input_html[:data]['role'] = 'bulk-actions-all'
+
       form.input name, label: false, required: false, value: nil,
         as: :boolean,
-        input_html: { name: nil, value: nil, autocomplete: 'off', data: {'column-name' => opts[:name], 'column-index' => opts[:index], 'role' => 'bulk-actions-all'} }
+        input_html: input_html
     end
   end
 

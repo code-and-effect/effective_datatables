@@ -1,7 +1,7 @@
 # These are expected to be called by a developer.  They are part of the datatables DSL.
 module EffectiveDatatablesHelper
 
-  def render_datatable(datatable, input_js_options = nil)
+  def render_datatable(datatable, input_js: {}, charts: true, filters: true, simple: false)
     raise 'expected datatable to be present' unless datatable
 
     datatable.view ||= self
@@ -12,121 +12,86 @@ module EffectiveDatatablesHelper
       return content_tag(:p, "You are not authorized to view this datatable. (cannot :index, #{datatable.collection_class})")
     end
 
-    render partial: 'effective/datatables/datatable',
-      locals: { datatable: datatable, input_js_options: input_js_options.try(:to_json) }
+    charts = charts && datatable._charts.present?
+    filters = filters && (datatable._scopes.present? || datatable._filters.present?)
+
+    effective_datatable_params = {
+      id: datatable.to_param,
+      class: datatable.table_html_class,
+      data: {
+        'effective-form-inputs' => defined?(EffectiveFormInputs),
+        'bulk-actions' => datatable_bulk_actions(datatable),
+        'columns' => datatable_columns(datatable),
+        'display-length' => datatable.display_length,
+        'display-order' => [datatable.order_index, datatable.order_direction].to_json(),
+        'display-records' => datatable.to_json[:recordsFiltered],
+        'display-start' => datatable.display_start,
+        'input-js-options' => (input_js || {}).to_json,
+        'reset' => datatable_reset(datatable),
+        'simple' => datatable.simple?.to_s,
+        'source' => effective_datatables.datatable_path(datatable, {format: 'json'}),
+        'total-records' => datatable.to_json[:recordsTotal]
+      }
+    }
+
+    if (charts || filters) && !simple
+      output = ''.html_safe
+
+      if charts
+        datatable._charts.each { |name, _| output << render_datatable_chart(datatable, name) }
+      end
+
+      if filters
+        output << render_datatable_filters(datatable)
+      end
+
+      output << render(partial: 'effective/datatables/datatable',
+        locals: { datatable: datatable, effective_datatable_params: effective_datatable_params }
+      )
+
+      output
+    else
+      datatable.attributes[:simple] = true if simple
+
+      render(partial: 'effective/datatables/datatable',
+        locals: { datatable: datatable, effective_datatable_params: effective_datatable_params }
+      )
+    end
   end
 
-  def render_simple_datatable(datatable, input_js_options = nil)
+  def render_datatable_filters(datatable)
     raise 'expected datatable to be present' unless datatable
 
     datatable.view ||= self
-    datatable.simple = true
+    return unless datatable._scopes.present? || datatable._filters.present?
 
-    begin
-      EffectiveDatatables.authorized?(controller, :index, datatable.collection_class) || raise(Effective::AccessDenied)
-    rescue Effective::AccessDenied => e
-      return content_tag(:p, "You are not authorized to view this datatable. (cannot :index, #{datatable.collection_class})})")
+    if datatable._filters_form_required?
+      render partial: 'effective/datatables/filters', locals: { datatable: datatable }
+    else
+      render(partial: 'effective/datatables/filters', locals: { datatable: datatable }).gsub('<form', '<div').gsub('/form>', '/div>').html_safe
     end
 
-    render partial: 'effective/datatables/datatable',
-      locals: {datatable: datatable, input_js_options: input_js_options.try(:to_json) }
-  end
-
-  def render_datatable_scopes(datatable)
-    raise 'expected datatable to be present' unless datatable
-
-    return unless datatable.scopes.present?
-    datatable.view ||= self
-
-    render partial: 'effective/datatables/scopes', locals: { datatable: datatable }
   end
 
   def render_datatable_charts(datatable)
     raise 'expected datatable to be present' unless datatable
 
-    return unless datatable.charts.present?
     datatable.view ||= self
+    return unless datatable._charts.present?
 
-    datatable.charts.map { |name, _| render_datatable_chart(datatable, name) }.join.html_safe
+    datatable._charts.map { |name, _| render_datatable_chart(datatable, name) }.join.html_safe
   end
 
   def render_datatable_chart(datatable, name)
     raise 'expected datatable to be present' unless datatable
 
-    return unless datatable.charts.present?
-    return unless datatable.charts[name].present?
     datatable.view ||= self
+    return unless datatable._charts[name].present?
 
-    options = datatable.charts[name]
-    chart = datatable.to_json[:charts][name]
+    chart = datatable._charts[name]
+    chart_data = datatable.to_json[:charts][name][:data]
 
-    render partial: (options[:partial] || 'effective/datatables/chart'),
-      locals: { datatable: datatable, chart: chart }
+    render partial: chart[:partial], locals: { datatable: datatable, chart: chart, chart_data: chart_data }
   end
-
-  def datatables_admin_path?
-    @datatables_admin_path ||= (
-      path = request.path.to_s.downcase.chomp('/') + '/'
-      referer = request.referer.to_s.downcase.chomp('/') + '/'
-      (attributes[:admin_path] || referer.include?('/admin/') || path.include?('/admin/')) rescue false
-    )
-  end
-
-  # TODO: Improve on this
-  def datatables_active_admin_path?
-    attributes[:active_admin_path] rescue false
-  end
-
-  ### Icon Helpers for actions_column or elsewhere
-  def show_icon_to(path, options = {})
-    glyphicon_to('eye-open', path, {title: 'Show'}.merge(options))
-  end
-
-  def edit_icon_to(path, options = {})
-    glyphicon_to('edit', path, {title: 'Edit'}.merge(options))
-  end
-
-  def destroy_icon_to(path, options = {})
-    defaults = {title: 'Destroy', data: {method: :delete, confirm: 'Delete this item?'}}
-    glyphicon_to('trash', path, defaults.merge(options))
-  end
-
-  def archive_icon_to(path, options = {})
-    defaults = {title: 'Archive', data: {method: :delete, confirm: 'Archive this item?'}}
-    glyphicon_to('trash', path, defaults.merge(options))
-  end
-
-  def unarchive_icon_to(path, options = {})
-    defaults = {title: 'Unarchive', data: {confirm: 'Unarchive this item?'}}
-    glyphicon_to('retweet', path, defaults.merge(options))
-  end
-
-  def settings_icon_to(path, options = {})
-    glyphicon_to('cog', path, {title: 'Settings'}.merge(options))
-  end
-
-  def ok_icon_to(path, options = {})
-    glyphicon_to('ok', path, {title: 'OK'}.merge(options))
-  end
-
-  def approve_icon_to(path, options = {})
-    glyphicon_to('ok', path, {title: 'Approve'}.merge(options))
-  end
-
-  def remove_icon_to(path, options = {})
-    glyphicon_to('remove', path, {title: 'Remove'}.merge(options))
-  end
-
-  def glyphicon_to(icon, path, options = {})
-    content_tag(:a, options.merge(href: path)) do
-      if icon.start_with?('glyphicon-')
-        content_tag(:span, '', class: "glyphicon #{icon}")
-      else
-        content_tag(:span, '', class: "glyphicon glyphicon-#{icon}")
-      end
-    end
-  end
-  alias_method :bootstrap_icon_to, :glyphicon_to
-  alias_method :glyph_icon_to, :glyphicon_to
 
 end

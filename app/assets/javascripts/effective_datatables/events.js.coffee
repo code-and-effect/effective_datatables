@@ -11,3 +11,10 @@ $(document).on 'column-visibility.dt', (event, settings, index, state) ->
       $.event.trigger('page:change')
     , 700)
   )
+
+# Remove empty label (bulk actions) from ColVis dropdown
+$(document).on 'click.dtb-collection', (event) ->
+  $colvis = $('.dt-button-collection:not(.initialized)')
+  return if $colvis.length == 0
+
+  $colvis.addClass('initialized').find('li > a:empty').each -> $(this).parent().remove()

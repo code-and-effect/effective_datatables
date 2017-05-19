@@ -15,7 +15,7 @@ module EffectiveDatatables
     end
 
     # Set up our default configuration options.
-    initializer "effective_datatables.defaults", :before => :load_config_initializers do |app|
+    initializer 'effective_datatables.defaults', before: :load_config_initializers do |app|
       eval File.read("#{config.root}/config/effective_datatables.rb")
     end
 

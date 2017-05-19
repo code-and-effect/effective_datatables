@@ -1,19 +1,25 @@
-# These are Class level methods.
-
 module Effective
   module EffectiveDatatable
     module Dsl
 
-      def datatable(&block)
-        define_method('initialize_datatable') { instance_exec(&block) }
-      end
-
-      def scopes(&block)
-        define_method('initialize_scopes') { instance_exec(&block) }
+      def bulk_actions(&block)
+        define_method('initialize_bulk_actions') { dsl_tool.instance_exec(&block) }
       end
 
       def charts(&block)
-        define_method('initialize_charts') { instance_exec(&block) }
+        define_method('initialize_charts') { dsl_tool.instance_exec(&block) }
+      end
+
+      def collection(&block)
+        define_method('initialize_collection') { self._collection = dsl_tool.instance_exec(&block) }
+      end
+
+      def datatable(&block)
+        define_method('initialize_datatable') { dsl_tool.instance_exec(&block) }
+      end
+
+      def filters(&block)
+        define_method('initialize_filters') { dsl_tool.instance_exec(&block) }
       end
 
     end

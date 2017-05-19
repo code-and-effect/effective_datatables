@@ -1,36 +1,18 @@
-:ruby
-  effective_datatable_params = {
-    id: "#{datatable.to_param}-table-#{Time.zone.now.nsec}",
-    class: "#{datatable.table_html_class}",
-    data: {
-      'effective-form-inputs' => defined?(EffectiveFormInputs),
-      'bulk-actions' => datatable_bulk_actions(datatable),
-      'columns' => datatable_columns(datatable),
-      'input-js-options' => local_assigns[:input_js_options],
-      'simple' => datatable.simple?.to_s,
-      'source' => effective_datatables.datatable_path(datatable, {format: 'json'}.merge(attributes: datatable.attributes)).chomp('?'),
-      'default-order' => datatable_default_order(datatable),
-      'display-entries' => datatable.display_entries,
-      'display-records' => (datatable.to_json[:recordsFiltered] || 0),
-      'total-records' => (datatable.to_json[:recordsTotal] || 0)
-    }
-  }
-
 %table.effective-datatable{effective_datatable_params}
   %thead
-    - if datatable.table_columns.any? { |_, opts| opts[:th].present? } == false
+    - if datatable.columns.any? { |_, opts| opts[:th].present? } == false
       %tr
-        - datatable.table_columns.each do |name, opts|
+        - datatable.columns.each do |name, opts|
           %th= opts[:label] || name
     - else
-      - max_depth = datatable.table_columns.map { |_, opts| opts[:th].try(:[], :depth) || 0 }.max
+      - max_depth = datatable.columns.map { |_, opts| opts[:th].try(:[], :depth) || 0 }.max
       - [*0..max_depth].each do |depth|
         %tr
-          - table_columns = datatable.table_columns.select { |_, opts| (opts[:th].try(:[], :depth) || 0) == depth }
-          - table_columns.each do |name, opts|
+          - columns = datatable.columns.select { |_, opts| (opts[:th].try(:[], :depth) || 0) == depth }
+          - columns.each do |name, opts|
             %th{(opts[:th] || {}).merge(title: (opts[:label] || name))}
               = opts[:label] || name
-            - (opts[:append_th] || []).each do |faux_col|
+            - (opts[:th_append] || []).each do |faux_col|
               %th{(faux_col[:th] || {}).merge(title: faux_col[:label])}
                 = faux_col[:label]
 
@@ -40,7 +22,7 @@
         - row.each do |col|
           %td= col.to_s.html_safe
 
-  - if datatable.aggregates.present?
+  - if datatable.to_json[:aggregates].present?
     %tfoot
       - datatable.to_json[:aggregates].each do |row|
         %tr

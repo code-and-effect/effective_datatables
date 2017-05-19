@@ -3,9 +3,8 @@
     Bulk Actions
     %span.caret
   %ul.dropdown-menu
-    - if dropdown_block.respond_to?(:call)
-      = capture do
-        - instance_exec(&dropdown_block)
+    - if datatable._bulk_actions.present?
+      = datatable._bulk_actions.join.html_safe
     - else
       %li
         %a{href: '#'} No bulk actions

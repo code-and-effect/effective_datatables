@@ -3,17 +3,15 @@ module Effective
     module Dsl
       module Charts
         # Instance Methods inside the charts do .. end block
-        def chart(name, type, options = {}, &block)
+        def chart(name, as = 'BarChart', label: nil, legend: true, partial: nil, **options, &compute)
+          raise 'expected a block returning an Array of Arrays' unless block_given?
 
-          options[:title] ||= (options[:label] || name.to_s.titleize)
-          options[:legend] = 'none' if options[:legend] == false
-
-          (@charts ||= HashWithIndifferentAccess.new)[name] = {
+          datatable._charts[name.to_sym] = {
+            as: as,
+            compute: compute,
             name: name,
-            type: type,
-            partial: options.delete(:partial),
-            options: options,
-            block: (block if block_given?)
+            options: { label: (label || name.to_s.titleize), legend: (legend || 'none') }.merge(options),
+            partial: partial || '/effective/datatables/chart'
           }
         end
       end
