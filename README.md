@@ -20,6 +20,8 @@ Works with postgres, mysql, sqlite3 and arrays.
 
 This is the 3.0 release of effective_datatables.  It's a complete rewrite, with a similar but totally changed DSL.
 
+[Effective Datatables 2.0 README](https://github.com/code-and-effect/effective_datatables/tree/2.12.2)
+
 Previous versions of the gem were excellent, but the 3.0 release has stepped things up.
 
 Internally, all columns now have separate compute and format methods, removing the need for a ton of internal parsing and type conversions.
