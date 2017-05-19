@@ -21,6 +21,9 @@ module Effective
       end
 
       def save_cookie!
+        todelete = view.cookies.map { |name, value| name if (name.start_with?('datatable-') && name != cookie_name) }.compact
+        todelete.each { |name| view.cookies.delete(name) }
+
         view.cookies.signed[cookie_name] = Base64.encode64(Marshal.dump(attributes: attributes, state: state))
       end
 
