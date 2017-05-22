@@ -3,7 +3,7 @@ module Effective
     module Cookie
 
       def cookie
-        (@cookie ||= {})[cookie_name]
+        @cookie
       end
 
       def cookie_name
@@ -13,14 +13,15 @@ module Effective
       private
 
       def load_cookie!
-        @cookie = view.cookies.signed['_effective_dt']
+        @dt_cookie = view.cookies.signed['_effective_dt']
 
-        if @cookie.present?
-          @cookie = Marshal.load(Base64.decode64(@cookie))
-          raise 'invalid cookie' unless @cookie.kind_of?(Hash)
+        if @dt_cookie.present?
+          @dt_cookie = Marshal.load(Base64.decode64(@dt_cookie))
+          raise 'invalid datatables cookie' unless @dt_cookie.kind_of?(Array)
 
-          if @cookie[cookie_name].present?
-            @cookie[cookie_name] = initial_state.keys.zip(@cookie[cookie_name]).to_h
+          if (index = @dt_cookie.rindex { |name, _| name == cookie_name })
+            @cookie = @dt_cookie.delete_at(index)
+            @cookie = initial_state.keys.zip(@cookie.second).to_h if @cookie.kind_of?(Array)
           end
         end
 
@@ -28,12 +29,12 @@ module Effective
       end
 
       def save_cookie!
-        @cookie ||= {}
-        @cookie[cookie_name] = _cookie_to_save
+        @dt_cookie ||= []
+        @dt_cookie << [cookie_name, _cookie_to_save]
 
-        Rails.logger.info "SAVING COOKIE (#{@cookie.keys.length} TABLES): #{@cookie}"
+        Rails.logger.info "SAVING COOKIE (#{@dt_cookie.length} TABLES): #{@dt_cookie}"
 
-        view.cookies.signed['_effective_dt'] = Base64.encode64(Marshal.dump(@cookie))
+        view.cookies.signed['_effective_dt'] = Base64.encode64(Marshal.dump(@dt_cookie))
       end
 
       def _cookie_to_save

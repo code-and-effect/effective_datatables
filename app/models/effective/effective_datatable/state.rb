@@ -82,7 +82,6 @@ module Effective
       end
 
       def load_state!
-        binding.pry
         if datatables_ajax_request?
           load_filter_params!
           load_ajax_state!
