@@ -16,8 +16,7 @@ module Effective
     # The collection itself. Only evaluated once.
     attr_accessor :_collection
 
-    # The view, and the ajax/cookie/default state
-    attr_reader :cookie
+    # The view
     attr_reader :view
 
     extend Effective::EffectiveDatatable::Dsl

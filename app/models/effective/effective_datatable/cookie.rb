@@ -2,6 +2,10 @@ module Effective
   module EffectiveDatatable
     module Cookie
 
+      def cookie
+        (@cookie ||= {})[cookie_name]
+      end
+
       def cookie_name
         @cookie_name ||= "datatable-#{URI(datatables_ajax_request? ? view.request.referer : view.request.url).path}-#{to_param}".parameterize
       end
@@ -9,22 +13,24 @@ module Effective
       private
 
       def load_cookie!
-        @cookie ||= (
-          cookie = view.cookies.signed[cookie_name]
+        @cookie = view.cookies.signed['_effective_dt']
 
-          if cookie.present?
-            data = Marshal.load(Base64.decode64(cookie))
-            raise 'invalid cookie' unless [data, data[:attributes], data[:state]].all? { |obj| obj.kind_of?(Hash) }
-            data
-          end
-        )
+        if @cookie.present?
+          @cookie = Marshal.load(Base64.decode64(@cookie))
+          raise 'invalid cookie' unless @cookie.kind_of?(Hash)
+        end
+
+        Rails.logger.info "LOADED COOKIE: #{@cookie}"
+
       end
 
       def save_cookie!
-        todelete = view.cookies.map { |name, value| name if (name.start_with?('datatable-') && name != cookie_name) }.compact
-        todelete.each { |name| view.cookies.delete(name) }
+        @cookie ||= {}
+        @cookie[cookie_name] = { attributes: attributes, state: state }
 
-        view.cookies.signed[cookie_name] = Base64.encode64(Marshal.dump(attributes: attributes, state: state))
+        Rails.logger.info "SAVING COOKIE: #{@cookie}"
+
+        view.cookies.signed['_effective_dt'] = Base64.encode64(Marshal.dump(@cookie))
       end
 
     end
