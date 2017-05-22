@@ -158,13 +158,12 @@ module Effective
           visible_mask = state[:visible] # bitmask
           state[:visible] = {}
 
-          columns.each do |name, opts|
-            state[:visible][name] = (visible_mask & (2 ** opts[:index])) != 0
+          columns.each { |name, opts| state[:visible][name] = (visible_mask & (2 ** opts[:index])) != 0 }
           end
+        elsif state[:visible].kind_of?(Hash)
+          columns.each { |name, opts| state[:visible][name] = opts[:visible] unless state[:visible].key?(name) }
         else
-          columns.each do |name, opts|
-            state[:visible][name] = opts[:visible] unless state[:visible].key?(name)
-          end
+          columns.each { |name, opts| state[:visible][name] = opts[:visible] }
         end
 
         unless datatables_ajax_request?

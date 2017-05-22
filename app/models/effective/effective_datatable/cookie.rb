@@ -7,7 +7,7 @@ module Effective
       end
 
       def cookie_name
-        @cookie_name ||= "datatable-#{URI(datatables_ajax_request? ? view.request.referer : view.request.url).path}-#{to_param}".parameterize
+        @cookie_name ||= "#{URI(datatables_ajax_request? ? view.request.referer : view.request.url).path}-#{to_param}".parameterize
       end
 
       private
@@ -36,8 +36,12 @@ module Effective
       def _cookie_to_save
         payload = { attributes: attributes.dup, state: state.dup }
 
-        # Turn visible into a bitmask
-        payload[:state][:visible] = columns.keys.map { |name| (2 ** columns[name][:index]) if state[:visible][name] }.compact.sum
+        # Turn visible into a bitmask.  This is undone in load_columns!
+        payload[:state][:visible] = (
+          if columns.keys.length < 63 # 64-bit integer
+            columns.keys.map { |name| (2 ** columns[name][:index]) if state[:visible][name] }.compact.sum
+          end
+        )
 
         payload
       end
