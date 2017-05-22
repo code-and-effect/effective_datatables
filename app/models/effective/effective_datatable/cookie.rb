@@ -1,13 +1,20 @@
 module Effective
   module EffectiveDatatable
     module Cookie
+      MAX_COOKIE_SIZE = 2500  # String size. Real byte size is about 1.5 times bigger.
 
       def cookie
         @cookie
       end
 
       def cookie_name
-        @cookie_name ||= "#{URI(datatables_ajax_request? ? view.request.referer : view.request.url).path}-#{to_param}".parameterize
+        @cookie_name ||= (
+          if datatables_ajax_request?
+            view.params[:cookie]
+          else
+            [self.class, attributes].hash.to_s.last(12)
+          end
+        )
       end
 
       private
@@ -15,29 +22,34 @@ module Effective
       def load_cookie!
         @dt_cookie = view.cookies.signed['_effective_dt']
 
+        # Load global datatables cookie
         if @dt_cookie.present?
           @dt_cookie = Marshal.load(Base64.decode64(@dt_cookie))
           raise 'invalid datatables cookie' unless @dt_cookie.kind_of?(Array)
 
-          if (index = @dt_cookie.rindex { |name, _| name == cookie_name })
-            @cookie = @dt_cookie.delete_at(index)
-            @cookie = initial_state.keys.zip(@cookie.second).to_h if @cookie.kind_of?(Array)
-          end
+          # Assign individual cookie
+          index = @dt_cookie.rindex { |name, _| name == cookie_name }
+          @cookie = @dt_cookie.delete_at(index)
         end
 
-        Rails.logger.info "LOADED COOKIE: #{@cookie}"
+        # Load my individual cookie
+        if @cookie.kind_of?(Array)
+          @cookie = initial_state.keys.zip(@cookie.second).to_h
+        end
       end
 
       def save_cookie!
         @dt_cookie ||= []
-        @dt_cookie << [cookie_name, _cookie_to_save]
+        @dt_cookie << [cookie_name, cookie_payload]
 
-        Rails.logger.info "SAVING COOKIE (#{@dt_cookie.length} TABLES): #{@dt_cookie}"
+        while @dt_cookie.to_s.size > MAX_COOKIE_SIZE
+          @dt_cookie.shift((@dt_cookie.length / 3) + 1)
+        end
 
         view.cookies.signed['_effective_dt'] = Base64.encode64(Marshal.dump(@dt_cookie))
       end
 
-      def _cookie_to_save
+      def cookie_payload
         payload = state.except(:attributes)
 
         # Turn visible into a bitmask.  This is undone in load_columns!
@@ -48,9 +60,7 @@ module Effective
         )
 
         # Just store the values
-        payload = [attributes.delete_if { |k, v| v.nil? }] + payload.values
-
-        payload
+        [attributes.delete_if { |k, v| v.nil? }] + payload.values
       end
 
     end
