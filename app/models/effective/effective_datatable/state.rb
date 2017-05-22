@@ -50,6 +50,7 @@ module Effective
       # This is called first.  Our initial state is set.
       def initial_state
         {
+          attributes: {},
           filter: {},
           length: nil,
           order_name: nil,
@@ -81,10 +82,11 @@ module Effective
       end
 
       def load_state!
+        binding.pry
         if datatables_ajax_request?
           load_filter_params!
           load_ajax_state!
-        elsif cookie.present? && cookie[:state][:params] == params.length
+        elsif cookie.present? && cookie[:params] == params.length
           load_cookie_state!
         else
           # Nothing to do for default state
@@ -123,11 +125,11 @@ module Effective
           state[:filter][name] = parse_filter_value(_filters[name], value)
         end
 
-        state[:params] = cookie[:state][:params]
+        state[:params] = cookie[:params]
       end
 
       def load_cookie_state!
-        @state = cookie[:state]
+        @state = cookie
       end
 
       def load_columns!
@@ -157,13 +159,10 @@ module Effective
         if state[:visible].kind_of?(Integer)
           visible_mask = state[:visible] # bitmask
           state[:visible] = {}
-
           columns.each { |name, opts| state[:visible][name] = (visible_mask & (2 ** opts[:index])) != 0 }
-          end
-        elsif state[:visible].kind_of?(Hash)
-          columns.each { |name, opts| state[:visible][name] = opts[:visible] unless state[:visible].key?(name) }
         else
-          columns.each { |name, opts| state[:visible][name] = opts[:visible] }
+          state[:visible] = {} unless state[:visible].kind_of?(Hash)
+          columns.each { |name, opts| state[:visible][name] = opts[:visible] unless state[:visible].key?(name) }
         end
 
         unless datatables_ajax_request?

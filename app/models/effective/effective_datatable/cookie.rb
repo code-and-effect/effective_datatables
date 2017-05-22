@@ -18,30 +18,36 @@ module Effective
         if @cookie.present?
           @cookie = Marshal.load(Base64.decode64(@cookie))
           raise 'invalid cookie' unless @cookie.kind_of?(Hash)
+
+          if @cookie[cookie_name].present?
+            @cookie[cookie_name] = initial_state.keys.zip(@cookie[cookie_name]).to_h
+          end
         end
 
         Rails.logger.info "LOADED COOKIE: #{@cookie}"
-
       end
 
       def save_cookie!
         @cookie ||= {}
         @cookie[cookie_name] = _cookie_to_save
 
-        Rails.logger.info "SAVING COOKIE: #{@cookie}"
+        Rails.logger.info "SAVING COOKIE (#{@cookie.keys.length} TABLES): #{@cookie}"
 
         view.cookies.signed['_effective_dt'] = Base64.encode64(Marshal.dump(@cookie))
       end
 
       def _cookie_to_save
-        payload = { attributes: attributes.dup, state: state.dup }
+        payload = state.except(:attributes)
 
         # Turn visible into a bitmask.  This is undone in load_columns!
-        payload[:state][:visible] = (
+        payload[:visible] = (
           if columns.keys.length < 63 # 64-bit integer
             columns.keys.map { |name| (2 ** columns[name][:index]) if state[:visible][name] }.compact.sum
           end
         )
+
+        # Just store the values
+        payload = [attributes] + payload.values
 
         payload
       end
