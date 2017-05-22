@@ -29,7 +29,7 @@ module Effective
 
           # Assign individual cookie
           index = @dt_cookie.rindex { |name, _| name == cookie_name }
-          @cookie = @dt_cookie.delete_at(index)
+          @cookie = @dt_cookie.delete_at(index) if index
         end
 
         # Load my individual cookie
