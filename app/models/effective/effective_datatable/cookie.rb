@@ -26,11 +26,20 @@ module Effective
 
       def save_cookie!
         @cookie ||= {}
-        @cookie[cookie_name] = { attributes: attributes, state: state }
+        @cookie[cookie_name] = _cookie_to_save
 
         Rails.logger.info "SAVING COOKIE: #{@cookie}"
 
         view.cookies.signed['_effective_dt'] = Base64.encode64(Marshal.dump(@cookie))
+      end
+
+      def _cookie_to_save
+        payload = { attributes: attributes.dup, state: state.dup }
+
+        # Turn visible into a bitmask
+        payload[:state][:visible] = columns.keys.map { |name| (2 ** columns[name][:index]) if state[:visible][name] }.compact.sum
+
+        payload
       end
 
     end

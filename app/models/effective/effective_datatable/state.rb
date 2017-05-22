@@ -153,8 +153,18 @@ module Effective
           end
         end
 
-        columns.each do |name, opts|
-          state[:visible][name] = opts[:visible] unless state[:visible].key?(name)
+        # Load cookie bitmask
+        if state[:visible].kind_of?(Integer)
+          visible_mask = state[:visible] # bitmask
+          state[:visible] = {}
+
+          columns.each do |name, opts|
+            state[:visible][name] = (visible_mask & (2 ** opts[:index])) != 0
+          end
+        else
+          columns.each do |name, opts|
+            state[:visible][name] = opts[:visible] unless state[:visible].key?(name)
+          end
         end
 
         unless datatables_ajax_request?
