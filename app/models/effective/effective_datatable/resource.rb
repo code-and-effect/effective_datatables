@@ -7,7 +7,7 @@ module Effective
       end
 
       def controller_namespace
-        @attributes[:controller_namespace]
+        @attributes[:_n]
       end
 
       private

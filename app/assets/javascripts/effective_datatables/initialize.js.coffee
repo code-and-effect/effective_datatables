@@ -62,6 +62,8 @@ initializeDataTables = ->
         $table = $(api.table().node())
         $form = $(".effective-datatable-filters[aria-controls='#{$table.attr('id')}']").first()
 
+        params['cookie'] = $table.data('cookie')
+
         if $form.length > 0
           params['scope'] = $form.find("input[id^='filters_scope']:checked").val() || ''
           params['filter'] = {}

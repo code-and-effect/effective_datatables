@@ -22,6 +22,7 @@ module EffectiveDatatablesHelper
         'effective-form-inputs' => defined?(EffectiveFormInputs),
         'bulk-actions' => datatable_bulk_actions(datatable),
         'columns' => datatable_columns(datatable),
+        'cookie' => datatable.cookie_name,
         'display-length' => datatable.display_length,
         'display-order' => [datatable.order_index, datatable.order_direction].to_json(),
         'display-records' => datatable.to_json[:recordsFiltered],
