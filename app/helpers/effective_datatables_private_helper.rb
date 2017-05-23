@@ -17,15 +17,17 @@ module EffectiveDatatablesPrivateHelper
         sortable: (opts[:sort] && !datatable.simple?),
         visible: datatable.state[:visible][name],
       }
-    end.to_json
+    end.to_json.html_safe
   end
 
   def datatable_bulk_actions(datatable)
-    render(partial: '/effective/datatables/bulk_actions_dropdown', locals: { datatable: datatable }) if datatable._bulk_actions.present?
+    if datatable._bulk_actions.present?
+      render(partial: '/effective/datatables/bulk_actions_dropdown', locals: { datatable: datatable }).gsub("'", '"').html_safe
+    end
   end
 
   def datatable_reset(datatable)
-    render(partial: '/effective/datatables/reset', locals: { datatable: datatable })
+    render(partial: '/effective/datatables/reset', locals: { datatable: datatable }).gsub("'", '"').html_safe
   end
 
   def datatable_search_html(form, name, value, opts)
