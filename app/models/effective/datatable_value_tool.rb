@@ -125,7 +125,10 @@ module Effective
     end
 
     def paginate(collection)
-      Kaminari.paginate_array(collection).page(datatable.page).per(datatable.per_page)
+      page = [datatable.page.to_i - 1, 0].max
+      per_page = datatable.per_page.to_i
+
+      collection[(page * per_page)...((page * per_page) + per_page)]
     end
 
     def size(collection)
