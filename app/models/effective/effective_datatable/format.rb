@@ -52,6 +52,8 @@ module Effective
       end
 
       def format_column(value, column)
+        return if value.nil?
+
         case column[:as]
         when :boolean
           case value
@@ -60,23 +62,23 @@ module Effective
           when String ; value
           end
         when :currency
-          view.number_to_currency(value) if value.present?
+          view.number_to_currency(value)
         when :date
-          (value.strftime('%F') rescue BLANK) if value.present?
+          (value.strftime('%F') rescue BLANK)
         when :datetime
-          (value.strftime('%F %H:%M') rescue BLANK) if value.present?
+          (value.strftime('%F %H:%M') rescue BLANK)
         when :decimal
           value
         when :duration
-          view.number_to_duration(value) if value.present?
+          view.number_to_duration(value)
         when :effective_addresses
-          value.to_html if value.present?
+          value.to_html
         when :effective_obfuscation
           value
         when :effective_roles
           value.join(', ')
         when :email
-          view.mail_to(value) if value.present?
+          view.mail_to(value)
         when :integer
           value
         when :percentage
@@ -86,8 +88,11 @@ module Effective
           when String     ; value
           end
         when :price
-          raise 'column type: price expects an Integer representing the number of cents' unless value.kind_of?(Integer)
-          view.number_to_currency(value / 100.0) if value.present?
+          case value
+          when Integer    ; view.number_to_currency(value / 100.0) # an Integer representing the number of cents
+          when Numeric    ; view.number_to_currency(value)
+          when String     ; value
+          end
         else
           value.to_s
         end
