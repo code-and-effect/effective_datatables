@@ -863,7 +863,7 @@ datatable do
   end.search do |collection, term, column, sql_column|
     # collection is an ActiveRecord scoped collection
     # term is the incoming PostCategory ID as per the search
-    # column is this column's attributes Hash
+    # column is this column's options Hash
     # sql_column is the column[:sql_column]
     categories = current_user.post_categories.where(id: term.to_i)
 
@@ -911,13 +911,13 @@ The search and sort for each column will be merged together to form the final re
 
 ### Default search collection
 
-When using a `col :user` type belongs_to or has_many column, a search collection for that class will be loaded.
+When using a `col :comments` type belongs_to or has_many column, a search collection for that class will be loaded.
 
 Add the following to your related model to customize the search collection:
 
 ```ruby
 class Comment < ApplicationRecord
-  scope :datatables_filter, -> { Comment.includes(:user) }
+  scope :datatables_filter, -> { includes(:user) }
 end
 ```
 
@@ -993,7 +993,7 @@ There are a few other ways to customize the behaviour of effective_datatables
 
 ## Checking for Empty collection
 
-Check whether the datatable has records by calling `@datatable.empty?` and `@datatable.present?`.
+Check whether the datatable has records by calling `@datatable.present?` and `@datatable.blank?`.
 
 ## Override javascript options
 
