@@ -89,6 +89,8 @@ module Effective
 
           if search[:collection].kind_of?(ActiveRecord::Relation)
             search[:collection] = search[:collection].map { |obj| [obj.to_s, obj.to_param] }
+          elsif search[:collection].kind_of?(Array) && search[:collection].first.kind_of?(ActiveRecord::Base)
+            search[:collection] = search[:collection].map { |obj| [obj.to_s, obj.to_param] }
           elsif search[:collection].kind_of?(Array)
             search[:collection].each { |obj| obj[1] = 'nil' if obj[1] == nil }
           end
