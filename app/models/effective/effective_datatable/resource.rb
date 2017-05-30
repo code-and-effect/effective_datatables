@@ -93,6 +93,8 @@ module Effective
             search[:collection].each { |obj| obj[1] = 'nil' if obj[1] == nil }
           end
 
+          search[:value] ||= search.delete(:selected) if search.key?(:selected)
+
           search[:as] ||= :select if (search.key?(:collection) && opts[:as] != :belongs_to_polymorphic)
           search[:fuzzy] = true unless search.key?(:fuzzy)
 

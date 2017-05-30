@@ -142,7 +142,7 @@ initializeDataTables = ->
         $th = $(api.column(index).header())
         settings = api.settings()[0].aoColumns[index] # column specific settings
 
-        if settings.search && ('' + settings.search).length > 0 # Assign preselected values
+        if settings.search != null # Assign preselected values
           api.settings()[0].aoPreSearchCols[index].sSearch = settings.search
 
         if settings.searchHtml  # Append the search html and initialize input events

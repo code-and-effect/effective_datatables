@@ -38,7 +38,4 @@ EffectiveDatatables.setup do |config|
     destroy: true,
   }
 
-  # Which packages to load when using the charts DSL
-  config.google_chart_packages = ['corechart']
-
 end

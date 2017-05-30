@@ -148,9 +148,9 @@ module Effective
         # Set default order direction
         state[:order_dir] ||= ['_at', '_on', 'date'].any? { |str| order_name.to_s.end_with?(str) } ? :desc : :asc
 
-        if state[:search].blank?
+        if state[:search].blank? && !datatables_ajax_request?
           columns.each do |name, opts|
-            state[:search][name] = opts[:search][:value] if opts[:search].kind_of?(Hash) && opts[:search].key?(:value)
+            state[:search][name] = opts[:search][:value] if (opts[:search] || {}).key?(:value)
           end
         end
 
