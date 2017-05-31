@@ -40,7 +40,7 @@ module Effective
     end
 
     def order_column(collection, direction, column, sql_column)
-      Rails.logger.info "COLUMN TOOL: order_column #{column.to_s} #{direction} #{sql_column}"
+      Rails.logger.info "COLUMN TOOL: order_column #{column.to_s} #{direction} #{sql_column}" if EffectiveDatatables.debug
 
       if column[:sql_as_column]
         collection.order("#{sql_column} #{datatable.resource.sql_direction(direction)}")
@@ -73,7 +73,7 @@ module Effective
     end
 
     def search_column(collection, value, column, sql_column)
-      Rails.logger.info "COLUMN TOOL: search_column #{column.to_s} #{value} #{sql_column}"
+      Rails.logger.info "COLUMN TOOL: search_column #{column.to_s} #{value} #{sql_column}" if EffectiveDatatables.debug
 
       Effective::Resource.new(collection)
         .search(column[:name], value, as: column[:as], fuzzy: column[:search][:fuzzy], sql_column: sql_column)

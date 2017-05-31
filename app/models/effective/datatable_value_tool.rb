@@ -37,7 +37,7 @@ module Effective
     end
 
     def order_column(collection, direction, column, index)
-      Rails.logger.info "VALUE TOOL: order_column :#{column.to_s} :#{direction} #{index}"
+      Rails.logger.info "VALUE TOOL: order_column :#{column.to_s} :#{direction} #{index}" if EffectiveDatatables.debug
 
       if direction == :asc
         collection.sort! do |x, y|
@@ -69,7 +69,7 @@ module Effective
     end
 
     def search_column(collection, value, column, index)
-      Rails.logger.info "VALUE TOOL: search_column #{column.to_s} #{value} #{index}"
+      Rails.logger.info "VALUE TOOL: search_column #{column.to_s} #{value} #{index}" if EffectiveDatatables.debug
 
       fuzzy = column[:search][:fuzzy]
       term = Effective::Attribute.new(column[:as]).parse(value, name: column[:name])

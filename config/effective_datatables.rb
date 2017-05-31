@@ -38,4 +38,7 @@ EffectiveDatatables.setup do |config|
     destroy: true,
   }
 
+  # Log search/sort information to the console
+  config.debug = false
+
 end
