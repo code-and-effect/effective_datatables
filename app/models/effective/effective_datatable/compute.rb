@@ -81,6 +81,8 @@ module Effective
         cols = collection.transpose
 
         _aggregates.map do |_, aggregate|
+          aggregate[:labeled] = false
+
           columns.map do |name, opts|
             next if state[:visible][name] == false && datatables_ajax_request?
 
@@ -88,17 +90,18 @@ module Effective
 
             if state[:visible][name] == false
               BLANK
+            elsif opts[:aggregate]
+              dsl_tool.instance_exec(values, columns[name], &opts[:aggregate])
             elsif aggregate[:compute]
               dsl_tool.instance_exec(values, columns[name], &aggregate[:compute])
             else
               format_column(aggregate_column(values, opts, aggregate), opts)
-            end
+            end || BLANK
           end.compact
         end
       end
 
       def aggregate_column(values, column, aggregate)
-        labeled = false
         length = values.length
         values = values.reject { |value| value.nil? }
 
@@ -111,21 +114,17 @@ module Effective
           if values.all? { |value| value.kind_of?(Numeric) }
             values.sum
           elsif values.all? { |value| value == true || value == false }
-            "#{values.count { |val| val == true }} / #{values.count { |val| val == false}}"
-          elsif !labeled
-            labeled = aggregate[:label]
-          elsif values.any? { |value| value.kind_of?(String) == false }
-            "#{values.flatten.count} total"
+            "#{values.count { |val| val == true }} &bull; #{values.count { |val| val == false}}"
+          elsif aggregate[:labeled] == false
+            aggregate[:labeled] = aggregate[:label]
           end
         when :average
           if values.all? { |value| value.kind_of?(Numeric) }
             values.sum / [length, 1].max
           elsif values.all? { |value| value == true || value == false }
             values.count { |val| val == true } >= (length / 2) ? true : false
-          elsif !labeled
-            labeled = aggregate[:label]
-          elsif values.any? { |value| value.kind_of?(String) == false }
-            '-'
+          elsif aggregate[:labeled] == false
+            aggregate[:labeled] = aggregate[:label]
           end
         else
           raise 'not implemented'

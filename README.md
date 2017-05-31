@@ -593,6 +593,14 @@ aggregate :average_as_percentage do |values, column|
 end
 ```
 
+You can also override an individual columns aggregate calculation as follows:
+
+```ruby
+col :created_at, label: 'Created' do |post|
+  time_ago_in_words(post.created_at)
+end.aggregate { |values, column| distance_of_time_in_words(values.min, values.max) }
+```
+
 In the above example, `values` is an Array containing all row's values for one column at a time.
 
 ## filters

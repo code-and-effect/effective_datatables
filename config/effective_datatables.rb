@@ -39,6 +39,6 @@ EffectiveDatatables.setup do |config|
   }
 
   # Log search/sort information to the console
-  config.debug = false
+  config.debug = true
 
 end

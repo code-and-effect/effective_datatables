@@ -54,12 +54,15 @@ module Effective
       def format_column(value, column)
         return if value.nil?
 
+        unless column[:as] == :email
+          return value if value.kind_of?(String)
+        end
+
         case column[:as]
         when :boolean
           case value
           when true   ; 'Yes'
           when false  ; 'No'
-          when String ; value
           end
         when :currency
           view.number_to_currency(value)
@@ -85,13 +88,11 @@ module Effective
           case value
           when Integer    ; "#{value}%"
           when Numeric    ; view.number_to_percentage(value * 100, precision: 2)
-          when String     ; value
           end
         when :price
           case value
           when Integer    ; view.number_to_currency(value / 100.0) # an Integer representing the number of cents
           when Numeric    ; view.number_to_currency(value)
-          when String     ; value
           end
         else
           value.to_s

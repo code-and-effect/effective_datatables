@@ -12,6 +12,10 @@ module Effective
       self[:name]
     end
 
+    def aggregate(&block)
+      @attributes[:aggregate] = block; self
+    end
+
     def format(&block)
       @attributes[:format] = block; self
     end
