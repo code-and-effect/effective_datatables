@@ -90,6 +90,10 @@ module Effective
 
             if state[:visible][name] == false
               BLANK
+            elsif [:bulk_actions, :actions].include?(opts[:as])
+              BLANK
+            elsif values.length == 0
+              BLANK
             elsif opts[:aggregate]
               dsl_tool.instance_exec(values, columns[name], &opts[:aggregate])
             elsif aggregate[:compute]
@@ -105,13 +109,11 @@ module Effective
         length = values.length
         values = values.reject { |value| value.nil? }
 
-        if [:bulk_actions, :actions].include?(column[:as]) || length == 0
-          return BLANK
-        end
-
         case aggregate[:name]
         when :total
-          if values.all? { |value| value.kind_of?(Numeric) }
+          if [:percentage].include?(column[:as])
+            BLANK
+          elsif values.all? { |value| value.kind_of?(Numeric) }
             values.sum
           elsif values.all? { |value| value == true || value == false }
             "#{values.count { |val| val == true }} &bull; #{values.count { |val| val == false}}"
