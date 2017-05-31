@@ -69,7 +69,7 @@ module Effective
             elsif array_collection?
               obj[opts[:index]]
             elsif opts[:sql_as_column]
-              obj[name] || obj.send(name)
+              obj[name] || (obj.send(name) if obj.respond_to?(name))
             else
               obj.send(name)
             end

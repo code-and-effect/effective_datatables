@@ -98,7 +98,8 @@ module Effective
           search[:value] ||= search.delete(:selected) if search.key?(:selected)
 
           search[:as] ||= :select if (search.key?(:collection) && opts[:as] != :belongs_to_polymorphic)
-          search[:fuzzy] = true unless search.key?(:fuzzy)
+
+          search[:fuzzy] = (opts[:sql_as_column] != true) unless search.key?(:fuzzy)
 
           if array_collection? && opts[:resource].present?
             search.reverse_merge!(resource.search_form_field(name, collection.first[opts[:index]]))
