@@ -69,6 +69,7 @@ module EffectiveDatatablesPrivateHelper
         wrapper_html: wrapper_html,
         input_group: false,
         input_html: input_html,
+        date_linked: false,
         input_js: { useStrict: true, keepInvalid: true }
         # Keep invalid format like "2015-11" so we can still search by year, month or day
     when :select, :boolean
