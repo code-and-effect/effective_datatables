@@ -173,7 +173,7 @@ initializeDataTables = ->
 
     if simple
       init_options['dom'] = "<'row'<'col-sm-12'tr>>" # Just show the table
-      datatable.addClass('sort-hidden')
+      datatable.addClass('sort-hidden search-hidden')
 
     # Let's actually initialize the table now
     table = datatable.dataTable(jQuery.extend(init_options, input_js_options))

@@ -42,6 +42,8 @@ table.dataTable.sort-hidden thead .sorting { background-image: none; }
 table.dataTable.sort-hidden thead .sorting_asc { background-image: none; }
 table.dataTable.sort-hidden thead .sorting_desc { background-image: none; }
 
+table.dataTable.search-hidden thead .form-group { display: none; }
+
 // Filter bar
 table.dataTable .form-group { width: 100%; margin-left: 0px; margin-right: 0px; }
 table.dataTable select { width: 100%; }
