@@ -24,6 +24,9 @@ EffectiveDatatables.setup do |config|
   # Valid options are: 5, 10, 25, 50, 100, 250, 1000, :all
   config.default_length = 25
 
+  # Default class used on the <table> tag
+  config.html_class = 'table table-bordered table-striped'
+
   # When using the actions_column DSL method, apply the following behavior
   # Valid values for each action are:
   # true - display this action if authorized?(:show, Post)

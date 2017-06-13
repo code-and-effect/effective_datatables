@@ -127,7 +127,7 @@ module Effective
     end
 
     def table_html_class
-      attributes[:class] || 'table table-bordered table-striped'
+      attributes[:class] || EffectiveDatatables.html_class
     end
 
     def to_param

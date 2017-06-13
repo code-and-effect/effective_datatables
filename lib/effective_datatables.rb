@@ -7,6 +7,8 @@ module EffectiveDatatables
   mattr_accessor :authorization_method
 
   mattr_accessor :default_length
+  mattr_accessor :html_class
+
   mattr_accessor :actions_column # A Hash
   mattr_accessor :debug
 

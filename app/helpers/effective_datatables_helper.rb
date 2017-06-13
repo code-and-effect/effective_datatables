@@ -17,7 +17,7 @@ module EffectiveDatatablesHelper
 
     effective_datatable_params = {
       id: datatable.to_param,
-      class: datatable.table_html_class,
+      class: Array(datatable.table_html_class).join(' '),
       data: {
         'effective-form-inputs' => defined?(EffectiveFormInputs),
         'bulk-actions' => datatable_bulk_actions(datatable),
