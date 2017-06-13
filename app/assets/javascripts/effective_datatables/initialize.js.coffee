@@ -3,7 +3,7 @@ initializeDataTables = ->
     return if $.fn.DataTable.fnIsDataTable(this)
 
     datatable = $(this)
-    simple = (datatable.data('simple') == true)
+    simple = ('' + datatable.data('simple') == 'true')
     input_js_options = datatable.data('input-js-options') || {}
     buttons_export_columns = input_js_options['buttons_export_columns'] || ':not(.col-actions)'
 

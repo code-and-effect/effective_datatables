@@ -150,7 +150,8 @@ module Effective
 
         if state[:search].blank? && !datatables_ajax_request?
           columns.each do |name, opts|
-            state[:search][name] = opts[:search][:value] if (opts[:search] || {}).key?(:value)
+            next unless opts[:search].kind_of?(Hash) && opts[:search].key?(:value)
+            state[:search][name] = opts[:search][:value]
           end
         end
 

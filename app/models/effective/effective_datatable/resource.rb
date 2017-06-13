@@ -83,6 +83,10 @@ module Effective
             opts[:search] = { as: opts[:search] }
           when Array, ActiveRecord::Relation
             opts[:search] = { collection: opts[:search] }
+          when Hash
+            # Nothing
+          else
+            raise "column #{name} unexpected search value"
           end
 
           search = opts[:search]
@@ -93,6 +97,8 @@ module Effective
             search[:collection] = search[:collection].map { |obj| [obj.to_s, obj.to_param] }
           elsif search[:collection].kind_of?(Array)
             search[:collection].each { |obj| obj[1] = 'nil' if obj[1] == nil }
+          elsif search[:collection].kind_of?(Hash)
+            search[:collection].each { |k, v| search[:collection][k] = 'nil' if v == nil }
           end
 
           search[:value] ||= search.delete(:selected) if search.key?(:selected)

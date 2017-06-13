@@ -41,6 +41,7 @@ A lot has changed. See below for full details.
 # Getting Started
 
 ```ruby
+gem 'haml-rails'            # or try using gem 'hamlit-rails'
 gem 'effective_datatables'
 ```
 
@@ -312,6 +313,8 @@ As well, a datatable can be initialized with `attributes`.
 ## attributes
 
 When initialized with a Hash, that hash is available throughout the entire datatable as `attributes`.
+
+You can call the attributes from within the datatable as `attributes` or within a partial/view as `@datatable.attributes`.
 
 These attributes are serialized and stored in an encrypted cookie. Objects won't work. Keep it simple.
 
