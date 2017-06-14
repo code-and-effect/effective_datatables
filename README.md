@@ -861,7 +861,9 @@ The built-in search and ordering can be overridden on a per-column basis.
 
 The only gotcha here is that you must be aware of the type of collection.
 
-In the case of a `col` and an ActiveRecord-based collection:
+### With ActiveRecord collection
+
+In the case of a `col` and an ActiveRecord collection:
 
 ```ruby
 collection do
@@ -885,7 +887,15 @@ datatable do
 end
 ```
 
-And in the case of a `col` with an Array-based collection, or any `val`:
+If you run into issues where `collection` here is an Array, you're probably using some joins in your `collection do ... end block`.
+
+If `column[:sql_column].blank?` then this `col` is being treated as an array.
+
+Try adding `col :post_category, sql_column: 'post_categories.title'`
+
+### With Array collection
+
+And in the case of a `col` with an Array collection, or any `val`:
 
 ```ruby
 collection do
