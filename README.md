@@ -887,9 +887,9 @@ datatable do
 end
 ```
 
-If you run into issues where `collection` here is an Array, you're probably using some joins in your `collection do ... end block`.
+If you run into issues where `collection` here is an Array, you're probably using some joins in your `collection do ... end` block.
 
-If `column[:sql_column].blank?` then this `col` is being treated as an array.
+If `column[:sql_column].blank?` then this `col` has fallen back to being a `val`.
 
 Try adding `col :post_category, sql_column: 'post_categories.title'`
 
