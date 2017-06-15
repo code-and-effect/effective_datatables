@@ -1,7 +1,11 @@
-$(document).on 'click', 'a.buttons-reset-cookie', (event) ->
-  event.preventDefault()
+$(document).on 'click', 'a.buttons-reset-search', (event) ->
+  event.preventDefault() # prevent the click
 
-  $obj = $(event.currentTarget)
-  $obj.find('span').text('Resetting...')
-  document.cookie = "_effective_dt=; expires=Thu, 01-Jan-70 00:00:01 GMT; path=/"
-  location.reload()
+  $table = $(event.currentTarget).closest('.dataTables_wrapper').find('table.dataTable').first()
+  $thead = $table.children('thead').first()
+
+  $thead.find('input').val('').removeAttr('checked').removeAttr('selected')
+  $thead.find('select').val('').trigger('change.select2')
+
+  $table.DataTable().search('').columns().search('').draw()
+
