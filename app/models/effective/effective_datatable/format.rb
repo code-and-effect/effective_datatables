@@ -151,7 +151,7 @@ module Effective
           if (EffectiveDatatables.authorized?(view.controller, :edit, resource.klass) rescue false)
             locals[:edit_path] = resource.edit_path(check: true)
           elsif (EffectiveDatatables.authorized?(view.controller, :show, resource.klass) rescue false)
-            locals[:show_path] = resource.show(check: true)
+            locals[:show_path] = resource.show_path(check: true)
           end
         end
 
