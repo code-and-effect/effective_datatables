@@ -37,6 +37,10 @@ module Effective
         state[:search]
       end
 
+      def offset
+        [(page - 1), 0].max * per_page
+      end
+
       def page
         state[:start].to_i / state[:length] + 1
       end
@@ -44,6 +48,7 @@ module Effective
       def per_page
         state[:length]
       end
+      alias_method :limit, :per_page
 
       private
 

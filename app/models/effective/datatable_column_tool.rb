@@ -80,7 +80,7 @@ module Effective
     end
 
     def paginate(collection)
-      collection.page(datatable.page).per(datatable.per_page)
+      collection.limit(datatable.limit).offset(datatable.offset)
     end
 
     # Not every ActiveRecord query will work when calling the simple .count

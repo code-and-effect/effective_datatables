@@ -116,7 +116,7 @@ module Effective
           if fuzzy
             row[index].to_s.downcase.include?(term_downcased)
           else
-            row[index] == term
+            row[index].to_s == term.to_s
           end
         else
           row[index] == term
