@@ -24,12 +24,12 @@ module Effective
             case opts[:as]
             when *resource.macros
               opts[:resource] = Effective::Resource.new(resource.associated(name), namespace: controller_namespace)
-              opts[:sql_column] ||= name
+              (opts[:sql_column] = name) if opts[:sql_column].nil?
             when Class
               if opts[:as].ancestors.include?(ActiveRecord::Base)
                 opts[:resource] = Effective::Resource.new(opts[:as], namespace: controller_namespace)
                 opts[:as] = :resource
-                opts[:sql_column] ||= name
+                (opts[:sql_column] = name) if opts[:sql_column].nil?
               end
             when :effective_addresses
               opts[:resource] = Effective::Resource.new(resource.associated(name), namespace: controller_namespace)
