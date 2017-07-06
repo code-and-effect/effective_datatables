@@ -42,7 +42,6 @@ module EffectiveDatatablesPrivateHelper
       value: value,
       title: title,
       pattern: pattern,
-      autocomplete: 'off',
       data: {'column-name' => name, 'column-index' => opts[:index]}
     }.delete_if { |k, v| v.blank? && k != :name }
 
@@ -77,21 +76,10 @@ module EffectiveDatatablesPrivateHelper
         as: (ActionView::Helpers::FormBuilder.instance_methods.include?(:effective_select) ? :effective_select : :select),
         collection: opts[:search][:collection],
         selected: opts[:search][:value],
-        multiple: opts[:search][:multiple] == true,
+        multiple: opts[:search][:multiple],
+        grouped: opts[:search][:grouped],
+        polymorphic: opts[:search][:polymorphic],
         include_blank: include_blank,
-        wrapper_html: wrapper_html,
-        input_html: input_html,
-        input_js: { placeholder: placeholder }
-    when :grouped_select
-      form.input name, label: false, required: false, value: value,
-        as: (ActionView::Helpers::FormBuilder.instance_methods.include?(:effective_select) ? :effective_select : :grouped_select),
-        collection: opts[:search][:collection],
-        selected: opts[:search][:value],
-        multiple: opts[:search][:multiple] == true,
-        grouped: true,
-        polymorphic: opts[:search][:polymorphic] == true,
-        group_label_method: opts[:search][:group_label_method] || :first,
-        group_method: opts[:search][:group_method] || :last,
         wrapper_html: wrapper_html,
         input_html: input_html,
         input_js: { placeholder: placeholder }
