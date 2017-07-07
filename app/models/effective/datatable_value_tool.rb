@@ -73,7 +73,7 @@ module Effective
 
       fuzzy = column[:search][:fuzzy]
       term = Effective::Attribute.new(column[:as]).parse(value, name: column[:name])
-      term_downcased = term.downcase if fuzzy && term.kind_of?(String)
+      term_downcased = term.to_s.downcase
       macros = Effective::Resource.new('').macros
 
       if term == 'nil'
@@ -104,21 +104,21 @@ module Effective
             row[index] == term
           end
         when *macros, :resource
-          Array(row[index]).any? do |resource|
-            if column[:as] != :resource
-              resource = resource.send(column[:name])
+          resources = Array(column[:as] == :resource ? row[index] : row[index].send(column[:name]))
+          terms = Array(term)
+
+          resources.any? do |resource|
+            terms.any? do |term|
+              matched = false
+
+              if term.kind_of?(Integer) && resource.respond_to?(:to_param)
+                matched = (resource.id == term || resource.to_param == term)
+              end
+
+              matched ||= (fuzzy ? resource.to_s.downcase.include?(term.to_s.downcase) : resource.to_s == term)
             end
-
-            matched = false
-
-            if term.kind_of?(Integer) && resource.respond_to?(:id)
-              matched ||= (resource.id == term || resource.to_param == term)
-            elsif term.kind_of?(Array) && resource.respond_to?(:id)
-              matched ||= term.any? { |term| resource.id == term || resource.to_param == term || resource.to_param == value }
-            end
-
-            matched ||= (fuzzy ? resource.to_s.downcase.include?(term_downcased) : resource.to_s == term)
           end
+
         else  # :string, :text, :email
           if fuzzy
             row[index].to_s.downcase.include?(term_downcased)

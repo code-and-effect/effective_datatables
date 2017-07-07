@@ -19,7 +19,7 @@ module Effective
         if active_record_collection?
           columns.each do |name, opts|
             opts[:as] ||= resource.sql_type(name)
-            opts[:sql_column] = (resource.sql_column(name) || false) if opts[:sql_column].nil?
+            opts[:sql_column] = resource.sql_column(name) if opts[:sql_column].nil?
 
             case opts[:as]
             when *resource.macros
