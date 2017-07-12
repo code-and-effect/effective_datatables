@@ -11,7 +11,9 @@ module Effective
 
       def load_attributes!
         if datatables_ajax_request?
-          raise 'Expected attributes cookie to be present' unless cookie && cookie[:attributes]
+          raise 'expected cookie to be present' unless cookie
+          raise 'expected attributes cookie to be present' unless cookie[:attributes]
+
           @attributes = cookie.delete(:attributes)
         end
 

@@ -83,6 +83,10 @@ initializeDataTables = ->
         $table = $(this.api().table().node())
 
         if settings['json']
+          if settings['json']['effective_datatables_error']
+            alert("Unexpected datatable error: #{settings['json']['effective_datatables_error']}\n\nPlease refresh the page and try again")
+            return
+
           if settings['json']['aggregates']
             drawAggregates($table, settings['json']['aggregates'])
 
