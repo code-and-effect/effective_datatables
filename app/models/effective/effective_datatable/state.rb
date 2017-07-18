@@ -113,7 +113,7 @@ module Effective
         state[:visible] = {}
 
         params[:columns].values.each do |params|
-          name = params[:name].to_sym
+          name = (params[:name].include?('.') ? params[:name] : params[:name].to_sym)
 
           if params[:search][:value].present? && !['null'].include?(params[:search][:value])
             state[:search][name] = params[:search][:value]

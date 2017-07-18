@@ -136,7 +136,7 @@ class PostsDatatable < Effective::Datatable
   # It has access to the attributes and filters Hashes, representing the current state
   # It must return an ActiveRecord::Relation or an Array of Arrays
   collection do
-    scope = Post.all.where(created_at: filters[:start_date]...filters[:end_date])
+    scope = Post.all.joins(:user).where(created_at: filters[:start_date]...filters[:end_date])
     scope = scope.where(user_id: attributes[:user_id]) if attributes[:user_id]
     scope
   end
@@ -209,6 +209,8 @@ class PostsDatatable < Effective::Datatable
 
     if attributes[:user_id].nil?  # Show all users, otherwise this table is meant for one user only
       col :user, search: { collection: User.authors }
+
+      col 'user.first_name'  # Using the joined syntax
     end
 
     if can?(:index, Comment)
@@ -483,6 +485,14 @@ end
 ```
 
 You can also set custom search and sort on a per-column basis. See Advanced Search and Sort below.
+
+If the column name matches a `belongs_to`, `has_many` or other association on your collection class, like `col :user`, the column will be created as a resource column.
+
+A resource column will try to link to the show/edit/destroy actions of its objects, based on permissions and routes. You can alter this behaviour with the `action:` variable.
+
+You can also use the joined syntax, `col 'user.email'` to create a column for just this one field.
+
+This feature is only working with `belongs_to` and you need to add the `.joins(:user)` to the collection do ... end block yourself.
 
 ### val
 

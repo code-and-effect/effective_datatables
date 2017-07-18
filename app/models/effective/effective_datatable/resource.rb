@@ -18,12 +18,42 @@ module Effective
 
         if active_record_collection?
           columns.each do |name, opts|
+
+            if name.kind_of?(String) && name.include?('.')
+              raise "invalid datatables column '#{name}'. the joined syntax only supports one dot." if name.scan(/\./).count > 1
+
+              (associated, field) = name.split('.').first(2)
+
+              unless resource.macros.include?(resource.sql_type(associated))
+                raise "invalid datatables column '#{name}'. unable to find '#{name.split('.').first}' association on '#{resource}'."
+              end
+
+              unless collection.joined_includes_values.include?(associated) || collection.joined_includes_values.include?(associated.to_sym)
+                raise "your datatables collection must .joins(:#{associated}) to work with the joined syntax"
+              end
+
+              opts[:resource] = Effective::Resource.new(resource.associated(associated), namespace: controller_namespace)
+
+              if opts[:resource].column(field)
+                opts[:as] ||= opts[:resource].sql_type(field)
+                opts[:sql_column] = opts[:resource].sql_column(field) if opts[:sql_column].nil?
+
+                opts[:resource].sort_column = field
+                opts[:resource].search_columns = field
+              end
+
+              opts[:resource_field] = field
+
+              next
+            end
+
+            # Regular fields
             opts[:as] ||= resource.sql_type(name)
             opts[:sql_column] = resource.sql_column(name) if opts[:sql_column].nil?
 
             case opts[:as]
             when *resource.macros
-              opts[:resource] = Effective::Resource.new(resource.associated(name), namespace: controller_namespace)
+              opts[:resource] ||= Effective::Resource.new(resource.associated(name), namespace: controller_namespace)
               (opts[:sql_column] = name) if opts[:sql_column].nil?
             when Class
               if opts[:as].ancestors.include?(ActiveRecord::Base)
@@ -63,9 +93,11 @@ module Effective
 
         columns.each do |name, opts|
           opts[:as] ||= :string
-          opts[:as] = :email if (opts[:as] == :string && name == :email)
+          opts[:as] = :email if (opts[:as] == :string && name.to_s.end_with?('email'))
 
-          opts[:partial] ||= '/effective/datatables/resource_column' if (opts[:resource] && opts[:as] != :effective_addresses)
+          if opts[:resource] && !opts[:resource_field] && opts[:as] != :effective_addresses
+            opts[:partial] ||= '/effective/datatables/resource_column'
+          end
 
           opts[:col_class] = "col-#{opts[:as]} col-#{name.to_s.parameterize} #{opts[:col_class]}".strip
         end

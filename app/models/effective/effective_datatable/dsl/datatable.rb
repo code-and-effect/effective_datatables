@@ -22,15 +22,17 @@ module Effective
         def col(name, action: nil, as: nil, col_class: nil, label: nil, partial: nil, partial_as: nil, responsive: 10000, search: {}, sort: true, sql_column: nil, th: nil, th_append: nil, visible: true, &format)
           raise 'You cannot use partial: ... with the block syntax' if partial && block_given?
 
-          datatable._columns[name.to_sym] = Effective::DatatableColumn.new(
+          name = name.to_sym unless name.to_s.include?('.')
+
+          datatable._columns[name] = Effective::DatatableColumn.new(
             action: action,  # resource columns only
             as: as,
             compute: nil,
             col_class: col_class,
             format: (format if block_given?),
             index: datatable.columns.length,
-            label: label || name.to_s.titleize,
-            name: name.to_sym,
+            label: label || name.to_s.split('.').last.titleize,
+            name: name,
             partial: partial,
             partial_as: partial_as,
             responsive: responsive,
@@ -48,15 +50,17 @@ module Effective
         def val(name, action: nil, as: nil, col_class: nil, label: nil, partial: nil, partial_as: nil, responsive: 10000, search: {}, sort: true, sql_column: false, th: nil, th_append: nil, visible: true, &compute)
           raise 'You cannot use partial: ... with the block syntax' if partial && block_given?
 
-          datatable._columns[name.to_sym] = Effective::DatatableColumn.new(
+          name = name.to_sym unless name.to_s.include?('.')
+
+          datatable._columns[name] = Effective::DatatableColumn.new(
             action: action, # Resource columns only
             as: as,
             compute: (compute if block_given?),
             col_class: col_class,
             format: nil,
             index: datatable.columns.length,
-            label: label || name.to_s.titleize,
-            name: name.to_sym,
+            label: label || name.to_s.split('.').last.titleize,
+            name: name,
             partial: partial,
             partial_as: partial_as,
             responsive: responsive,
