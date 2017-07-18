@@ -74,7 +74,7 @@ module Effective
                 values = Array(resource.send(associated)).map { |obj| obj.send(field) }.flatten.compact
                 values.length == 1 ? values.first : values
               else
-                value.send(name)
+                resource.send(name)
               end
 
             elsif opts[:as] == :effective_obfuscation
