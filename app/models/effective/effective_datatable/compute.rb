@@ -60,11 +60,9 @@ module Effective
           columns.map do |name, opts|
             if state[:visible][name] == false && (name != order_name)  # Sort by invisible array column
               BLANK
-            elsif opts[:partial]
-              active_record_collection? ? obj : obj[opts[:index]]
             elsif opts[:compute]
               dsl_tool.instance_exec(obj, (active_record_collection? ? collection : obj[opts[:index]]), &opts[:compute])
-            elsif opts[:format]
+            elsif (opts[:partial] || opts[:format])
               active_record_collection? ? obj : obj[opts[:index]]
             elsif opts[:resource]
               resource = active_record_collection? ? obj : obj[opts[:index]]
