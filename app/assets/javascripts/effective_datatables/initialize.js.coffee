@@ -44,6 +44,7 @@ initializeDataTables = ->
         },
         {
           extend: 'print',
+          footer: true,
           exportOptions:
             format:
               header: (str) -> $("<div>#{str}</div>").children('.filter-label').first().text()
