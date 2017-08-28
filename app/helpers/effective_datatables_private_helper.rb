@@ -79,6 +79,7 @@ module EffectiveDatatablesPrivateHelper
         multiple: opts[:search][:multiple],
         grouped: opts[:search][:grouped],
         polymorphic: opts[:search][:polymorphic],
+        template: opts[:search][:template],
         include_blank: include_blank,
         wrapper_html: wrapper_html,
         input_html: input_html,
