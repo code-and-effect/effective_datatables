@@ -38,6 +38,7 @@ initializeDataTables = ->
         },
         {
           extend: 'print',
+          footer: true,
           exportOptions:
             format:
               header: (str) -> $("<div>#{str}</div>").children('.search-label').first().text()
