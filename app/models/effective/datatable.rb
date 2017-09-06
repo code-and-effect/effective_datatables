@@ -78,6 +78,9 @@ module Effective
       # Figure out the class, and if it's activerecord, do all the resource discovery on it
       load_resource!
 
+      # If attributes match a belongs_to column, scope the collection and remove the column
+      apply_belongs_to_attributes!
+
       save_cookie!
     end
 

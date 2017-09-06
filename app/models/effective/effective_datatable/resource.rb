@@ -146,6 +146,24 @@ module Effective
           end
         end
       end
+
+      def apply_belongs_to_attributes!
+        return unless active_record_collection?
+
+        changed = attributes.any? do |attribute, value|
+          attribute = attribute.to_s
+          next unless attribute.ends_with?('_id')
+
+          associated = attribute.gsub(/_id\z/, '').to_sym  # Replace last _id
+          next unless columns[associated] && columns[associated][:as] == :belongs_to
+
+          @_collection = @_collection.where(attribute => value)
+          columns.delete(associated)
+        end
+
+        columns.each_with_index { |(_, column), index| column[:index] = index } if changed
+      end
+
     end
   end
 end
