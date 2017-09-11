@@ -65,7 +65,8 @@ module Effective
           scope: nil,
           start: 0,
           search: {},
-          visible: {}
+          vismask: nil,
+          visible: {},
         }
       end
 
@@ -140,6 +141,8 @@ module Effective
         state[:length] ||= EffectiveDatatables.default_length
 
         if columns.present?
+          columns.each_with_index { |(_, column), index| column[:index] = index }
+
           if order_index.present?
             state[:order_name] = columns.keys[order_index]
           end
@@ -161,10 +164,11 @@ module Effective
         end
 
         # Load cookie bitmask
-        if state[:visible].kind_of?(Integer)
-          visible_mask = state[:visible] # bitmask
+        if datatables_ajax_request?
+          # Nothing to do
+        elsif state[:vismask].kind_of?(Integer) # bitmask
           state[:visible] = {}
-          columns.each { |name, opts| state[:visible][name] = (visible_mask & (2 ** opts[:index])) != 0 }
+          columns.each { |name, opts| state[:visible][name] = (state[:vismask] & (2 ** opts[:index])) != 0 }
         else
           state[:visible] = {} unless state[:visible].kind_of?(Hash)
           columns.each { |name, opts| state[:visible][name] = opts[:visible] unless state[:visible].key?(name) }

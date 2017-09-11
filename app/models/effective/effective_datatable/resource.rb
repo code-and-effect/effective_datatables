@@ -161,7 +161,7 @@ module Effective
           columns.delete(associated)
         end
 
-        columns.each_with_index { |(_, column), index| column[:index] = index } if changed
+        load_columns! if changed
       end
 
     end

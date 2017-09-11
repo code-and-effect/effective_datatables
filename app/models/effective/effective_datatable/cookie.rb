@@ -35,6 +35,7 @@ module Effective
         # Load my individual cookie
         if @cookie.kind_of?(Array)
           @cookie = initial_state.keys.zip(@cookie.second).to_h
+          Rails.logger.info "READ COOKIE: #{@cookie}"
         end
       end
 
@@ -50,10 +51,10 @@ module Effective
       end
 
       def cookie_payload
-        payload = state.except(:attributes)
+        payload = state.except(:attributes, :visible)
 
         # Turn visible into a bitmask.  This is undone in load_columns!
-        payload[:visible] = (
+        payload[:vismask] = (
           if columns.keys.length < 63 # 64-bit integer
             columns.keys.map { |name| (2 ** columns[name][:index]) if state[:visible][name] }.compact.sum
           end
