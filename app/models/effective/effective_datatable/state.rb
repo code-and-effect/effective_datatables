@@ -52,7 +52,7 @@ module Effective
 
       private
 
-      # This is called first.  Our initial state is set.
+      # This is called first. Our initial state is set.
       def initial_state
         {
           attributes: {},

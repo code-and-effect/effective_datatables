@@ -35,7 +35,6 @@ module Effective
         # Load my individual cookie
         if @cookie.kind_of?(Array)
           @cookie = initial_state.keys.zip(@cookie.second).to_h
-          Rails.logger.info "READ COOKIE: #{@cookie}"
         end
       end
 
