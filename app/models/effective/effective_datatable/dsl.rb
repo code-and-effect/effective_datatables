@@ -15,7 +15,11 @@ module Effective
       end
 
       def datatable(&block)
-        define_method('initialize_datatable') { dsl_tool.instance_exec(&block) }
+        define_method('initialize_datatable') do
+          dsl_tool.in_datatables_do_block = true
+          dsl_tool.instance_exec(&block)
+          dsl_tool.in_datatables_do_block = false
+        end
       end
 
       def filters(&block)
