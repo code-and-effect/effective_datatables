@@ -22,7 +22,7 @@ module Effective
     private
 
     def find_datatable(id)
-      id = id.gsub('-', '/')
+      id = id.to_s.gsub(/-\d{12}\z/, '').gsub('-', '/')
       id.classify.safe_constantize || id.classify.pluralize.safe_constantize
     end
 

@@ -5,7 +5,10 @@ module Effective
       private
 
       def datatables_ajax_request?
-        view && view.params[:draw] && view.params[:columns] && view.params[:id] == to_param
+        return @_datatables_ajax_request unless @_datatables_ajax_request.nil?
+
+        @_datatables_ajax_request =
+          (view && view.params[:draw] && view.params[:columns] && cookie_keys.include?(view.params[:cookie])) == true
       end
 
       def params

@@ -134,7 +134,7 @@ module Effective
     end
 
     def to_param
-      @to_param ||= self.class.name.underscore.parameterize
+      @to_param ||= "#{self.class.name.underscore.parameterize}-#{cookie_param}"
     end
 
     def columns

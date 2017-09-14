@@ -7,14 +7,17 @@ module Effective
         @cookie
       end
 
-      def cookie_name
-        @cookie_name ||= (
-          if datatables_ajax_request?
-            view.params[:cookie]
-          else
-            [self.class, attributes].hash.to_s.last(12)
-          end
-        )
+      def cookie_key
+        @cookie_key ||= (datatables_ajax_request? ? view.params[:cookie] : cookie_param)
+      end
+
+      # All possible dt cookie keys.  Used to make sure the datatable has a cookie set for this session.
+      def cookie_keys
+        @cookie_keys ||= Array(@dt_cookie).compact.map(&:first)
+      end
+
+      def cookie_param
+        [self.class, attributes].hash.to_s.last(12)
       end
 
       private
@@ -28,7 +31,7 @@ module Effective
           raise 'invalid datatables cookie' unless @dt_cookie.kind_of?(Array)
 
           # Assign individual cookie
-          index = @dt_cookie.rindex { |name, _| name == cookie_name }
+          index = @dt_cookie.rindex { |key, _| key == cookie_key }
           @cookie = @dt_cookie.delete_at(index) if index
         end
 
@@ -40,7 +43,7 @@ module Effective
 
       def save_cookie!
         @dt_cookie ||= []
-        @dt_cookie << [cookie_name, cookie_payload]
+        @dt_cookie << [cookie_key, cookie_payload]
 
         while @dt_cookie.to_s.size > MAX_COOKIE_SIZE
           @dt_cookie.shift((@dt_cookie.length / 3) + 1)
