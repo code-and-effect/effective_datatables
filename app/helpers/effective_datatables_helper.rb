@@ -1,7 +1,7 @@
 # These are expected to be called by a developer.  They are part of the datatables DSL.
 module EffectiveDatatablesHelper
 
-  def render_datatable(datatable, input_js: {}, charts: true, filters: true, simple: false)
+  def render_datatable(datatable, input_js: {}, charts: true, filters: true, simple: false, buttons: true)
     raise 'expected datatable to be present' unless datatable
 
     datatable.view ||= self
@@ -14,6 +14,7 @@ module EffectiveDatatablesHelper
 
     charts = charts && datatable._charts.present?
     filters = filters && (datatable._scopes.present? || datatable._filters.present?)
+    input_js[:buttons] = false unless buttons
 
     effective_datatable_params = {
       id: datatable.to_param,
