@@ -28,7 +28,7 @@ module Effective
                 raise "invalid datatables column '#{name}'. unable to find '#{name.split('.').first}' association on '#{resource}'."
               end
 
-              unless collection.joined_includes_values.include?(associated) || collection.joined_includes_values.include?(associated.to_sym)
+              unless collection.joins_values.include?(associated) || collection.joins_values.include?(associated.to_sym)
                 raise "your datatables collection must .joins(:#{associated}) to work with the joined syntax"
               end
 
