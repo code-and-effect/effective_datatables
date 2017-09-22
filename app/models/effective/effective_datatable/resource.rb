@@ -150,7 +150,7 @@ module Effective
       def apply_belongs_to_attributes!
         return unless active_record_collection?
 
-        changed = attributes.any? do |attribute, value|
+        changed = attributes.select do |attribute, value|
           attribute = attribute.to_s
           next unless attribute.ends_with?('_id')
 
@@ -159,7 +159,7 @@ module Effective
 
           @_collection = @_collection.where(attribute => value)
           columns.delete(associated)
-        end
+        end.present?
 
         load_columns! if changed
       end
