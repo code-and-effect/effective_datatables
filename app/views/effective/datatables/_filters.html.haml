@@ -1,8 +1,8 @@
 .effective-datatable-filters{'aria-controls': datatable.to_param}
   = simple_form_for :filters, url: (datatable._form[:url] || '#'), method: datatable._form[:verb], html: { class: 'form-inline' } do |form|
 
-    .btn-toolbar
-      - if datatable._scopes.present?
+    - if datatable._scopes.present?
+      .btn-toolbar
         = form.input :scope, label: false, required: false, checked: datatable.state[:scope],
           as: (defined?(EffectiveFormInputs) ? :effective_radio_buttons : :radio_buttons),
           collection: datatable._scopes.map { |name, opts| [opts[:label], name] },
