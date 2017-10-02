@@ -52,7 +52,7 @@ module Effective
       end
 
       def format_column(value, column)
-        return if value.nil?
+        return if value.nil? || (column[:resource] && value.blank?)
 
         unless column[:as] == :email
           return value if value.kind_of?(String)

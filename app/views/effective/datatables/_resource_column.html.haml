@@ -1,5 +1,5 @@
 - Array(datatable.array_collection? ? resource : resource.send(name)).each do |associated|
-  %p
+  .col-resource_item
     - if show_path
       = link_to associated.to_s, send(show_path, associated.to_param), title: associated.to_s
     - elsif edit_path
