@@ -19,6 +19,7 @@ module Effective
         if active_record_collection?
           columns.each do |name, opts|
 
+            # col 'comments.title'
             if name.kind_of?(String) && name.include?('.')
               raise "invalid datatables column '#{name}'. the joined syntax only supports one dot." if name.scan(/\./).count > 1
 

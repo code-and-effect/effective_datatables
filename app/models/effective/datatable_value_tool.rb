@@ -85,12 +85,12 @@ module Effective
 
       # term == 'nil' rescue false is a Rails 4.1 fix, where you can't compare a TimeWithZone to 'nil'
       if (term == 'nil' rescue false)
-        return collection.select! { |row| obj_to_value(row[index], column) == nil } || collection
+        return collection.select! { |row| obj_to_value(row[index], column, row) == nil } || collection
       end
 
       # See effective_resources gem search() method # relation.rb
       collection.select! do |row|
-        obj = obj_to_value(row[index], column)
+        obj = obj_to_value(row[index], column, row)
 
         case column[:as]
         when :boolean
@@ -165,8 +165,20 @@ module Effective
       collection.size
     end
 
-    def obj_to_value(obj, column)
-      ((column[:partial] || column[:format]) && !column[:compute]) ? obj.send(column[:name]) : obj
+    def obj_to_value(obj, column, row = nil)
+      return obj if column[:compute]
+
+      # This matches format.rb.  Probably should be refactored.
+
+      if column[:format]
+        datatable.dsl_tool.instance_exec(obj, row, &column[:format])
+      elsif column[:partial]
+        raise 'unsupported'
+      elsif obj.respond_to?(column[:name])
+        obj.send(column[:name])
+      else
+        obj
+      end
     end
 
   end
