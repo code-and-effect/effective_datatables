@@ -2,7 +2,7 @@
   = simple_form_for :filters, url: (datatable._form[:url] || '#'), method: datatable._form[:verb], html: { class: 'form-inline' } do |form|
 
     - if datatable._scopes.present?
-      .btn-toolbar
+      .btn-toolbar.effective-datatables-scopes
         = form.input :scope, label: false, required: false, checked: datatable.state[:scope],
           as: (defined?(EffectiveFormInputs) ? :effective_radio_buttons : :radio_buttons),
           collection: datatable._scopes.map { |name, opts| [opts[:label], name] },
@@ -14,10 +14,12 @@
           - else
             = link_to 'Apply', '#', class: 'btn btn-primary btn-effective-datatable-filters', 'data-apply-datatable-filters': true
 
+    - if datatable._filters.present?
+      .effective-datatables-filters-inputs
         - datatable._filters.each do |name, opts|
-          .btn-group
-            = form.input name, label: opts[:label], required: false, value: datatable.state[:filter][name],
-              as: opts[:as],
-              collection: opts[:input_html].delete(:collection),
-              multiple: opts[:input_html].delete(:multiple),
-              input_html: (({name: ''} unless datatable._filters_form_required?) || {}).merge(opts[:input_html])
+          = form.input name, label: opts[:label], required: false, value: datatable.state[:filter][name],
+            as: opts[:as],
+            collection: opts[:input_html].delete(:collection),
+            multiple: opts[:input_html].delete(:multiple),
+            input_html: (({name: ''} unless datatable._filters_form_required?) || {}).merge(opts[:input_html]),
+            wrapper_html: {class: 'form-group-sm'}
