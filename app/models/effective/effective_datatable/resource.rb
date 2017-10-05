@@ -19,6 +19,7 @@ module Effective
         if active_record_collection?
           columns.each do |name, opts|
 
+            # col 'comments.title'
             if name.kind_of?(String) && name.include?('.')
               raise "invalid datatables column '#{name}'. the joined syntax only supports one dot." if name.scan(/\./).count > 1
 
@@ -28,8 +29,10 @@ module Effective
                 raise "invalid datatables column '#{name}'. unable to find '#{name.split('.').first}' association on '#{resource}'."
               end
 
-              unless collection.joins_values.include?(associated) || collection.joins_values.include?(associated.to_sym)
-                raise "your datatables collection must .joins(:#{associated}) to work with the joined syntax"
+              joins_values = (collection.joins_values + collection.left_outer_joins_values)
+
+              unless joins_values.include?(associated.to_sym)
+                raise "your datatables collection must .joins(:#{associated}) or .left_outer_joins(:#{associated}) to work with the joined syntax"
               end
 
               opts[:resource] = Effective::Resource.new(resource.associated(associated), namespace: controller_namespace)
