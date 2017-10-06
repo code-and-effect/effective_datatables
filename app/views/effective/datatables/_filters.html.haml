@@ -1,18 +1,13 @@
-.effective-datatable-filters{'aria-controls': datatable.to_param}
+.effective-datatables-filters{'aria-controls': datatable.to_param}
   = simple_form_for :filters, url: (datatable._form[:url] || '#'), method: datatable._form[:verb], html: { class: 'form-inline' } do |form|
 
     - if datatable._scopes.present?
-      .btn-toolbar.effective-datatables-scopes
+      .effective-datatables-filters-scopes
         = form.input :scope, label: false, required: false, checked: datatable.state[:scope],
           as: (defined?(EffectiveFormInputs) ? :effective_radio_buttons : :radio_buttons),
           collection: datatable._scopes.map { |name, opts| [opts[:label], name] },
-          buttons: true
-
-        .btn-group
-          - if datatable._filters_form_required?
-            = form.button :submit, 'Apply', 'data-disable-with': 'Applying...'
-          - else
-            = link_to 'Apply', '#', class: 'btn btn-primary btn-effective-datatable-filters', 'data-apply-datatable-filters': true
+          buttons: true,
+          wrapper_html: {class: 'btn-group-sm'}
 
     - if datatable._filters.present?
       .effective-datatables-filters-inputs
@@ -23,3 +18,10 @@
             multiple: opts[:input_html].delete(:multiple),
             input_html: (({name: ''} unless datatable._filters_form_required?) || {}).merge(opts[:input_html]),
             wrapper_html: {class: 'form-group-sm'}
+
+    - if datatable._scopes.present? || datatable._filters.present?
+      .effective-datatables-filters-btn
+        - if datatable._filters_form_required?
+          = form.button :submit, 'Apply', 'data-disable-with': 'Applying...'
+        - else
+          = link_to 'Apply', '#', class: 'btn btn-primary btn-sm btn-effective-datatables-filters', 'data-apply-datatable-filters': true
