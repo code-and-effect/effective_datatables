@@ -49,9 +49,9 @@ initializeDataTables = ->
       deferLoading: [datatable.data('display-records'), datatable.data('total-records')]
       deferRender: true
       displayStart: datatable.data('display-start')
-      dom: "<'row'<'col-sm-4'l><'col-sm-8'B>><'row'<'col-sm-12'tr>><'row'<'col-sm-6'i><'col-sm-6'p>>"
+      dom: "<'row'<'col-sm-12'B>><'row'<'col-sm-12'tr>><'row'<'col-sm-2'l><'col-sm-4'i><'col-sm-6'p>>"
       iDisplayLength: datatable.data('display-length')
-      language: { 'lengthMenu': 'Show _MENU_ per page'}
+      language: { 'lengthMenu': '_MENU_ per page'}
       lengthMenu: [[10, 25, 50, 100, 250, 1000, 9999999], ['10', '25', '50', '100', '250', '1000', 'All']]
       order: datatable.data('display-order')
       processing: true
@@ -61,7 +61,7 @@ initializeDataTables = ->
         api.columns().flatten().each (index) => params['columns'][index]['visible'] = api.column(index).visible()
 
         $table = $(api.table().node())
-        $form = $(".effective-datatable-filters[aria-controls='#{$table.attr('id')}']").first()
+        $form = $(".effective-datatables-filters[aria-controls='#{$table.attr('id')}']").first()
 
         params['cookie'] = $table.data('cookie')
 
