@@ -61,7 +61,7 @@ initializeDataTables = ->
         api.columns().flatten().each (index) => params['columns'][index]['visible'] = api.column(index).visible()
 
         $table = $(api.table().node())
-        $form = $(".effective-datatable-filters[aria-controls='#{$table.attr('id')}']").first()
+        $form = $(".effective-datatables-filters[aria-controls='#{$table.attr('id')}']").first()
 
         params['cookie'] = $table.data('cookie')
 
