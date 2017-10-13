@@ -49,10 +49,10 @@ initializeDataTables = ->
       deferLoading: [datatable.data('display-records'), datatable.data('total-records')]
       deferRender: true
       displayStart: datatable.data('display-start')
-      dom: "<'row'<'col-sm-12'B>><'row'<'col-sm-12'tr>><'row'<'col-sm-2'l><'col-sm-4'i><'col-sm-6'p>>"
+      dom: "<'row'<'col-sm-12'B>><'row'<'col-sm-12'tr>><'row'<'col-sm-6 dataTables_entries'il><'col-sm-6'p>>"
       iDisplayLength: datatable.data('display-length')
-      language: { 'lengthMenu': '_MENU_ per page'}
-      lengthMenu: [[10, 25, 50, 100, 250, 1000, 9999999], ['10', '25', '50', '100', '250', '1000', 'All']]
+      language: { 'lengthMenu': '&nbsp;with _MENU_ per page'}
+      lengthMenu: [[10, 25, 50, 100, 250, 500, 9999999], ['10', '25', '50', '100', '250', '500', 'All']]
       order: datatable.data('display-order')
       processing: true
       responsive: true
@@ -185,7 +185,7 @@ initializeDataTables = ->
 
     # Apply EffectiveFormInputs to the Show x per page dropdown
     if datatable.data('effective-form-inputs')
-      try table.closest('.dataTables_wrapper').find('.dataTables_length select').removeAttr('name').select2()
+      try table.closest('.dataTables_wrapper').find('.dataTables_length select').removeAttr('name').select2(minimumResultsForSearch: 10)
 
 destroyDataTables = ->
   $('table.effective-datatable').each ->

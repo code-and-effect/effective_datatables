@@ -68,10 +68,41 @@ div.dataTables_wrapper div.dataTables_processing {
   width: 70%;
 }
 
-// Show x per page
-.dataTables_wrapper div.dataTables_length {
+// Datatables entries
+@media screen and (max-width: 767px) {
+  div.dataTables_wrapper div.dataTables_entries { text-align: center; }
+}
+
+.dataTables_wrapper .dataTables_entries {
   color: #909090;
   font-size: 12px;
+
+  // Showing 1 to 2 of 2 entries (filtered from 10 total entries)
+  div.dataTables_info {
+    display: inline-block;
+    padding: 5px 0px 6px 6px;
+  }
+
+  // with 25 per page
+  div.dataTables_length {
+    display: inline-block;
+
+    // Apply custom style to the inline x per page select
+    span.select2-container {
+      margin: 0px -3px 3px -3px;
+      max-width: 45px;
+    }
+
+    span.select2-container.select2-container--open { max-width: 55px; }
+    span.select2-container--focus { border: none; box-shadow: none; }
+    .select2-container--focus > .selection > .select2-selection { border: none !important; }
+
+    span.select2-selection__rendered {
+      padding: 0px; color: #909090;
+    }
+
+    span.select2-selection { border: none; }
+  }
 }
 
 // Buttons
@@ -137,13 +168,6 @@ ul.dt-button-collection {
   .buttons-colvisRestore {
     border-top: 1px solid grey;
   }
-}
-
-// Showing 1 to 25 of 100 entries
-div.dataTables_wrapper div.dataTables_info {
-  color: #909090;
-  font-size: 12px;
-  padding: 5px 0px 6px 6px;
 }
 
 // Collapsed Responsive View

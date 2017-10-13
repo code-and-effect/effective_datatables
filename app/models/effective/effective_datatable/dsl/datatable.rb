@@ -11,7 +11,7 @@ module Effective
         end
 
         def length(length)
-          raise 'length must be 10, 25, 50, 100, 250, 1000, :all' unless [10, 25, 50, 100, 250, 1000, :all].include?(length)
+          raise 'length must be 10, 25, 50, 100, 250, 500, :all' unless [10, 25, 50, 100, 250, 500, :all].include?(length)
           datatable.state[:length] ||= (length == :all ? 9999999 : length)
         end
 

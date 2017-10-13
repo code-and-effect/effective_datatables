@@ -189,7 +189,7 @@ class PostsDatatable < Effective::Datatable
   # The user's selected filters, search, sort, length, column visibility and pagination settings are saved between visits
   # on a per-table basis and can be Reset with a button
   datatable do
-    length 25  # 5, 10, 25, 50, 100, 1000, :all
+    length 25  # 5, 10, 25, 50, 100, 500, :all
     order :updated_at, :desc
 
     # Renders a column of checkboxes to select items for any bulk_actions
@@ -559,7 +559,7 @@ The `glyphicon_to` helper is part of the [effective_resources](https://github.co
 
 ### length
 
-Sets the default number of rows per page. Valid lengths are `5`, `10`, `25`, `50`, `100`, `250`, `1000`, `:all`
+Sets the default number of rows per page. Valid lengths are `5`, `10`, `25`, `50`, `100`, `250`, `500`, `:all`
 
 When not specified, effective_datatables uses the default as per the `config/initializers/effective_datatables.rb` or 25.
 
