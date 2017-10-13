@@ -57,12 +57,12 @@ module Effective
             case opts[:as]
             when *resource.macros
               opts[:resource] ||= Effective::Resource.new(resource.associated(name), namespace: controller_namespace)
-              (opts[:sql_column] = name) if opts[:sql_column].nil?
+              opts[:sql_column] = name if opts[:sql_column].nil?
             when Class
               if opts[:as].ancestors.include?(ActiveRecord::Base)
                 opts[:resource] = Effective::Resource.new(opts[:as], namespace: controller_namespace)
                 opts[:as] = :resource
-                (opts[:sql_column] = name) if opts[:sql_column].nil?
+                opts[:sql_column] = name if opts[:sql_column].nil?
               end
             when :effective_addresses
               opts[:resource] = Effective::Resource.new(resource.associated(name), namespace: controller_namespace)
@@ -71,9 +71,7 @@ module Effective
               opts[:sql_column] = :effective_roles
             when :string  # This is the fallback
               # Anything that doesn't belong to the model or the sql table, we assume is a SELECT SUM|AVG|RANK() as fancy
-              if (resource.table && resource.column(name).blank?)
-                opts[:sql_as_column] = true
-              end
+              opts[:sql_as_column] = true if (resource.table && resource.column(name).blank?)
             end
           end
         end

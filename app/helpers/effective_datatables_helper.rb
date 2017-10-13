@@ -1,7 +1,7 @@
 # These are expected to be called by a developer.  They are part of the datatables DSL.
 module EffectiveDatatablesHelper
 
-  def render_datatable(datatable, input_js: {}, charts: true, filters: true, simple: false, buttons: true)
+  def render_datatable(datatable, input_js: {}, buttons: true, charts: true, filters: true, simple: false)
     raise 'expected datatable to be present' unless datatable
 
     datatable.view ||= self
@@ -14,7 +14,8 @@ module EffectiveDatatablesHelper
 
     charts = charts && datatable._charts.present?
     filters = filters && (datatable._scopes.present? || datatable._filters.present?)
-    input_js[:buttons] = false unless buttons
+
+    datatable.attributes[:simple] = true if simple
 
     effective_datatable_params = {
       id: datatable.to_param,
@@ -28,13 +29,13 @@ module EffectiveDatatablesHelper
         'display-order' => [datatable.order_index, datatable.order_direction].to_json().html_safe,
         'display-records' => datatable.to_json[:recordsFiltered],
         'display-start' => datatable.display_start,
-        'input-js-options' => (input_js || {}).to_json.html_safe,
+        'input-js-options' => (input_js || {}).merge(buttons: buttons, simple: simple).to_json.html_safe,
         'reset' => datatable_reset(datatable),
-        'simple' => simple.to_s,
         'source' => effective_datatables.datatable_path(datatable, {format: 'json'}),
         'total-records' => datatable.to_json[:recordsTotal]
       }
     }
+
 
     if (charts || filters) && !simple
       output = ''.html_safe
@@ -53,8 +54,6 @@ module EffectiveDatatablesHelper
 
       output
     else
-      datatable.attributes[:simple] = true if simple
-
       render(partial: 'effective/datatables/datatable',
         locals: { datatable: datatable, effective_datatable_params: effective_datatable_params }
       )

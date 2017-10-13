@@ -58,7 +58,7 @@ $(document).on 'click', '.buttons-bulk-actions a', (event) ->
         $processing.html(success)
         $table.dataTable().data('bulk-actions-restore-selected-values', values)
         $table.DataTable().draw()
-      failCallback:  ->
+      failCallback: ->
         error = "An error occured while attempting #{title} bulk action"
         $processing.html(error)
         alert(error)

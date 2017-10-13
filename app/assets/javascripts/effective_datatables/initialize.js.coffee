@@ -3,7 +3,6 @@ initializeDataTables = ->
     return if $.fn.DataTable.fnIsDataTable(this)
 
     datatable = $(this)
-    simple = ('' + datatable.data('simple') == 'true')
     input_js_options = datatable.data('input-js-options') || {}
     buttons_export_columns = input_js_options['buttons_export_columns'] || ':not(.col-actions)'
 
@@ -176,9 +175,9 @@ initializeDataTables = ->
       table = $input.closest('table.dataTable')
       table.DataTable().column("#{$input.data('column-name')}:name").search($input.val()).draw()
 
-    if simple
+    if input_js_options['simple'] == true
       init_options['dom'] = "<'row'<'col-sm-12'tr>>" # Just show the table
-      datatable.addClass('sort-hidden search-hidden')
+      datatable.addClass('simple')
 
     # Let's actually initialize the table now
     table = datatable.dataTable(jQuery.extend(init_options, input_js_options))

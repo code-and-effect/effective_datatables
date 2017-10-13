@@ -1,4 +1,4 @@
-$(document).on 'click', 'a[data-apply-datatable-filters]', (event) ->
+$(document).on 'click', 'a[data-apply-effective-datatables-filters]', (event) ->
   event.preventDefault()
   $form = $(event.currentTarget).closest('.effective-datatables-filters')
   $table = $('#' + $form.attr('aria-controls'))

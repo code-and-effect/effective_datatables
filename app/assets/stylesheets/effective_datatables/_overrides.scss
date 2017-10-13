@@ -37,12 +37,17 @@ table.dataTable thead tr th {
   .form-group { margin-bottom: 0px; font-weight: normal; }
 }
 
-// Sorting disabled
-table.dataTable.sort-hidden thead .sorting { background-image: none; }
-table.dataTable.sort-hidden thead .sorting_asc { background-image: none; }
-table.dataTable.sort-hidden thead .sorting_desc { background-image: none; }
+// Simple styles
+table.dataTable.simple {
+  thead {
+    .sorting { background-image: none; cursor: default; }
+    .sorting_asc { background-image: none; cursor: default; }
+    .sorting_desc { background-image: none; cursor: default; }
 
-table.dataTable.search-hidden thead .form-group { display: none; }
+    .form-group { display: none; }
+    .col-bulk_actions { display: none; }
+  }
+}
 
 // Filter bar
 table.dataTable .form-group { width: 100%; margin-left: 0px; margin-right: 0px; }
