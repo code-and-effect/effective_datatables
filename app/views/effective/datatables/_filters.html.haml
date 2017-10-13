@@ -17,6 +17,7 @@
             collection: opts[:input_html].delete(:collection),
             multiple: opts[:input_html].delete(:multiple),
             input_html: (({name: ''} unless datatable._filters_form_required?) || {}).merge(opts[:input_html]),
+            input_js: { placeholder: ''},
             wrapper_html: {class: 'form-group-sm'}
 
     - if datatable._scopes.present? || datatable._filters.present?
