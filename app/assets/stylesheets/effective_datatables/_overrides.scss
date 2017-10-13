@@ -60,11 +60,12 @@ table.dataTable.simple {
 
 // Processing popup
 div.dataTables_wrapper div.dataTables_processing {
-  top: -20px;
+  top: -10px;
   border: none;
   box-shadow: none;
-  margin-left: -40%;
-  width: 80%;
+  margin-left: -35%;
+  margin-bottom: 0;
+  width: 70%;
 }
 
 // Show x per page
