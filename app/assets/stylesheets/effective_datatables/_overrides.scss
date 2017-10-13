@@ -27,33 +27,37 @@ table.dataTable thead > tr > th.sorting {
   padding-right: 18px;
 }
 
-table.dataTable thead tr th {
-  text-align: left;
-  vertical-align: top;
-  border-bottom: none;
-  white-space: nowrap;
-  padding: 6px;
+// Search bar
+table.dataTable thead {
+  tr th {
+    text-align: left;
+    vertical-align: top;
+    border-bottom: none;
+    white-space: nowrap;
+    padding: 6px;
+  }
 
-  .form-group { margin-bottom: 0px; font-weight: normal; }
+  .form-control, .form-group {
+    width: 100%;
+    font-weight: normal;
+    margin-left: 0px;
+    margin-right: 0px;
+  }
+
+  .datatable_search__bulk_actions { margin-left: 5px; }
 }
 
 // Simple styles
 table.dataTable.simple {
   thead {
-    .sorting { background-image: none; cursor: default; }
-    .sorting_asc { background-image: none; cursor: default; }
-    .sorting_desc { background-image: none; cursor: default; }
+    .sorting { background-image: none; }
+    .sorting_asc { background-image: none; }
+    .sorting_desc { background-image: none; }
 
     .form-group { display: none; }
     .col-bulk_actions { display: none; }
   }
 }
-
-// Filter bar
-table.dataTable .form-group { width: 100%; margin-left: 0px; margin-right: 0px; }
-table.dataTable select { width: 100%; }
-table.dataTable .form-control { width: 100%;  }
-table.dataTable .form-group.datatable_search_bulk_actions { margin-left: 4px; }
 
 // Processing popup
 div.dataTables_wrapper div.dataTables_processing {
@@ -66,7 +70,6 @@ div.dataTables_wrapper div.dataTables_processing {
 
 // Show x per page
 .dataTables_wrapper div.dataTables_length {
-  margin-bottom: 4px;
   color: #909090;
   font-size: 12px;
 }
@@ -140,7 +143,7 @@ ul.dt-button-collection {
 div.dataTables_wrapper div.dataTables_info {
   color: #909090;
   font-size: 12px;
-  padding: 5px 0px 0px 6px;
+  padding: 5px 0px 6px 6px;
 }
 
 // Collapsed responsive view
@@ -149,7 +152,7 @@ table.dataTable > tbody > tr.child span.dtr-data { white-space: nowrap; }
 
 table.dataTable.dtr-inline.collapsed > tbody > tr:not(.child) > td:first-child,
 table.dataTable.dtr-inline.collapsed > tbody > tr:not(.child) > th:first-child {
- padding-left: 30px !important;
+  padding-left: 30px !important;
 }
 
 // Column specific adjustments
