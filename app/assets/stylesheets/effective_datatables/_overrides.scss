@@ -91,17 +91,14 @@ div.dataTables_wrapper div.dataTables_processing {
     span.select2-container {
       margin: 0px -3px 3px -3px;
       max-width: 45px;
+
+      .select2-selection { border: none; }
+      .select2-selection__rendered { padding: 0px; color: #909090; }
     }
 
-    span.select2-container.select2-container--open { max-width: 55px; }
-    span.select2-container--focus { border: none; box-shadow: none; }
-    .select2-container--focus > .selection > .select2-selection { border: none !important; }
-
-    span.select2-selection__rendered {
-      padding: 0px; color: #909090;
-    }
-
-    span.select2-selection { border: none; }
+    span.select2-container.select2-container--open { max-width: 60px; }
+    span.select2-container.select2-container--focus { border: none; box-shadow: none; }
+    span.select2-container--focus > .selection > .select2-selection { border: none !important; }
   }
 }
 
