@@ -16,6 +16,7 @@ module EffectiveDatatablesHelper
     filters = filters && (datatable._scopes.present? || datatable._filters.present?)
 
     datatable.attributes[:simple] = true if simple
+    input_js[:buttons] = false if simple || !buttons
 
     effective_datatable_params = {
       id: datatable.to_param,
@@ -29,13 +30,13 @@ module EffectiveDatatablesHelper
         'display-order' => [datatable.order_index, datatable.order_direction].to_json().html_safe,
         'display-records' => datatable.to_json[:recordsFiltered],
         'display-start' => datatable.display_start,
-        'input-js-options' => (input_js || {}).merge(buttons: buttons, simple: simple).to_json.html_safe,
+        'input-js-options' => (input_js || {}).to_json.html_safe,
         'reset' => datatable_reset(datatable),
+        'simple' => simple.to_s,
         'source' => effective_datatables.datatable_path(datatable, {format: 'json'}),
         'total-records' => datatable.to_json[:recordsTotal]
       }
     }
-
 
     if (charts || filters) && !simple
       output = ''.html_safe

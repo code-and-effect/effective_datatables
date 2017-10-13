@@ -5,6 +5,7 @@ initializeDataTables = ->
     datatable = $(this)
     input_js_options = datatable.data('input-js-options') || {}
     buttons_export_columns = input_js_options['buttons_export_columns'] || ':not(.col-actions)'
+    simple = ('' + datatable.data('simple') == 'true')
 
     if input_js_options['buttons'] == false
       input_js_options['buttons'] = []
@@ -175,7 +176,7 @@ initializeDataTables = ->
       table = $input.closest('table.dataTable')
       table.DataTable().column("#{$input.data('column-name')}:name").search($input.val()).draw()
 
-    if input_js_options['simple'] == true
+    if simple
       init_options['dom'] = "<'row'<'col-sm-12'tr>>" # Just show the table
       datatable.addClass('simple')
 

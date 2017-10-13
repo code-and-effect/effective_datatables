@@ -50,9 +50,9 @@ table.dataTable thead {
 // Simple styles
 table.dataTable.simple {
   thead {
-    .sorting { background-image: none; }
-    .sorting_asc { background-image: none; }
-    .sorting_desc { background-image: none; }
+    .sorting { background-image: none; cursor: default; }
+    .sorting_asc { background-image: none; cursor: default; }
+    .sorting_desc { background-image: none; cursor: default; }
 
     .form-group { display: none; }
     .col-bulk_actions { display: none; }
