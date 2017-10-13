@@ -32,7 +32,7 @@ module EffectiveDatatablesHelper
         'display-start' => datatable.display_start,
         'input-js-options' => (input_js || {}).to_json.html_safe,
         'reset' => datatable_reset(datatable),
-        'simple' => simple.to_s,
+        'simple' => datatable.simple?.to_s,
         'source' => effective_datatables.datatable_path(datatable, {format: 'json'}),
         'total-records' => datatable.to_json[:recordsTotal]
       }

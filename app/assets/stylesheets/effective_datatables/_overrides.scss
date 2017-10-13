@@ -146,13 +146,11 @@ div.dataTables_wrapper div.dataTables_info {
   padding: 5px 0px 6px 6px;
 }
 
-// Collapsed responsive view
-table.dataTable > tbody > tr.child span.dtr-title { min-width: 175px; }
-table.dataTable > tbody > tr.child span.dtr-data { white-space: nowrap; }
-
-table.dataTable.dtr-inline.collapsed > tbody > tr:not(.child) > td:first-child,
-table.dataTable.dtr-inline.collapsed > tbody > tr:not(.child) > th:first-child {
-  padding-left: 30px !important;
+// Collapsed Responsive View
+table.dataTable > tbody > tr.child {
+  span.dtr-title { min-width: 175px; margin-bottom: 4px; }
+  span.dtr-data { white-space: nowrap; }
+  .col-resource_item { margin-bottom: 4px; }
 }
 
 // Column specific adjustments
