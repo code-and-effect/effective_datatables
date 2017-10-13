@@ -1,17 +1,17 @@
 // Use asset-data-url to prevent 3 additional GET requests for icons
 table.dataTable thead .sorting {
   background-image: asset-data-url('dataTables/sort_both.png');
-  background-position: 100% 70%;
+  background-position: right 0px bottom 14px;
 }
 
 table.dataTable thead .sorting_asc {
   background-image: asset-data-url('dataTables/sort_asc.png');
-  background-position: 100% 70%;
+  background-position: right 0px bottom 14px;
 }
 
 table.dataTable thead .sorting_desc {
   background-image: asset-data-url('dataTables/sort_desc.png');
-  background-position: 100% 70%;
+  background-position: right 0px bottom 14px;
 }
 
 // Override bootstrap default glyphicons
@@ -40,8 +40,7 @@ table.dataTable thead {
   .form-control, .form-group {
     width: 100%;
     font-weight: normal;
-    margin-left: 0px;
-    margin-right: 0px;
+    margin: 0px;
   }
 
   .datatable_search__bulk_actions { margin-left: 5px; }
