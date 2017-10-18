@@ -46,7 +46,7 @@ module Effective
         collection.order("#{sql_column} #{datatable.resource.sql_direction(direction)}")
       else
         Effective::Resource.new(collection)
-          .order(column[:name], direction, as: column[:as], sort: column[:sort], sql_column: column[:sql_column])
+          .order(column[:name], direction, as: column[:as], sort: column[:sort], sql_column: column[:sql_column], limit: datatable.limit)
       end
     end
 
