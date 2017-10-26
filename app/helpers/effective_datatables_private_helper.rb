@@ -71,6 +71,15 @@ module EffectiveDatatablesPrivateHelper
         date_linked: false,
         input_js: { useStrict: true, keepInvalid: true }
         # Keep invalid format like "2015-11" so we can still search by year, month or day
+    when :time
+      form.input name, label: false, required: false, value: value,
+        as: (ActionView::Helpers::FormBuilder.instance_methods.include?(:effective_time_picker) ? :effective_time_picker : :string),
+        placeholder: placeholder,
+        wrapper_html: wrapper_html,
+        input_group: false,
+        input_html: input_html,
+        date_linked: false,
+        input_js: { useStrict: false, keepInvalid: true }
     when :select, :boolean
       form.input name, label: false, required: false, value: value,
         as: (ActionView::Helpers::FormBuilder.instance_methods.include?(:effective_select) ? :effective_select : :select),

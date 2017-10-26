@@ -94,6 +94,8 @@ module Effective
           when Integer    ; view.number_to_currency(value / 100.0) # an Integer representing the number of cents
           when Numeric    ; view.number_to_currency(value)
           end
+        when :time
+          (value.strftime('%H:%M') rescue BLANK)
         else
           value.to_s
         end

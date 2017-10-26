@@ -112,6 +112,8 @@ module Effective
             end
           )
           obj >= term && obj <= end_at
+        when :time
+          (obj.hour == term.hour) && (term.min == 0 ? true : (obj.min == term.min))
         when :decimal, :currency
           if fuzzy && (term.round(0) == term) && value.to_s.include?('.') == false
             if term < 0
@@ -176,6 +178,8 @@ module Effective
         raise 'unsupported'
       elsif obj.respond_to?(column[:name])
         obj.send(column[:name])
+      elsif column[:as] == :time && obj.respond_to?(:strftime)
+        (@_column_as_time ||= Time.zone.now.beginning_of_day) + ((1.hour * obj.hour) + (1.minute * obj.min)) # For search/order by time
       else
         obj
       end
