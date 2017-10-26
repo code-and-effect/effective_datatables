@@ -39,6 +39,7 @@ module Effective
 
               if opts[:resource].column(field)
                 opts[:as] ||= opts[:resource].sql_type(field)
+                opts[:as] = :integer if opts[:resource].sql_type(field) == :belongs_to && field.end_with?('_id')
                 opts[:sql_column] = opts[:resource].sql_column(field) if opts[:sql_column].nil?
 
                 opts[:resource].sort_column = field
