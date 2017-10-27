@@ -15,7 +15,6 @@ module Effective
         (EffectiveDatatables.authorized?(self, :index, @datatable.try(:collection_class)) rescue false)
 
         render json: error_json(e)
-        raise e
       end
     end
 

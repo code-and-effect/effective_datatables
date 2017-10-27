@@ -739,6 +739,22 @@ def bulk_approve
 end
 ```
 
+or if using [effective_resources](https://github.com/code-and-effect/effective_resources):
+
+```ruby
+  include Effective::CrudController
+
+  collection_action :bulk_approve
+```
+
+and in your model
+
+```ruby
+  def approve!
+    update_attributes!(status: :approved)
+  end
+```
+
 ### bulk_action_divider
 
 Inserts a menu divider `<li class='divider' role='separator'></li>`
