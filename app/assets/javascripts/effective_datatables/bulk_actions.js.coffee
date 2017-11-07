@@ -38,10 +38,19 @@ $(document).on 'click', '.buttons-bulk-actions a', (event) ->
 
   url = $bulkAction.attr('href')
   title = $bulkAction.text()
-  values = $.map($selected, (input) -> input.getAttribute('value'))
   token = $bulkAction.parent('li').data('authenticity-token')
+  values = $.map($selected, (input) -> input.getAttribute('value'))
+  get_link = $bulkAction.data('bulk-actions-get')
 
   return unless url && values
+
+  if get_link
+    if url.includes('?')
+      window.location.assign(url + '&' + $.param({ids: values}))
+    else
+      window.location.assign(url + '?' + $.param({ids: values}))
+
+    return
 
   # Disable the Bulk Actions dropdown, so only one can be run at a time
   $bulkAction.closest('button').attr('disabled', 'disabled')

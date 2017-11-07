@@ -705,7 +705,9 @@ Creates a link that becomes clickable when one or more checkbox/rows are selecte
 
 A controller action must be created to accept a POST with an array of selected ids, `params[:ids]`.
 
-This is a pass-through to `link_to` and accepts all the same options, except that the method `POST` is forced.
+This is a pass-through to `link_to` and accepts all the same options, except that the method `POST` is used by default.
+
+You can also specify `data-method: :get` to instead make a `GET` request with the selected ids and redirect the browser link a normal link.
 
 ```ruby
 bulk_actions do
@@ -742,17 +744,17 @@ end
 or if using [effective_resources](https://github.com/code-and-effect/effective_resources):
 
 ```ruby
-  include Effective::CrudController
+include Effective::CrudController
 
-  collection_action :bulk_approve
+collection_action :bulk_approve
 ```
 
 and in your model
 
 ```ruby
-  def approve!
-    update_attributes!(status: :approved)
-  end
+def approve!
+  update_attributes!(status: :approved)
+end
 ```
 
 ### bulk_action_divider

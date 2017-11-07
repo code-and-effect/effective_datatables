@@ -187,6 +187,8 @@ table.dataTable {
     input[type='checkbox'] { margin-left: 1px; margin-right: 1px; }
   }
 
+  td.col-resource_item { word-break: keep-all; }
+
   td {
     p { margin-bottom: 0px; }
   }
