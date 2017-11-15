@@ -6,9 +6,7 @@ module EffectiveDatatablesHelper
 
     datatable.view ||= self
 
-    begin
-      EffectiveDatatables.authorized?(controller, :index, datatable.collection_class) || raise(Effective::AccessDenied)
-    rescue Effective::AccessDenied => e
+    unless EffectiveDatatables.authorized?(controller, :index, datatable.collection_class)
       return content_tag(:p, "You are not authorized to view this datatable. (cannot :index, #{datatable.collection_class})")
     end
 

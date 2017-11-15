@@ -8,11 +8,11 @@ module Effective
         @datatable = find_datatable(params[:id]).try(:new) || raise('unable to find datatable')
         @datatable.view = view_context
 
-        EffectiveDatatables.authorized?(self, :index, @datatable.collection_class)
+        EffectiveDatatables.authorize!(self, :index, @datatable.collection_class)
 
         render json: @datatable.to_json
       rescue => e
-        (EffectiveDatatables.authorized?(self, :index, @datatable.try(:collection_class)) rescue false)
+        EffectiveDatatables.authorized?(self, :index, @datatable.try(:collection_class))
 
         render json: error_json(e)
       end
