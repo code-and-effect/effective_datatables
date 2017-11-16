@@ -103,57 +103,42 @@ module Effective
 
       def actions_col_locals(opts)
         return {} unless opts[:as] == :actions
-        return { show_path: false, edit_path: false, destroy_path: false } unless active_record_collection?
 
-        locals = {}
-
-        locals[:show_action] = opts[:show]
-        locals[:edit_action] = opts[:edit]
-        locals[:destroy_action] = opts[:destroy]
-
-        if locals[:show_action] && (EffectiveDatatables.authorized?(view.controller, :show, collection_class) rescue false)
-          locals[:show_path] = resource.show_path(check: true)
-        else
-          locals[:show_path] = false
-        end
-
-        if locals[:edit_action] && (EffectiveDatatables.authorized?(view.controller, :edit, collection_class) rescue false)
-          locals[:edit_path] = resource.edit_path(check: true)
-        else
-          locals[:edit_path] = false
-        end
-
-        if locals[:destroy_action] && (EffectiveDatatables.authorized?(view.controller, :destroy, collection_class) rescue false)
-          locals[:destroy_path] = resource.destroy_path(check: true)
-        else
-          locals[:destroy_path] = false
-        end
-
-        locals
+        locals = {
+          show_action: (
+            active_record_collection? && opts[:show] && resource.routes[:show] &&
+            EffectiveDatatables.authorized?(view.controller, :show, collection_class)
+          ),
+          edit_action: (
+            active_record_collection? && opts[:edit] && resource.routes[:edit] &&
+            EffectiveDatatables.authorized?(view.controller, :edit, collection_class)
+          ),
+          destroy_action: (
+            active_record_collection? && opts[:destroy] && resource.routes[:destroy] &&
+            EffectiveDatatables.authorized?(view.controller, :destroy, collection_class)
+          ),
+          effective_resource: resource
+        }
       end
 
       def resource_col_locals(opts)
         return {} unless (resource = opts[:resource]).present?
 
-        locals = { name: opts[:name], macro: opts[:as], show_path: false, edit_path: false }
+        locals = { name: opts[:name], effective_resource: resource, show_action: false, edit_action: false }
 
         case opts[:action]
         when :edit
-          if (EffectiveDatatables.authorized?(view.controller, :edit, resource.klass) rescue false)
-            locals[:edit_path] = resource.edit_path(check: true)
-          end
+          locals[:edit_action] = (resource.routes[:edit] && EffectiveDatatables.authorized?(view.controller, :edit, resource.klass))
         when :show
-          if (EffectiveDatatables.authorized?(view.controller, :show, resource.klass) rescue false)
-            locals[:show_path] = resource.show_path(check: true)
-          end
+          locals[:show_action] = (resource.routes[:show] && EffectiveDatatables.authorized?(view.controller, :show, resource.klass))
         when false
           # Nothing
         else
           # Fallback to defaults - check edit then show
-          if (EffectiveDatatables.authorized?(view.controller, :edit, resource.klass) rescue false)
-            locals[:edit_path] = resource.edit_path(check: true)
-          elsif (EffectiveDatatables.authorized?(view.controller, :show, resource.klass) rescue false)
-            locals[:show_path] = resource.show_path(check: true)
+          if resource.routes[:edit] && EffectiveDatatables.authorized?(view.controller, :edit, resource.klass)
+            locals[:edit_action] = true
+          elsif resource.routes[:show] && EffectiveDatatables.authorized?(view.controller, :show, resource.klass)
+            locals[:show_action] = true
           end
         end
 

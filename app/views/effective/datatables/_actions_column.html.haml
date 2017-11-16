@@ -1,11 +1,8 @@
-- if show_path
-  - if show_action == true || (EffectiveDatatables.authorized?(controller, :show, resource) rescue false)
-    = show_icon_to send(show_path, resource.to_param)
+- if show_action && EffectiveDatatables.authorized?(self, :show, resource)
+  = show_icon_to effective_resource.action_path(:show, resource)
 
-- if edit_path
-  - if edit_action == true || (EffectiveDatatables.authorized?(controller, :edit, resource) rescue false)
-    = edit_icon_to send(edit_path, resource.to_param)
+- if edit_action && EffectiveDatatables.authorized?(self, :edit, resource)
+  = edit_icon_to effective_resource.action_path(:edit, resource)
 
-- if destroy_path
-  - if destroy_action == true || (EffectiveDatatables.authorized?(controller, :destroy, resource) rescue false)
-    = destroy_icon_to send(destroy_path, resource.to_param), data: { method: :delete, confirm: "Delete #{resource}?" }
+- if destroy_action && EffectiveDatatables.authorized?(self, :destroy, resource)
+  = destroy_icon_to effective_resource.action_path(:destroy, resource), data: { method: :delete, confirm: "Delete #{resource}?" }
