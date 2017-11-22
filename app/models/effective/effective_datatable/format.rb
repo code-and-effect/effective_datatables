@@ -36,7 +36,7 @@ module Effective
             value = row[index]
 
             row[index] = (
-              if opts[:format] && opts[:as] == :actions
+              if opts[:format] && rendered.key?(name)
                 dsl_tool.instance_exec(value, row, rendered[name][row_index], &opts[:format])
               elsif opts[:format]
                 dsl_tool.instance_exec(value, row, &opts[:format])
