@@ -88,7 +88,7 @@ module Effective
         end
       end
 
-      def aggregate(collection)
+      def aggregate(collection, raw: false) # raw values
         cols = collection.transpose
 
         _aggregates.map do |_, aggregate|
@@ -109,6 +109,8 @@ module Effective
               dsl_tool.instance_exec(values, columns[name], &opts[:aggregate])
             elsif aggregate[:compute]
               dsl_tool.instance_exec(values, columns[name], &aggregate[:compute])
+            elsif raw
+              aggregate_column(values, opts, aggregate)
             else
               format_column(aggregate_column(values, opts, aggregate), opts)
             end || BLANK
@@ -133,7 +135,7 @@ module Effective
           end
         when :average
           if values.all? { |value| value.kind_of?(Numeric) }
-            values.sum / [length, 1].max
+            values.sum / ([length, 1].max)
           elsif values.all? { |value| value == true || value == false }
             values.count { |val| val == true } >= (length / 2) ? true : false
           elsif aggregate[:labeled] == false

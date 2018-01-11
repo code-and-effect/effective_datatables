@@ -52,7 +52,7 @@ initializeDataTables = ->
       dom: "<'row'<'col-sm-12'B>><'row'<'col-sm-12'tr>><'row'<'col-sm-6 dataTables_entries'il><'col-sm-6'p>>"
       iDisplayLength: datatable.data('display-length')
       language: { 'lengthMenu': '&nbsp;with _MENU_ per page'}
-      lengthMenu: [[10, 25, 50, 100, 250, 500, 9999999], ['10', '25', '50', '100', '250', '500', 'All']]
+      lengthMenu: [[5, 10, 25, 50, 100, 250, 500, 9999999], ['5', '10', '25', '50', '100', '250', '500', 'All']]
       order: datatable.data('display-order')
       processing: true
       responsive: true

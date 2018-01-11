@@ -175,7 +175,7 @@ module Effective
       if column[:format]
         datatable.dsl_tool.instance_exec(obj, row, &column[:format])
       elsif column[:partial]
-        raise 'unsupported'
+        obj.to_s
       elsif obj.respond_to?(column[:name])
         obj.send(column[:name])
       elsif column[:as] == :time && obj.respond_to?(:strftime)
