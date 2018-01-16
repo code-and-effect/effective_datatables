@@ -15,7 +15,7 @@ module Effective
             name: name.to_sym,
             parse: parse,
             required: required,
-            input_html: input_html
+            input_html: input_html.merge({ value: value })
           }
         end
 
