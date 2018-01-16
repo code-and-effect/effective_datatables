@@ -11,7 +11,7 @@ module Effective
           datatable._filters[name.to_sym] = {
             value: value,
             as: as,
-            label: label || name.to_s.titleize,
+            label: label || (label == false ? false : name.to_s.titleize),
             name: name.to_sym,
             parse: parse,
             required: required,
