@@ -17,6 +17,11 @@
             as: opts[:as],
             collection: opts[:input_html].delete(:collection),
             multiple: opts[:input_html].delete(:multiple),
+            include_blank: opts[:input_html].delete(:include_blank),
+            group_method: opts[:input_html].delete(:group_method),
+            group_label_method: opts[:input_html].delete(:group_label_method),
+            value_method: opts[:input_html].delete(:value_method),
+            label_method: opts[:input_html].delete(:label_method),
             input_html: (({name: ''} unless datatable._filters_form_required?) || {}).merge(opts[:input_html]),
             input_js: ({ placeholder: ''} if opts[:as] == :effective_select),
             wrapper_html: {class: 'form-group-sm'}
