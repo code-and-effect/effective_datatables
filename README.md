@@ -665,6 +665,8 @@ filters do
   filter :start_date, Time.zone.now-3.months, required: true
   filter :end_date, nil, parse: -> { |term| Time.zone.local(term).end_of_day }
   filter :user, current_user, as: :select, collection: User.all
+  filter :year, 2018, as: :select, collection: [2018, 2017], label: false, include_blank: false
+  filter :reports, '2018', as: :grouped_select, collection: [['Years', [['2017', '2017'], ['2018', '2018']]], ['Months', [['January', '1'], ['February', '2']]]], group_method: :last
 end
 ```
 
