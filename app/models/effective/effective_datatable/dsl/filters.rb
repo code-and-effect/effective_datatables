@@ -8,6 +8,11 @@ module Effective
           raise 'expected second argument to be a value' if value == :_no_value
           raise 'parse must be a Proc' if parse.present? && !parse.kind_of?(Proc)
 
+          # Merge search
+          if input_html.kind_of?(Hash) && input_html[:search].kind_of?(Hash)
+            input_html = input_html.merge(input_html[:search])
+          end
+
           datatable._filters[name.to_sym] = {
             value: value,
             as: as,

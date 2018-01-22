@@ -12,7 +12,10 @@
     - if datatable._filters.present?
       .effective-datatables-filters-inputs
         - datatable._filters.each do |name, opts|
-          = form.input name, label: opts[:label], required: false, value: datatable.state[:filter][name],
+          = form.input name,
+            label: opts[:label],
+            required: opts[:input_html].delete(:required),
+            value: datatable.state[:filter][name],
             as: opts[:as],
             collection: opts[:input_html].delete(:collection),
             multiple: opts[:input_html].delete(:multiple),
