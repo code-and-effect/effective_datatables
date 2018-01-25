@@ -1,6 +1,7 @@
 module Effective
   module EffectiveDatatable
     module Resource
+      AGGREGATE_SQL_FUNCTIONS = ['ARRAY_AGG(', 'AVG(', 'COUNT(', 'MAX(', 'MIN(', 'STRING_AGG(', 'SUM(']
 
       def admin_namespace?
         controller_namespace == 'admin'
@@ -73,6 +74,10 @@ module Effective
             when :string  # This is the fallback
               # Anything that doesn't belong to the model or the sql table, we assume is a SELECT SUM|AVG|RANK() as fancy
               opts[:sql_as_column] = true if (resource.table && resource.column(name).blank?)
+            end
+
+            if opts[:sql_column].present? && AGGREGATE_SQL_FUNCTIONS.any? { |str| opts[:sql_column].to_s.start_with?(str) }
+              opts[:sql_as_column] = true
             end
           end
         end

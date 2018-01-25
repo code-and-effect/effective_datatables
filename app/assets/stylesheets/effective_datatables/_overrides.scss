@@ -177,6 +177,7 @@ table.dataTable > tbody > tr.child {
 // Column specific adjustments
 table.dataTable {
   td.col-price { text-align: right; }
+  td.col-decimal { text-align: right; }
   td.col-right { text-align: right; }
 
   td.col-actions {
