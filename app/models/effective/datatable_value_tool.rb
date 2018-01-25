@@ -136,7 +136,7 @@ module Effective
           end
         when *macros, :resource
           Array(obj).any? do |resource|
-            Array(terms).any? do |term|
+            Array(term).any? do |term|
               matched = false
 
               if term.kind_of?(Integer) && resource.respond_to?(:to_param)
