@@ -16,33 +16,19 @@ For use with any Rails 3, 4, 5 application already using Twitter Bootstrap 3.
 
 Works with postgres, mysql, sqlite3 and arrays.
 
-## effective_datatables 3.0
+## Bootstrap3
 
-This is the 3.0 release of effective_datatables.  It's a complete rewrite, with a similar but totally changed DSL.
+This is the `bootstrap3` branch of effective_datatables which supports Twitter Bootstrap 3.
 
-[Effective Datatables 2.0 README](https://github.com/code-and-effect/effective_datatables/tree/2.12.2)
+All published effective_datatables 3.x gems will support Twitter Bootstrap 3 and SimpleForm.
 
-Previous versions of the gem were excellent, but the 3.0 release has stepped things up.
-
-Internally, all columns now have separate compute and format methods, removing the need for a ton of internal parsing and type conversions.
-This allows things like filters, aggregates and searching/sorting to work effectively.
-
-Column rendering has been improved so all datatable and view methods are callable from anywhere in the DSL.
-This allows the developer to do things like: include/exclude/configure columns based on the current_user, apply logic around current filters
-to change columns dynamically, to use regular ifs instead of procs in toggling visibility, and generally removes all weirdness.
-
-This release adds a dependency on [effective_resources](https://github.com/code-and-effect/effective_resources) for ActiveRecord resource discovery,
-full sql table fuzzy searching/sorting, attribute parsing, and checking availability & authorization of edit/show actions.
-
-A cookie has been added to persist the user's selected filters, search, sort, length, column visibility and pagination settings.
-
-A lot has changed. See below for full details.
+For Bootstrap 4 please see the master branch and/or effective_datatables 4.x gems.
 
 # Getting Started
 
 ```ruby
 gem 'haml-rails'            # or try using gem 'hamlit-rails'
-gem 'effective_datatables'
+gem 'effective_datatables', github: 'code-and-effect/effective_datatables', branch: 'bootstrap3'
 ```
 
 Run the bundle command to install it:
