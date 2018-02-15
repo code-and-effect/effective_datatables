@@ -18,7 +18,7 @@ module EffectiveDatatablesHelper
 
     effective_datatable_params = {
       id: datatable.to_param,
-      class: Array(datatable.table_html_class).join(' '),
+      class: ('effective-datatable ' + Array(datatable.table_html_class).join(' ')),
       data: {
         'effective-form-inputs' => defined?(EffectiveFormInputs),
         'bulk-actions' => datatable_bulk_actions(datatable),
@@ -57,6 +57,26 @@ module EffectiveDatatablesHelper
         locals: { datatable: datatable, effective_datatable_params: effective_datatable_params }
       )
     end
+  end
+
+  def render_simple_datatable(datatable)
+    raise 'expected datatable to be present' unless datatable
+
+    datatable.view ||= self
+
+    unless EffectiveDatatables.authorized?(controller, :index, datatable.collection_class)
+      return content_tag(:p, "You are not authorized to view this datatable. (cannot :index, #{datatable.collection_class})")
+    end
+
+    effective_datatable_params = {
+      id: datatable.to_param,
+      class: Array(datatable.table_html_class).join(' '),
+      data: {}
+    }
+
+    render(partial: 'effective/datatables/datatable',
+      locals: { datatable: datatable, effective_datatable_params: effective_datatable_params }
+    )
   end
 
   def render_datatable_filters(datatable)
