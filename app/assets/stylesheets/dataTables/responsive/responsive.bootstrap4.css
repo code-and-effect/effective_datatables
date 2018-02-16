@@ -16,7 +16,7 @@ table.dataTable.dtr-inline.collapsed > tbody > tr[role="row"] > th:first-child {
 }
 table.dataTable.dtr-inline.collapsed > tbody > tr[role="row"] > td:first-child:before,
 table.dataTable.dtr-inline.collapsed > tbody > tr[role="row"] > th:first-child:before {
-  top: 9px;
+  top: 12px;
   left: 4px;
   height: 14px;
   width: 14px;
@@ -32,7 +32,7 @@ table.dataTable.dtr-inline.collapsed > tbody > tr[role="row"] > th:first-child:b
   font-family: 'Courier New', Courier, monospace;
   line-height: 14px;
   content: '+';
-  background-color: #337ab7;
+  background-color: #0275d8;
 }
 table.dataTable.dtr-inline.collapsed > tbody > tr.parent > td:first-child:before,
 table.dataTable.dtr-inline.collapsed > tbody > tr.parent > th:first-child:before {
@@ -78,7 +78,7 @@ table.dataTable.dtr-column > tbody > tr > th.control:before {
   font-family: 'Courier New', Courier, monospace;
   line-height: 14px;
   content: '+';
-  background-color: #337ab7;
+  background-color: #0275d8;
 }
 table.dataTable.dtr-column > tbody > tr.parent td.control:before,
 table.dataTable.dtr-column > tbody > tr.parent th.control:before {

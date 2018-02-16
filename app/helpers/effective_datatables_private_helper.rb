@@ -27,7 +27,7 @@ module EffectiveDatatablesPrivateHelper
   end
 
   def datatable_reset(datatable)
-    render(partial: '/effective/datatables/reset', locals: { datatable: datatable }).gsub("'", '"').html_safe
+    link_to(content_tag(:span, 'Reset'), '#', class: 'btn btn-light buttons-reset-search')
   end
 
   def datatable_search_html(form, name, value, opts)

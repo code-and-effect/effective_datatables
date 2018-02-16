@@ -26,7 +26,7 @@ EffectiveDatatables.setup do |config|
   config.default_length = 25
 
   # Default class used on the <table> tag
-  config.html_class = 'table table-bordered table-striped'
+  config.html_class = 'table table-hover'
 
   # When using the actions_column DSL method, apply the following behavior
   # Valid values for each action are:

@@ -8,13 +8,15 @@ $(document).on 'column-visibility.dt', (event, settings, index, state) ->
   clearTimeout(timeout) if timeout
   $table.data('timeout', setTimeout( =>
       $table.DataTable().draw()
-      $.event.trigger('page:change')
     , 700)
   )
+  true
 
 # Remove empty label (bulk actions) from ColVis dropdown
-$(document).on 'click.dtb-collection', (event) ->
-  $colvis = $('.dt-button-collection:not(.initialized)')
+$(document).on 'click', 'a.buttons-colvis:not(.initialized)', (event) ->
+  $colvis = $('.dt-button-collection')
   return if $colvis.length == 0
 
-  $colvis.addClass('initialized').find('li > a:empty').each -> $(this).parent().remove()
+  $colvis.find('a > span:empty').each -> $(this).parent().remove()
+  $colvis.find('a.buttons-colvisGroup').first().before("<div class='dropdown-divider'></div>")
+  $(event.currentTarget).addClass('initialized')
