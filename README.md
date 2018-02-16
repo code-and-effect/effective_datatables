@@ -12,31 +12,16 @@ Other features include aggregate (total/average) footer rows, bulk actions, show
 
 This gem includes the jQuery DataTables assets.
 
-For use with any Rails 3, 4, 5 application already using Twitter Bootstrap 3.
 
 Works with postgres, mysql, sqlite3 and arrays.
 
-## effective_datatables 3.0
+## effective_datatables 4.0
 
-This is the 3.0 release of effective_datatables.  It's a complete rewrite, with a similar but totally changed DSL.
+This is the 4.0 relese of effective_datatables.
 
-[Effective Datatables 2.0 README](https://github.com/code-and-effect/effective_datatables/tree/2.12.2)
+This requires Twitter Bootstrap 4 and Rails 5.1+
 
-Previous versions of the gem were excellent, but the 3.0 release has stepped things up.
-
-Internally, all columns now have separate compute and format methods, removing the need for a ton of internal parsing and type conversions.
-This allows things like filters, aggregates and searching/sorting to work effectively.
-
-Column rendering has been improved so all datatable and view methods are callable from anywhere in the DSL.
-This allows the developer to do things like: include/exclude/configure columns based on the current_user, apply logic around current filters
-to change columns dynamically, to use regular ifs instead of procs in toggling visibility, and generally removes all weirdness.
-
-This release adds a dependency on [effective_resources](https://github.com/code-and-effect/effective_resources) for ActiveRecord resource discovery,
-full sql table fuzzy searching/sorting, attribute parsing, and checking availability & authorization of edit/show actions.
-
-A cookie has been added to persist the user's selected filters, search, sort, length, column visibility and pagination settings.
-
-A lot has changed. See below for full details.
+Please check out [Effective Datatables 3.x](https://github.com/code-and-effect/effective_datatables/tree/bootstrap3) for more information using this gem with Bootstrap 3.
 
 # Getting Started
 
@@ -58,6 +43,8 @@ rails generate effective_datatables:install
 ```
 
 The generator will install an initializer which describes all configuration options.
+
+Make sure you have (Twitter Bootstrap 4)[https://github.com/twbs/bootstrap-rubygem] installed.
 
 Require the javascript on the asset pipeline by adding the following to your application.js:
 

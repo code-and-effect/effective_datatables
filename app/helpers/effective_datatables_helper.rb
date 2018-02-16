@@ -28,7 +28,7 @@ module EffectiveDatatablesHelper
         'display-order' => [datatable.order_index, datatable.order_direction].to_json().html_safe,
         'display-records' => datatable.to_json[:recordsFiltered],
         'display-start' => datatable.display_start,
-        'input-js-options' => (input_js || {}).to_json.html_safe,
+        'options' => (input_js || {}).to_json.html_safe,
         'reset' => datatable_reset(datatable),
         'simple' => datatable.simple?.to_s,
         'source' => effective_datatables.datatable_path(datatable, {format: 'json'}),

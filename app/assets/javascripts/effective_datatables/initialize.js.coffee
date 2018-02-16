@@ -3,12 +3,12 @@ initializeDataTables = ->
     return if $.fn.DataTable.fnIsDataTable(this)
 
     datatable = $(this)
-    input_js_options = datatable.data('input-js-options') || {}
-    buttons_export_columns = input_js_options['buttons_export_columns'] || ':not(.col-actions)'
+    options = datatable.data('options') || {}
+    buttons_export_columns = options['buttons_export_columns'] || ':not(.col-actions)'
     simple = ('' + datatable.data('simple') == 'true')
 
-    if input_js_options['buttons'] == false
-      input_js_options['buttons'] = []
+    if options['buttons'] == false
+      options['buttons'] = []
 
     init_options =
       ajax: { url: datatable.data('source'), type: 'POST' }
@@ -181,7 +181,7 @@ initializeDataTables = ->
       datatable.addClass('simple')
 
     # Let's actually initialize the table now
-    table = datatable.dataTable(jQuery.extend(init_options, input_js_options))
+    table = datatable.dataTable(jQuery.extend(init_options, options))
 
     # Apply EffectiveFormInputs to the Show x per page dropdown
     if datatable.data('effective-form-inputs')
