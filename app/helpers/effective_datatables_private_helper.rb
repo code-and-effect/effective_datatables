@@ -9,9 +9,8 @@ module EffectiveDatatablesPrivateHelper
     datatable.columns.map do |name, opts|
       {
         name: name,
-        title: content_tag(:span, opts[:label], class: 'search-label'),
         className: opts[:col_class],
-        searchHtml: (datatable_search_html(form, name, datatable.state[:search][name], opts[:search]) unless datatable.simple?),
+        searchHtml: (datatable_search_html(form, name, datatable.state[:search][name], opts[:label], opts[:search]) unless datatable.simple?),
         responsivePriority: opts[:responsive],
         search: datatable.state[:search][name],
         sortable: (opts[:sort] && !datatable.simple?),
@@ -30,16 +29,11 @@ module EffectiveDatatablesPrivateHelper
     link_to(content_tag(:span, 'Reset'), '#', class: 'btn btn-light buttons-reset-search')
   end
 
-  def datatable_search_html(form, name, value, opts)
+  def datatable_search_html(form, name, value, label, opts)
     collection = opts.delete(:collection)
 
-    input_options = opts.reverse_merge({
-      label: false,
-      name: nil,
-      value: value,
-      title: (opts[:label] || name.to_s.titleize),
-      data: {'column-name' => name, 'column-index' => opts[:index]}
-    }).delete_if { |k, v| v.blank? && v != false && k != :name }
+    input_options = opts.reverse_merge(label: (label.presence || false), value: value).except(:as, :fuzzy)
+    input_options.merge!(name: nil, feedback: false, data: {'column-name': name, 'column-index': opts[:index] })
 
     form.text_field name, input_options
 

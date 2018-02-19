@@ -151,7 +151,7 @@ initializeDataTables = ->
           api.settings()[0].aoPreSearchCols[index].sSearch = settings.search
 
         if settings.searchHtml  # Append the search html and initialize input events
-          $th.append('<br>' + settings.searchHtml)
+          $th.html(settings.searchHtml)
           initializeSearchEvents($th)
 
     # Sets up the proper events for each input
@@ -184,8 +184,7 @@ initializeDataTables = ->
     table = datatable.dataTable(jQuery.extend(init_options, options))
 
     # Apply EffectiveFormInputs to the Show x per page dropdown
-    if datatable.data('effective-form-inputs')
-      try table.closest('.dataTables_wrapper').find('.dataTables_length select').removeAttr('name').select2(minimumResultsForSearch: 100)
+    try table.closest('.dataTables_wrapper').find('.dataTables_length select').removeAttr('name').select2(minimumResultsForSearch: 100)
 
 destroyDataTables = ->
   $('table.effective-datatable').each ->
