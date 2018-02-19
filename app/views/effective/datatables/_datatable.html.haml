@@ -3,15 +3,15 @@
     - if datatable.columns.any? { |_, opts| opts[:th].present? } == false
       %tr
         - datatable.columns.each do |name, opts|
-          %th= opts[:label] || name
+          %th{title: opts[:label]}= opts[:label]
     - else
       - max_depth = datatable.columns.map { |_, opts| opts[:th].try(:[], :depth) || 0 }.max
       - [*0..max_depth].each do |depth|
         %tr
           - columns = datatable.columns.select { |_, opts| (opts[:th].try(:[], :depth) || 0) == depth }
           - columns.each do |name, opts|
-            %th{(opts[:th] || {}).merge(title: (opts[:label] || name))}
-              = opts[:label] || name
+            %th{(opts[:th] || {}).merge(title: opts[:label])}
+              = opts[:label]
             - (opts[:th_append] || []).each do |faux_col|
               %th{(faux_col[:th] || {}).merge(title: faux_col[:label])}
                 = faux_col[:label]

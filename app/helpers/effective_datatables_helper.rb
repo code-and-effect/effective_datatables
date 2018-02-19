@@ -70,7 +70,7 @@ module EffectiveDatatablesHelper
 
     effective_datatable_params = {
       id: datatable.to_param,
-      class: Array(datatable.table_html_class).join(' '),
+      class: ('effective-datatable simple ' + Array(datatable.table_html_class).join(' ')),
       data: {}
     }
 

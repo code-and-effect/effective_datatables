@@ -4,15 +4,16 @@ module Effective
       module BulkActions
 
         def bulk_action(*args)
-          datatable._bulk_actions.push(content_tag(:li, link_to_bulk_action(*args)))
+
+          datatable._bulk_actions.push(link_to_bulk_action(*args))
         end
 
         def bulk_download(*args)
-          datatable._bulk_actions.push(content_tag(:li, link_to_bulk_action(*args), 'data-authenticity-token' => form_authenticity_token))
+          datatable._bulk_actions.push(link_to_bulk_action(*args.merge('data-authenticity-token' => form_authenticity_token)))
         end
 
         def bulk_action_divider
-          datatable._bulk_actions.push(content_tag(:li, '', class: 'divider', role: 'separator'))
+          datatable._bulk_actions.push(content_tag(:div, '', class: 'dropdown-divider'))
         end
 
         def bulk_action_content(&block)
@@ -36,6 +37,9 @@ module Effective
               if data_method.to_s == 'get'
                 arg[:data].present? ? arg[:data]['bulk-actions-get'] = true : arg['data-bulk-actions-get'] = true
               end
+
+              arg[:class] = [arg[:class], 'dropdown-item'].compact.join(' ')
+
             end
 
             arg
