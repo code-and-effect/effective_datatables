@@ -151,7 +151,7 @@ initializeDataTables = ->
           api.settings()[0].aoPreSearchCols[index].sSearch = settings.search
 
         if settings.searchHtml  # Append the search html and initialize input events
-          $th.html(settings.searchHtml)
+          $th.append(settings.searchHtml)
           initializeSearchEvents($th)
 
     # Sets up the proper events for each input

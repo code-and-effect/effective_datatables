@@ -32,10 +32,11 @@ module EffectiveDatatablesPrivateHelper
   def datatable_search_html(form, name, value, opts)
     collection = opts[:search].delete(:collection)
 
-    options = opts[:search]
-      .except(:fuzzy)
-      .reverse_merge(label: (opts[:label].presence || false), value: value)
-      .merge(name: nil, feedback: false, data: {'column-name': name, 'column-index': opts[:index]})
+    options = opts[:search].except(:fuzzy)
+
+    options.merge!(
+      name: nil, label: false, feedback: false, value: value, data: { 'column-name': name, 'column-index': opts[:index] }
+    )
 
     case options.delete(:as)
     when :string, :text, :number
