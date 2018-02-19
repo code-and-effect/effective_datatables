@@ -10,7 +10,7 @@ module EffectiveDatatablesPrivateHelper
       {
         name: name,
         className: opts[:col_class],
-        searchHtml: (datatable_search_html(form, name, datatable.state[:search][name], opts[:label], opts[:search]) unless datatable.simple?),
+        searchHtml: (datatable_search_html(form, name, datatable.state[:search][name], opts) unless datatable.simple?),
         responsivePriority: opts[:responsive],
         search: datatable.state[:search][name],
         sortable: (opts[:sort] && !datatable.simple?),
@@ -29,21 +29,25 @@ module EffectiveDatatablesPrivateHelper
     link_to(content_tag(:span, 'Reset'), '#', class: 'btn btn-light buttons-reset-search')
   end
 
-  def datatable_search_html(form, name, value, label, opts)
-    collection = opts.delete(:collection)
+  def datatable_search_html(form, name, value, opts)
+    collection = opts[:search].delete(:collection)
 
-    options = opts
+    options = opts[:search]
       .except(:fuzzy)
-      .reverse_merge(label: (label.presence || false), value: value)
+      .reverse_merge(label: (opts[:label].presence || false), value: value)
       .merge(name: nil, feedback: false, data: {'column-name': name, 'column-index': opts[:index]})
 
     case options.delete(:as)
     when :string, :text, :number
       form.text_field name, options
     when :date, :datetime
-      form.date_field name, options.merge(date_linked: false, input_js: { useStrict: true, keepInvalid: true })
+      form.date_field name, options.merge(
+        date_linked: false, prepend: false, input_js: { useStrict: true, keepInvalid: true }
+      )
     when :time
-      form.time_field name, options.merge(date_linked: false, input_js: { useStrict: false, keepInvalid: true })
+      form.time_field name, options.merge(
+        date_linked: false, prepend: false, input_js: { useStrict: false, keepInvalid: true }
+      )
     when :select, :boolean
       form.select name, collection, options
     when :bulk_actions
