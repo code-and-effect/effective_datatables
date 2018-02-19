@@ -32,67 +32,25 @@ module EffectiveDatatablesPrivateHelper
   def datatable_search_html(form, name, value, label, opts)
     collection = opts.delete(:collection)
 
-    input_options = opts.reverse_merge(label: (label.presence || false), value: value).except(:as, :fuzzy)
-    input_options.merge!(name: nil, feedback: false, data: {'column-name': name, 'column-index': opts[:index] })
+    options = opts
+      .except(:fuzzy)
+      .reverse_merge(label: (label.presence || false), value: value)
+      .merge(name: nil, feedback: false, data: {'column-name': name, 'column-index': opts[:index]})
 
-    form.text_field name, input_options
+    case options.delete(:as)
+    when :string, :text, :number
+      form.text_field name, options
+    when :date, :datetime
+      form.date_field name, options.merge(date_linked: false, input_js: { useStrict: true, keepInvalid: true })
+    when :time
+      form.time_field name, options.merge(date_linked: false, input_js: { useStrict: false, keepInvalid: true })
+    when :select, :boolean
+      form.select name, collection, options
+    when :bulk_actions
+      options[:data]['role'] = 'bulk-actions-all'
+      form.check_box name, options.merge(custom: false)
+    end
 
-    # case opts[:search][:as]
-    # when :string, :text, :number
-
-    #   form.input name, label: false, required: false, value: value,
-    #     as: :string,
-    #     placeholder: placeholder,
-    #     wrapper_html: wrapper_html,
-    #     input_html: input_html
-    # when :effective_obfuscation
-    #   input_html[:pattern] ||= '[0-9]{3}-?[0-9]{4}-?[0-9]{3}'
-    #   input_html[:title] = 'Expected format: XXX-XXXX-XXX'
-
-    #   form.input name, label: false, required: false, value: value,
-    #     as: :string,
-    #     placeholder: placeholder,
-    #     wrapper_html: wrapper_html,
-    #     input_html: input_html
-    # when :date, :datetime
-    #   form.input name, label: false, required: false, value: value,
-    #     as: (ActionView::Helpers::FormBuilder.instance_methods.include?(:effective_date_picker) ? :effective_date_picker : :string),
-    #     placeholder: placeholder,
-    #     wrapper_html: wrapper_html,
-    #     input_group: false,
-    #     input_html: input_html,
-    #     date_linked: false,
-    #     input_js: { useStrict: true, keepInvalid: true }
-    #     # Keep invalid format like "2015-11" so we can still search by year, month or day
-    # when :time
-    #   form.input name, label: false, required: false, value: value,
-    #     as: (ActionView::Helpers::FormBuilder.instance_methods.include?(:effective_time_picker) ? :effective_time_picker : :string),
-    #     placeholder: placeholder,
-    #     wrapper_html: wrapper_html,
-    #     input_group: false,
-    #     input_html: input_html,
-    #     date_linked: false,
-    #     input_js: { useStrict: false, keepInvalid: true }
-    # when :select, :boolean
-    #   form.input name, label: false, required: false, value: value,
-    #     as: (ActionView::Helpers::FormBuilder.instance_methods.include?(:effective_select) ? :effective_select : :select),
-    #     collection: opts[:search][:collection],
-    #     selected: opts[:search][:value],
-    #     multiple: opts[:search][:multiple],
-    #     grouped: opts[:search][:grouped],
-    #     polymorphic: opts[:search][:polymorphic],
-    #     template: opts[:search][:template],
-    #     include_blank: include_blank,
-    #     wrapper_html: wrapper_html,
-    #     input_html: input_html,
-    #     input_js: { placeholder: placeholder }
-    # when :bulk_actions
-    #   input_html[:data]['role'] = 'bulk-actions-all'
-
-    #   form.input name, label: false, required: false, value: nil,
-    #     as: :boolean,
-    #     input_html: input_html
-    # end
   end
 
 end
