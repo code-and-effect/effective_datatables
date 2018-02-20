@@ -57,6 +57,7 @@ module EffectiveDatatablesPrivateHelper
         date_linked: false, prepend: false, input_js: { useStrict: false, keepInvalid: true }
       )
     when :select, :boolean
+      options[:input_js] = (options[:input_js] || {}).reverse_merge(placeholder: '')
       form.select name, collection, options
     when :bulk_actions
       options[:data]['role'] = 'bulk-actions-all'
@@ -88,7 +89,8 @@ module EffectiveDatatablesPrivateHelper
     when :time
       form.time_field name, options
     when :select, :boolean
-      form.select name, collection, options.merge(input_js: { placeholder: placeholder })
+      options[:input_js] = (options[:input_js] || {}).reverse_merge(placeholder: placeholder)
+      form.select name, collection, options
     else
       form.text_field name, options
     end
