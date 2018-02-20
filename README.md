@@ -44,7 +44,7 @@ rails generate effective_datatables:install
 
 The generator will install an initializer which describes all configuration options.
 
-Make sure you have (Twitter Bootstrap 4)[https://github.com/twbs/bootstrap-rubygem] installed.
+Make sure you have [Twitter Bootstrap 4](https://github.com/twbs/bootstrap-rubygem) installed.
 
 Require the javascript on the asset pipeline by adding the following to your application.js:
 
