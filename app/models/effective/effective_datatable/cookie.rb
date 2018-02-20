@@ -39,10 +39,6 @@ module Effective
         if @cookie.kind_of?(Array)
           @cookie = initial_state.keys.zip(@cookie.second).to_h
         end
-
-        Rails.logger.info '==== LOAD ==='
-        Rails.logger.info @dt_cookie
-        Rails.logger.info '============'
       end
 
       def save_cookie!
@@ -52,10 +48,6 @@ module Effective
         while @dt_cookie.to_s.size > MAX_COOKIE_SIZE
           @dt_cookie.shift((@dt_cookie.length / 3) + 1)
         end
-
-        Rails.logger.info '==== SAVE ==='
-        Rails.logger.info @dt_cookie
-        Rails.logger.info '============'
 
         view.cookies.signed['_effective_dt'] = Base64.encode64(Marshal.dump(@dt_cookie))
       end
