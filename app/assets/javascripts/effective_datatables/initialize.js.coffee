@@ -150,9 +150,7 @@ initializeDataTables = ->
         if settings.search != null # Assign preselected values
           api.settings()[0].aoPreSearchCols[index].sSearch = settings.search
 
-        if settings.searchHtml  # Append the search html and initialize input events
-          $th.append(settings.searchHtml)
-          initializeSearchEvents($th)
+        initializeSearchEvents($th)
 
     # Sets up the proper events for each input
     initializeSearchEvents = ($th) ->
@@ -194,7 +192,5 @@ destroyDataTables = ->
 $ -> initializeDataTables()
 $(document).on 'page:change', -> initializeDataTables()
 $(document).on 'turbolinks:load', -> initializeDataTables()
+$(document).on 'turbolinks:render', -> initializeDataTables()
 $(document).on 'turbolinks:before-cache', -> destroyDataTables()
-
-
-

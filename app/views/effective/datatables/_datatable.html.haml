@@ -4,7 +4,7 @@
       %tr
         - datatable.columns.each do |name, opts|
           %th{title: opts[:label].presence}
-            = datatable_header_html(datatable, name, opts)
+            = datatable_header_tag(datatable, name, opts)
     - else
       - max_depth = datatable.columns.map { |_, opts| opts[:th].try(:[], :depth) || 0 }.max
       - [*0..max_depth].each do |depth|

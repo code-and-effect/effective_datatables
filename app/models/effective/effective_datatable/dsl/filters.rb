@@ -13,6 +13,15 @@ module Effective
             input_html = input_html.merge(input_html[:search])
           end
 
+          # Try to guess as value
+          as ||= (
+            if input_html.key?(:collection)
+              :select
+            elsif value.present?
+              Effective::Attribute.new(value).type
+            end
+          )
+
           datatable._filters[name.to_sym] = {
             value: value,
             as: as,
@@ -20,8 +29,7 @@ module Effective
             name: name.to_sym,
             parse: parse,
             required: required,
-            input_html: input_html.merge({ value: value })
-          }
+          }.reverse_merge(input_html)
         end
 
         def scope(name = nil, *args, default: nil, label: nil)

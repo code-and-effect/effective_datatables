@@ -25,7 +25,7 @@ module EffectiveDatatablesPrivateHelper
     link_to(content_tag(:span, 'Reset'), '#', class: 'btn btn-light buttons-reset-search')
   end
 
-  def datatable_header_html(datatable, name, opts)
+  def datatable_header_tag(datatable, name, opts)
     # Build the label
     label = opts[:label].present? ? content_tag(:span, opts[:label]) : ''.html_safe
     return label if opts[:search] == false
@@ -35,21 +35,24 @@ module EffectiveDatatablesPrivateHelper
     form = @_effective_datatables_form_builder
 
     collection = opts[:search].delete(:collection)
-    value = datatable.state[:search][name]
 
     options = opts[:search].except(:fuzzy).merge!(
-      name: nil, feedback: false, label: false, value: value, data: { 'column-name': name, 'column-index': opts[:index] }
+      name: nil,
+      feedback: false,
+      label: false,
+      value: datatable.state[:search][name],
+      data: { 'column-name': name, 'column-index': opts[:index] }
     )
 
     label + case options.delete(:as)
     when :string, :text, :number
       form.text_field name, options
     when :date, :datetime
-      form.date_field name, options.merge(
+      form.date_field name, options.reverse_merge(
         date_linked: false, prepend: false, input_js: { useStrict: true, keepInvalid: true }
       )
     when :time
-      form.time_field name, options.merge(
+      form.time_field name, options.reverse_merge(
         date_linked: false, prepend: false, input_js: { useStrict: false, keepInvalid: true }
       )
     when :select, :boolean
@@ -57,6 +60,24 @@ module EffectiveDatatablesPrivateHelper
     when :bulk_actions
       options[:data]['role'] = 'bulk-actions-all'
       form.check_box name, options.merge(custom: false)
+    end
+  end
+
+  def datatable_filter_tag(form, datatable, name, opts)
+    options = opts.except(:parse).merge(value: datatable.state[:filter][name])
+    options[name] = '' unless datatable._filters_form_required?
+
+    collection = options.delete(:collection)
+
+    case options.delete(:as)
+    when :date, :datetime
+      form.date_field name, options
+    when :time
+      form.time_field name, options
+    when :select, :boolean
+      form.select name, collection, options
+    else
+      form.text_field name, options
     end
   end
 

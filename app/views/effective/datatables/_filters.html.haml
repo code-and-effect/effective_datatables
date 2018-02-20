@@ -1,38 +1,13 @@
-%p Todo
-/ .effective-datatables-filters{'aria-controls': datatable.to_param}
-/   = simple_form_for :filters, url: (datatable._form[:url] || '#'), method: datatable._form[:verb], html: { class: 'form-inline' } do |form|
+.effective-datatables-filters{'aria-controls': datatable.to_param}
+  = effective_form_with(scope: :filters, url: (datatable._form[:url] || '#'), layout: :inline, method: datatable._form[:verb]) do |form|
+    - if datatable._scopes.present?
+      = form.collection_radio_buttons :scope, datatable._scopes.map { |name, opts| [opts[:label], name] }, :last, :first, label: false, required: false, checked: datatable.state[:scope]
 
-/     - if datatable._scopes.present?
-/       .effective-datatables-filters-scopes
-/         = form.input :scope, label: false, required: false, checked: datatable.state[:scope],
-/           as: (defined?(EffectiveFormInputs) ? :effective_radio_buttons : :radio_buttons),
-/           collection: datatable._scopes.map { |name, opts| [opts[:label], name] },
-/           buttons: true,
-/           wrapper_html: {class: 'btn-group-sm'}
+    - datatable._filters.each do |name, opts|
+      = datatable_filter_tag(form, datatable, name, opts)
 
-/     - if datatable._filters.present?
-/       .effective-datatables-filters-inputs
-/         - datatable._filters.each do |name, opts|
-/           = form.input name,
-/             label: opts[:label],
-/             required: opts[:input_html].delete(:required),
-/             value: datatable.state[:filter][name],
-/             selected: datatable.state[:filter][name],
-/             as: opts[:as],
-/             collection: opts[:input_html].delete(:collection),
-/             multiple: opts[:input_html].delete(:multiple),
-/             include_blank: opts[:input_html].delete(:include_blank),
-/             group_method: opts[:input_html].delete(:group_method),
-/             group_label_method: opts[:input_html].delete(:group_label_method),
-/             value_method: opts[:input_html].delete(:value_method),
-/             label_method: opts[:input_html].delete(:label_method),
-/             input_html: (({name: ''} unless datatable._filters_form_required?) || {}).merge(opts[:input_html]),
-/             input_js: ({ placeholder: ''} if opts[:as] == :effective_select),
-/             wrapper_html: {class: 'form-group-sm'}
+    - if datatable._filters_form_required?
+      = form.submit 'Apply', 'data-disable-with': 'Applying...'
+    - else
+      = link_to 'Apply', '#', class: 'btn btn-primary btn-effective-datatables-filters', 'data-apply-effective-datatables-filters': true
 
-/     - if datatable._scopes.present? || datatable._filters.present?
-/       .effective-datatables-filters-btn
-/         - if datatable._filters_form_required?
-/           = form.button :submit, 'Apply', 'data-disable-with': 'Applying...'
-/         - else
-/           = link_to 'Apply', '#', class: 'btn btn-primary btn-sm btn-effective-datatables-filters', 'data-apply-effective-datatables-filters': true
