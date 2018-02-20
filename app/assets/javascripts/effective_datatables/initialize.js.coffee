@@ -26,14 +26,14 @@ initializeDataTables = ->
           extend: 'copy',
           exportOptions:
             format:
-              header: (str) -> $("<div>#{str}</div>").children('.search-label').first().text()
+              header: (str) -> $("<div>#{str}</div>").children('span').first().text()
             columns: buttons_export_columns
         },
         {
           extend: 'csv',
           exportOptions:
             format:
-              header: (str) -> $("<div>#{str}</div>").children('.search-label').first().text()
+              header: (str) -> $("<div>#{str}</div>").children('span').first().text()
             columns: buttons_export_columns
         },
         {
@@ -41,7 +41,7 @@ initializeDataTables = ->
           footer: true,
           exportOptions:
             format:
-              header: (str) -> $("<div>#{str}</div>").children('.search-label').first().text()
+              header: (str) -> $("<div>#{str}</div>").children('span').first().text()
             columns: ':visible:not(.col-actions)'
         },
       ]
@@ -150,7 +150,9 @@ initializeDataTables = ->
         if settings.search != null # Assign preselected values
           api.settings()[0].aoPreSearchCols[index].sSearch = settings.search
 
-        initializeSearchEvents($th)
+        if settings.searchHtml  # Append the search html and initialize input events
+          $th.append(settings.searchHtml)
+          initializeSearchEvents($th)
 
     # Sets up the proper events for each input
     initializeSearchEvents = ($th) ->

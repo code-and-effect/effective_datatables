@@ -20,7 +20,7 @@ table.dataTable thead .sorting_desc:after,
 table.dataTable thead .sorting_asc_disabled:after,
 table.dataTable thead .sorting_desc_disabled:after { content: ''; }
 
-table.dataTable thead th {
+table.dataTable > thead th {
   vertical-align: top;
   background-repeat: no-repeat;
 

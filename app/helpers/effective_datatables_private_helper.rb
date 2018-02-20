@@ -6,9 +6,11 @@ module EffectiveDatatablesPrivateHelper
     datatable.columns.map do |name, opts|
       {
         name: name,
+        title: content_tag(:span, opts[:label].presence),
         className: opts[:col_class],
         responsivePriority: opts[:responsive],
         search: datatable.state[:search][name],
+        searchHtml: datatable_search_tag(datatable, name, opts),
         sortable: (opts[:sort] && !datatable.simple?),
         visible: datatable.state[:visible][name],
       }
@@ -25,26 +27,25 @@ module EffectiveDatatablesPrivateHelper
     link_to(content_tag(:span, 'Reset'), '#', class: 'btn btn-light buttons-reset-search')
   end
 
-  def datatable_header_tag(datatable, name, opts)
-    # Build the label
-    label = opts[:label].present? ? content_tag(:span, opts[:label]) : ''.html_safe
-    return label if opts[:search] == false
+  def datatable_search_tag(datatable, name, opts)
+    return if opts[:search] == false
 
     # Build the search
-    @_effective_datatables_form_builder || effective_form_with(scope: :datatable_search) { |f| @_effective_datatables_form_builder = f }
+    @_effective_datatables_form_builder || effective_form_with(scope: :datatable_search, url: '#') { |f| @_effective_datatables_form_builder = f }
     form = @_effective_datatables_form_builder
 
     collection = opts[:search].delete(:collection)
+    value = datatable.state[:search][name]
 
     options = opts[:search].except(:fuzzy).merge!(
       name: nil,
       feedback: false,
       label: false,
-      value: datatable.state[:search][name],
+      value: value,
       data: { 'column-name': name, 'column-index': opts[:index] }
     )
 
-    label + case options.delete(:as)
+    case options.delete(:as)
     when :string, :text, :number
       form.text_field name, options
     when :date, :datetime
@@ -64,18 +65,30 @@ module EffectiveDatatablesPrivateHelper
   end
 
   def datatable_filter_tag(form, datatable, name, opts)
-    options = opts.except(:parse).merge(value: datatable.state[:filter][name])
-    options[name] = '' unless datatable._filters_form_required?
+    placeholder = opts.delete(:label)
 
-    collection = options.delete(:collection)
+    collection = opts.delete(:collection)
+    value = datatable.state[:filter][name],
+
+    options = opts.except(:parse).merge(
+      placeholder: placeholder,
+      feedback: false,
+      label: false,
+      value: value,
+      wrapper: { class: 'form-group col-auto'}
+    )
+
+    options[:name] = '' unless datatable._filters_form_required?
 
     case options.delete(:as)
-    when :date, :datetime
+    when :date
       form.date_field name, options
+    when :datetime
+      form.datetime_field name, options
     when :time
       form.time_field name, options
     when :select, :boolean
-      form.select name, collection, options
+      form.select name, collection, options.merge(input_js: { placeholder: placeholder })
     else
       form.text_field name, options
     end

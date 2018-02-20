@@ -20,7 +20,7 @@ module Effective
       end
 
       def filter_params
-        params.select { |name, value| _filters.key?(name.to_sym) }
+        params.select { |name, value| _filters.key?(name.to_sym) && name != 'id' }
       end
 
       def scope_param
