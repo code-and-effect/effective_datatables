@@ -3,18 +3,19 @@
     - if datatable.columns.any? { |_, opts| opts[:th].present? } == false
       %tr
         - datatable.columns.each do |name, opts|
-          %th{title: opts[:label].presence}= opts[:label].presence
+          %th{title: opts[:label].presence}
+            = datatable_header_html(datatable, name, opts)
     - else
       - max_depth = datatable.columns.map { |_, opts| opts[:th].try(:[], :depth) || 0 }.max
       - [*0..max_depth].each do |depth|
         %tr
           - columns = datatable.columns.select { |_, opts| (opts[:th].try(:[], :depth) || 0) == depth }
           - columns.each do |name, opts|
-            %th{(opts[:th] || {}).merge(title: opts[:label])}
-              = opts[:label].presence
+            %th{(opts[:th] || {}).merge(title: opts[:label].presence)}
+              %span= opts[:label] if opts[:label]
             - (opts[:th_append] || []).each do |faux_col|
               %th{(faux_col[:th] || {}).merge(title: faux_col[:label].presence)}
-                = faux_col[:label].presence
+                %span= faux_col[:label] if faux_col[:label]
 
   %tbody
     - datatable.to_json[:data].each do |row|

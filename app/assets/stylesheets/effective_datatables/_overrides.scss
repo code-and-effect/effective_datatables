@@ -1,4 +1,12 @@
+// Override dataTables.bootstrap4.css defaults
 table.dataTable { border-collapse: collapse !important; }
+
+table.dataTable thead > tr > th.sorting_asc, table.dataTable thead > tr > th.sorting_desc, table.dataTable thead > tr > th.sorting,
+table.dataTable thead > tr > td.sorting_asc,
+table.dataTable thead > tr > td.sorting_desc,
+table.dataTable thead > tr > td.sorting {
+  padding: 0.5em 0.5em 0.5em 0.5em;
+}
 
 // Override default sort icons
 table.dataTable thead .sorting:before,
@@ -12,21 +20,26 @@ table.dataTable thead .sorting_desc:after,
 table.dataTable thead .sorting_asc_disabled:after,
 table.dataTable thead .sorting_desc_disabled:after { content: ''; }
 
-table.dataTable thead th { background-repeat: no-repeat; }
+table.dataTable thead th {
+  vertical-align: top;
+  background-repeat: no-repeat;
+
+  > span { padding-right: 1rem; }
+}
 
 table.dataTable thead .sorting {
   background-image: asset-data-url('dataTables/sort.svg');
-  background-position: right 0px bottom 14px;
+  background-position: right 0.25rem top 0.25rem;
 }
 
 table.dataTable thead .sorting_asc {
   background-image: asset-data-url('dataTables/sort-up.svg');
-  background-position: right 0px bottom 14px;
+  background-position: right 0.25rem top 0.25rem;
 }
 
 table.dataTable thead .sorting_desc {
   background-image: asset-data-url('dataTables/sort-down.svg');
-  background-position: right 0px bottom 14px;
+  background-position: right 0.25rem top 0.25rem;
 }
 
 // Collapsed Responsive View
@@ -39,9 +52,9 @@ table.dataTable > tbody > tr.child {
 
     &:hover { background-color: rgba(0, 0, 0, 0.075); }
 
-    span.dtr-title { min-width: 175px; margin-bottom: 4px; }
+    span.dtr-title { min-width: 175px; margin-bottom: 0.25em; }
     span.dtr-data { white-space: nowrap; }
-    .col-resource_item { margin-bottom: 4px; }
+    .col-resource_item { margin-bottom: 0.25em; }
   }
 }
 
@@ -55,6 +68,17 @@ table.dataTable thead {
   tr th {
     border-bottom: none;
     white-space: nowrap;
+
+    .form-group {
+      font-weight: normal;
+      margin-bottom: 0em;
+
+      input { max-height: 38px; }
+    }
+
+    .select2-container--bootstrap .select2-selection--single { height: 38px; }
+
+    .form-check { padding-top: 1rem; }
   }
 }
 
@@ -82,7 +106,7 @@ table.dataTable.simple {
   // Showing 1 to 2 of 2 entries (filtered from 10 total entries)
   div.dataTables_info {
     display: inline-block;
-    padding: 5px 0px 6px 6px;
+    padding: 0.25em 0em 0.25em 0.25em;
   }
 
   // with 25 per page
@@ -95,7 +119,7 @@ table.dataTable.simple {
       max-width: 45px;
 
       .select2-selection { border: none; }
-      .select2-selection__rendered { padding: 0px; color: #909090; }
+      .select2-selection__rendered { padding: 0em; color: #909090; }
     }
 
     span.select2-container.select2-container--open { max-width: 60px; }
@@ -121,6 +145,6 @@ table.dataTable {
   td.col-resource_item { word-break: keep-all; }
 
   td {
-    p { margin-bottom: 0px; }
+    p { margin-bottom: 0em; }
   }
 }

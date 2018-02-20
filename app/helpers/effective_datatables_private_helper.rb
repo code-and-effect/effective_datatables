@@ -3,14 +3,10 @@ module EffectiveDatatablesPrivateHelper
 
   # https://datatables.net/reference/option/columns
   def datatable_columns(datatable)
-    form = nil
-    effective_form_with(scope: :datatable_search, url: '#', html: { id: "#{datatable.to_param}-form" }) { |f| form = f }
-
     datatable.columns.map do |name, opts|
       {
         name: name,
         className: opts[:col_class],
-        searchHtml: (datatable_search_html(form, name, datatable.state[:search][name], opts) unless datatable.simple?),
         responsivePriority: opts[:responsive],
         search: datatable.state[:search][name],
         sortable: (opts[:sort] && !datatable.simple?),
@@ -29,16 +25,23 @@ module EffectiveDatatablesPrivateHelper
     link_to(content_tag(:span, 'Reset'), '#', class: 'btn btn-light buttons-reset-search')
   end
 
-  def datatable_search_html(form, name, value, opts)
+  def datatable_header_html(datatable, name, opts)
+    # Build the label
+    label = opts[:label].present? ? content_tag(:span, opts[:label]) : ''.html_safe
+    return label if opts[:search] == false
+
+    # Build the search
+    @_effective_datatables_form_builder || effective_form_with(scope: :datatable_search) { |f| @_effective_datatables_form_builder = f }
+    form = @_effective_datatables_form_builder
+
     collection = opts[:search].delete(:collection)
+    value = datatable.state[:search][name]
 
-    options = opts[:search].except(:fuzzy)
-
-    options.merge!(
-      name: nil, label: false, feedback: false, value: value, data: { 'column-name': name, 'column-index': opts[:index] }
+    options = opts[:search].except(:fuzzy).merge!(
+      name: nil, feedback: false, label: false, value: value, data: { 'column-name': name, 'column-index': opts[:index] }
     )
 
-    case options.delete(:as)
+    label + case options.delete(:as)
     when :string, :text, :number
       form.text_field name, options
     when :date, :datetime
@@ -55,7 +58,6 @@ module EffectiveDatatablesPrivateHelper
       options[:data]['role'] = 'bulk-actions-all'
       form.check_box name, options.merge(custom: false)
     end
-
   end
 
 end
