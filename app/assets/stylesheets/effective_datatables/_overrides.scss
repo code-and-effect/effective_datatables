@@ -1,12 +1,11 @@
 // Override dataTables.bootstrap4.css defaults
 table.dataTable { border-collapse: collapse !important; }
 
+// Override default padding
 table.dataTable thead > tr > th.sorting_asc, table.dataTable thead > tr > th.sorting_desc, table.dataTable thead > tr > th.sorting,
 table.dataTable thead > tr > td.sorting_asc,
 table.dataTable thead > tr > td.sorting_desc,
-table.dataTable thead > tr > td.sorting {
-  padding: 0.5em 0.5em 0.5em 0.5em;
-}
+table.dataTable thead > tr > td.sorting { padding: 0.5em 0.5em 0.5em 0.5em; }
 
 // Override default sort icons
 table.dataTable thead .sorting:before,
@@ -27,17 +26,17 @@ table.dataTable > thead th {
   > span { padding-right: 1rem; }
 }
 
-table.dataTable thead .sorting {
+table.dataTable > thead .sorting {
   background-image: asset-data-url('dataTables/sort.svg');
   background-position: right 0.25rem top 0.25rem;
 }
 
-table.dataTable thead .sorting_asc {
+table.dataTable > thead .sorting_asc {
   background-image: asset-data-url('dataTables/sort-up.svg');
   background-position: right 0.25rem top 0.25rem;
 }
 
-table.dataTable thead .sorting_desc {
+table.dataTable > thead .sorting_desc {
   background-image: asset-data-url('dataTables/sort-down.svg');
   background-position: right 0.25rem top 0.25rem;
 }
@@ -64,7 +63,7 @@ table.dataTable > tbody > tr.child {
 }
 
 // Search bar
-table.dataTable thead {
+table.dataTable > thead {
   tr th {
     border-bottom: none;
     white-space: nowrap;
@@ -81,15 +80,13 @@ table.dataTable thead {
 }
 
 // Simple styles
-table.dataTable.simple {
-  thead {
-    .sorting { background-image: none; cursor: default; }
-    .sorting_asc { background-image: none; cursor: default; }
-    .sorting_desc { background-image: none; cursor: default; }
+table.dataTable.simple > thead {
+  .sorting { background-image: none; cursor: default; }
+  .sorting_asc { background-image: none; cursor: default; }
+  .sorting_desc { background-image: none; cursor: default; }
 
-    .form-group { display: none; }
-    .col-bulk_actions { display: none; }
-  }
+  .form-group { display: none; }
+  .col-bulk_actions { display: none; }
 }
 
 // Datatables entries
@@ -127,7 +124,7 @@ table.dataTable.simple {
 }
 
 // Column specific adjustments
-table.dataTable {
+table.dataTable > tbody {
   td.col-price { text-align: right; }
   td.col-decimal { text-align: right; }
   td.col-right { text-align: right; }

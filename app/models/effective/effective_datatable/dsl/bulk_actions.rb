@@ -4,7 +4,6 @@ module Effective
       module BulkActions
 
         def bulk_action(*args)
-
           datatable._bulk_actions.push(link_to_bulk_action(*args))
         end
 
