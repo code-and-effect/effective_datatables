@@ -4,6 +4,10 @@ module EffectiveDatatables
 
     config.autoload_paths += Dir["#{config.root}/app/models/concerns", '/app/datatables/**/']
 
+    if defined?(EffectiveStyleGuide)
+      config.autoload_paths += Dir["#{config.root}/lib/effective_style_guide/"]
+    end
+
     # Include Helpers to base application
     initializer 'effective_datatables.action_controller' do |app|
       ActiveSupport.on_load :action_controller do
@@ -18,6 +22,5 @@ module EffectiveDatatables
     initializer 'effective_datatables.defaults', before: :load_config_initializers do |app|
       eval File.read("#{config.root}/config/effective_datatables.rb")
     end
-
   end
 end
