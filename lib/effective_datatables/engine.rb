@@ -2,11 +2,7 @@ module EffectiveDatatables
   class Engine < ::Rails::Engine
     engine_name 'effective_datatables'
 
-    config.autoload_paths += Dir["#{config.root}/app/models/concerns", '/app/datatables/**/']
-
-    if defined?(EffectiveStyleGuide)
-      config.autoload_paths += Dir["#{config.root}/lib/effective_style_guide/"]
-    end
+    config.autoload_paths += Dir["#{config.root}/app/models/concerns", '/app/datatables/**/', "#{config.root}/lib/effective_style_guide/"]
 
     # Include Helpers to base application
     initializer 'effective_datatables.action_controller' do |app|
