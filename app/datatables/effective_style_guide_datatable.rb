@@ -1,4 +1,4 @@
-class StyleGuideDatatable < Effective::Datatable
+class EffectiveStyleGuideDatatable < Effective::Datatable
   datatable do
     length 10
 
