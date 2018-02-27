@@ -66,12 +66,13 @@ initializeDataTables = ->
         params['cookie'] = $table.data('cookie')
 
         if $form.length > 0
-          params['scope'] = $form.find("input[id^='filters_scope']:checked").val() || ''
+          params['scope'] = $form.find("input[name='filters[scope]']:checked").val() || ''
           params['filter'] = {}
 
-          $form.find("[id^='filters_']:not(input[id^='filters_scope'])").each ->
+          $form.find("select,textarea,input:not([type=submit]):not([name='filters[scope]'])").each ->
             $input = $(this)
-            params['filter'][$input.attr('id').substring(8, $input.attr('id').length)] = $input.val()
+            if $input.attr('id')
+              params['filter'][$input.attr('id').substring(8, $input.attr('id').length)] = $input.val()
 
       serverSide: true
       scrollCollapse: true

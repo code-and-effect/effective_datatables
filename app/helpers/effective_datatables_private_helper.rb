@@ -69,14 +69,15 @@ module EffectiveDatatablesPrivateHelper
     placeholder = opts.delete(:label)
 
     collection = opts.delete(:collection)
-    value = datatable.state[:filter][name],
+    value = datatable.state[:filter][name]
 
     options = opts.except(:parse).merge(
       placeholder: placeholder,
       feedback: false,
       label: false,
       value: value,
-      wrapper: { class: 'form-group col-auto'}
+      wrapper: { class: 'form-group col-auto'},
+      autocomplete: 'off'
     )
 
     options[:name] = '' unless datatable._filters_form_required?
