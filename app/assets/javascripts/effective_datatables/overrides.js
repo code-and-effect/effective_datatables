@@ -8,5 +8,5 @@ $.extend(true, $.fn.dataTable.Buttons.defaults, {
 
 /* Default class modification */
 $.extend($.fn.dataTable.ext.classes, {
-  sWrapper: 'dataTables_wrapper dt-bootstrap4',  // Remove container-fluid
+  sWrapper: 'dataTables_wrapper dt-bootstrap4', // Remove container-fluid
 });

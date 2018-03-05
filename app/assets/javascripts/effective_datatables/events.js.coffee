@@ -8,6 +8,7 @@ $(document).on 'column-visibility.dt', (event, settings, index, state) ->
   clearTimeout(timeout) if timeout
   $table.data('timeout', setTimeout( =>
       $table.DataTable().draw()
+      $table.trigger('effective-bootstrap:initialize')
     , 700)
   )
   true
