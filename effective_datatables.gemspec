@@ -1,4 +1,4 @@
-$:.push File.expand_path("../lib", __FILE__)
+$:.push File.expand_path('../lib', __FILE__)
 
 # Maintain your gem's version:
 require 'effective_datatables/version'
@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
 
   s.files = Dir['{app,config,db,lib}/**/*'] + ['MIT-LICENSE', 'README.md']
 
-  s.add_dependency 'rails', ['>= 3.2.0']
+  s.add_dependency 'rails', '>= 3.2.0'
   s.add_dependency 'coffee-rails'
   s.add_dependency 'effective_bootstrap'
   s.add_dependency 'effective_resources'

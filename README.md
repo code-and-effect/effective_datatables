@@ -15,9 +15,9 @@ This gem includes the jQuery DataTables assets.
 
 Works with postgres, mysql, sqlite3 and arrays.
 
-## effective_datatables 4.0 BETA
+## effective_datatables 4.0
 
-This is the 4.0 BETA release of effective_datatables.
+This is the 4.0 series of effective_datatables.
 
 This requires Twitter Bootstrap 4 and Rails 5.1+
 

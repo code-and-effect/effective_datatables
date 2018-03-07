@@ -39,7 +39,7 @@ EffectiveDatatables.setup do |config|
   config.actions_column = {
     show: true,
     edit: true,
-    destroy: true,
+    destroy: true
   }
 
   # Log search/sort information to the console
