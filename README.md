@@ -28,7 +28,7 @@ For Bootstrap 4 please see the master branch and/or effective_datatables 4.x gem
 
 ```ruby
 gem 'haml-rails'            # or try using gem 'hamlit-rails'
-gem 'effective_datatables', github: 'code-and-effect/effective_datatables', branch: 'bootstrap3'
+gem 'effective_datatables', '~> 3.0'
 ```
 
 Run the bundle command to install it:
