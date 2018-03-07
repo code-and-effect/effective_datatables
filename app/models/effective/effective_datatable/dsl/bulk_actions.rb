@@ -38,11 +38,12 @@ module Effective
               end
 
               arg[:class] = [arg[:class], 'dropdown-item'].compact.join(' ')
-
             end
 
             arg
           end
+
+          args << { class: 'dropdown-item' } if args.none? { |arg| arg.kind_of?(Hash) }
 
           link_to(*args)
         end

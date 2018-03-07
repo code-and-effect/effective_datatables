@@ -24,7 +24,7 @@ module EffectiveDatatablesPrivateHelper
   end
 
   def datatable_reset(datatable)
-    link_to(content_tag(:span, 'Reset'), '#', class: 'btn btn-light buttons-reset-search')
+    link_to(content_tag(:span, 'Reset'), '#', class: 'btn btn-link btn-sm buttons-reset-search')
   end
 
   def datatable_search_tag(datatable, name, opts)

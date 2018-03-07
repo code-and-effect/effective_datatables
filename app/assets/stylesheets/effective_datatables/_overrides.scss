@@ -60,6 +60,7 @@ table.dataTable > tbody > tr.child {
 // Buttons
 .dataTables_buttons {
   text-align: right;
+  .btn { font-size: 0.75rem; }
 }
 
 // Search bar
@@ -74,8 +75,6 @@ table.dataTable > thead {
 
       input { max-height: 38px; }
     }
-
-    .select2-container--bootstrap .select2-selection--single { height: 38px; }
   }
 }
 
