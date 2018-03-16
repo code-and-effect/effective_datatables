@@ -13,9 +13,12 @@ module Effective
         render json: @datatable.to_json
       rescue => e
         EffectiveDatatables.authorized?(self, :index, @datatable.try(:collection_class))
-
         render json: error_json(e)
+
+        ExceptionNotifier.notify_exception(e) if defined?(ExceptionNotifier)
+        raise e if Rails.env.development?
       end
+
     end
 
     private

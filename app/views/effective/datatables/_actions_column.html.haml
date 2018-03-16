@@ -6,5 +6,5 @@
     = dropdown_link_to 'View', effective_resource.action_path(:show, resource), title: resource.to_s
 
   - if destroy_action && EffectiveDatatables.authorized?(self, :destroy, resource)
-    = dropdown_link_to "Delete #{resource}", effective_resource.action_path(:show, resource),
+    = dropdown_link_to "Delete #{resource}", effective_resource.action_path(:destroy, resource),
       title: "Delete #{resource}", data: { method: :delete, confirm: "Delete #{resource}?" }
