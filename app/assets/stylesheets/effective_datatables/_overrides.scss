@@ -123,10 +123,16 @@ table.dataTable.simple > thead {
 }
 
 // Column specific adjustments
-table.dataTable > tbody {
+table.dataTable {
   td.col-price { text-align: right; }
   td.col-decimal { text-align: right; }
   td.col-right { text-align: right; }
+
+  tfoot {
+    .col-price { text-align: right; }
+    .col-decimal { text-align: right; }
+    .col-right { text-align: right; }
+  }
 
   td.col-actions {
     white-space: nowrap;
@@ -141,4 +147,5 @@ table.dataTable > tbody {
   td {
     p { margin-bottom: 0em; }
   }
+
 }

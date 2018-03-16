@@ -126,6 +126,8 @@ module Effective
         length = values.length
         values = values.reject { |value| value.nil? }
 
+        return BLANK if [:id, :year].include?(column[:name])
+
         case aggregate[:name]
         when :total
           if [:percentage].include?(column[:as])
