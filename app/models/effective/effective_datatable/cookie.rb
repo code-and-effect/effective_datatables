@@ -17,7 +17,7 @@ module Effective
       end
 
       def cookie_param
-        [self.class, attributes].hash.to_s.last(12)
+        [self.class, attributes].hash.abs.to_s.last(12) # Not guaranteed to be 12 long
       end
 
       private
