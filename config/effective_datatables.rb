@@ -28,6 +28,10 @@ EffectiveDatatables.setup do |config|
   # Default class used on the <table> tag
   config.html_class = 'table table-bordered table-striped'
 
+  # If a user has previously visited this page and is returning, use the cookie to restore last session
+  # Irregardless of this setting, effective_datatables still uses a cookie to function
+  config.save_state = true
+
   # When using the actions_column DSL method, apply the following behavior
   # Valid values for each action are:
   # true - display this action if authorized?(:show, Post)

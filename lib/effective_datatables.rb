@@ -8,6 +8,7 @@ module EffectiveDatatables
 
   mattr_accessor :default_length
   mattr_accessor :html_class
+  mattr_accessor :save_state
 
   mattr_accessor :actions_column # A Hash
   mattr_accessor :debug
