@@ -148,7 +148,7 @@ module Effective
 
           if array_collection? && opts[:resource].present?
             search.reverse_merge!(resource.search_form_field(name, collection.first[opts[:index]]))
-          else
+          elsif search[:as] != :string
             search.reverse_merge!(resource.search_form_field(name, opts[:as]))
           end
         end
