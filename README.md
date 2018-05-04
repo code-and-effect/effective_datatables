@@ -92,7 +92,7 @@ We're going to display this DataTable on the posts#index action.
 ```ruby
 class PostsController < ApplicationController
   def index
-    @datatable = PostsDatatable.new(self)
+    @datatable = PostsDatatable.new
   end
 end
 ```
@@ -256,7 +256,7 @@ In the above example, when `attributes[:user_id]` is present, the table displays
 ```ruby
 class PostsController < ApplicationController
   def index
-    @datatable = PostsDatatable.new(self, user_id: current_user.id)
+    @datatable = PostsDatatable.new(user_id: current_user.id)
   end
 end
 ```
@@ -312,7 +312,7 @@ Attributes cannot be changed by search, filter, or state in any way. They're gua
 ```ruby
 class PostsController < ApplicationController
   def index
-    @datatable = PostsDatatable.new(self, user_id: current_user.id, admin: true)
+    @datatable = PostsDatatable.newuser_id: current_user.id, admin: true)
   end
 end
 ```
