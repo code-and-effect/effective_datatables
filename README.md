@@ -312,7 +312,7 @@ Attributes cannot be changed by search, filter, or state in any way. They're gua
 ```ruby
 class PostsController < ApplicationController
   def index
-    @datatable = PostsDatatable.newuser_id: current_user.id, admin: true)
+    @datatable = PostsDatatable.new(user_id: current_user.id, admin: true)
   end
 end
 ```
