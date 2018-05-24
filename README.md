@@ -131,7 +131,7 @@ class PostsDatatable < Effective::Datatable
   # Everything in the filters block ends up in a single form
   # The form is submitted by datatables javascript as an AJAX post
   filters do
-    # Scopes are rendered as a single radio button form field (works well with effective_form_inputs gem)
+    # Scopes are rendered as a single radio button form field (works well with effective_bootstrap gem)
     # The scopes only work when your collection is an ActiveRecord class, and they must exist on the model
     # The current scope is automatically applied by effective_datatables to your collection
     # You don't have to consider the current scope when writing your collection block
