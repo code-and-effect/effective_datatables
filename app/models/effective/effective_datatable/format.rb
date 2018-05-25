@@ -103,20 +103,8 @@ module Effective
       def actions_col_locals(opts)
         return {} unless opts[:as] == :actions
 
-        locals = {
-          show_action: (
-            active_record_collection? && opts[:show] && resource.routes[:show] &&
-            EffectiveDatatables.authorized?(view.controller, :show, collection_class)
-          ),
-          edit_action: (
-            active_record_collection? && opts[:edit] && resource.routes[:edit] &&
-            EffectiveDatatables.authorized?(view.controller, :edit, collection_class)
-          ),
-          destroy_action: (
-            active_record_collection? && opts[:destroy] && resource.routes[:destroy] &&
-            EffectiveDatatables.authorized?(view.controller, :destroy, collection_class)
-          ),
-          effective_resource: resource
+        {
+          actions_col_locals: opts[:actions].merge(effective_resource: resource)
         }
       end
 
