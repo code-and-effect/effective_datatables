@@ -109,7 +109,7 @@ module Effective
             index: nil,
             label: false,
             name: :actions,
-            partial: partial || '/effective/datatables/actions_column',
+            partial: partial,
             partial_as: partial_as,
             responsive: responsive,
             search: false,
@@ -119,7 +119,7 @@ module Effective
             th_append: nil,
             visible: visible,
 
-            actions: { show: show, edit: edit, destroy: destroy }.reject { |k, v| v.nil? }
+            actions: { show: show, edit: edit, destroy: destroy, partial: :dropleft }.reject { |k, v| v.nil? }
           )
         end
 

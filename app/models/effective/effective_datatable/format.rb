@@ -10,8 +10,6 @@ module Effective
         rendered = {}
 
         columns.each do |name, opts|
-          next if opts[:as] == :actions
-
           if opts[:partial] && state[:visible][name]
             locals = {
               datatable: self,
@@ -42,9 +40,6 @@ module Effective
                 dsl_tool.instance_exec(value, row, rendered[name][row_index], &opts[:format])
               elsif opts[:format]
                 dsl_tool.instance_exec(value, row, &opts[:format])
-              elsif opts[:as] == :actions
-                atts = opts[:actions].merge(effective_resource: resource, partial: :dropleft)
-                view.render_resource_actions(value, **atts)
               elsif opts[:partial]
                 rendered[name][row_index]
               else
@@ -63,6 +58,8 @@ module Effective
         end
 
         case column[:as]
+        when :actions
+          view.render_resource_actions(value, **column[:actions].merge(effective_resource: resource))
         when :boolean
           case value
           when true   ; 'Yes'
