@@ -10,12 +10,14 @@ module Effective
         rendered = {}
 
         columns.each do |name, opts|
+          next if opts[:as] == :actions
+
           if opts[:partial] && state[:visible][name]
             locals = {
               datatable: self,
               column: columns[name],
               controller_namespace: controller_namespace
-            }.merge(actions_col_locals(opts)).merge(resource_col_locals(opts))
+            }.merge(resource_col_locals(opts))
 
             rendered[name] = (view.render(
               partial: opts[:partial],
@@ -40,6 +42,9 @@ module Effective
                 dsl_tool.instance_exec(value, row, rendered[name][row_index], &opts[:format])
               elsif opts[:format]
                 dsl_tool.instance_exec(value, row, &opts[:format])
+              elsif opts[:as] == :actions
+                atts = opts[:actions].merge(effective_resource: resource, partial: :dropleft)
+                view.render_resource_actions(value, **atts)
               elsif opts[:partial]
                 rendered[name][row_index]
               else
@@ -98,14 +103,6 @@ module Effective
         else
           value.to_s
         end
-      end
-
-      def actions_col_locals(opts)
-        return {} unless opts[:as] == :actions
-
-        {
-          actions_col_locals: opts[:actions].merge(effective_resource: resource)
-        }
       end
 
       def resource_col_locals(opts)
