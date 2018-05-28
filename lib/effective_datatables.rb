@@ -21,7 +21,7 @@ module EffectiveDatatables
     @_exceptions ||= [Effective::AccessDenied, (CanCan::AccessDenied if defined?(CanCan)), (Pundit::NotAuthorizedError if defined?(Pundit))].compact
 
     return !!authorization_method unless authorization_method.respond_to?(:call)
-    controller = controller.controller if controller.respond_to?(:controller) # Do the right thing with a view
+    controller = controller.controller if controller.respond_to?(:controller)
 
     begin
       !!(controller || self).instance_exec((controller || self), action, resource, &authorization_method)
@@ -31,7 +31,7 @@ module EffectiveDatatables
   end
 
   def self.authorize!(controller, action, resource)
-    raise Effective::AccessDenied unless authorized?(controller, action, resource)
+    raise Effective::AccessDenied.new('Access Denied', action, resource) unless authorized?(controller, action, resource)
   end
 
 end
