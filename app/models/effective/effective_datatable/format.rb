@@ -15,7 +15,7 @@ module Effective
               datatable: self,
               column: columns[name],
               controller_namespace: controller_namespace
-            }.merge(actions_col_locals(opts)).merge(resource_col_locals(opts))
+            }.merge(resource_col_locals(opts))
 
             rendered[name] = (view.render(
               partial: opts[:partial],
@@ -58,6 +58,8 @@ module Effective
         end
 
         case column[:as]
+        when :actions
+          view.render_resource_actions(value, **column[:actions].merge(effective_resource: resource))
         when :boolean
           case value
           when true   ; 'Yes'
@@ -101,23 +103,11 @@ module Effective
       end
 
       def actions_col_locals(opts)
-        return {} unless opts[:as] == :actions
-
-        locals = {
-          show_action: (
-            active_record_collection? && opts[:show] && resource.routes[:show] &&
-            EffectiveDatatables.authorized?(view.controller, :show, collection_class)
-          ),
-          edit_action: (
-            active_record_collection? && opts[:edit] && resource.routes[:edit] &&
-            EffectiveDatatables.authorized?(view.controller, :edit, collection_class)
-          ),
-          destroy_action: (
-            active_record_collection? && opts[:destroy] && resource.routes[:destroy] &&
-            EffectiveDatatables.authorized?(view.controller, :destroy, collection_class)
-          ),
-          effective_resource: resource
-        }
+        if opts[:as] == :actions
+          { actions_col_locals: opts[:actions].merge(effective_resource: resource) }
+        else
+          {}
+        end
       end
 
       def resource_col_locals(opts)

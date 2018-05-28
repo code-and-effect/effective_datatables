@@ -1,7 +1,7 @@
 module Effective
   module EffectiveDatatable
     module Cookie
-      MAX_COOKIE_SIZE = 2500  # String size. Real byte size is about 1.5 times bigger.
+      MAX_COOKIE_SIZE = 2000  # String size. Real byte size is about 1.5 times bigger.
 
       def cookie
         @cookie

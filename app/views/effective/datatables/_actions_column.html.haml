@@ -1,8 +1,1 @@
-- if show_action && EffectiveDatatables.authorized?(self, :show, resource)
-  = show_icon_to effective_resource.action_path(:show, resource)
-
-- if edit_action && EffectiveDatatables.authorized?(self, :edit, resource)
-  = edit_icon_to effective_resource.action_path(:edit, resource)
-
-- if destroy_action && EffectiveDatatables.authorized?(self, :destroy, resource)
-  = destroy_icon_to effective_resource.action_path(:destroy, resource), data: { method: :delete, confirm: "Delete #{resource}?" }
+= render_resource_actions(resource, **actions_col_locals)

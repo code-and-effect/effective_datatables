@@ -75,6 +75,8 @@ module Effective
                 resource.send(name)
               end
 
+            elsif opts[:as] == :actions
+              obj
             elsif opts[:as] == :effective_obfuscation
               obj.to_param
             elsif array_collection?

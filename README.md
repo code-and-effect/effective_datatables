@@ -91,7 +91,7 @@ We're going to display this DataTable on the posts#index action.
 ```ruby
 class PostsController < ApplicationController
   def index
-    @datatable = PostsDatatable.new(self)
+    @datatable = PostsDatatable.new
   end
 end
 ```
@@ -255,7 +255,7 @@ In the above example, when `attributes[:user_id]` is present, the table displays
 ```ruby
 class PostsController < ApplicationController
   def index
-    @datatable = PostsDatatable.new(self, user_id: current_user.id)
+    @datatable = PostsDatatable.new(user_id: current_user.id)
   end
 end
 ```
@@ -311,7 +311,7 @@ Attributes cannot be changed by search, filter, or state in any way. They're gua
 ```ruby
 class PostsController < ApplicationController
   def index
-    @datatable = PostsDatatable.new(self, user_id: current_user.id, admin: true)
+    @datatable = PostsDatatable.new(user_id: current_user.id, admin: true)
   end
 end
 ```
@@ -407,7 +407,7 @@ Sometimes it's handy to call `.reorder(nil)` on a scope.
 
 The `datatable do ... end` block configures a table of data.
 
-Initialize the datatable in your controller or view, `@datatable = PostsDatatable.new(self)`, and render it in your view `<%= render_datatable(@datatable) %>`
+Initialize the datatable in your controller or view, `@datatable = PostsDatatable.new`, and render it in your view `<%= render_datatable(@datatable) %>`
 
 ### col
 
@@ -608,7 +608,7 @@ Creates a single form with fields for each `filter` and a single radio input fie
 
 The form is submitted by an AJAX POST action, or, in some advanced circumstances (see Dynamic Columns below) as a regular POST or even GET.
 
-Initialize the datatable in your controller or view, `@datatable = PostsDatatable.new(self)`, and render its filters anywhere with `<%= render_datatable_filters(@datatable) %>`.
+Initialize the datatable in your controller or view, `@datatable = PostsDatatable.new`, and render its filters anywhere with `<%= render_datatable_filters(@datatable) %>`.
 
 ### scope
 
@@ -864,7 +864,7 @@ If you just want to render a datatable and nothing else, there is a quick way to
 ```ruby
 class PostsController < ApplicationController
   def index
-    render_datatable_index PostsDatatable.new(self)
+    render_datatable_index PostsDatatable.new
   end
 end
 ```
