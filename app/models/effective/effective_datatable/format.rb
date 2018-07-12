@@ -2,6 +2,8 @@ module Effective
   module EffectiveDatatable
     module Format
       BLANK = ''.freeze
+      SPACER = 'EFFECTIVEDATATABLESSPACER'.freeze
+      SPACER_TEMPLATE = '/effective/datatables/spacer_template'.freeze
 
       private
 
@@ -11,11 +13,7 @@ module Effective
 
         columns.each do |name, opts|
           if opts[:partial] && state[:visible][name]
-            locals = {
-              datatable: self,
-              column: columns[name],
-              controller_namespace: controller_namespace
-            }.merge(resource_col_locals(opts))
+            locals = { datatable: self, column: columns[name] }.merge(resource_col_locals(opts))
 
             rendered[name] = (view.render(
               partial: opts[:partial],
@@ -23,9 +21,18 @@ module Effective
               collection: collection.map { |row| row[opts[:index]] },
               formats: :html,
               locals: locals,
-              spacer_template: '/effective/datatables/spacer_template',
-            ) || '').split('EFFECTIVEDATATABLESSPACER')
+              spacer_template: SPACER_TEMPLATE
+            ) || '').split(SPACER)
+          elsif opts[:as] == :actions # This is default actions_col
+            locals = { datatable: self, column: columns[name], spacer_template: SPACER_TEMPLATE }
+
+            rendered[name] = (view.render_resource_actions(
+              resource,
+              collection.map { |row| row[opts[:index]] },
+              opts[:actions].merge(locals: locals)
+            ) || '').split(SPACER)
           end
+
         end
 
         collection.each_with_index do |row, row_index|
@@ -41,6 +48,8 @@ module Effective
               elsif opts[:format]
                 dsl_tool.instance_exec(value, row, &opts[:format])
               elsif opts[:partial]
+                rendered[name][row_index]
+              elsif opts[:as] == :actions
                 rendered[name][row_index]
               else
                 format_column(value, opts)
