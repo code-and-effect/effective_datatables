@@ -32,10 +32,9 @@ EffectiveDatatables.setup do |config|
   # Valid values for each action are:
   # true - display this action if authorized?(:show, Post)
   # false - do not display this action
-  # :authorize - display this action if authorized?(:show, Post<3>)  (every instance is checked)
   #
   # You can override these defaults on a per-table basis
-  # by calling `actions_column(show: false, edit: true, destroy: :authorize)`
+  # by calling `actions_column(show: false, edit: true, destroy: false)`
   config.actions_column = {
     show: true,
     edit: true,

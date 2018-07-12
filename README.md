@@ -235,11 +235,12 @@ class PostsDatatable < Effective::Datatable
     aggregate :total
 
     # Uses effective_resources gem to discover the resource path and authorization actions
-    # Puts in icons to show/edit/destroy actions, if authorized to those actions.
+    # Puts links to show/edit/destroy actions, if authorized to those actions.
     # Use the actions_col block to add additional actions
-    actions_col show: false do |post|
-      if !post.approved? && can?(:approve, Post)
-        link_to 'Approve', approve_post_path(post) data: { method: :post, confirm: 'Really approve?'}
+
+    actions_col do |post|
+      render_resource_actions(resource, post, edit: false, partial: :dropleft) do
+        dropdown_link_to('Approve', approve_post_path(post) data: { method: :post, confirm: "Approve #{post}?"})
       end
     end
   end
@@ -515,34 +516,30 @@ You can only have one `bulk_actions_col` per datatable.
 
 ### actions_col
 
-When working with an ActiveRecord based collection, this column will consider the `current_user`'s authorization, and generate
-glyphicon links to edit, show and destroy actions for any collection class.
+When working with an ActiveRecord based collection, this column will consider the `current_user`'s authorization, and generate links to edit, show and destroy actions for any collection class.
 
 The authorization method is configured via the `config/initializers/effective_datatables.rb` initializer file.
 
 There are just a few options:
 
 ```ruby
-show: true|false|:authorize
-edit: true|false|:authorize
-destroy: true|false|:authorize
-
+show: true|false
+edit: true|false
+destroy: true|false
 visible: true|false
 ```
 
 When the show, edit and destroy actions are `true` (default), the permission check will be made just once, authorizing the class.
-When set to `:authorize`, permission to each individual object will be checked.
 
-Use the block syntax to add additional actions
+Use the block syntax to add additional actions. This helper comes from `effective_resources` gem.
 
 ```ruby
-actions_col show: false do |post|
-  (post.approved? ? link_to('Approve', approve_post_path(post)) : '') +
-  glyphicon_to('print', print_ticket_path(ticket), title: 'Print')
+actions_col do |post|
+  render_resource_actions(resource, post, edit: false, partial: :dropleft) do
+    dropdown_link_to('Approve', approve_post_path(post) data: { method: :post, confirm: "Approve #{post}?"})
+  end
 end
 ```
-
-The `glyphicon_to` helper is part of the [effective_resources](https://github.com/code-and-effect/effective_resources) gem, which is a dependency of this gem.
 
 ### length
 
