@@ -59,7 +59,7 @@ module Effective
 
         case column[:as]
         when :actions
-          view.render_resource_actions(value, **column[:actions].merge(effective_resource: resource))
+          view.render_resource_actions(resource, value, **column[:actions])
         when :boolean
           case value
           when true   ; 'Yes'
