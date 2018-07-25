@@ -234,13 +234,15 @@ class PostsDatatable < Effective::Datatable
     aggregate :total
 
     # Uses effective_resources gem to discover the resource path and authorization actions
-    # Puts in icons to show/edit/destroy actions, if authorized to those actions.
+    # Puts links to show/edit/destroy actions, if authorized to those actions.
     # Use the actions_col block to add additional actions
-    actions_col show: false do |post|
-      if !post.approved? && can?(:approve, Post)
-        link_to 'Approve', approve_post_path(post) data: { method: :post, confirm: 'Really approve?'}
+
+    actions_col do |post|
+      render_resource_actions(resource, post, edit: false, partial: :glyphicons) do
+        glyphicon_to('print', print_post_path(post), title: 'Print')
       end
     end
+
   end
 
 end
@@ -538,6 +540,16 @@ Use the block syntax to add additional actions
 actions_col show: false do |post|
   (post.approved? ? link_to('Approve', approve_post_path(post)) : '') +
   glyphicon_to('print', print_ticket_path(ticket), title: 'Print')
+end
+```
+
+or
+
+```ruby
+actions_col do |post|
+  render_resource_actions(resource, post, edit: false, partial: :glyphicons) do
+    glyphicon_to('print', print_post_path(post), title: 'Print')
+  end
 end
 ```
 
