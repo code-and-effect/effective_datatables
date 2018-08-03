@@ -19,6 +19,6 @@ Gem::Specification.new do |s|
   s.add_dependency 'rails', ['>= 3.2.0']
   s.add_dependency 'coffee-rails'
   s.add_dependency 'effective_resources', '>= 0.7.0'
-  s.add_dependency 'sass-rails'
+  s.add_dependency 'sass'
   s.add_dependency 'simple_form'
 end
