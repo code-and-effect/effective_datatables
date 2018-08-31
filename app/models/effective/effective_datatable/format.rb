@@ -27,9 +27,8 @@ module Effective
             locals = { datatable: self, column: columns[name], spacer_template: SPACER_TEMPLATE }
 
             rendered[name] = (view.render_resource_actions(
-              resource,
               collection.map { |row| row[opts[:index]] },
-              opts[:actions].merge(locals: locals)
+              opts[:actions].merge(effective_resource: resource, locals: locals, partial: opts[:actions_partial])
             ) || '').split(SPACER)
           end
 
@@ -68,7 +67,7 @@ module Effective
 
         case column[:as]
         when :actions
-          view.render_resource_actions(resource, value, **column[:actions])
+          view.render_resource_actions(value, **column[:actions].merge(effective_resource: resource, partial: column[:actions_partial]))
         when :boolean
           case value
           when true   ; 'Yes'
