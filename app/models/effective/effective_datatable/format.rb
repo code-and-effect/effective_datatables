@@ -23,13 +23,13 @@ module Effective
               locals: locals,
               spacer_template: SPACER_TEMPLATE
             ) || '').split(SPACER)
-          elsif opts[:as] == :actions # This is default actions_col
+          elsif opts[:as] == :actions # This is actions_col and actions_col do .. end, but not actions_col partial: 'something'
             locals = { datatable: self, column: columns[name], spacer_template: SPACER_TEMPLATE }
 
-            rendered[name] = (view.render_resource_actions(
-              collection.map { |row| row[opts[:index]] },
-              opts[:actions].merge(effective_resource: resource, locals: locals, partial: opts[:actions_partial])
-            ) || '').split(SPACER)
+            resources = collection.map { |row| row[opts[:index]] }
+            atts = opts[:actions].merge(effective_resource: resource, locals: locals, partial: opts[:actions_partial])
+
+            rendered[name] = (view.render_resource_actions(resources, atts, &opts[:format]) || '').split(SPACER)
           end
 
         end
@@ -42,13 +42,13 @@ module Effective
             value = row[index]
 
             row[index] = (
-              if opts[:format] && rendered.key?(name)
+              if opts[:as] == :actions
+                rendered[name][row_index]
+              elsif opts[:format] && rendered.key?(name)
                 dsl_tool.instance_exec(value, row, rendered[name][row_index], &opts[:format])
               elsif opts[:format]
                 dsl_tool.instance_exec(value, row, &opts[:format])
               elsif opts[:partial]
-                rendered[name][row_index]
-              elsif opts[:as] == :actions
                 rendered[name][row_index]
               else
                 format_column(value, opts)
