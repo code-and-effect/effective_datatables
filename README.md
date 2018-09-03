@@ -514,44 +514,35 @@ You can only have one `bulk_actions_col` per datatable.
 
 ### actions_col
 
-When working with an ActiveRecord based collection, this column will consider the `current_user`'s authorization, and generate
-glyphicon links to edit, show and destroy actions for any collection class.
+When working with an ActiveRecord based collection, this column will consider the `current_user`'s authorization, and generate links to edit, show and destroy actions for any collection class.
 
 The authorization method is configured via the `config/initializers/effective_datatables.rb` initializer file.
 
 There are just a few options:
 
 ```ruby
-show: true|false|:authorize
-edit: true|false|:authorize
-destroy: true|false|:authorize
-
+show: true|false
+edit: true|false
+destroy: true|false
 visible: true|false
+actions_partial: :glyphicons
 ```
 
-When the show, edit and destroy actions are `true` (default), the permission check will be made just once, authorizing the class.
-When set to `:authorize`, permission to each individual object will be checked.
+Each object is checked individually for authorization.
 
-Use the block syntax to add additional actions
+The arguments to `actions_col` are passed through to the `effective_resource` gem's [render_resource_actions](https://github.com/code-and-effect/effective_resources/blob/master/app/helpers/effective_resources_helper.rb#L57).
 
-```ruby
-actions_col show: false do |post|
-  (post.approved? ? link_to('Approve', approve_post_path(post)) : '') +
-  glyphicon_to('print', print_ticket_path(ticket), title: 'Print')
-end
-```
+It's all very complicated.
 
-or
+If you just want to override this entire column with your own actions implementation, you can pass `actions_col partial: 'my_partial'` and roll your own.
+
+Otherwise, use the following block syntax to add additional actions. This helper comes from `effective_form_inputs` gem.
 
 ```ruby
 actions_col do |post|
-  render_resource_actions(resource, post, edit: false, partial: :glyphicons) do
-    glyphicon_to('print', print_post_path(post), title: 'Print')
-  end
+  glyphicon_to('print', print_post_path(post), title: 'Print')
 end
 ```
-
-The `glyphicon_to` helper is part of the [effective_resources](https://github.com/code-and-effect/effective_resources) gem, which is a dependency of this gem.
 
 ### length
 
