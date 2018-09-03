@@ -530,7 +530,7 @@ actions_partial: :dropleft
 
 Each object is checked individually for authorization.
 
-The arguments to `actions_col` are passed through to the `effective_resource` gem's (render_resource_actions)[https://github.com/code-and-effect/effective_resources/blob/master/app/helpers/effective_resources_helper.rb#L57].
+The arguments to `actions_col` are passed through to the `effective_resource` gem's [render_resource_actions](https://github.com/code-and-effect/effective_resources/blob/master/app/helpers/effective_resources_helper.rb#L57).
 
 It's all very complicated.
 
