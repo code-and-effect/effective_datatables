@@ -238,10 +238,8 @@ class PostsDatatable < Effective::Datatable
     # Puts links to show/edit/destroy actions, if authorized to those actions.
     # Use the actions_col block to add additional actions
 
-    actions_col do |post|
-      render_resource_actions(resource, post, edit: false, partial: :dropleft) do
-        dropdown_link_to('Approve', approve_post_path(post) data: { method: :post, confirm: "Approve #{post}?"})
-      end
+    actions_col(edit: false) do |post|
+      dropdown_link_to('Approve', approve_post_path(post) data: { method: :post, confirm: "Approve #{post}?"})
     end
   end
 
@@ -527,17 +525,22 @@ show: true|false
 edit: true|false
 destroy: true|false
 visible: true|false
+actions_partial: :dropleft
 ```
 
-When the show, edit and destroy actions are `true` (default), the permission check will be made just once, authorizing the class.
+Each object is checked individually for authorization.
 
-Use the block syntax to add additional actions. This helper comes from `effective_resources` gem.
+The arguments to `actions_col` are passed through to the `effective_resource` gem's (render_resource_actions)[https://github.com/code-and-effect/effective_resources/blob/master/app/helpers/effective_resources_helper.rb#L57].
+
+It's all very complicated.
+
+If you just want to override this entire column with your own actions implementation, you can pass `actions_col partial: 'my_partial'` and roll your own.
+
+Otherwise, use the following block syntax to add additional actions. This helper comes from `effective_bootstrap` gem.
 
 ```ruby
 actions_col do |post|
-  render_resource_actions(resource, post, edit: false, partial: :dropleft) do
-    dropdown_link_to('Approve', approve_post_path(post) data: { method: :post, confirm: "Approve #{post}?"})
-  end
+  dropdown_link_to('Approve', approve_post_path(post) data: { method: :post, confirm: "Approve #{post}?"})
 end
 ```
 
