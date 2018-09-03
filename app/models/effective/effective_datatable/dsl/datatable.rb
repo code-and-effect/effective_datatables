@@ -31,7 +31,7 @@ module Effective
             col_class: col_class,
             format: (format if block_given?),
             index: nil,
-            label: label || name.to_s.split('.').last.titleize,
+            label: (label.nil? ? name.to_s.split('.').last.titleize : label),
             name: name,
             partial: partial,
             partial_as: partial_as,
@@ -59,7 +59,7 @@ module Effective
             col_class: col_class,
             format: nil,
             index: nil,
-            label: label || name.to_s.split('.').last.titleize,
+            label: (label.nil? ? name.to_s.split('.').last.titleize : label),
             name: name,
             partial: partial,
             partial_as: partial_as,
@@ -83,7 +83,7 @@ module Effective
             col_class: col_class,
             format: nil,
             index: nil,
-            label: '',
+            label: false,
             name: :bulk_actions,
             partial: partial || '/effective/datatables/bulk_actions_column',
             partial_as: partial_as,
@@ -97,7 +97,7 @@ module Effective
           )
         end
 
-        def actions_col(show: nil, edit: nil, destroy: nil, col_class: nil, partial: nil, partial_as: nil, responsive: 5000, visible: true, &format)
+        def actions_col(col_class: nil, partial: nil, partial_as: nil, actions_partial: nil, responsive: 5000, visible: true, **actions, &format)
           raise 'You can only have one actions column' if datatable.columns[:_actions].present?
 
           datatable._columns[:_actions] = Effective::DatatableColumn.new(
@@ -107,10 +107,11 @@ module Effective
             col_class: col_class,
             format: (format if block_given?),
             index: nil,
-            label: '',
+            label: false,
             name: :actions,
             partial: partial,
             partial_as: partial_as,
+            actions_partial: (actions_partial || :glyphicons),
             responsive: responsive,
             search: false,
             sort: false,
@@ -119,7 +120,8 @@ module Effective
             th_append: nil,
             visible: visible,
 
-            actions: { show: show, edit: edit, destroy: destroy, partial: :glyphicons }.reject { |k, v| v.nil? }
+            # { approve: false }. These args are passed to effective_resources render_resource_actions
+            actions: actions
           )
         end
 
