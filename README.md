@@ -237,10 +237,8 @@ class PostsDatatable < Effective::Datatable
     # Puts links to show/edit/destroy actions, if authorized to those actions.
     # Use the actions_col block to add additional actions
 
-    actions_col do |post|
-      render_resource_actions(resource, post, edit: false, partial: :glyphicons) do
-        glyphicon_to('print', print_post_path(post), title: 'Print')
-      end
+    actions_col(edit: false) do |post|
+      glyphicon_to('print', print_post_path(post), title: 'Print')
     end
 
   end

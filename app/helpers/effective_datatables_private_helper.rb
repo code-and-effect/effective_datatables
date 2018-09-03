@@ -9,7 +9,7 @@ module EffectiveDatatablesPrivateHelper
     datatable.columns.map do |name, opts|
       {
         name: name,
-        title: content_tag(:span, opts[:label], class: 'search-label'),
+        title: content_tag(:span, (opts[:label] == false ? '' : opts[:label]), class: 'search-label'),
         className: opts[:col_class],
         searchHtml: (datatable_search_html(form, name, datatable.state[:search][name], opts) unless datatable.simple?),
         responsivePriority: opts[:responsive],
