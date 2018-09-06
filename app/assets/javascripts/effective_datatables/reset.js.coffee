@@ -1,4 +1,4 @@
-$(document).on 'click', 'a.buttons-reset-search', (event) ->
+$(document).on 'click', '.dataTables_wrapper a.buttons-reset-search', (event) ->
   event.preventDefault() # prevent the click
 
   $table = $(event.currentTarget).closest('.dataTables_wrapper').find('table.dataTable').first()

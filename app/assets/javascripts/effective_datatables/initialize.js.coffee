@@ -189,8 +189,7 @@ initializeDataTables = ->
 
 destroyDataTables = ->
   $('table.effective-datatable').each ->
-    if $.fn.DataTable.fnIsDataTable(this)
-      $(this).DataTable().destroy()
+    $(this).DataTable().destroy() if $.fn.DataTable.fnIsDataTable(this)
 
 $ -> initializeDataTables()
 $(document).on 'page:change', -> initializeDataTables()

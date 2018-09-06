@@ -8,7 +8,7 @@ module Effective
         end
 
         def bulk_download(*args)
-          datatable._bulk_actions.push(link_to_bulk_action(*args.merge('data-authenticity-token' => form_authenticity_token)))
+          datatable._bulk_actions.push(link_to_bulk_action(*args.merge('data-authenticity-token' => form_authenticity_token, 'data-method' => :post)))
         end
 
         def bulk_action_divider
@@ -22,30 +22,19 @@ module Effective
         private
 
         # We can't let any data-method be applied to the link, or jquery_ujs does the wrong thing with it
-        def link_to_bulk_action(*args)
-          args.map! do |arg|
-            if arg.kind_of?(Hash)
-              data_method = (
-                arg.delete(:'data-method') ||
-                arg.delete('data-method') ||
-                (arg[:data] || {}).delete('method') ||
-                (arg[:data] || {}).delete(:method)
-              )
+        def link_to_bulk_action(body, url, opts = {})
 
-              # But if the data-method was :get, we add bulk-actions-get-link = true
-              if data_method.to_s == 'get'
-                arg[:data].present? ? arg[:data]['bulk-actions-get'] = true : arg['data-bulk-actions-get'] = true
-              end
-
-              arg[:class] = [arg[:class], 'dropdown-item'].compact.join(' ')
-            end
-
-            arg
+          # Transform data: { ... } hash into 'data-' keys
+          if (data = opts.delete(:data))
+            data.each { |k, v| opts["data-#{k}"] ||= v }
           end
 
-          args << { class: 'dropdown-item' } if args.none? { |arg| arg.kind_of?(Hash) }
+          verbs = {'DELETE' => 'DELETE', 'GET' => 'GET'}
+          opts['data-ajax-method'] = verbs[opts.delete('data-method').to_s.upcase] || 'POST'
 
-          link_to(*args)
+          opts[:class] = [opts[:class], 'dropdown-item'].compact.join(' ')
+
+          link_to(body, url, opts)
         end
 
       end

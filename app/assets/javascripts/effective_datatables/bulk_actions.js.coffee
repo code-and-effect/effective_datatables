@@ -40,11 +40,11 @@ $(document).on 'click', '.buttons-bulk-actions a', (event) ->
   title = $bulkAction.text()
   token = $bulkAction.parent('li').data('authenticity-token')
   values = $.map($selected, (input) -> input.getAttribute('value'))
-  get_link = $bulkAction.data('bulk-actions-get')
+  method = $bulkAction.data('ajax-method')
 
   return unless url && values
 
-  if get_link
+  if method == 'GET'
     if url.includes('?')
       window.location.assign(url + '&' + $.param({ids: values}))
     else
@@ -75,8 +75,10 @@ $(document).on 'click', '.buttons-bulk-actions a', (event) ->
         $table.DataTable().draw()
     )
   else # Normal AJAX post
-    $.post(
-      url, { ids: values }
+    $.ajax(
+      method: method,
+      url: url,
+      data: { ids: values }
     ).done((response) ->
       success = response['message'] || "Successfully completed #{title} bulk action"
       $processing.html(success)

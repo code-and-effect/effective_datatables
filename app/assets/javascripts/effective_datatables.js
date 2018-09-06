@@ -13,6 +13,7 @@
 //= require dataTables/responsive/responsive.bootstrap4
 
 //= require effective_datatables/bulk_actions
+//= require effective_datatables/crud
 //= require effective_datatables/events
 //= require effective_datatables/filters
 //= require effective_datatables/reset
