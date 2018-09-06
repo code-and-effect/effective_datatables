@@ -117,7 +117,7 @@ initializeDataTables = ->
       $bulkActions = $table.closest('.dataTables_wrapper').children().first().find('.buttons-bulk-actions').children('button')
 
       if selected && selected.length > 0
-        $table.find("input[data-role='bulk-actions-resource']").each (_, input) ->
+        $table.find("input[data-role='bulk-action']").each (_, input) ->
           $input = $(input)
           $input.prop('checked', selected.indexOf($input.val()) > -1)
 

@@ -60,7 +60,7 @@ module EffectiveDatatablesPrivateHelper
       options[:input_js] = (options[:input_js] || {}).reverse_merge(placeholder: '')
       form.select name, collection, options
     when :bulk_actions
-      options[:data]['role'] = 'bulk-actions-all'
+      options[:data]['role'] = 'bulk-actions'
       form.check_box name, options.merge(custom: false)
     end
   end
