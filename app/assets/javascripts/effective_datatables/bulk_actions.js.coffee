@@ -25,6 +25,22 @@ toggleBulkActionsDropdown = ($wrapper) ->
   else
     $bulkActions.attr('disabled', 'disabled')
 
+restoreSelected = ($table, selected) ->
+  $bulkActions = $table.closest('.dataTables_wrapper').children().first().find('.buttons-bulk-actions').children('button')
+  present = false
+
+  if selected && selected.length > 0
+    $table.find("input[data-role='bulk-action']").each (_, input) ->
+      $input = $(input)
+
+      if selected.indexOf($input.val()) > -1
+        $input.prop('checked', true)
+        present = true
+      else
+        $input.prop('checked', false)
+
+  if present then $bulkActions.removeAttr('disabled') else $bulkActions.attr('disabled', 'disabled')
+
 #### Bulk Action link behaviour
 $(document).on 'click', '.buttons-bulk-actions a', (event) ->
   event.preventDefault() # prevent the click
@@ -54,8 +70,6 @@ $(document).on 'click', '.buttons-bulk-actions a', (event) ->
   # Disable the Bulk Actions dropdown, so only one can be run at a time
   $bulkAction.closest('button').attr('disabled', 'disabled')
 
-  # Show Processing...
-  $processing.show().data('bulk-actions-processing', true)
   $table.dataTable().data('bulk-actions-restore-selected-values', values)
 
   if token # This is a file download
@@ -64,17 +78,15 @@ $(document).on 'click', '.buttons-bulk-actions a', (event) ->
       data: { ids: values, authenticity_token: token }
       successCallback: ->
         success = "Successfully completed #{title} bulk action"
-        $processing.html(success)
+        $table.one 'draw.dt', (e) -> $(e.target).DataTable().flash(success)
         $table.DataTable().draw()
       failCallback: ->
         error = "An error occured while attempting #{title} bulk action"
-        $processing.html(error)
-        alert(error)
+        $table.one 'draw.dt', (e) -> $(e.target).DataTable().flash(error)
         $table.DataTable().draw()
     )
   else # Normal AJAX post
     $table.dataTable().data('bulk-actions-restore-selected-values', values)
-    $table.one 'draw.dt', (e, settings) -> settings.oFeatures.bProcessing = false
 
     $.ajax(
       method: method,
@@ -82,10 +94,12 @@ $(document).on 'click', '.buttons-bulk-actions a', (event) ->
       data: { ids: values }
     ).done((response) ->
       success = response['message'] || "Successfully completed #{title} bulk action"
-      $table.one 'draw.dt', (e) -> $(e.target).DataTable().flash(success)
+      $table.one 'draw.dt', (e) -> $(e.target).DataTable().flash(success) and restoreSelected($(e.target), values)
+
     ).fail((response) ->
       error = response['message'] || "An error occured while attempting #{title} bulk action: #{response.statusText}"
-      $table.one 'draw.dt', (e) -> $(e.target).DataTable().flash(error)
+      $table.one 'draw.dt', (e) -> $(e.target).DataTable().flash(error) and restoreSelected($(e.target), values)
+
     ).always((response) ->
       $table.DataTable().draw()
     )

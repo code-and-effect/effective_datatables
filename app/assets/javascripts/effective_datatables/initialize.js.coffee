@@ -95,8 +95,6 @@ initializeDataTables = ->
           if settings['json']['charts']
             drawCharts($table, settings['json']['charts'])
 
-        drawBulkActions($table)
-
     # Copies the bulk actions html, stored in a data attribute on the table, into the buttons area
     initializeBulkActions = (api) ->
       $table = $(api.table().node())
@@ -109,22 +107,6 @@ initializeDataTables = ->
 
       if $table.data('reset')
         $table.closest('.dataTables_wrapper').children().first().find('.dt-buttons').prepend($table.data('reset'))
-
-    # After we perform a bulk action, we have to re-select the checkboxes manually and do a bit of house keeping
-    drawBulkActions = ($table) ->
-      selected = $table.data('bulk-actions-restore-selected-values')
-
-      $bulkActions = $table.closest('.dataTables_wrapper').children().first().find('.buttons-bulk-actions').children('button')
-
-      if selected && selected.length > 0
-        $table.find("input[data-role='bulk-action']").each (_, input) ->
-          $input = $(input)
-          $input.prop('checked', selected.indexOf($input.val()) > -1)
-
-        $bulkActions.removeAttr('disabled')
-        $table.data('bulk-actions-restore-selected-values', [])
-      else
-        $bulkActions.attr('disabled', 'disabled')
 
     drawAggregates = ($table, aggregates) ->
       $tfoot = $table.find('tfoot').first()
