@@ -602,7 +602,9 @@ var excelStrings = {
 				'<fill>'+
 					'<patternFill patternType="none" />'+
 				'</fill>'+
-				'<fill/>'+ // Excel appears to use this as a dotted background regardless of values
+				'<fill>'+ // Excel appears to use this as a dotted background regardless of values but
+					'<patternFill patternType="none" />'+ // to be valid to the schema, use a patternFill
+				'</fill>'+
 				'<fill>'+
 					'<patternFill patternType="solid">'+
 						'<fgColor rgb="FFD9D9D9" />'+
@@ -811,7 +813,7 @@ DataTable.ext.buttons.copyHtml5 = {
 		}
 
 		if ( config.customize ) {
-			output = config.customize( output, config );
+			output = config.customize( output, config, dt );
 		}
 
 		var textarea = $('<textarea readonly/>')
@@ -923,7 +925,7 @@ DataTable.ext.buttons.csvHtml5 = {
 		var charset = config.charset;
 
 		if ( config.customize ) {
-			output = config.customize( output, config );
+			output = config.customize( output, config, dt );
 		}
 
 		if ( charset !== false ) {
@@ -1031,9 +1033,15 @@ DataTable.ext.buttons.excelHtml5 = {
 
 				// For null, undefined of blank cell, continue so it doesn't create the _createNode
 				if ( row[i] === null || row[i] === undefined || row[i] === '' ) {
-					continue;
+					if ( config.createEmptyCells === true ) {
+						row[i] = '';
+					}
+					else {
+						continue;
+					}
 				}
 
+				var originalContent = row[i];
 				row[i] = $.trim( row[i] );
 
 				// Special number formatting options
@@ -1084,9 +1092,9 @@ DataTable.ext.buttons.excelHtml5 = {
 					}
 					else {
 						// String output - replace non standard characters for text output
-						var text = ! row[i].replace ?
-							row[i] :
-							row[i].replace(/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, '');
+						var text = ! originalContent.replace ?
+							originalContent :
+							originalContent.replace(/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, '');
 
 						cell = _createNode( rels, 'c', {
 							attr: {
@@ -1097,7 +1105,10 @@ DataTable.ext.buttons.excelHtml5 = {
 								row: _createNode( rels, 'is', {
 									children: {
 										row: _createNode( rels, 't', {
-											text: text
+											text: text,
+											attr: {
+												'xml:space': 'preserve'
+											}
 										} )
 									}
 								} )
@@ -1127,7 +1138,7 @@ DataTable.ext.buttons.excelHtml5 = {
 					ref: 'A'+row+':'+createCellPos(colspan)+row
 				}
 			} ) );
-			mergeCells.attr( 'count', mergeCells.attr( 'count' )+1 );
+			mergeCells.attr( 'count', parseFloat(mergeCells.attr( 'count' ))+1 );
 			$('row:eq('+(row-1)+') c', rels).attr( 's', '51' ); // centre
 		};
 
@@ -1181,7 +1192,12 @@ DataTable.ext.buttons.excelHtml5 = {
 
 		// Let the developer customise the document if they want to
 		if ( config.customize ) {
-			config.customize( xlsx );
+			config.customize( xlsx, config, dt );
+		}
+
+		// Excel doesn't like an empty mergeCells tag
+		if ( $('mergeCells', rels).children().length === 0 ) {
+			$('mergeCells', rels).remove();
 		}
 
 		var jszip = _jsZip();
@@ -1226,7 +1242,9 @@ DataTable.ext.buttons.excelHtml5 = {
 
 	messageTop: '*',
 
-	messageBottom: '*'
+	messageBottom: '*',
+
+	createEmptyCells: false
 };
 
 //
@@ -1344,23 +1362,19 @@ DataTable.ext.buttons.pdfHtml5 = {
 		}
 
 		if ( config.customize ) {
-			config.customize( doc, config );
+			config.customize( doc, config, dt );
 		}
 
 		var pdf = _pdfMake().createPdf( doc );
 
 		if ( config.download === 'open' && ! _isDuffSafari() ) {
 			pdf.open();
-			this.processing( false );
 		}
 		else {
-			pdf.getBuffer( function (buffer) {
-				var blob = new Blob( [buffer], {type:'application/pdf'} );
-
-				_saveAs( blob, info.filename );
-				that.processing( false );
-			} );
+			pdf.download( info.filename );
 		}
+
+		this.processing( false );
 	},
 
 	title: '*',

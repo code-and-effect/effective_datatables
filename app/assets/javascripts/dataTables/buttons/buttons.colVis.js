@@ -122,14 +122,8 @@ $.extend( DataTable.ext.buttons, {
 						return;
 					}
 
-					if ( typeof conf.columns === 'number' ) {
-						conf.columns = details.mapping[ conf.columns ];
-					}
-
-					var col = dt.column( conf.columns );
-
 					that.text( conf._columnText( dt, conf ) );
-					that.active( col.visible() );
+					that.active( dt.column( conf.columns ).visible() );
 				} );
 
 			this.active( dt.column( conf.columns ).visible() );
@@ -149,7 +143,9 @@ $.extend( DataTable.ext.buttons, {
 			var title = dt.settings()[0].aoColumns[ idx ].sTitle
 				.replace(/\n/g," ")        // remove new lines
 				.replace(/<br\s*\/?>/gi, " ")  // replace line breaks with spaces
-				.replace( /<.*?>/g, "" )   // strip HTML
+				.replace(/<select(.*?)<\/select>/g, "") // remove select tags, including options text
+				.replace(/<!\-\-.*?\-\->/g, "") // strip HTML comments
+				.replace(/<.*?>/g, "")   // strip HTML
 				.replace(/^\s+|\s+$/g,""); // trim
 
 			return conf.columnText ?
