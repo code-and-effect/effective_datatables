@@ -74,7 +74,7 @@ $(document).on 'click', '.buttons-bulk-actions a', (event) ->
     )
   else # Normal AJAX post
     $table.dataTable().data('bulk-actions-restore-selected-values', values)
-    $table.one 'draw.dt', (e, settings) -> settings.blockProcessing = true
+    $table.one 'draw.dt', (e, settings) -> settings.oFeatures.bProcessing = false
 
     $.ajax(
       method: method,
