@@ -28,19 +28,6 @@ EffectiveDatatables.setup do |config|
   # Default class used on the <table> tag
   config.html_class = 'table table-hover'
 
-  # When using the actions_column DSL method, apply the following behavior
-  # Valid values for each action are:
-  # true - display this action if authorized?(:show, Post)
-  # false - do not display this action
-  #
-  # You can override these defaults on a per-table basis
-  # by calling `actions_column(show: false, edit: true, destroy: false)`
-  config.actions_column = {
-    show: true,
-    edit: true,
-    destroy: true
-  }
-
   # Log search/sort information to the console
   config.debug = true
 
