@@ -42,7 +42,7 @@ restoreSelected = ($table, selected) ->
   if present then $bulkActions.removeAttr('disabled') else $bulkActions.attr('disabled', 'disabled')
 
 #### Bulk Action link behaviour
-$(document).on 'click', '.buttons-bulk-actions a', (event) ->
+$(document).on 'click', '.dataTables_wrapper .buttons-bulk-actions a', (event) ->
   event.preventDefault() # prevent the click
 
   $bulkAction = $(event.currentTarget)  # This is a regular <a href=...> tag

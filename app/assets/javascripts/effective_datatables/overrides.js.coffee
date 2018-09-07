@@ -12,6 +12,8 @@ $.extend(true, $.fn.dataTable.Buttons.defaults, {
 flash = (message) ->
   @context[0].oFeatures.bProcessing = false
 
+  message ||= 'Processing...'
+
   $processing = $(@table().node()).siblings('.dataTables_processing')
   $processing.html(message).show()
 

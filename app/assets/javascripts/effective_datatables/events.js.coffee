@@ -14,7 +14,7 @@ $(document).on 'column-visibility.dt', (event, settings, index, state) ->
   true
 
 # Remove empty label (bulk actions) from ColVis dropdown
-$(document).on 'click', 'a.buttons-colvis:not(.initialized)', (event) ->
+$(document).on 'click', '.dataTables_wrapper a.buttons-colvis:not(.initialized)', (event) ->
   $colvis = $('.dt-button-collection')
   return if $colvis.length == 0
 

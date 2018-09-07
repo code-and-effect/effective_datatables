@@ -30,6 +30,7 @@ module EffectiveDatatablesHelper
         'options' => (input_js || {}).to_json.html_safe,
         'reset' => datatable_reset(datatable),
         'simple' => datatable.simple?.to_s,
+        'spinner' => icon('spinner'), # effective_bootstrap
         'source' => effective_datatables.datatable_path(datatable, {format: 'json'}),
         'total-records' => datatable.to_json[:recordsTotal]
       }

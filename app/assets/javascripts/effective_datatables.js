@@ -12,6 +12,7 @@
 //= require dataTables/responsive/dataTables.responsive
 //= require dataTables/responsive/responsive.bootstrap4
 
+//= require effective_datatables/actions_col
 //= require effective_datatables/bulk_actions
 //= require effective_datatables/crud
 //= require effective_datatables/events
