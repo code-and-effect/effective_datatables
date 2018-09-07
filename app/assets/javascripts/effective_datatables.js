@@ -14,7 +14,6 @@
 
 //= require effective_datatables/actions_col
 //= require effective_datatables/bulk_actions
-//= require effective_datatables/crud
 //= require effective_datatables/events
 //= require effective_datatables/filters
 //= require effective_datatables/reset
