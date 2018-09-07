@@ -18,7 +18,6 @@ loadInlineForm = ($action, payload) ->
 
   true
 
-
 $(document).on 'click', ".dataTables_wrapper a[data-role='inline-form-cancel']", (event) ->
   $tr = $(event.currentTarget).closest('tr')
 
@@ -44,6 +43,8 @@ $(document).on 'click', ".dataTables_wrapper a[data-role='inline-form-reset']", 
   $tr.html($tr.data('inline-form-original-html'))
 
   $tr.closest('table').DataTable().draw()
+
+  false
 
 $(document).on 'ajax:beforeSend', '.dataTables_wrapper', (e, _, settings) ->
   if $(e.target).closest('.effective-datatables-inline-form').length > 0
