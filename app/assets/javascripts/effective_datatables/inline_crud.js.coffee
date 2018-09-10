@@ -117,6 +117,10 @@ expand = ($table) ->
   $wrapper = $table.closest('.dataTables_wrapper').addClass('effective-datatables-inline-expanded')
   $table.one 'draw.dt', (event) -> $wrapper.removeClass('effective-datatables-inline-expanded')
 
+cancel = ($table) ->
+  $wrapper = $table.closest('.dataTables_wrapper')
+  $wrapper.removeClass('effective-datatables-inline-expanded') if $wrapper.find('.effective-datatables-inline-row').length == 0
+
 # Cancel button clicked. Blow away new tr, or restore edit tr
 # No data will have changed at this point
 $(document).on 'click', ".dataTables_wrapper a[data-role='inline-form-cancel']", (event) ->
@@ -130,11 +134,12 @@ $(document).on 'click', ".dataTables_wrapper a[data-role='inline-form-cancel']",
       $actions.children('svg').remove()
       $actions.children('a').fadeIn()
 
-      $table.closest('.dataTables_wrapper').removeClass('effective-datatables-inline-expanded')
       $(this).remove()
+      cancel($table)
     )
   else
     $tr.fadeOut('slow', ->
+      $table = $(this).closest('table')
       $tr.html($tr.data('inline-form-original-html'))
 
       $td = $tr.children('.col-actions').first()
@@ -144,9 +149,8 @@ $(document).on 'click', ".dataTables_wrapper a[data-role='inline-form-cancel']",
       $td.children('.btn-group').show()
       $td.children('a').show()
 
-      $tr.closest('.dataTables_wrapper').removeClass('effective-datatables-inline-expanded')
-      $tr.removeClass('effective-datatables-inline-row')
-      $tr.fadeIn()
+      $tr.removeClass('effective-datatables-inline-row').fadeIn()
+      cancel($table)
     )
 
   false
