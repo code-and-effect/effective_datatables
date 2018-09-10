@@ -27,11 +27,11 @@ $(document).on 'click', ".dataTables_wrapper a[data-role='inline-form-cancel']",
   # Undo any ajax:beforeSend stuff
   $td = $tr.children('.col-actions').first()
 
-  # Show dropdown
+  # - Show dropdown
   $td.find('.dropdown-toggle').dropdown('toggle')
   $td.find('.btn-group').show()
 
-  # Remove spinner
+  # - Remove spinner
   $td.find('svg').remove()
 
   false
@@ -46,16 +46,11 @@ $(document).on 'click', ".dataTables_wrapper a[data-role='inline-form-reset']", 
 
   false
 
-$(document).on 'ajax:beforeSend', '.dataTables_wrapper', (e, _, settings) ->
-  if $(e.target).closest('.effective-datatables-inline-form').length > 0
-    # Submit made inside an inline-form
-    $btnClose = $(e.target).closest('.effective-datatables-inline-form').siblings('.col-actions-inline-form').find("[data-role='inline-form-cancel']")
-    $btnClose.attr('data-role', 'inline-form-reset')
-    return true
+beforeNew = ($action) ->
+  console.log 'new clicked'
+  $table = $action.closest('table')
 
-  console.log 'ajax before send'
-
-  $action = $(e.target)
+beforeEdit = ($action) ->
   $table = $action.closest('table')
   $td = $action.closest('td')
 
@@ -67,21 +62,50 @@ $(document).on 'ajax:beforeSend', '.dataTables_wrapper', (e, _, settings) ->
   $td.append($table.data('spinner'))
   $table.DataTable().flash()
 
-  EffectiveForm.remote_form_payload = ''
+# Submit made inside an inline-form
+beforeInlineFormSave = ($action) ->
+  $btnClose = $action.closest('.effective-datatables-inline-form').siblings('.col-actions-inline-form').find("[data-role='inline-form-cancel']")
+  $btnClose.attr('data-role', 'inline-form-reset')
   true
 
-$(document).on 'ajax:success', '.dataTables_wrapper', (e, a, b, c) ->
+$(document).on 'ajax:beforeSend', '.dataTables_wrapper', (e, _, settings) ->
+  $action = $(e.target)
+
+  console.log 'ajax before send'
+
+  if $action.closest('.effective-datatables-inline-form').length > 0
+    beforeInlineFormSave($action)
+  else if $action.closest('tr').parent().prop('tagName') == 'THEAD'
+    beforeNew($action)
+  else
+    beforeEdit($action)
+
+  true
+
+afterNew = ($action) ->
+  console.log 'after new'
+
+afterEdit = ($action) ->
+  loadInlineForm($action, EffectiveForm.remote_form_payload)
+  EffectiveForm.remote_form_payload = ''
+
+afterAction = ($action) ->
+  $table = $action.closest('table')
+  $table.DataTable().flash('Successful ' + $action.attr('title'))
+  $table.DataTable().draw()
+
+$(document).on 'ajax:success', '.dataTables_wrapper', (e) ->
+  $action = $(e.target)
+
   console.log 'ajax success'
 
-  $action = $(e.target)
-  $table = $action.closest('table')
-
   if ($action.data('method') || 'get') == 'get'
-    loadInlineForm($action, EffectiveForm.remote_form_payload)
-    EffectiveForm.remote_form_payload = ''
+    if $action.closest('tr').parent().prop('tagName') == 'THEAD'
+      afterNew($action)
+    else
+      afterEdit($action)
   else
-    $table.DataTable().flash('Successful ' + $action.attr('title'))
-    $table.DataTable().draw()
+    afterAction($action)
 
 $(document).on 'ajax:error', '.dataTables_wrapper', (e, b, c) ->
   console.log 'ajax error'
@@ -91,11 +115,3 @@ $(document).on 'ajax:error', '.dataTables_wrapper', (e, b, c) ->
 
   $table.DataTable().flash('Error: unable to ' + $action.attr('title'))
   $table.DataTable().draw()
-
-
-$(document).on 'ajax:success', '.effective-datatables-inline-form', (e) ->
-  console.log 'ajax inline form success '
-
-$(document).on 'ajax:error', '.effective-datatables-inline-form', (e) ->
-  console.log 'ajax inline form error'
-

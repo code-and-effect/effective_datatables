@@ -4,7 +4,7 @@ $(document).on 'change', ".dataTables_wrapper input[data-role='bulk-action']", (
   $wrapper = $(event.currentTarget).closest('.dataTables_wrapper')
 
   $wrapper.find("input[data-role='bulk-actions']").prop('checked', false)
-  toggleBulkActionsDropdown($wrapper)
+  toggleDropdown($wrapper)
 
 $(document).on 'change', ".dataTables_wrapper input[data-role='bulk-actions']", (event) ->
   $wrapper = $(event.currentTarget).closest('.dataTables_wrapper')
@@ -15,9 +15,9 @@ $(document).on 'change', ".dataTables_wrapper input[data-role='bulk-actions']", 
   else
     $resources.prop('checked', false)
 
-  toggleBulkActionsDropdown($wrapper)
+  toggleDropdown($wrapper)
 
-toggleBulkActionsDropdown = ($wrapper) ->
+toggleDropdown = ($wrapper) ->
   $bulkActions = $wrapper.children().first().find('.buttons-bulk-actions').children('button')
 
   if $wrapper.find("input[data-role='bulk-action']:checked").length > 0
