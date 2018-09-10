@@ -27,6 +27,30 @@ table.dataTable > thead {
   }
 }
 
+.dataTables_wrapper {
+  table.dataTable {
+    tr.effective-datatables-inline-row { visibility: collapse; }  // Turbolinks destroy fix
+  }
+}
+
+// When Inline Expanded
+.dataTables_wrapper.effective-datatables-inline-expanded {
+  .dt-buttons { opacity: 0.4; }
+  .dataTables_entries { opacity: 0.4; }
+  .dataTables_paginate { opacity: 0.4; }
+
+  table.dataTable {
+    tr { opacity: 0.4; }
+
+    tr.effective-datatables-inline-row {
+      visibility: visible;
+      opacity: 1.0;
+
+      &:hover { background-color: inherit; }
+    }
+  }
+}
+
 table.dataTable > thead th {
   vertical-align: top;
   background-repeat: no-repeat;

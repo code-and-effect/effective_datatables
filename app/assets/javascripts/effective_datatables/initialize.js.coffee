@@ -1,5 +1,5 @@
 initializeDataTables = ->
-  $('table.effective-datatable').each ->
+  $('table.effective-datatable:not(.initialized)').each ->
     return if $.fn.DataTable.fnIsDataTable(this)
 
     datatable = $(this)
@@ -166,12 +166,16 @@ initializeDataTables = ->
     # Let's actually initialize the table now
     table = datatable.dataTable(jQuery.extend(init_options, options))
 
+    table.addClass('initialized')
+
     # Apply EffectiveFormInputs to the Show x per page dropdown
     try table.closest('.dataTables_wrapper').find('.dataTables_length select').removeAttr('name').select2(minimumResultsForSearch: 100)
 
 destroyDataTables = ->
-  $('table.effective-datatable').each ->
-    $(this).DataTable().destroy() if $.fn.DataTable.fnIsDataTable(this)
+  $('table.effective-datatable.initialized').each ->
+    if $.fn.DataTable.fnIsDataTable(this)
+      $(this).closest('.dataTables_wrapper').removeClass('effective-datatables-inline-expanded')
+      try $(this).DataTable().destroy()
 
 $ -> initializeDataTables()
 $(document).on 'page:change', -> initializeDataTables()

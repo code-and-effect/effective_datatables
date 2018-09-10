@@ -12,10 +12,10 @@
 //= require dataTables/responsive/dataTables.responsive
 //= require dataTables/responsive/responsive.bootstrap4
 
-//= require effective_datatables/actions_col
 //= require effective_datatables/bulk_actions
 //= require effective_datatables/events
 //= require effective_datatables/filters
+//= require effective_datatables/inline_crud
 //= require effective_datatables/reset
 //= require effective_datatables/responsive
 //= require effective_datatables/overrides

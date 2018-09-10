@@ -49,7 +49,6 @@ $(document).on 'ajax:error', '.dataTables_wrapper', (e) ->
   $table = $action.closest('table')
   $table.DataTable().flash('Error: unable to ' + ($action.attr('title') || 'complete action')).draw()
 
-## New Stuff ##
 beforeNew = ($action) ->
   $table = $action.closest('table')
   $th = $action.closest('th')
@@ -64,13 +63,15 @@ beforeNew = ($action) ->
 
 afterNew = ($action) ->
   $tr = $action.closest('tr')
+  $table = $tr.closest('table')
   $action.siblings('svg').remove()
 
   html = buildRow($tr.children('th').length, EffectiveForm.remote_form_payload)
 
   $tr = $("<tr class='effective-datatables-inline-row effective-datatables-new-resource' role='row'>#{html}</tr>")
-  $action.closest('table').find('tbody').prepend($tr)
+  $table.children('tbody').prepend($tr)
 
+  expand($table)
   $tr.find('form').attr('data-remote', true).trigger('effective-bootstrap:initialize')
   $tr.hide().fadeIn()
 
@@ -88,6 +89,7 @@ beforeEdit = ($action) ->
 
 afterEdit = ($action) ->
   $tr = $action.closest('tr')
+  $table = $tr.closest('table')
   $tr.data('inline-form-original-html', $tr.html())
 
   html = buildRow($tr.children('td').length, EffectiveForm.remote_form_payload)
@@ -95,6 +97,7 @@ afterEdit = ($action) ->
   $tr.html(html)
   $tr.addClass('effective-datatables-inline-row')
 
+  expand($table)
   $tr.find('form').attr('data-remote', true).trigger('effective-bootstrap:initialize')
   $tr.hide().fadeIn()
 
@@ -104,10 +107,14 @@ afterAction = ($action) ->
   $table.DataTable().flash('Successful ' + $action.attr('title')).draw()
 
 buildRow = (length, payload) ->
-  "<td class='col-inline-form' colspan='#{length-1}'>#{payload}</td>" +
+  "<td class='col-inline-form' colspan='#{length-1}'><div class='container'>#{payload}</div></td>" +
   "<td class='col-actions col-actions-inline-form'>" +
     "<a href='#' class='btn btn-outline-primary' title='Cancel' data-role='inline-form-cancel'>Cancel</a>" +
   "</td>"
+
+expand = ($table) ->
+  $wrapper = $table.closest('.dataTables_wrapper').addClass('effective-datatables-inline-expanded')
+  $table.one 'draw.dt', (event) -> $wrapper.removeClass('effective-datatables-inline-expanded')
 
 # Cancel button clicked. Blow away new tr, or restore edit tr
 # No data will have changed at this point
@@ -116,10 +123,13 @@ $(document).on 'click', ".dataTables_wrapper a[data-role='inline-form-cancel']",
 
   if $tr.hasClass('effective-datatables-new-resource')
     $tr.fadeOut('slow', ->
-      $actions = $(this).closest('table').children('thead').find('th.col-actions')
+      $table = $(this).closest('table')
+
+      $actions = $table.children('thead').find('th.col-actions')
       $actions.find('svg').remove()
       $actions.find('a').fadeIn()
 
+      $table.closest('.dataTables_wrapper').removeClass('effective-datatables-inline-expanded')
       $(this).remove()
     )
   else
@@ -132,6 +142,7 @@ $(document).on 'click', ".dataTables_wrapper a[data-role='inline-form-cancel']",
       $td.find('.dropdown-toggle').dropdown('toggle')
       $td.find('.btn-group').show()
 
+      $tr.closest('.dataTables_wrapper').removeClass('effective-datatables-inline-expanded')
       $tr.removeClass('effective-datatables-inline-row')
       $tr.fadeIn()
     )
