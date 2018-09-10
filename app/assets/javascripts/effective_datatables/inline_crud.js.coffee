@@ -37,8 +37,8 @@ $(document).on '.dataTables_wrapper effective-form:success', (event, flash) ->
     $tr.fadeOut('slow')
 
     $actions = $table.children('thead').find('th.col-actions')
-    $actions.find('svg').remove()
-    $actions.find('a').fadeIn()
+    $actions.children('svg').remove()
+    $actions.children('a').fadeIn()
   else
     $table.DataTable().flash(flash || 'Item updated').draw()
     $tr.fadeOut('slow')
@@ -54,7 +54,7 @@ beforeNew = ($action) ->
   $th = $action.closest('th')
 
   # Hide New Button
-  $th.find('a').hide()
+  $th.children('a').hide()
 
   # Append spinner and show Processing
   $th.append($table.data('spinner'))
@@ -81,7 +81,8 @@ beforeEdit = ($action) ->
 
   # Hide dropdown
   $td.find('.dropdown-toggle').dropdown('toggle')
-  $td.find('.btn-group').hide()
+  $td.children('.btn-group').hide()
+  $td.children('a').hide()
 
   # Append spinner and show Processing
   $td.append($table.data('spinner'))
@@ -126,8 +127,8 @@ $(document).on 'click', ".dataTables_wrapper a[data-role='inline-form-cancel']",
       $table = $(this).closest('table')
 
       $actions = $table.children('thead').find('th.col-actions')
-      $actions.find('svg').remove()
-      $actions.find('a').fadeIn()
+      $actions.children('svg').remove()
+      $actions.children('a').fadeIn()
 
       $table.closest('.dataTables_wrapper').removeClass('effective-datatables-inline-expanded')
       $(this).remove()
@@ -137,10 +138,11 @@ $(document).on 'click', ".dataTables_wrapper a[data-role='inline-form-cancel']",
       $tr.html($tr.data('inline-form-original-html'))
 
       $td = $tr.children('.col-actions').first()
-      $td.find('svg').remove()
+      $td.children('svg').remove()
 
       $td.find('.dropdown-toggle').dropdown('toggle')
-      $td.find('.btn-group').show()
+      $td.children('.btn-group').show()
+      $td.children('a').show()
 
       $tr.closest('.dataTables_wrapper').removeClass('effective-datatables-inline-expanded')
       $tr.removeClass('effective-datatables-inline-row')
