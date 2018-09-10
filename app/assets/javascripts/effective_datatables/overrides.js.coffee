@@ -26,5 +26,6 @@ flash = (message) ->
     , 1500)
   )
 
-# @context[0]
+  return @
+
 $.fn.DataTable.Api.register('flash()', flash);
