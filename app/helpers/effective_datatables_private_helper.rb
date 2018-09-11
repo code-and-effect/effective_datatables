@@ -27,13 +27,15 @@ module EffectiveDatatablesPrivateHelper
     link_to(content_tag(:span, 'Reset'), '#', class: 'btn btn-link btn-sm buttons-reset-search')
   end
 
-  def datatable_new_resource_button(datatable, name)
-    actions = {'New' => { action: :new, class: 'btn btn-outline-primary' } }
-    render_resource_actions(datatable.resource.klass, actions: actions) # Will only work if permitted
+  def datatable_new_resource_button(datatable, name, column)
+    if column[:inline] && column[:actions][:new] != false
+      actions = {'New' => { action: :new, class: 'btn btn-outline-primary', 'data-remote': true } }
+      render_resource_actions(datatable.resource.klass, actions: actions) # Will only work if permitted
+    end
   end
 
   def datatable_search_tag(datatable, name, opts)
-    return datatable_new_resource_button(datatable, name) if name == :_actions
+    return datatable_new_resource_button(datatable, name, opts) if name == :_actions
 
     return if opts[:search] == false
 

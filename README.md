@@ -526,6 +526,7 @@ edit: true|false
 destroy: true|false
 visible: true|false
 actions_partial: :dropleft
+inline: true|false
 ```
 
 Each object is checked individually for authorization.

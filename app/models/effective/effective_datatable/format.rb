@@ -24,10 +24,9 @@ module Effective
               spacer_template: SPACER_TEMPLATE
             ) || '').split(SPACER)
           elsif opts[:as] == :actions # This is actions_col and actions_col do .. end, but not actions_col partial: 'something'
-            locals = { datatable: self, column: columns[name], spacer_template: SPACER_TEMPLATE }
-
             resources = collection.map { |row| row[opts[:index]] }
-            atts = opts[:actions].merge(effective_resource: resource, locals: locals, partial: opts[:actions_partial])
+            locals = { datatable: self, column: opts, spacer_template: SPACER_TEMPLATE }
+            atts = { actions: actions_col_actions(opts), effective_resource: resource, locals: locals, partial: opts[:actions_partial] }.merge(opts[:actions])
 
             rendered[name] = (view.render_resource_actions(resources, atts, &opts[:format]) || '').split(SPACER)
           end
@@ -67,7 +66,9 @@ module Effective
 
         case column[:as]
         when :actions
-          view.render_resource_actions(value, **column[:actions].merge(effective_resource: resource, partial: column[:actions_partial]))
+          atts = { actions: actions_col_actions(column), effective_resource: resource, partial: column[:actions_partial] }.merge(column[:actions])
+
+          (view.render_resource_actions(value, atts) || '')
         when :boolean
           case value
           when true   ; 'Yes'
@@ -107,6 +108,16 @@ module Effective
           (value.strftime('%H:%M') rescue BLANK)
         else
           value.to_s
+        end
+      end
+
+      # Takes all default resource actions
+      # Applies data-remote to anything that's data-method post or delete
+      def actions_col_actions(column)
+        if column[:inline]
+          resource.resource_actions.transform_values { |opts| opts['data-remote'] = true; opts }
+        else
+          resource.resource_actions.transform_values { |opts| opts['data-remote'] = true if opts['data-method']; opts }
         end
       end
 

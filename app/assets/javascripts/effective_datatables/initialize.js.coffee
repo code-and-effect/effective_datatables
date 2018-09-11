@@ -76,8 +76,7 @@ initializeDataTables = ->
       scrollCollapse: true
       pagingType: 'simple_numbers'
       initComplete: (settings) ->
-        initializeReset(this.api())
-        initializeBulkActions(this.api())
+        initializeButtons(this.api())
         initializeSearch(this.api())
       drawCallback: (settings) ->
         $table = $(this.api().table().node())
@@ -94,17 +93,15 @@ initializeDataTables = ->
             drawCharts($table, settings['json']['charts'])
 
     # Copies the bulk actions html, stored in a data attribute on the table, into the buttons area
-    initializeBulkActions = (api) ->
+    initializeButtons = (api) ->
       $table = $(api.table().node())
+      $buttons = $table.closest('.dataTables_wrapper').children().first().find('.dt-buttons')
 
       if $table.data('bulk-actions')
-        $table.closest('.dataTables_wrapper').children().first().find('.dt-buttons').prepend($table.data('bulk-actions'))
-
-    initializeReset = (api) ->
-      $table = $(api.table().node())
+        $buttons.prepend($table.data('bulk-actions'))
 
       if $table.data('reset')
-        $table.closest('.dataTables_wrapper').children().first().find('.dt-buttons').prepend($table.data('reset'))
+        $buttons.prepend($table.data('reset'))
 
     drawAggregates = ($table, aggregates) ->
       $tfoot = $table.find('tfoot').first()
@@ -171,7 +168,7 @@ initializeDataTables = ->
 
 destroyDataTables = ->
   $('.effective-datatables-inline-expanded').each -> $(this).removeClass('effective-datatables-inline-expanded')
-  $('table.effective-datatable.initialized').each -> try $(this).DataTable().destroy()
+  $('table.effective-datatable.initialized').each -> $(this).DataTable().destroy()
 
 $ -> initializeDataTables()
 $(document).on 'page:change', -> initializeDataTables()
