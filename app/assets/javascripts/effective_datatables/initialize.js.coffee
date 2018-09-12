@@ -97,11 +97,11 @@ initializeDataTables = ->
       $table = $(api.table().node())
       $buttons = $table.closest('.dataTables_wrapper').children().first().find('.dt-buttons')
 
-      if $table.data('bulk-actions')
-        $buttons.prepend($table.data('bulk-actions'))
-
       if $table.data('reset')
         $buttons.prepend($table.data('reset'))
+
+      if $table.data('bulk-actions')
+        $buttons.prepend($table.data('bulk-actions'))
 
     drawAggregates = ($table, aggregates) ->
       $tfoot = $table.find('tfoot').first()
@@ -167,8 +167,8 @@ initializeDataTables = ->
     table.addClass('initialized')
 
 destroyDataTables = ->
-  $('.effective-datatables-inline-expanded').each -> $(this).removeClass('effective-datatables-inline-expanded')
-  $('table.effective-datatable.initialized').each -> $(this).DataTable().destroy()
+  $('.effective-datatables-inline-expanded').removeClass('effective-datatables-inline-expanded')
+  $('table.effective-datatable').each -> $(this).DataTable().turboDestroy()
 
 $ -> initializeDataTables()
 $(document).on 'page:change', -> initializeDataTables()
