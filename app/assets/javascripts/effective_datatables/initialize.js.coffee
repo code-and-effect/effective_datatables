@@ -168,7 +168,7 @@ initializeDataTables = ->
 
 destroyDataTables = ->
   $('.effective-datatables-inline-expanded').removeClass('effective-datatables-inline-expanded')
-  $('table.effective-datatable').each -> $(this).removeClass('initialized').DataTable().destroy()
+  $('table.effective-datatable').each -> try $(this).removeClass('initialized').DataTable().destroy()
 
 $ -> initializeDataTables()
 $(document).on 'page:change', -> initializeDataTables()
