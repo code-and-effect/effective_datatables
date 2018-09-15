@@ -92,13 +92,14 @@ module EffectiveDatatablesHelper
 
   def inline_datatable
     return nil unless inline_datatable?
+    return @_inline_datatable if @_inline_datatable
 
     datatable = EffectiveDatatables.find(params[:_datatable_id])
     datatable.view = self
 
     EffectiveDatatables.authorize!(self, :index, datatable.collection_class)
 
-    datatable
+    @_inline_datatable ||= datatable
   end
 
 end
