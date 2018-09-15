@@ -8,7 +8,15 @@ module Effective
       end
 
       def cookie_key
-        @cookie_key ||= (datatables_ajax_request? ? view.params[:cookie] : cookie_param)
+        @cookie_key ||= (
+          if datatables_ajax_request?
+            view.params[:cookie]
+          elsif datatables_inline_request?
+            view.params[:_datatable_cookie]
+          else
+            cookie_param
+          end
+        )
       end
 
       # All possible dt cookie keys.  Used to make sure the datatable has a cookie set for this session.

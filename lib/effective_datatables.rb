@@ -32,4 +32,11 @@ module EffectiveDatatables
     raise Effective::AccessDenied.new('Access Denied', action, resource) unless authorized?(controller, action, resource)
   end
 
+  def self.find(id)
+    id = id.to_s.gsub(/-\d+\z/, '').gsub('-', '/')
+    klass = (id.classify.safe_constantize || id.classify.pluralize.safe_constantize)
+
+    klass.try(:new) || raise('unable to find datatable')
+  end
+
 end

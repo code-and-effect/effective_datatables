@@ -97,7 +97,7 @@ module Effective
           )
         end
 
-        def actions_col(col_class: nil, inline: false, partial: nil, partial_as: nil, actions_partial: nil, responsive: 5000, visible: true, **actions, &format)
+        def actions_col(col_class: nil, inline: nil, partial: nil, partial_as: nil, actions_partial: nil, responsive: 5000, visible: true, **actions, &format)
           raise 'You can only have one actions column' if datatable.columns[:_actions].present?
 
           datatable._columns[:_actions] = Effective::DatatableColumn.new(
@@ -107,7 +107,7 @@ module Effective
             col_class: col_class,
             format: (format if block_given?),
             index: nil,
-            inline: inline,
+            inline: (inline.nil? ? datatable.inline? : inline),
             label: false,
             name: :actions,
             partial: partial,

@@ -11,6 +11,13 @@ module Effective
           (view && view.params[:draw] && view.params[:columns] && cookie_keys.include?(view.params[:cookie])) == true
       end
 
+      def datatables_inline_request?
+        return @_datatables_inline_request unless @_datatables_inline_request.nil?
+
+        @_datatables_inline_request =
+          (view && view.params[:_datatable_cookie] && cookie_keys.include?(view.params[:_datatable_cookie])) == true
+      end
+
       def params
         return {} unless view.present?
         @params ||= {}.tap do |params|

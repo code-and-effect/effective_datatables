@@ -5,7 +5,7 @@ module Effective
     # This will respond to both a GET and a POST
     def show
       begin
-        @datatable = find_datatable(params[:id]).try(:new) || raise('unable to find datatable')
+        @datatable = EffectiveDatatables.find(params[:id])
         @datatable.view = view_context
 
         EffectiveDatatables.authorize!(self, :index, @datatable.collection_class)
@@ -22,11 +22,6 @@ module Effective
     end
 
     private
-
-    def find_datatable(id)
-      id = id.to_s.gsub(/-\d+\z/, '').gsub('-', '/')
-      id.classify.safe_constantize || id.classify.pluralize.safe_constantize
-    end
 
     def error_json(e)
       {

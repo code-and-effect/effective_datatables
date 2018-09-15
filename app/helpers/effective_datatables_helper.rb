@@ -1,8 +1,11 @@
 # These are expected to be called by a developer.  They are part of the datatables DSL.
 module EffectiveDatatablesHelper
 
-  def render_datatable(datatable, input_js: {}, buttons: true, charts: true, filters: true, simple: false)
+  def render_datatable(datatable, input_js: {}, buttons: true, charts: true, filters: true, simple: false, inline: false)
     raise 'expected datatable to be present' unless datatable
+
+    datatable.attributes[:simple] = true if simple
+    datatable.attributes[:inline] = true if inline
 
     datatable.view ||= self
 
@@ -13,7 +16,6 @@ module EffectiveDatatablesHelper
     charts = charts && datatable._charts.present?
     filters = filters && (datatable._scopes.present? || datatable._filters.present?)
 
-    datatable.attributes[:simple] = true if simple
     input_js[:buttons] = false if simple || !buttons
 
     effective_datatable_params = {
@@ -27,6 +29,7 @@ module EffectiveDatatablesHelper
         'display-order' => [datatable.order_index, datatable.order_direction].to_json().html_safe,
         'display-records' => datatable.to_json[:recordsFiltered],
         'display-start' => datatable.display_start,
+        'inline' => datatable.inline?.to_s,
         'options' => (input_js || {}).to_json.html_safe,
         'reset' => datatable_reset(datatable),
         'simple' => datatable.simple?.to_s,
@@ -58,6 +61,11 @@ module EffectiveDatatablesHelper
       )
     end
   end
+
+  def render_inline_datatable(datatable)
+    render_datatable(datatable, inline: true)
+  end
+
 
   def render_simple_datatable(datatable)
     raise 'expected datatable to be present' unless datatable
@@ -112,6 +120,21 @@ module EffectiveDatatablesHelper
     chart_data = datatable.to_json[:charts][name][:data]
 
     render partial: chart[:partial], locals: { datatable: datatable, chart: chart, chart_data: chart_data }
+  end
+
+  def inline_datatable?
+    params[:_datatable_id].present?
+  end
+
+  def inline_datatable
+    return nil unless inline_datatable?
+
+    datatable = EffectiveDatatables.find(params[:_datatable_id])
+    datatable.view = self
+
+    EffectiveDatatables.authorize!(self, :index, datatable.collection_class)
+
+    datatable
   end
 
 end

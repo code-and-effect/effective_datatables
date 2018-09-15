@@ -2,8 +2,12 @@
 # This works with EffectiveForm.remote_form which is part of the effective_bootstrap gem.
 
 # About to do a resource action, or fetch a partial. Show loading.
-$(document).on 'ajax:beforeSend', '.dataTables_wrapper', (e) ->
+$(document).on 'ajax:beforeSend', '.dataTables_wrapper', (e, xhr, settings) ->
   $action = $(e.target)
+  $table = $(e.target).closest('table')
+
+  $params =  $.param({_datatable_id: $table.attr('id'), _datatable_cookie: $table.data('cookie') })
+  settings.url += (if settings.url.indexOf('?') == -1 then '?' else '&') + $params
 
   if $action.closest('.effective-datatables-inline-row').length > 0
     # Nothing. This is a save action from within the inline form.
