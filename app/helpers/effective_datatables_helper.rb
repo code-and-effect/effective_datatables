@@ -66,7 +66,6 @@ module EffectiveDatatablesHelper
     render_datatable(datatable, inline: true)
   end
 
-
   def render_simple_datatable(datatable)
     raise 'expected datatable to be present' unless datatable
 
@@ -85,41 +84,6 @@ module EffectiveDatatablesHelper
     render(partial: 'effective/datatables/datatable',
       locals: { datatable: datatable, effective_datatable_params: effective_datatable_params }
     )
-  end
-
-  def render_datatable_filters(datatable)
-    raise 'expected datatable to be present' unless datatable
-
-    datatable.view ||= self
-    return unless datatable._scopes.present? || datatable._filters.present?
-
-    if datatable._filters_form_required?
-      render partial: 'effective/datatables/filters', locals: { datatable: datatable }
-    else
-      render(partial: 'effective/datatables/filters', locals: { datatable: datatable }).gsub('<form', '<div').gsub('/form>', '/div>').html_safe
-    end
-
-  end
-
-  def render_datatable_charts(datatable)
-    raise 'expected datatable to be present' unless datatable
-
-    datatable.view ||= self
-    return unless datatable._charts.present?
-
-    datatable._charts.map { |name, _| render_datatable_chart(datatable, name) }.join.html_safe
-  end
-
-  def render_datatable_chart(datatable, name)
-    raise 'expected datatable to be present' unless datatable
-
-    datatable.view ||= self
-    return unless datatable._charts[name].present?
-
-    chart = datatable._charts[name]
-    chart_data = datatable.to_json[:charts][name][:data]
-
-    render partial: chart[:partial], locals: { datatable: datatable, chart: chart, chart_data: chart_data }
   end
 
   def inline_datatable?
