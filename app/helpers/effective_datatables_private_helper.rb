@@ -30,7 +30,7 @@ module EffectiveDatatablesPrivateHelper
   def datatable_new_resource_button(datatable, name, column)
     if column[:inline] && column[:actions][:new] != false
       actions = {'New' => { action: :new, class: 'btn btn-outline-primary', 'data-remote': true } }
-      render_resource_actions(datatable.resource.klass, actions: actions) # Will only work if permitted
+      render_resource_actions(datatable.resource.klass, actions: actions, effective_resource: datatable.resource) # Will only work if permitted
     end
   end
 
