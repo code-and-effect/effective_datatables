@@ -92,6 +92,8 @@ initializeDataTables = ->
           if settings['json']['charts']
             drawCharts($table, settings['json']['charts'])
 
+          $table.children('tbody').trigger('effective-bootstrap:initialize')
+
     # Copies the bulk actions html, stored in a data attribute on the table, into the buttons area
     initializeButtons = (api) ->
       $table = $(api.table().node())
