@@ -163,6 +163,9 @@ initializeDataTables = ->
     # Let's actually initialize the table now
     table = datatable.dataTable(jQuery.extend(init_options, options))
 
+    # Fix a tabindex issue
+    table.children('tbody').children('tr').children('td[tabindex]').removeAttr('tabindex')
+
     # Apply EffectiveFormInputs to the Show x per page dropdown
     try table.closest('.dataTables_wrapper').find('.dataTables_length select').removeAttr('name').select2(minimumResultsForSearch: 100)
 

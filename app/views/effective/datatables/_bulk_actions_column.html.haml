@@ -1,2 +1,6 @@
 - id = (resource.try(:to_param) || resource.try(:id) || resource.object_id)
-= check_box_tag 'bulk_actions_resources[]', id, false, autocomplete: 'off', id: "datatable_bulk_actions_resource_#{id}", data: { role: 'bulk-action' }
+
+.form-group.custom-control.custom-checkbox
+  %input{value: 0, type: 'hidden'}
+  %input.custom-control-input{name: 'bulk_actions_resources[]', id: "datatable_bulk_actions_resource_#{id}", value: id, type: 'checkbox', autocomplete: 'off', 'data-role': 'bulk-action' }
+  %label.custom-control-label{for: "datatable_bulk_actions_resource_#{id}" }

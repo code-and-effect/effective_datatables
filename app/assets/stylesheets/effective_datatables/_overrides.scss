@@ -107,6 +107,13 @@ table.dataTable > thead {
 
       input { max-height: 38px; }
     }
+
+    &.col-bulk_actions {
+      label {
+        cursor: pointer;
+      }
+    }
+
   }
 }
 
@@ -173,6 +180,13 @@ table.dataTable {
   td.col-decimal { text-align: right; }
   td.col-right { text-align: right; }
 
+  td.col-bulk_actions {
+    label {
+      cursor: pointer;
+      vertical-align: top;
+    }
+  }
+
   tfoot {
     .col-price { text-align: right; }
     .col-decimal { text-align: right; }
@@ -182,10 +196,6 @@ table.dataTable {
   td.col-actions {
     white-space: nowrap;
     text-align: right;
-  }
-
-  td.col-bulk_actions {
-    input[type='checkbox'] { margin-left: 1px; margin-right: 1px; }
   }
 
   td.col-resource_item { word-break: keep-all; }
