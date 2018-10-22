@@ -545,6 +545,10 @@ actions_col do |post|
 end
 ```
 
+Any `data-remote` actions will be hijacked and performed as inline ajax by datatables.
+
+If you'd like to opt-out of this behavior, use `actions_col(inline: false)` or add `data-inline: false` to your action link.
+
 ### length
 
 Sets the default number of rows per page. Valid lengths are `5`, `10`, `25`, `50`, `100`, `250`, `500`, `:all`

@@ -2,9 +2,11 @@
 # This works with EffectiveForm.remote_form which is part of the effective_bootstrap gem.
 
 # About to do a resource action, or fetch a partial. Show loading.
-$(document).on 'ajax:beforeSend', '.dataTables_wrapper', (e, xhr, settings) ->
+$(document).on 'ajax:beforeSend', '.dataTables_wrapper .col-actions', (e, xhr, settings) ->
   $action = $(e.target)
   $table = $(e.target).closest('table')
+
+  return true if ('' + $action.data('inline')) == 'false'
 
   $params =  $.param({_datatable_id: $table.attr('id'), _datatable_cookie: $table.data('cookie') })
   settings.url += (if settings.url.indexOf('?') == -1 then '?' else '&') + $params
@@ -19,8 +21,10 @@ $(document).on 'ajax:beforeSend', '.dataTables_wrapper', (e, xhr, settings) ->
   true
 
 # We have either completed the resource action, or fetched the inline form to load.
-$(document).on 'ajax:success', '.dataTables_wrapper', (e) ->
-  $action = $(e.target)
+$(document).on 'ajax:success', '.dataTables_wrapper .col-actions', (event) ->
+  $action = $(event.target)
+
+  return true if ('' + $action.data('inline')) == 'false'
 
   if ($action.data('method') || 'get') == 'get'
     if $action.closest('tr').parent().prop('tagName') == 'THEAD' then afterNew($action) else afterEdit($action)
@@ -32,8 +36,10 @@ $(document).on 'ajax:success', '.dataTables_wrapper', (e) ->
   true
 
 # The inline form has been submitted successfully
-$(document).on '.dataTables_wrapper effective-form:success', (event, flash) ->
-  $tr = $(event.target).closest('tr')
+$(document).on '.dataTables_wrapper .col-inline-form effective-form:success', (event, flash) ->
+  $action = $(event.target)
+
+  $tr = $action.closest('tr')
   $table = $tr.closest('table')
 
   if $tr.hasClass('effective-datatables-new-resource')
@@ -48,8 +54,8 @@ $(document).on '.dataTables_wrapper effective-form:success', (event, flash) ->
     $tr.fadeOut('slow')
 
 # There was an error completing something
-$(document).on 'ajax:error', '.dataTables_wrapper', (e) ->
-  $action = $(e.target)
+$(document).on 'ajax:error', '.dataTables_wrapper .col-inline-form', (event) ->
+  $action = $(event.target)
   $table = $action.closest('table')
   $table.DataTable().flash('Error: unable to ' + ($action.attr('title') || 'complete action')).draw()
 

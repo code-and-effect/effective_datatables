@@ -28,13 +28,4 @@ flash = (message) ->
 
   return @
 
-turboDestroy = ->
-  @iterator('table', (settings) ->
-    $(window).off('.DT-' + settings.sInstance)
-
-    index = $.inArray(settings, $.fn.DataTable.settings)
-    $.fn.DataTable.settings.splice(index, 1) if index > -1
-  )
-
 $.fn.DataTable.Api.register('flash()', flash);
-$.fn.DataTable.Api.register('turboDestroy()', turboDestroy);
