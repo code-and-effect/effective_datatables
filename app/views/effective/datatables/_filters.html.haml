@@ -2,9 +2,7 @@
   = effective_form_with(scope: :filters, url: (datatable._form[:url] || '#'), method: datatable._form[:verb]) do |form|
     .form-row.align-items-center
       - if datatable._scopes.present?
-        = form.radios :scope, datatable._scopes.map { |name, opts| [opts[:label], name] },
-          label: false, required: false, checked: datatable.state[:scope], buttons: true,
-          wrapper: { class: 'form-group col-auto' }
+        = datatable_scope_tag(form, datatable)
 
       - datatable._filters.each do |name, opts|
         = datatable_filter_tag(form, datatable, name, opts)

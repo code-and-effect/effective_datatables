@@ -67,6 +67,7 @@ module EffectiveDatatablesPrivateHelper
       )
     when :select, :boolean
       options[:input_js] = (options[:input_js] || {}).reverse_merge(placeholder: '')
+
       form.select name, collection, options
     when :bulk_actions
       options[:data]['role'] = 'bulk-actions'
@@ -95,12 +96,12 @@ module EffectiveDatatablesPrivateHelper
     value = datatable.state[:filter][name]
 
     options = opts.except(:parse).merge(
-      placeholder: placeholder,
+      autocomplete: 'off',
       feedback: false,
       label: false,
+      placeholder: placeholder,
       value: value,
-      wrapper: { class: 'form-group col-auto'},
-      autocomplete: 'off'
+      wrapper: { class: 'form-group col-auto'}
     )
 
     options[:name] = '' unless datatable._filters_form_required?
@@ -118,6 +119,22 @@ module EffectiveDatatablesPrivateHelper
     else
       form.text_field name, options
     end
+  end
+
+  def datatable_scope_tag(form, datatable, opts = {})
+    collection = datatable._scopes.map { |name, opts| [opts[:label], name] }
+
+    options = {
+      autocomplete: 'off',
+      buttons: true,
+      checked: datatable.state[:scope],
+      feedback: false,
+      label: false,
+      required: false,
+      wrapper: { class: 'form-group col-auto'}
+    }.merge(opts)
+
+    form.radios :scope, collection, options
   end
 
   def render_datatable_charts(datatable)
