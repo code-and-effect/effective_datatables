@@ -3,7 +3,7 @@ module Effective
     module Dsl
 
       def bulk_actions(&block)
-        define_method('initialize_bulk_actions') { dsl_tool.instance_exec(&block) }
+        define_method('initialize_bulk_actions') { dsl_tool.instance_exec(&block); dsl_tool.bulk_actions_col }
       end
 
       def charts(&block)

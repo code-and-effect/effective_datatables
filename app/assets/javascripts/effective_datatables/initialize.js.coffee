@@ -4,6 +4,7 @@ initializeDataTables = ->
     options = datatable.data('options') || {}
     buttons_export_columns = options['buttons_export_columns'] || ':not(.col-actions)'
     simple = ('' + datatable.data('simple') == 'true')
+    reorder = ('' + datatable.data('reorder') == 'true')
 
     if options['buttons'] == false
       options['buttons'] = []
@@ -160,6 +161,9 @@ initializeDataTables = ->
       init_options['dom'] = "<'row'<'col-sm-12'tr>>" # Just show the table
       datatable.addClass('simple')
 
+    if reorder
+      init_options['rowReorder'] = { selector: 'td.col-_reorder', snapX: true }
+
     # Let's actually initialize the table now
     table = datatable.dataTable(jQuery.extend(init_options, options))
 
@@ -168,6 +172,9 @@ initializeDataTables = ->
 
     # Apply EffectiveFormInputs to the Show x per page dropdown
     try table.closest('.dataTables_wrapper').find('.dataTables_length select').removeAttr('name').select2(minimumResultsForSearch: 100)
+
+    if reorder
+      table.DataTable().on('row-reorder', (event, diff, edit) -> $(event.target).DataTable().reorder(event, diff, edit))
 
     table.addClass('initialized')
 

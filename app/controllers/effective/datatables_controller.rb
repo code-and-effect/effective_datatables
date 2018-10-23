@@ -18,8 +18,27 @@ module Effective
         ExceptionNotifier.notify_exception(e) if defined?(ExceptionNotifier)
         raise e if Rails.env.development?
       end
+    end
+
+    def reorder
+      begin
+        @datatable = EffectiveDatatables.find(params[:id])
+        @datatable.view = view_context
+
+        EffectiveDatatables.authorize!(self, :update, @datatable.collection_class)
+
+        render status: :ok
+
+      rescue => e
+        EffectiveDatatables.authorized?(self, :update, @datatable.try(:collection_class))
+        render json: error_json(e)
+
+        ExceptionNotifier.notify_exception(e) if defined?(ExceptionNotifier)
+        raise e if Rails.env.development?
+      end
 
     end
+
 
     private
 

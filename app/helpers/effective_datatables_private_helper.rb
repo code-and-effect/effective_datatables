@@ -3,7 +3,9 @@ module EffectiveDatatablesPrivateHelper
 
   # https://datatables.net/reference/option/columns
   def datatable_columns(datatable)
-    datatable.columns.map do |name, opts|
+    sortable = datatable.sortable?
+
+    datatable.columns.map.with_index do |(name, opts), index|
       {
         name: name,
         title: content_tag(:span, opts[:label].presence),
@@ -11,8 +13,8 @@ module EffectiveDatatablesPrivateHelper
         responsivePriority: opts[:responsive],
         search: datatable.state[:search][name],
         searchHtml: datatable_search_tag(datatable, name, opts),
-        sortable: (opts[:sort] && !datatable.simple?),
-        visible: datatable.state[:visible][name],
+        sortable: (opts[:sort] && sortable),
+        visible: datatable.state[:visible][name]
       }
     end.to_json.html_safe
   end
@@ -21,6 +23,10 @@ module EffectiveDatatablesPrivateHelper
     if datatable._bulk_actions.present?
       render(partial: '/effective/datatables/bulk_actions_dropdown', locals: { datatable: datatable }).gsub("'", '"').html_safe
     end
+  end
+
+  def datatable_display_order(datatable)
+    (datatable.sortable? ? [datatable.order_index, datatable.order_direction] : false).to_json.html_safe
   end
 
   def datatable_reset(datatable)

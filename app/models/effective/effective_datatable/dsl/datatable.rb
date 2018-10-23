@@ -3,6 +3,11 @@ module Effective
     module Dsl
       module Datatable
         # Instance Methods inside the datatable do .. end block
+        def length(length)
+          raise 'length must be 5, 10, 25, 50, 100, 250, 500, :all' unless [5, 10, 25, 50, 100, 250, 500, :all].include?(length)
+          datatable.state[:length] ||= (length == :all ? 9999999 : length)
+        end
+
         def order(name, dir = nil)
           raise 'order direction must be :asc or :desc' unless [nil, :asc, :desc].include?(dir)
 
@@ -10,9 +15,13 @@ module Effective
           datatable.state[:order_dir] ||= dir
         end
 
-        def length(length)
-          raise 'length must be 5, 10, 25, 50, 100, 250, 500, :all' unless [5, 10, 25, 50, 100, 250, 500, :all].include?(length)
-          datatable.state[:length] ||= (length == :all ? 9999999 : length)
+        def reorder(name, dir = nil)
+          raise 'order direction must be :asc or :desc' unless [nil, :asc, :desc].include?(dir)
+
+          datatable.state[:order_name] = :_reorder
+          datatable.state[:order_dir] = dir
+
+          reorder_col(name)
         end
 
         # A col has its internal values sorted/searched before the block is run
@@ -74,7 +83,7 @@ module Effective
         end
 
         def bulk_actions_col(col_class: nil, partial: nil, partial_as: nil, responsive: 5000)
-          raise 'You can only have one bulk actions column' if datatable.columns[:_bulk_actions].present?
+          datatable._columns.delete(:_bulk_actions) if datatable.columns[:_bulk_actions]
 
           datatable._columns[:_bulk_actions] = Effective::DatatableColumn.new(
             action: false,
@@ -123,6 +132,31 @@ module Effective
 
             # { approve: false }. These args are passed to effective_resources render_resource_actions
             actions: actions
+          )
+        end
+
+        def reorder_col(name, col_class: nil, partial: nil, partial_as: nil, sql_column: nil, responsive: 5000)
+          datatable._columns.delete(:_reorder) if datatable.columns[:_reorder]
+
+          datatable._columns[:_reorder] = Effective::DatatableColumn.new(
+            action: false,
+            as: :reorder,
+            compute: nil,
+            col_class: col_class,
+            format: nil,
+            index: nil,
+            label: false,
+            name: :reorder,
+            partial: partial || '/effective/datatables/reorder_column',
+            partial_as: partial_as,
+            reorder: name,
+            responsive: responsive,
+            search: false,
+            sort: true,
+            sql_column: (sql_column || name),
+            th: nil,
+            th_append: nil,
+            visible: true
           )
         end
 

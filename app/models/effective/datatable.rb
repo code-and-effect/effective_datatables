@@ -63,12 +63,14 @@ module Effective
       load_filters!
       load_state!
 
+      # Bulk actions called first so it can add the bulk_actions_col first
+      initialize_bulk_actions if respond_to?(:initialize_bulk_actions)
+
       # Now we initialize all the columns. columns knows about attributes and filters and scope
       initialize_datatable if respond_to?(:initialize_datatable)
       load_columns!
 
       # Execute any additional DSL methods
-      initialize_bulk_actions if respond_to?(:initialize_bulk_actions)
       initialize_charts if respond_to?(:initialize_charts)
 
       # Load the collection. This is the first time def collection is called on the Datatable itself
@@ -77,10 +79,13 @@ module Effective
 
       # Figure out the class, and if it's activerecord, do all the resource discovery on it
       load_resource!
-
-      # If attributes match a belongs_to column, scope the collection and remove the column
+      load_resource_search!
       apply_belongs_to_attributes!
 
+      # Check everything is okay
+      validate_datatable!
+
+      # Save for next time
       save_cookie!
     end
 
@@ -129,6 +134,14 @@ module Effective
       attributes[:inline] == true
     end
 
+    def reorder?
+      columns.key?(:_reorder)
+    end
+
+    def sortable?
+      !simple? && !reorder?
+    end
+
     # Whether the filters must be rendered as a <form> or we can keep the normal <div> behaviour
     def _filters_form_required?
       _form[:verb].present?
@@ -162,6 +175,10 @@ module Effective
 
     def value_tool
       @value_tool ||= DatatableValueTool.new(self)
+    end
+
+    def validate_datatable!
+      raise 'cannot use reorder with an Array collection' if reorder? && array_collection?
     end
 
   end
