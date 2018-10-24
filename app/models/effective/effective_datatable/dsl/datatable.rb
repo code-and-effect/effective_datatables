@@ -168,7 +168,7 @@ module Effective
             sql_column: (sql_column || name),
             th: nil,
             th_append: nil,
-            visible: true
+            visible: false
           )
         end
 

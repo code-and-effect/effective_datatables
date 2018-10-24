@@ -23,3 +23,15 @@ reorder = (event, diff, edit) ->
   )
 
 $.fn.DataTable.Api.register('reorder()', reorder);
+
+$(document).on 'click', '.dataTables_wrapper a.buttons-reorder', (event) ->
+  event.preventDefault() # prevent the click
+
+  $link = $(event.currentTarget)
+  $table = $link.closest('.dataTables_wrapper').find('table.dataTable').first()
+
+  column = $table.DataTable().column('.col-_reorder')
+  return unless column.length > 0
+
+  column.visible(!column.visible())
+

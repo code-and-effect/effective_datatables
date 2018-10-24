@@ -571,6 +571,24 @@ When not specified, effective_datatables will sort by the first defined column.
 order :created_at, :asc|:desc
 ```
 
+### reorder
+
+Enables drag-and-drop row re-ordering.
+
+Only works with ActiveRecord collections.
+
+The underlying field must be an Integer, and it's assumed to be a sequential list of unique numbers.
+
+When a drag and drop is completed, a POST request is made to the datatables#reorder action that will update the indexes.
+
+Both zero and one based lists will work.
+
+```ruby
+reorder :position
+```
+
+Using `reorder` will sort the collection by this field and disable all other column sorting.
+
 ### aggregate
 
 The `aggregate` command inserts a row in the table's `tfoot`.

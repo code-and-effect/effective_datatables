@@ -52,7 +52,6 @@ table.dataTable > thead {
 }
 
 table.dataTable > thead th {
-  vertical-align: top;
   background-repeat: no-repeat;
 
   > span { padding-right: 1rem; }
@@ -95,6 +94,13 @@ table.dataTable > tbody > tr.child {
   .btn { font-size: 0.75rem; }
 }
 
+div.dt-button-collection-title { padding: 0px; }
+
+.dt-button.buttons-colvisGroup-first {
+  padding-top: 0.5rem;
+  border-top: 1px solid #dee2e6;
+}
+
 // Search bar
 table.dataTable > thead {
   tr th {
@@ -113,8 +119,11 @@ table.dataTable > thead {
         cursor: pointer;
       }
     }
-
   }
+}
+
+table.dataTable.collapsed  {
+  th.col-bulk_actions:first-child { div { margin-left: 18px; } }
 }
 
 // Processing div
@@ -196,6 +205,10 @@ table.dataTable {
   td.col-actions {
     white-space: nowrap;
     text-align: right;
+  }
+
+  td.col-reorder {
+    cursor: move;
   }
 
   td.col-resource_item { word-break: keep-all; }

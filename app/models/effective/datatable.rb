@@ -178,7 +178,10 @@ module Effective
     end
 
     def validate_datatable!
-      raise 'cannot use reorder with an Array collection' if reorder? && array_collection?
+      if reorder?
+        raise 'cannot use reorder with an Array collection' if array_collection?
+        raise 'cannot use reorder with a non-Integer column' if resource.sql_type(columns[:_reorder][:reorder]) != :integer
+      end
     end
 
   end

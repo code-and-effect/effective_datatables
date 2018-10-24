@@ -17,7 +17,8 @@ initializeDataTables = ->
           extend: 'colvis',
           text: 'Show / Hide',
           postfixButtons: [
-            { extend: 'colvisGroup', text: 'Show all', show: ':hidden'},
+            { extend: 'colvisGroup', text: 'Show all', show: ':hidden', className: 'buttons-colvisGroup-first'},
+            { extend: 'colvisGroup', text: 'Show none', hide: ':visible'}
             { extend: 'colvisRestore', text: 'Show default'}
           ]
         },
@@ -103,6 +104,9 @@ initializeDataTables = ->
       if $table.data('reset')
         $buttons.prepend($table.data('reset'))
 
+      if $table.data('reorder')
+        $buttons.prepend($table.data('reorder'))
+
       if $table.data('bulk-actions')
         $buttons.prepend($table.data('bulk-actions'))
 
@@ -162,7 +166,7 @@ initializeDataTables = ->
       datatable.addClass('simple')
 
     if reorder
-      init_options['rowReorder'] = { selector: 'td.col-_reorder', snapX: true, dataSrc: reorder }
+      init_options['rowReorder'] = { selector: 'td.col-_reorder', snapX: true, dataSrc: datatable.data('reorder-index') }
 
     # Let's actually initialize the table now
     table = datatable.dataTable(jQuery.extend(init_options, options))

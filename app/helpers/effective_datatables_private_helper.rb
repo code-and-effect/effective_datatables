@@ -33,6 +33,11 @@ module EffectiveDatatablesPrivateHelper
     link_to(content_tag(:span, 'Reset'), '#', class: 'btn btn-link btn-sm buttons-reset-search')
   end
 
+  def datatable_reorder(datatable)
+    return false unless datatable.reorder?
+    link_to(content_tag(:span, 'Reorder'), '#', class: 'btn btn-link btn-sm buttons-reorder')
+  end
+
   def datatable_new_resource_button(datatable, name, column)
     if column[:inline] && column[:actions][:new] != false
       actions = {'New' => { action: :new, class: 'btn btn-outline-primary', 'data-remote': true } }
