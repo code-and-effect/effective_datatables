@@ -108,8 +108,6 @@ module Effective
 
           opts[:col_class] = "col-#{opts[:as]} col-#{name.to_s.parameterize} #{opts[:col_class]}".strip
         end
-
-        load_resource_search!
       end
 
       def load_resource_search!

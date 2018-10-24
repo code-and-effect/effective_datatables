@@ -91,9 +91,13 @@ DataTable.ext.buttons.print = {
 			$.extend( {decodeEntities: false}, config.exportOptions ) // XSS protection
 		);
 		var exportInfo = dt.buttons.exportInfo( config );
-		var columnClasses = $.map( dt.settings()[0].aoColumns, function (col, key) {
-			return col.sClass;
-		} );
+		var columnClasses = dt
+			.columns( config.exportOptions.columns )
+			.flatten()
+			.map( function (idx) {
+				return dt.settings()[0].aoColumns[dt.column(idx).index()].sClass;
+			} )
+			.toArray();
 
 		var addRow = function ( d, tag ) {
 			var str = '<tr>';
@@ -169,12 +173,19 @@ DataTable.ext.buttons.print = {
 		}
 
 		// Allow stylesheets time to load
-		win.setTimeout( function () {
+		var autoPrint = function () {
 			if ( config.autoPrint ) {
 				win.print(); // blocking - so close will not
 				win.close(); // execute until this is done
 			}
-		}, 1000 );
+		};
+
+		if ( navigator.userAgent.match(/Trident\/\d.\d/) ) { // IE needs to call this without a setTimeout
+			autoPrint();
+		}
+		else {
+			win.setTimeout( autoPrint, 1000 );
+		}
 	},
 
 	title: '*',

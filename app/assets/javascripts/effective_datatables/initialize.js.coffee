@@ -4,6 +4,7 @@ initializeDataTables = ->
     options = datatable.data('options') || {}
     buttons_export_columns = options['buttons_export_columns'] || ':not(.col-actions)'
     simple = ('' + datatable.data('simple') == 'true')
+    reorder = datatable.data('reorder')
 
     if options['buttons'] == false
       options['buttons'] = []
@@ -16,7 +17,8 @@ initializeDataTables = ->
           extend: 'colvis',
           text: 'Show / Hide',
           postfixButtons: [
-            { extend: 'colvisGroup', text: 'Show all', show: ':hidden'},
+            { extend: 'colvisGroup', text: 'Show all', show: ':hidden', className: 'buttons-colvisGroup-first'},
+            { extend: 'colvisGroup', text: 'Show none', hide: ':visible'}
             { extend: 'colvisRestore', text: 'Show default'}
           ]
         },
@@ -102,6 +104,9 @@ initializeDataTables = ->
       if $table.data('reset')
         $buttons.prepend($table.data('reset'))
 
+      if $table.data('reorder')
+        $buttons.prepend($table.data('reorder'))
+
       if $table.data('bulk-actions')
         $buttons.prepend($table.data('bulk-actions'))
 
@@ -160,6 +165,9 @@ initializeDataTables = ->
       init_options['dom'] = "<'row'<'col-sm-12'tr>>" # Just show the table
       datatable.addClass('simple')
 
+    if reorder
+      init_options['rowReorder'] = { selector: 'td.col-_reorder', snapX: true, dataSrc: datatable.data('reorder-index') }
+
     # Let's actually initialize the table now
     table = datatable.dataTable(jQuery.extend(init_options, options))
 
@@ -168,6 +176,9 @@ initializeDataTables = ->
 
     # Apply EffectiveFormInputs to the Show x per page dropdown
     try table.closest('.dataTables_wrapper').find('.dataTables_length select').removeAttr('name').select2(minimumResultsForSearch: 100)
+
+    if reorder
+      table.DataTable().on('row-reorder', (event, diff, edit) -> $(event.target).DataTable().reorder(event, diff, edit))
 
     table.addClass('initialized')
 

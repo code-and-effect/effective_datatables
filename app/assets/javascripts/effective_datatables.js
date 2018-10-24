@@ -11,14 +11,7 @@
 //= require dataTables/buttons/buttons.print
 //= require dataTables/responsive/dataTables.responsive
 //= require dataTables/responsive/responsive.bootstrap4
+//= require dataTables/rowReorder/dataTables.rowReorder
+//= require dataTables/rowReorder/rowReorder.bootstrap4
 
-//= require effective_datatables/bulk_actions
-//= require effective_datatables/events
-//= require effective_datatables/filters
-//= require effective_datatables/inline_crud
-//= require effective_datatables/reset
-//= require effective_datatables/responsive
-//= require effective_datatables/overrides
-
-//= require effective_datatables/charts
-//= require effective_datatables/initialize
+//= require_tree ./effective_datatables

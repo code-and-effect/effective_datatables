@@ -2,6 +2,7 @@ module Effective
   module EffectiveDatatable
     module Format
       BLANK = ''.freeze
+      NONVISIBLE = '...'.freeze
       SPACER = 'EFFECTIVEDATATABLESSPACER'.freeze
       SPACER_TEMPLATE = '/effective/datatables/spacer_template'.freeze
 
@@ -12,7 +13,9 @@ module Effective
         rendered = {}
 
         columns.each do |name, opts|
-          if opts[:partial] && state[:visible][name]
+          next unless state[:visible][name]
+
+          if opts[:partial]
             locals = { datatable: self, column: columns[name] }.merge(resource_col_locals(opts))
 
             rendered[name] = (view.render(
@@ -35,13 +38,13 @@ module Effective
 
         collection.each_with_index do |row, row_index|
           columns.each do |name, opts|
-            next unless state[:visible][name]
-
             index = opts[:index]
             value = row[index]
 
             row[index] = (
-              if opts[:as] == :actions
+              if state[:visible][name] == false
+                NONVISIBLE
+              elsif opts[:as] == :actions
                 rendered[name][row_index]
               elsif opts[:format] && rendered.key?(name)
                 dsl_tool.instance_exec(value, row, rendered[name][row_index], &opts[:format])

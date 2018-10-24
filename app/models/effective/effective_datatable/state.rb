@@ -104,8 +104,10 @@ module Effective
       def load_ajax_state!
         state[:length] = params[:length].to_i
 
-        state[:order_dir] = (params[:order]['0'][:dir] == 'desc' ? :desc : :asc)
-        state[:order_index] = params[:order]['0'][:column].to_i
+        if params[:order]
+          state[:order_dir] = (params[:order]['0'][:dir] == 'desc' ? :desc : :asc)
+          state[:order_index] = params[:order]['0'][:column].to_i
+        end
 
         state[:scope] = _scopes.keys.find { |name| params[:scope] == name.to_s }
         state[:start] = params[:start].to_i
@@ -140,14 +142,19 @@ module Effective
       def load_columns!
         state[:length] ||= EffectiveDatatables.default_length
 
+        (columns || {}).each_with_index { |(_, column), index| column[:index] = index }
+
         if columns.present?
-          columns.each_with_index { |(_, column), index| column[:index] = index }
+          state[:order_name] = (
+            if columns.key?(:_reorder)
+              :_reorder
+            elsif order_index.present?
+              columns.keys[order_index]
+            else
+              columns.find { |name, opts| opts[:sort] }.first
+            end
+          )
 
-          if order_index.present?
-            state[:order_name] = columns.keys[order_index]
-          end
-
-          state[:order_name] ||= columns.find { |name, opts| opts[:sort] }.first
           raise "order column :#{order_name} must exist as a col or val" unless columns[order_name]
 
           state[:order_index] = columns[order_name][:index]
