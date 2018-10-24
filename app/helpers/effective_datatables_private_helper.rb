@@ -5,15 +5,15 @@ module EffectiveDatatablesPrivateHelper
   def datatable_columns(datatable)
     sortable = datatable.sortable?
 
-    datatable.columns.map.with_index do |(name, opts), index|
+    datatable.columns.map do |name, opts|
       {
-        name: name,
-        title: content_tag(:span, opts[:label].presence),
         className: opts[:col_class],
+        name: name,
         responsivePriority: opts[:responsive],
         search: datatable.state[:search][name],
         searchHtml: datatable_search_tag(datatable, name, opts),
         sortable: (opts[:sort] && sortable),
+        title: datatable_label_tag(datatable, name, opts),
         visible: datatable.state[:visible][name]
       }
     end.to_json.html_safe
@@ -37,6 +37,19 @@ module EffectiveDatatablesPrivateHelper
     if column[:inline] && column[:actions][:new] != false
       actions = {'New' => { action: :new, class: 'btn btn-outline-primary', 'data-remote': true } }
       render_resource_actions(datatable.resource.klass, actions: actions, effective_resource: datatable.resource) # Will only work if permitted
+    end
+  end
+
+  def datatable_label_tag(datatable, name, opts)
+    case opts[:as]
+    when :actions
+      content_tag(:span, 'Actions', style: 'display: none;')
+    when :bulk_actions
+      content_tag(:span, 'Bulk Actions', style: 'display: none;')
+    when :reorder
+      content_tag(:span, 'Reorder', style: 'display: none;')
+    else
+      content_tag(:span, opts[:label].presence)
     end
   end
 
