@@ -1,5 +1,6 @@
+- id = (resource.try(:to_param) || resource.try(:id) || resource.object_id)
 - value = resource.send(column[:reorder])
 
-%input{value: value, type: 'hidden'}
+%input{type: 'hidden', value: value, 'data-reorder-resource': id}
 = icon('move')
 = value

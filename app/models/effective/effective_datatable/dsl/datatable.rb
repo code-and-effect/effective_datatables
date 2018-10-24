@@ -82,30 +82,6 @@ module Effective
           )
         end
 
-        def bulk_actions_col(col_class: nil, partial: nil, partial_as: nil, responsive: 5000)
-          datatable._columns.delete(:_bulk_actions) if datatable.columns[:_bulk_actions]
-
-          datatable._columns[:_bulk_actions] = Effective::DatatableColumn.new(
-            action: false,
-            as: :bulk_actions,
-            compute: nil,
-            col_class: col_class,
-            format: nil,
-            index: nil,
-            label: false,
-            name: :bulk_actions,
-            partial: partial || '/effective/datatables/bulk_actions_column',
-            partial_as: partial_as,
-            responsive: responsive,
-            search: { as: :bulk_actions },
-            sort: false,
-            sql_column: nil,
-            th: nil,
-            th_append: nil,
-            visible: true,
-          )
-        end
-
         def actions_col(col_class: nil, inline: nil, partial: nil, partial_as: nil, actions_partial: nil, responsive: 5000, visible: true, **actions, &format)
           raise 'You can only have one actions column' if datatable.columns[:_actions].present?
 
@@ -135,6 +111,42 @@ module Effective
           )
         end
 
+        def aggregate(name, label: nil, &compute)
+          datatable._aggregates[name.to_sym] = {
+            compute: (compute if block_given?),
+            label: label || name.to_s.titleize,
+            name: name.to_sym,
+          }
+        end
+
+        # Called automatically after bulk_actions do ... end
+        # Call again if you want to change the position of the bulk_actions_col
+        def bulk_actions_col(col_class: nil, partial: nil, partial_as: nil, responsive: 5000)
+          datatable._columns.delete(:_bulk_actions) if datatable.columns[:_bulk_actions]
+
+          datatable._columns[:_bulk_actions] = Effective::DatatableColumn.new(
+            action: false,
+            as: :bulk_actions,
+            compute: nil,
+            col_class: col_class,
+            format: nil,
+            index: nil,
+            label: false,
+            name: :bulk_actions,
+            partial: partial || '/effective/datatables/bulk_actions_column',
+            partial_as: partial_as,
+            responsive: responsive,
+            search: { as: :bulk_actions },
+            sort: false,
+            sql_column: nil,
+            th: nil,
+            th_append: nil,
+            visible: true,
+          )
+        end
+
+        # Called automatically after reorder
+        # Call again if you want to change the position of the reorder_col
         def reorder_col(name, col_class: nil, partial: nil, partial_as: nil, sql_column: nil, responsive: 5000)
           datatable._columns.delete(:_reorder) if datatable.columns[:_reorder]
 
@@ -160,13 +172,6 @@ module Effective
           )
         end
 
-        def aggregate(name, label: nil, &compute)
-          datatable._aggregates[name.to_sym] = {
-            compute: (compute if block_given?),
-            label: label || name.to_s.titleize,
-            name: name.to_sym,
-          }
-        end
       end
     end
   end

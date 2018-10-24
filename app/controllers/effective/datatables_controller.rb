@@ -21,24 +21,30 @@ module Effective
     end
 
     def reorder
-      begin
-        @datatable = EffectiveDatatables.find(params[:id])
-        @datatable.view = view_context
+      @datatable = EffectiveDatatables.find(params[:id])
+      @datatable.view = view_context
 
-        EffectiveDatatables.authorize!(self, :update, @datatable.collection_class)
+      @resource = @datatable.collection.find(params[:reorder][:id])
+      EffectiveDatatables.authorize!(self, :update, @resource)
 
-        render status: :ok
+      attribute = @datatable.columns[:_reorder][:reorder]
+      new_index = params[:reorder][:new].to_i
+      old_index = params[:reorder][:old].to_i
 
-      rescue => e
-        EffectiveDatatables.authorized?(self, :update, @datatable.try(:collection_class))
-        render json: error_json(e)
+      @resource.class.transaction do
+        if new_index > old_index
+          @datatable.collection.where("#{attribute} > ? AND #{attribute} <= ?", old_index, new_index).update_all("#{attribute} = #{attribute} - 1")
+          @resource.update_column(attribute, new_index)
+        end
 
-        ExceptionNotifier.notify_exception(e) if defined?(ExceptionNotifier)
-        raise e if Rails.env.development?
+        if old_index > new_index
+          @datatable.collection.where("#{attribute} >= ? AND #{attribute} < ?", new_index, old_index).update_all("#{attribute} = #{attribute} + 1")
+          @resource.update_column(attribute, new_index)
+        end
       end
 
+      render status: :ok, body: :ok
     end
-
 
     private
 

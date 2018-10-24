@@ -32,7 +32,7 @@ module EffectiveDatatablesHelper
         'inline' => datatable.inline?.to_s,
         'options' => (input_js || {}).to_json.html_safe,
         'reset' => datatable_reset(datatable),
-        'reorder' => datatable.reorder?.to_s,
+        'reorder' => (datatable.reorder? ? datatable.columns[:_reorder][:index] : false).to_s,
         'simple' => datatable.simple?.to_s,
         'spinner' => icon('spinner'), # effective_bootstrap
         'source' => effective_datatables.datatable_path(datatable, {format: 'json'}),

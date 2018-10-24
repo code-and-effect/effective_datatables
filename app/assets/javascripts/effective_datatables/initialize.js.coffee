@@ -4,7 +4,7 @@ initializeDataTables = ->
     options = datatable.data('options') || {}
     buttons_export_columns = options['buttons_export_columns'] || ':not(.col-actions)'
     simple = ('' + datatable.data('simple') == 'true')
-    reorder = ('' + datatable.data('reorder') == 'true')
+    reorder = datatable.data('reorder')
 
     if options['buttons'] == false
       options['buttons'] = []
@@ -162,7 +162,7 @@ initializeDataTables = ->
       datatable.addClass('simple')
 
     if reorder
-      init_options['rowReorder'] = { selector: 'td.col-_reorder', snapX: true }
+      init_options['rowReorder'] = { selector: 'td.col-_reorder', snapX: true, dataSrc: reorder }
 
     # Let's actually initialize the table now
     table = datatable.dataTable(jQuery.extend(init_options, options))
