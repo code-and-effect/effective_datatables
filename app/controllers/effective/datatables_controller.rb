@@ -28,8 +28,8 @@ module Effective
       EffectiveDatatables.authorize!(self, :update, @resource)
 
       attribute = @datatable.columns[:_reorder][:reorder]
-      new_index = params[:reorder][:new].to_i
       old_index = params[:reorder][:old].to_i
+      new_index = params[:reorder][:new].to_i
 
       @resource.class.transaction do
         if new_index > old_index

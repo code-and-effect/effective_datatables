@@ -9,14 +9,17 @@ reorder = (event, diff, edit) ->
   url = @context[0].ajax.url.replace('.json', '/reorder.json')
   data = {'reorder[id]': oldNode.data('reorder-resource'), 'reorder[old]': oldNode.val(), 'reorder[new]': newNode.val()}
 
+  @context[0].rowreorder.c.enable = false
+
   $.ajax(
     method: 'post',
     url: url,
-    data: data
-  ).done((response) ->
-    console.log 'DONE'
-  ).fail((response) ->
-    console.log "FAIL"
+    data: data,
+    async: false
+  ).fail((response, text, status) =>
+    $(event.target).closest('table').DataTable().flash(status)
+  ).always((response) =>
+    @context[0].rowreorder.c.enable = true
   )
 
 $.fn.DataTable.Api.register('reorder()', reorder);
