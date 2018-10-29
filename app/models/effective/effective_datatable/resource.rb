@@ -140,7 +140,7 @@ module Effective
 
           search[:value] ||= search.delete(:selected) if search.key?(:selected)
 
-          search[:as] ||= :select if (search.key?(:collection) && opts[:as] != :belongs_to_polymorphic)
+          search[:as] ||= :select if search.key?(:collection)
 
           search[:fuzzy] = true unless search.key?(:fuzzy)
 
@@ -148,6 +148,11 @@ module Effective
             search.reverse_merge!(resource.search_form_field(name, collection.first[opts[:index]]))
           elsif search[:as] != :string
             search.reverse_merge!(resource.search_form_field(name, opts[:as]))
+          end
+
+          # Assign default include_null
+          if search[:as] == :select && !search.key?(:include_null)
+            search[:include_null] = true
           end
         end
       end
@@ -160,10 +165,19 @@ module Effective
           next unless attribute.ends_with?('_id')
 
           associated = attribute.gsub(/_id\z/, '').to_sym  # Replace last _id
-          next unless columns[associated] && columns[associated][:as] == :belongs_to
 
-          @_collection = @_collection.where(attribute => value)
-          columns.delete(associated)
+          next unless columns[associated]
+
+          if columns[associated][:as] == :belongs_to
+            @_collection = @_collection.where(attribute => value)
+            columns.delete(associated)
+          elsif columns[associated][:as] == :belongs_to_polymorphic
+            associated_type = attributes["#{associated}_type".to_sym] || raise("Expected #{associated}_type attribute to be present when #{associated}_id is present on a polymorphic belongs to")
+
+            @_collection = @_collection.where(attribute => value).where("#{associated}_type" => associated_type)
+            columns.delete(associated)
+          end
+
         end.present?
 
         load_columns! if changed

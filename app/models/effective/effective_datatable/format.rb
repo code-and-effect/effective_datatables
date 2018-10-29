@@ -127,22 +127,20 @@ module Effective
       def resource_col_locals(opts)
         return {} unless (resource = opts[:resource]).present?
 
+        polymorphic = (opts[:as] == :belongs_to_polymorphic)
+
         locals = { name: opts[:name], effective_resource: resource, show_action: false, edit_action: false }
 
         case opts[:action]
         when :edit
-          locals[:edit_action] = (resource.routes[:edit] && EffectiveDatatables.authorized?(view.controller, :edit, resource.klass))
+          locals[:edit_action] = (resource.routes[:edit].present? || polymorphic)
         when :show
-          locals[:show_action] = (resource.routes[:show] && EffectiveDatatables.authorized?(view.controller, :show, resource.klass))
+          locals[:show_action] = (resource.routes[:show].present? || polymorphic)
         when false
-          # Nothing
+          # Nothing. Already false.
         else
-          # Fallback to defaults - check edit then show
-          if resource.routes[:edit] && EffectiveDatatables.authorized?(view.controller, :edit, resource.klass)
-            locals[:edit_action] = true
-          elsif resource.routes[:show] && EffectiveDatatables.authorized?(view.controller, :show, resource.klass)
-            locals[:show_action] = true
-          end
+          locals[:edit_action] = (resource.routes[:edit].present? || polymorphic)
+          locals[:show_action] = (resource.routes[:show].present? || polymorphic)
         end
 
         locals

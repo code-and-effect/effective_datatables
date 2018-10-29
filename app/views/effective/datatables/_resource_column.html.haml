@@ -1,8 +1,8 @@
 - Array(datatable.array_collection? ? resource : resource.send(name)).each do |resource|
   .col-resource_item
-    - if show_action
-      = link_to resource.to_s, effective_resource.action_path(:show, resource), title: resource.to_s
-    - elsif edit_action
+    - if edit_action && EffectiveDatatables.authorized?(controller, :edit, resource)
       = link_to resource.to_s, effective_resource.action_path(:edit, resource), title: resource.to_s
+    - elsif show_action && EffectiveDatatables.authorized?(controller, :show, resource)
+      = link_to resource.to_s, effective_resource.action_path(:show, resource), title: resource.to_s
     - else
       = resource.to_s.html_safe
