@@ -2,6 +2,7 @@ module Effective
   module EffectiveDatatable
     module Format
       BLANK = ''.freeze
+      NONVISIBLE = '...'.freeze
       SPACER = 'EFFECTIVEDATATABLESSPACER'.freeze
       SPACER_TEMPLATE = '/effective/datatables/spacer_template'.freeze
 
@@ -12,7 +13,9 @@ module Effective
         rendered = {}
 
         columns.each do |name, opts|
-          if opts[:partial] && state[:visible][name]
+          next unless state[:visible][name]
+
+          if opts[:partial]
             locals = { datatable: self, column: columns[name] }.merge(resource_col_locals(opts))
 
             rendered[name] = (view.render(
@@ -24,10 +27,9 @@ module Effective
               spacer_template: SPACER_TEMPLATE
             ) || '').split(SPACER)
           elsif opts[:as] == :actions # This is actions_col and actions_col do .. end, but not actions_col partial: 'something'
-            locals = { datatable: self, column: columns[name], spacer_template: SPACER_TEMPLATE }
-
             resources = collection.map { |row| row[opts[:index]] }
-            atts = opts[:actions].merge(effective_resource: resource, locals: locals, partial: opts[:actions_partial])
+            locals = { datatable: self, column: opts, spacer_template: SPACER_TEMPLATE }
+            atts = { actions: actions_col_actions(opts), effective_resource: resource, locals: locals, partial: opts[:actions_partial] }.merge(opts[:actions])
 
             rendered[name] = (view.render_resource_actions(resources, atts, &opts[:format]) || '').split(SPACER)
           end
@@ -36,13 +38,13 @@ module Effective
 
         collection.each_with_index do |row, row_index|
           columns.each do |name, opts|
-            next unless state[:visible][name]
-
             index = opts[:index]
             value = row[index]
 
             row[index] = (
-              if opts[:as] == :actions
+              if state[:visible][name] == false
+                NONVISIBLE
+              elsif opts[:as] == :actions
                 rendered[name][row_index]
               elsif opts[:format] && rendered.key?(name)
                 dsl_tool.instance_exec(value, row, rendered[name][row_index], &opts[:format])
@@ -67,7 +69,8 @@ module Effective
 
         case column[:as]
         when :actions
-          view.render_resource_actions(value, **column[:actions].merge(effective_resource: resource, partial: column[:actions_partial]))
+          atts = { actions: actions_col_actions(column), effective_resource: resource, partial: column[:actions_partial] }.merge(column[:actions])
+          (view.render_resource_actions(value, atts) || '')
         when :boolean
           case value
           when true   ; 'Yes'
@@ -108,6 +111,12 @@ module Effective
         else
           value.to_s
         end
+      end
+
+      # Takes all default resource actions
+      # Applies data-remote to anything that's data-method post or delete
+      def actions_col_actions(column)
+        resource.resource_actions
       end
 
       def resource_col_locals(opts)
