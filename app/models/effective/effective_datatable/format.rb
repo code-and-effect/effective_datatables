@@ -29,7 +29,7 @@ module Effective
           elsif opts[:as] == :actions # This is actions_col and actions_col do .. end, but not actions_col partial: 'something'
             resources = collection.map { |row| row[opts[:index]] }
             locals = { datatable: self, column: opts, spacer_template: SPACER_TEMPLATE }
-            atts = { actions: actions_col_actions(opts), effective_resource: resource, locals: locals, partial: opts[:actions_partial] }.merge(opts[:actions])
+            atts = { actions: actions_col_actions(opts), effective_resource: resource, locals: locals, partial: opts[:actions_partial], btn_class: opts[:btn_class] }.merge(opts[:actions])
 
             rendered[name] = (view.render_resource_actions(resources, atts, &opts[:format]) || '').split(SPACER)
           end

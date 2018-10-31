@@ -120,7 +120,7 @@ afterAction = ($action) ->
 buildRow = (length, payload) ->
   "<td class='col-inline-form' colspan='#{length-1}'><div class='container'>#{payload}</div></td>" +
   "<td class='col-actions col-actions-inline-form'>" +
-    "<a href='#' class='btn btn-outline-primary' title='Cancel' data-role='inline-form-cancel'>Cancel</a>" +
+    "<a href='#' class='btn btn-sm btn-outline-primary' title='Cancel' data-role='inline-form-cancel'>Cancel</a>" +
   "</td>"
 
 expand = ($table) ->
