@@ -36,7 +36,7 @@ $(document).on 'ajax:success', '.dataTables_wrapper .col-actions', (event) ->
   true
 
 # The inline form has been submitted successfully
-$(document).on '.dataTables_wrapper .col-inline-form effective-form:success', (event, flash) ->
+$(document).on 'effective-form:success', '.dataTables_wrapper .col-inline-form', (event, flash) ->
   $action = $(event.target)
 
   $tr = $action.closest('tr')
