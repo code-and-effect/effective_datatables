@@ -3,7 +3,6 @@ initializeDataTables = ->
     datatable = $(this)
     options = datatable.data('options') || {}
     buttons_export_columns = options['buttons_export_columns'] || ':not(.col-actions)'
-    simple = ('' + datatable.data('simple') == 'true')
     reorder = datatable.data('reorder')
 
     if options['buttons'] == false
@@ -49,7 +48,6 @@ initializeDataTables = ->
       deferLoading: [datatable.data('display-records'), datatable.data('total-records')]
       deferRender: true
       displayStart: datatable.data('display-start')
-      dom: "<'row'<'col-sm-12 dataTables_buttons'B>><'row'<'col-sm-12'tr>><'row'<'col-sm-6 dataTables_entries'il><'col-sm-6'p>>"
       iDisplayLength: datatable.data('display-length')
       language: { 'lengthMenu': '&nbsp;with _MENU_ per page'}
       lengthMenu: [[5, 10, 25, 50, 100, 250, 500, 9999999], ['5', '10', '25', '50', '100', '250', '500', 'All']]
@@ -160,10 +158,6 @@ initializeDataTables = ->
 
       table = $input.closest('table.dataTable')
       table.DataTable().column("#{$input.data('column-name')}:name").search($input.val()).draw()
-
-    if simple
-      init_options['dom'] = "<'row'<'col-sm-12'tr>>" # Just show the table
-      datatable.addClass('simple')
 
     if reorder
       init_options['rowReorder'] = { selector: 'td.col-_reorder', snapX: true, dataSrc: datatable.data('reorder-index') }

@@ -139,12 +139,17 @@ div.dataTables_wrapper div.dataTables_processing {
 }
 
 // Simple styles
-table.dataTable.simple > thead {
+table.dataTable.hide-sort > thead {
   .sorting { background-image: none; cursor: default; }
   .sorting_asc { background-image: none; cursor: default; }
   .sorting_desc { background-image: none; cursor: default; }
+}
 
+table.dataTable.hide-search > thead {
   .form-group { display: none; }
+}
+
+table.dataTable.hide-buttons {
   .col-bulk_actions { display: none; }
 }
 

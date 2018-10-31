@@ -1,11 +1,15 @@
 # These are expected to be called by a developer.  They are part of the datatables DSL.
 module EffectiveDatatablesHelper
 
-  def render_datatable(datatable, input_js: {}, buttons: true, charts: true, filters: true, simple: false, inline: false)
+  def render_datatable(datatable, input_js: {}, buttons: true, charts: true, entries: true, filters: true, inline: false, pagination: true, search: true, simple: false, sort: true)
     raise 'expected datatable to be present' unless datatable
 
-    datatable.attributes[:simple] = true if simple
+    if simple
+      buttons = charts = entries = filters = pagination = search = sort = false
+    end
+
     datatable.attributes[:inline] = true if inline
+    datatable.attributes[:sortable] = false unless sort
 
     datatable.view ||= self
 
@@ -16,11 +20,25 @@ module EffectiveDatatablesHelper
     charts = charts && datatable._charts.present?
     filters = filters && (datatable._scopes.present? || datatable._filters.present?)
 
-    input_js[:buttons] = false if simple || !buttons
+    html_class = ['effective-datatable', datatable.html_class, ('hide-sort' unless sort), ('hide-search' unless search), ('hide-buttons' unless buttons)].compact.join(' ')
+
+    if datatable.reorder? && !buttons
+      buttons = true; input_js[:buttons] = false
+    end
+
+    # Build the datatables DOM option
+    input_js[:dom] ||= [
+      ("<'row'<'col-sm-12 dataTables_buttons'B>>" if buttons),
+      "<'row'<'col-sm-12'tr>>",
+      ("<'row'" if entries || pagination),
+      ("<'col-sm-6 dataTables_entries'il>" if entries),
+      ("<'col-sm-6'p>" if pagination),
+      (">" if entries || pagination)
+    ].compact.join
 
     effective_datatable_params = {
       id: datatable.to_param,
-      class: ('effective-datatable ' + Array(datatable.table_html_class).join(' ')),
+      class: html_class,
       data: {
         'bulk-actions' => datatable_bulk_actions(datatable),
         'columns' => datatable_columns(datatable),
@@ -29,19 +47,19 @@ module EffectiveDatatablesHelper
         'display-order' => datatable_display_order(datatable),
         'display-records' => datatable.to_json[:recordsFiltered],
         'display-start' => datatable.display_start,
-        'inline' => datatable.inline?.to_s,
+        'inline' => inline.to_s,
         'options' => (input_js || {}).to_json.html_safe,
-        'reset' => datatable_reset(datatable),
+        'reset' => (datatable_reset(datatable) if search),
         'reorder' => datatable_reorder(datatable),
         'reorder-index' => (datatable.columns[:_reorder][:index] if datatable.reorder?).to_s,
-        'simple' => datatable.simple?.to_s,
+        'simple' => simple.to_s,
         'spinner' => icon('spinner'), # effective_bootstrap
         'source' => effective_datatables.datatable_path(datatable, {format: 'json'}),
         'total-records' => datatable.to_json[:recordsTotal]
       }
     }
 
-    if (charts || filters) && !simple
+    if (charts || filters)
       output = ''.html_safe
 
       if charts
@@ -69,23 +87,7 @@ module EffectiveDatatablesHelper
   end
 
   def render_simple_datatable(datatable)
-    raise 'expected datatable to be present' unless datatable
-
-    datatable.view ||= self
-
-    unless EffectiveDatatables.authorized?(controller, :index, datatable.collection_class)
-      return content_tag(:p, "You are not authorized to view this datatable. (cannot :index, #{datatable.collection_class})")
-    end
-
-    effective_datatable_params = {
-      id: datatable.to_param,
-      class: ('effective-datatable simple ' + Array(datatable.table_html_class).join(' ')),
-      data: {}
-    }
-
-    render(partial: 'effective/datatables/datatable',
-      locals: { datatable: datatable, effective_datatable_params: effective_datatable_params }
-    )
+    render_datatable(datatable, simple: true)
   end
 
   def inline_datatable?

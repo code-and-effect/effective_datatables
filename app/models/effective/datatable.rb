@@ -122,24 +122,18 @@ module Effective
       )
     end
 
-    # When simple only a table will be rendered with
-    # no sorting, no filtering, no export buttons, no pagination, no per page, no colReorder
-    # default sorting only, default visibility only, all records returned, and responsive enabled
-    def simple?
-      attributes[:simple] == true
-    end
-
     # Inline crud
     def inline?
       attributes[:inline] == true
     end
 
+    # Reordering
     def reorder?
       columns.key?(:_reorder)
     end
 
     def sortable?
-      !simple? && !reorder?
+      !reorder? && attributes[:sortable] != false
     end
 
     # Whether the filters must be rendered as a <form> or we can keep the normal <div> behaviour
@@ -147,8 +141,8 @@ module Effective
       _form[:verb].present?
     end
 
-    def table_html_class
-      attributes[:class] || EffectiveDatatables.html_class
+    def html_class
+      Array(attributes[:class] || EffectiveDatatables.html_class).join(' ').presence
     end
 
     def to_param
