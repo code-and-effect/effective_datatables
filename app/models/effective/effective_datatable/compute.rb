@@ -132,7 +132,7 @@ module Effective
 
         case aggregate[:name]
         when :total
-          if [:percentage].include?(column[:as])
+          if [:percent].include?(column[:as])
             BLANK
           elsif values.all? { |value| value.kind_of?(Numeric) }
             values.sum

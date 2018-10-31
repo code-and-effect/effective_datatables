@@ -97,10 +97,10 @@ module Effective
           view.mail_to(value)
         when :integer
           value
-        when :percentage
+        when :percent
           case value
-          when Integer    ; "#{value}%"
-          when Numeric    ; view.number_to_percentage(value * 100, precision: 2)
+          when Integer    ; view.number_to_percentage(value / 1000.0, precision: 3).gsub('.000%', '%')
+          when Numeric    ; view.number_to_percentage(value, precision: 3).gsub('.000%', '%')
           end
         when :price
           case value

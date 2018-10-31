@@ -454,7 +454,7 @@ These settings are loosely based on the regular datatypes, with some custom effe
 - `:currency` expects the underlying datatype to be a Float.
 - `:duration` expects the underlying datatype to be an Integer representing the number of minutes. 120 == 2 hours
 - `:email` expects the underlying datatype to be a String
-- `:percentage` expects the underlying datatype to be an Integer or a Float. 75 == 0.75 == 75%
+- `:percent` expects the underlying datatype to be an Integer * 1000. 50000 == 50%. 50125 == 50.125%.
 - `:price` expects the underlying datatype to be an Integer representing the number of cents. 5000 == $50.00
 - `:resource` can be used for an Array based collection which includes an ActiveRecord object
 
