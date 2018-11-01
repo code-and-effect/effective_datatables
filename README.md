@@ -195,10 +195,10 @@ class PostsDatatable < Effective::Datatable
     col :post_category, action: :edit
 
     if attributes[:user_id].nil?  # Show all users, otherwise this table is meant for one user only
-      col :user, search: { collection: User.authors }
-
-      col 'user.first_name'  # Using the joined syntax
+      col :user, search: User.authors.all
     end
+
+    col 'user.first_name'  # Using the joined syntax
 
     if can?(:index, Comment)
       col :comments
@@ -238,9 +238,11 @@ class PostsDatatable < Effective::Datatable
     # Puts links to show/edit/destroy actions, if authorized to those actions.
     # Use the actions_col block to add additional actions
 
-    actions_col(edit: false) do |post|
-      dropdown_link_to('Approve', approve_post_path(post) data: { method: :post, confirm: "Approve #{post}?"})
-    end
+    actions_col
+
+    # actions_col(edit: false) do |post|
+    #   dropdown_link_to('Approve', approve_post_path(post) data: { method: :post, confirm: "Approve #{post}?"})
+    # end
   end
 
 end
@@ -434,7 +436,9 @@ responsive: 10000          # Controls how columns collapse https://datatables.ne
 search: false
 search: :string
 search: { as: :string, fuzzy: true }
-search: { as: :select, collection: User.all, multiple: true }
+search: User.all
+search: { as: :select, collection: User.all, multiple: true, include_null: 'All Users' }
+search: { collection: { 'All Books' => Book.all, 'All Shirts' => Shirt.all}, polymorphic: true }
 
 sort: true|false           # Should this column be orderable. true by default
 sql_column: 'posts.rating' # The sql column to search/sort on. Only needed when doing custom selects or tricky joins.
@@ -447,7 +451,7 @@ It is auto-detected from an ActiveRecord collection's SQL datatype, and set to `
 
 Valid options for `:as` are as follows:
 
-`:boolean`, `:currency`, `:datetime`, `:date`, `:decimal`, `:duration`, `:email`, `:float`, `:integer`, `:percentage`, `:price`, `:resource`, `:string`, `:text`
+`:boolean`, `:currency`, `:datetime`, `:date`, `:decimal`, `:duration`, `:email`, `:float`, `:integer`, `:percent`, `:price`, `:resource`, `:string`, `:text`
 
 These settings are loosely based on the regular datatypes, with some custom effective types thrown in:
 
@@ -521,6 +525,7 @@ The authorization method is configured via the `config/initializers/effective_da
 There are just a few options:
 
 ```ruby
+btn_class: 'btn-sm btn-outline-primary'
 show: true|false
 edit: true|false
 destroy: true|false
@@ -697,10 +702,10 @@ end
 The filter command has the following options:
 
 ```ruby
-as: :select|:date|:boolean      # Passed to SimpleForm
+as: :select|:date|:boolean      # Passed to form
 label: 'My label'               # Label for this form field
 parse: -> { |term| term.to_i }  # Parse the incoming term (string) into whatever datatype
-required: true|false            # Passed to SimpleForm
+required: true|false            # Passed to form
 ```
 
 Any other option given will be yielded to SimpleForm as `input_html` options.
@@ -757,8 +762,6 @@ or if using [effective_resources](https://github.com/code-and-effect/effective_r
 
 ```ruby
 include Effective::CrudController
-
-collection_action :bulk_approve
 ```
 
 and in your model
