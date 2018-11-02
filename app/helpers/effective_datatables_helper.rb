@@ -3,6 +3,7 @@ module EffectiveDatatablesHelper
 
   def render_datatable(datatable, input_js: {}, buttons: true, charts: true, entries: true, filters: true, inline: false, pagination: true, search: true, simple: false, sort: true)
     raise 'expected datatable to be present' unless datatable
+    raise 'expected input_js to be a Hash' unless input_js.kind_of?(Hash)
 
     if simple
       buttons = charts = entries = filters = pagination = search = sort = false
@@ -48,7 +49,7 @@ module EffectiveDatatablesHelper
         'display-records' => datatable.to_json[:recordsFiltered],
         'display-start' => datatable.display_start,
         'inline' => inline.to_s,
-        'options' => (input_js || {}).to_json.html_safe,
+        'options' => input_js.to_json,
         'reset' => (datatable_reset(datatable) if search),
         'reorder' => datatable_reorder(datatable),
         'reorder-index' => (datatable.columns[:_reorder][:index] if datatable.reorder?).to_s,
