@@ -21,29 +21,37 @@ module Effective
     end
 
     def reorder
-      @datatable = EffectiveDatatables.find(params[:id])
-      @datatable.view = view_context
+      begin
+        @datatable = EffectiveDatatables.find(params[:id])
+        @datatable.view = view_context
 
-      @resource = @datatable.collection.find(params[:reorder][:id])
-      EffectiveDatatables.authorize!(self, :update, @resource)
+        @resource = @datatable.collection.find(params[:reorder][:id])
 
-      attribute = @datatable.columns[:_reorder][:reorder]
-      old_index = params[:reorder][:old].to_i
-      new_index = params[:reorder][:new].to_i
+        EffectiveDatatables.authorize!(self, :update, @resource)
 
-      @resource.class.transaction do
-        if new_index > old_index
-          @datatable.collection.where("#{attribute} > ? AND #{attribute} <= ?", old_index, new_index).update_all("#{attribute} = #{attribute} - 1")
-          @resource.update_column(attribute, new_index)
+        attribute = @datatable.columns[:_reorder][:reorder]
+        old_index = params[:reorder][:old].to_i
+        new_index = params[:reorder][:new].to_i
+
+        @resource.class.transaction do
+          if new_index > old_index
+            @datatable.collection.where("#{attribute} > ? AND #{attribute} <= ?", old_index, new_index).update_all("#{attribute} = #{attribute} - 1")
+            @resource.update_column(attribute, new_index)
+          end
+
+          if old_index > new_index
+            @datatable.collection.where("#{attribute} >= ? AND #{attribute} < ?", new_index, old_index).update_all("#{attribute} = #{attribute} + 1")
+            @resource.update_column(attribute, new_index)
+          end
         end
 
-        if old_index > new_index
-          @datatable.collection.where("#{attribute} >= ? AND #{attribute} < ?", new_index, old_index).update_all("#{attribute} = #{attribute} + 1")
-          @resource.update_column(attribute, new_index)
-        end
+        render status: :ok, body: :ok
+      rescue Effective::AccessDenied => e
+        render(status: :unauthorized, body: 'Access Denied')
+      rescue => e
+        render(status: :error, body: 'Unexpected Error')
       end
 
-      render status: :ok, body: :ok
     end
 
     private

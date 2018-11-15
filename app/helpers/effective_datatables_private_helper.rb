@@ -34,8 +34,8 @@ module EffectiveDatatablesPrivateHelper
   end
 
   def datatable_reorder(datatable)
-    return false unless datatable.reorder?
-    link_to(content_tag(:span, 'Reorder'), '#', class: 'btn btn-link btn-sm buttons-reorder')
+    return false unless datatable.reorder? && EffectiveDatatables.authorized?(self, :update, datatable.collection_class)
+    link_to(content_tag(:span, 'Reorder'), '#', class: 'btn btn-link btn-sm buttons-reorder', disabled: true)
   end
 
   def datatable_new_resource_button(datatable, name, column)
