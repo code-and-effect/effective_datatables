@@ -8,7 +8,7 @@ module Effective
       end
 
       def controller_namespace
-        @attributes[:_n]
+        @attributes.key?(:namespace) ? @attributes[:namespace] : @attributes[:_n]
       end
 
       private
