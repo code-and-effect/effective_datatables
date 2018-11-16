@@ -35,6 +35,16 @@ $(document).on 'ajax:success', '.dataTables_wrapper .col-actions', (event) ->
   EffectiveForm.remote_form_flash = ''
   true
 
+# There was an error completing something
+$(document).on 'ajax:error', '.dataTables_wrapper', (event) ->
+  $action = $(event.target)
+  $table = $action.closest('table')
+  $table.DataTable().flash('Error: unable to ' + ($action.attr('title') || 'complete action')).draw()
+
+  EffectiveForm.remote_form_payload = ''
+  EffectiveForm.remote_form_flash = ''
+  true
+
 # The inline form has been submitted successfully
 $(document).on 'effective-form:success', '.dataTables_wrapper .col-inline-form', (event, flash) ->
   $action = $(event.target)
@@ -53,11 +63,7 @@ $(document).on 'effective-form:success', '.dataTables_wrapper .col-inline-form',
     $table.DataTable().flash(flash || 'Item updated').draw()
     $tr.fadeOut('slow')
 
-# There was an error completing something
-$(document).on 'ajax:error', '.dataTables_wrapper .col-inline-form', (event) ->
-  $action = $(event.target)
-  $table = $action.closest('table')
-  $table.DataTable().flash('Error: unable to ' + ($action.attr('title') || 'complete action')).draw()
+
 
 beforeNew = ($action) ->
   $table = $action.closest('table')
