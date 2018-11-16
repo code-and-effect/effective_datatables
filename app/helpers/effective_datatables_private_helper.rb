@@ -34,15 +34,15 @@ module EffectiveDatatablesPrivateHelper
   end
 
   def datatable_reorder(datatable)
-    return false unless datatable.reorder? && EffectiveDatatables.authorized?(self, :update, datatable.collection_class)
+    return unless datatable.reorder? && EffectiveDatatables.authorized?(self, :update, datatable.collection_class)
     link_to(content_tag(:span, 'Reorder'), '#', class: 'btn btn-link btn-sm buttons-reorder', disabled: true)
   end
 
   def datatable_new_resource_button(datatable, name, column)
-    if column[:inline] && column[:actions][:new] != false
-      actions = {'New' => { action: :new, class: ['btn', column[:btn_class].presence].compact.join(' '), 'data-remote': true } }
-      render_resource_actions(datatable.resource.klass, actions: actions, effective_resource: datatable.resource) # Will only work if permitted
-    end
+    return unless column[:inline] && (column[:actions][:new] != false) && (datatable.resource.actions.include?(:new) rescue false)
+
+    actions = {'New' => { action: :new, class: ['btn', column[:btn_class].presence].compact.join(' '), 'data-remote': true } }
+    render_resource_actions(datatable.resource.klass, actions: actions, effective_resource: datatable.resource) # Will only work if permitted
   end
 
   def datatable_label_tag(datatable, name, opts)
