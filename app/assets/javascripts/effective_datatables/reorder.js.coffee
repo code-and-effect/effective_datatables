@@ -33,5 +33,10 @@ $(document).on 'click', '.dataTables_wrapper a.buttons-reorder', (event) ->
   column = $table.DataTable().column('.col-_reorder')
   return unless column.length > 0
 
+  if column.visible()
+    $table.removeClass('reordering')
+  else
+    $table.addClass('reordering')
+
   column.visible(!column.visible())
 
