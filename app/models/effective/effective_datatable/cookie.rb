@@ -71,7 +71,7 @@ module Effective
         )
 
         # Just store the values
-        [attributes.delete_if { |k, v| v.nil? }] + payload.values
+        [attributes] + payload.values
       end
 
     end
