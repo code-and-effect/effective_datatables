@@ -121,7 +121,12 @@ afterEdit = ($action) ->
 # This is when one of the resource actions completes
 afterAction = ($action) ->
   $table = $action.closest('table')
-  $table.DataTable().flash('Successful ' + $action.attr('title')).draw()
+
+  if EffectiveForm.remote_form_flash.length > 0
+    flash = EffectiveForm.remote_form_flash[0]
+    $table.DataTable().flash((if flash[0] == 'danger' then 'Error:' else "#{flash[0]}:") + ' ' + flash[1]).draw()
+  else
+    $table.DataTable().flash('Successfully ' + $action.attr('title')).draw()
 
 buildRow = (length, payload) ->
   "<td class='col-inline-form' colspan='#{length-1}'><div class='container'>#{payload}</div></td>" +
