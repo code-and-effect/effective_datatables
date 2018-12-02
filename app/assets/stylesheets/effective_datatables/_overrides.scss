@@ -128,14 +128,26 @@ table.dataTable.collapsed  {
 
 // Processing div
 div.dataTables_wrapper div.dataTables_processing {
+  margin: -26px 25% 0px 25%;
+
   position: absolute;
-  top: 1em;
-  left: 50%;
-  width: 300px;
-  margin-left: -150px;
-  margin-top: -26px;
+  top: 0;
+  left: 0;
+  width: 50%;
   text-align: center;
   padding: 1em;
+}
+
+// Processing success
+div.dataTables_wrapper div.dataTables_processing.alert-success {
+  margin: -26px 10% 0px 10%;
+  width: 80%;
+}
+
+// Processing error
+div.dataTables_wrapper div.dataTables_processing.alert-danger {
+  margin: -26px 10% 0px 10%;
+  width: 80%;
 }
 
 // Simple styles
