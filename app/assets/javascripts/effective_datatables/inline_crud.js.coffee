@@ -1,7 +1,7 @@
 # To achieve inline crud, we use rails' data-remote links, and override their behaviour when inside a datatable
 # This works with EffectiveForm.remote_form which is part of the effective_bootstrap gem.
 
-# About to do a resource action, or fetch a partial. Show loading.
+# We click the New/Edit/Action button from the col-actions
 $(document).on 'ajax:beforeSend', '.dataTables_wrapper .col-actions', (e, xhr, settings) ->
   $action = $(e.target)
   $table = $(e.target).closest('table')
@@ -12,7 +12,7 @@ $(document).on 'ajax:beforeSend', '.dataTables_wrapper .col-actions', (e, xhr, s
   settings.url += (if settings.url.indexOf('?') == -1 then '?' else '&') + $params
 
   if $action.closest('.effective-datatables-inline-row').length > 0
-    # Nothing. This is a save action from within the inline form.
+    # Nothing.
   else if $action.closest('tr').parent().prop('tagName') == 'THEAD'
     beforeNew($action)
   else
@@ -43,6 +43,15 @@ $(document).on 'ajax:error', '.dataTables_wrapper', (event) ->
 
   EffectiveForm.remote_form_payload = ''
   EffectiveForm.remote_form_flash = ''
+  true
+
+# Submitting an inline datatables form
+$(document).on 'ajax:beforeSend', '.dataTables_wrapper .col-inline-form', (e, xhr, settings) ->
+  $table = $(e.target).closest('table')
+
+  $params =  $.param({_datatable_id: $table.attr('id'), _datatable_cookie: $table.data('cookie') })
+  settings.url += (if settings.url.indexOf('?') == -1 then '?' else '&') + $params
+
   true
 
 # The inline form has been submitted successfully

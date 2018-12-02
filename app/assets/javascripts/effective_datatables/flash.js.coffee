@@ -17,7 +17,7 @@ flash = (message, status = '') ->
   timeout = $processing.data('timeout')
   clearTimeout(timeout) if timeout
 
-  delay = (if status == 'danger' then 4000 else 1000)
+  delay = (if status == 'danger' then 4000 else 1500)
 
   $processing.html(message).data('timeout', setTimeout( =>
       $processing.html('Processing...').hide()
