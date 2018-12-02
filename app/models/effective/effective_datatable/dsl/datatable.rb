@@ -122,7 +122,7 @@ module Effective
 
         # Called automatically after bulk_actions do ... end
         # Call again if you want to change the position of the bulk_actions_col
-        def bulk_actions_col(col_class: nil, partial: nil, partial_as: nil, responsive: 5000)
+        def bulk_actions_col(col_class: nil, input_name: nil, partial: nil, partial_as: nil, responsive: 5000)
           datatable._columns.delete(:_bulk_actions) if datatable.columns[:_bulk_actions]
 
           datatable._columns[:_bulk_actions] = Effective::DatatableColumn.new(
@@ -132,6 +132,7 @@ module Effective
             col_class: col_class,
             format: nil,
             index: nil,
+            input_name: (input_name || 'bulk_actions_resources'),
             label: false,
             name: :bulk_actions,
             partial: partial || '/effective/datatables/bulk_actions_column',
