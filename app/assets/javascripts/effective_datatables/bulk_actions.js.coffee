@@ -78,11 +78,11 @@ $(document).on 'click', '.dataTables_wrapper .buttons-bulk-actions a', (event) -
       data: { ids: values, authenticity_token: token }
       successCallback: ->
         success = "Successfully completed #{title} bulk action"
-        $table.one 'draw.dt', (e) -> $(e.target).DataTable().flash(success)
+        $table.one 'draw.dt', (e) -> $(e.target).DataTable().flash(success, 'success')
         $table.DataTable().draw()
       failCallback: ->
         error = "An error occured while attempting #{title} bulk action"
-        $table.one 'draw.dt', (e) -> $(e.target).DataTable().flash(error)
+        $table.one 'draw.dt', (e) -> $(e.target).DataTable().flash(error, 'danger')
         $table.DataTable().draw()
     )
   else # Normal AJAX post
@@ -94,11 +94,11 @@ $(document).on 'click', '.dataTables_wrapper .buttons-bulk-actions a', (event) -
       data: { ids: values }
     ).done((response) ->
       success = response['message'] || "Successfully completed #{title} bulk action"
-      $table.one 'draw.dt', (e) -> $(e.target).DataTable().flash(success) and restoreSelected($(e.target), values)
+      $table.one 'draw.dt', (e) -> $(e.target).DataTable().flash(success, 'success') and restoreSelected($(e.target), values)
 
     ).fail((response) ->
       error = response['message'] || "An error occured while attempting #{title} bulk action: #{response.statusText}"
-      $table.one 'draw.dt', (e) -> $(e.target).DataTable().flash(error) and restoreSelected($(e.target), values)
+      $table.one 'draw.dt', (e) -> $(e.target).DataTable().flash(error, 'danger') and restoreSelected($(e.target), values)
 
     ).always((response) ->
       $table.DataTable().draw()

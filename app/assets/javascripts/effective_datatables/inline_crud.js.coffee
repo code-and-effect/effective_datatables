@@ -39,7 +39,7 @@ $(document).on 'ajax:success', '.dataTables_wrapper .col-actions', (event) ->
 $(document).on 'ajax:error', '.dataTables_wrapper', (event) ->
   $action = $(event.target)
   $table = $action.closest('table')
-  $table.DataTable().flash('Error: unable to ' + ($action.attr('title') || 'complete action')).draw()
+  $table.DataTable().flash('unable to ' + ($action.attr('title') || 'complete action'), 'danger').draw()
 
   EffectiveForm.remote_form_payload = ''
   EffectiveForm.remote_form_flash = ''
@@ -53,17 +53,15 @@ $(document).on 'effective-form:success', '.dataTables_wrapper .col-inline-form',
   $table = $tr.closest('table')
 
   if $tr.hasClass('effective-datatables-new-resource')
-    $table.DataTable().flash(flash || 'Item created').draw()
+    $table.DataTable().flash(flash || 'Item created', 'success').draw()
     $tr.fadeOut('slow')
 
     $actions = $table.children('thead').find('th.col-actions')
     $actions.children('svg').remove()
     $actions.children('a').fadeIn()
   else
-    $table.DataTable().flash(flash || 'Item updated').draw()
+    $table.DataTable().flash(flash || 'Item updated', 'success').draw()
     $tr.fadeOut('slow')
-
-
 
 beforeNew = ($action) ->
   $table = $action.closest('table')
@@ -124,9 +122,9 @@ afterAction = ($action) ->
 
   if EffectiveForm.remote_form_flash.length > 0
     flash = EffectiveForm.remote_form_flash[0]
-    $table.DataTable().flash((if flash[0] == 'danger' then 'Error:' else "#{flash[0]}:") + ' ' + flash[1]).draw()
+    $table.DataTable().flash(flash[1], flash[0]).draw()
   else
-    $table.DataTable().flash('Successfully ' + $action.attr('title')).draw()
+    $table.DataTable().flash('Successfully ' + $action.attr('title'), 'success').draw()
 
 buildRow = (length, payload) ->
   "<td class='col-inline-form' colspan='#{length-1}'><div class='container'>#{payload}</div></td>" +

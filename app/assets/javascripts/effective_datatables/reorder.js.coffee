@@ -17,7 +17,7 @@ reorder = (event, diff, edit) ->
     data: data,
     async: false
   ).fail((response, text, status) =>
-    $(event.target).closest('table').DataTable().flash(status)
+    $(event.target).closest('table').DataTable().flash(status, 'danger')
   ).always((response) =>
     @context[0].rowreorder.c.enable = true
   )
