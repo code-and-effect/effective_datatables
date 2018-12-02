@@ -7,7 +7,7 @@ flash = (message, status = '') ->
     message = 'Error: ' + message
 
   $processing = $(@table().node()).siblings('.dataTables_processing')
-  $processing.removeClass('alert-success alert-info alert-warning alert-danger')
+  $processing.removeClass('alert-success alert-info alert-warning alert-danger alert-error')
 
   if status.length > 0
     $processing.addClass("alert-#{status}")
