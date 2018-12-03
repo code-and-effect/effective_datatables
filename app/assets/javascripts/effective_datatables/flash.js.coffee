@@ -7,7 +7,6 @@ flash = (message, status = '') ->
     message = 'Error: ' + message
 
   $processing = $(@table().node()).siblings('.dataTables_processing')
-  $processing.removeClass('alert-success alert-info alert-warning alert-danger alert-error')
 
   if status.length > 0
     $processing.addClass("alert-#{status}")
@@ -20,7 +19,9 @@ flash = (message, status = '') ->
   delay = (if status == 'danger' then 4000 else 1500)
 
   $processing.html(message).data('timeout', setTimeout( =>
-      $processing.html('Processing...').hide()
+      $processing.html('Processing...')
+      $processing.removeClass('alert-success alert-info alert-warning alert-danger alert-error')
+      $processing.hide()
       @context[0].oFeatures.bProcessing = true
     , delay)
   )
