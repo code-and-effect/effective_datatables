@@ -36,7 +36,7 @@ module Effective
 
       def search_params
         params.select do |name, value|
-          columns.key?(name) && (name != :id) && !value.kind_of?(Hash) && value.class.name != 'ActionController::Parameters'.freeze
+          columns.key?(name) && ![:id, :action].include?(name) && !value.kind_of?(Hash) && value.class.name != 'ActionController::Parameters'.freeze
         end
       end
     end
