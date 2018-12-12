@@ -31,4 +31,6 @@ EffectiveDatatables.setup do |config|
   # Log search/sort information to the console
   config.debug = true
 
+  config.max_cookie_size = 2000 # String size. Final byte size is about 1.5 times bigger, after rails signs it
+
 end
