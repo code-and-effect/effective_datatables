@@ -31,6 +31,11 @@ EffectiveDatatables.setup do |config|
   # Log search/sort information to the console
   config.debug = true
 
-  config.max_cookie_size = 2000 # String size. Final byte size is about 1.5 times bigger, after rails signs it
+  # If a user has previously visited this page and is returning, use the cookie to restore last session
+  # Irregardless of this setting, effective_datatables still uses a cookie to function
+  config.save_state = true
+
+  # String size. Final byte size is about 1.5 times bigger, after rails signs it
+  config.max_cookie_size = 2000
 
 end

@@ -8,6 +8,7 @@ module EffectiveDatatables
 
   mattr_accessor :default_length
   mattr_accessor :html_class
+  mattr_accessor :save_state
   mattr_accessor :max_cookie_size
 
   mattr_accessor :debug
