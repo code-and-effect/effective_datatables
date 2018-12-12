@@ -1,8 +1,6 @@
 module Effective
   module EffectiveDatatable
     module Cookie
-      MAX_COOKIE_SIZE = 2000  # String size. Real byte size is about 1.5 times bigger.
-
       def cookie
         @cookie
       end
@@ -45,7 +43,7 @@ module Effective
         @dt_cookie ||= []
         @dt_cookie << [cookie_key, cookie_payload]
 
-        while @dt_cookie.to_s.size > MAX_COOKIE_SIZE
+        while @dt_cookie.to_s.size > EffectiveDatatables.max_cookie_size.to_i
           @dt_cookie.shift((@dt_cookie.length / 3) + 1)
         end
 
