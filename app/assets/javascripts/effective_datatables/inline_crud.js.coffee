@@ -33,6 +33,7 @@ $(document).on 'ajax:success', '.dataTables_wrapper .col-actions', (event) ->
 
   EffectiveForm.remote_form_payload = ''
   EffectiveForm.remote_form_flash = ''
+  EffectiveForm.remote_form_refresh_datatables = ''
   true
 
 # There was an error completing something
@@ -43,6 +44,7 @@ $(document).on 'ajax:error', '.dataTables_wrapper', (event) ->
 
   EffectiveForm.remote_form_payload = ''
   EffectiveForm.remote_form_flash = ''
+  EffectiveForm.remote_form_refresh_datatables = ''
   true
 
 # Submitting an inline datatables form
@@ -71,6 +73,8 @@ $(document).on 'effective-form:success', '.dataTables_wrapper .col-inline-form',
   else
     $table.DataTable().flash(flash || 'Item updated', 'success').draw()
     $tr.fadeOut('slow')
+
+  refreshDatatables($table)
 
 beforeNew = ($action) ->
   $table = $action.closest('table')
@@ -135,6 +139,8 @@ afterAction = ($action) ->
   else
     $table.DataTable().flash('Successfully ' + $action.attr('title'), 'success').draw()
 
+  refreshDatatables($table)
+
 buildRow = (length, payload) ->
   "<td class='col-inline-form' colspan='#{length-1}'><div class='container'>#{payload}</div></td>" +
   "<td class='col-actions col-actions-inline-form'>" +
@@ -148,6 +154,17 @@ expand = ($table) ->
 cancel = ($table) ->
   $wrapper = $table.closest('.dataTables_wrapper')
   $wrapper.removeClass('effective-datatables-inline-expanded') if $wrapper.find('.effective-datatables-inline-row').length == 0
+
+refreshDatatables = ($source) ->
+  return unless EffectiveForm.remote_form_refresh_datatables.length > 0
+
+  $('table.dataTable.initialized').each ->
+    $table = $(this)
+
+    if EffectiveForm.remote_form_refresh_datatables.find((id) -> $table.attr('id').startsWith(id) || id == 'all') && $table != $except
+      if $table != $source
+        console.log("Refreshing #{$table}")
+        $table.DataTable().draw()
 
 # Cancel button clicked. Blow away new tr, or restore edit tr
 # No data will have changed at this point
@@ -182,5 +199,3 @@ $(document).on 'click', ".dataTables_wrapper a[data-role='inline-form-cancel']",
     )
 
   false
-
-
