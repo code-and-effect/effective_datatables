@@ -163,7 +163,6 @@ refreshDatatables = ($source) ->
 
     if EffectiveForm.remote_form_refresh_datatables.find((id) -> $table.attr('id').startsWith(id) || id == 'all') && $table != $except
       if $table != $source
-        console.log("Refreshing #{$table}")
         $table.DataTable().draw()
 
 # Cancel button clicked. Blow away new tr, or restore edit tr
