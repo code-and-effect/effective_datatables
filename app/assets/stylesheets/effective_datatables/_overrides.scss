@@ -188,13 +188,14 @@ table.dataTable.hide-buttons {
     // Apply custom style to the inline x per page select
     span.select2-container {
       margin: 0px -3px 3px -3px;
-      max-width: 45px;
+      max-width: 6.0rem;
+      min-width: 3.0rem;
 
       .select2-selection { border: none; }
       .select2-selection__rendered { padding: 0em; color: #909090; }
     }
 
-    span.select2-container.select2-container--open { max-width: 60px; }
+    span.select2-container.select2-container--open { min-width: 3.0rem; max-width: 6.0rem; }
     span.select2-container.select2-container--focus { border: none; box-shadow: none; }
     span.select2-container--focus > .selection > .select2-selection { border: none !important; }
   }
