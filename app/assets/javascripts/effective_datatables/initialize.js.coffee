@@ -1,5 +1,5 @@
-initializeDataTables = ->
-  $('table.effective-datatable:not(.initialized)').each ->
+initializeDataTables = (target) ->
+  $(target || document).find('table.effective-datatable:not(.initialized)').each ->
     datatable = $(this)
     options = datatable.data('options') || {}
     buttons_export_columns = options['buttons_export_columns'] || ':not(.col-actions)'
@@ -181,6 +181,8 @@ destroyDataTables = ->
   $('table.effective-datatable').each -> try $(this).removeClass('initialized').DataTable().destroy()
 
 $ -> initializeDataTables()
+$(document).on 'effective-datatables:initialize', (event) -> initializeDataTables(event.currentTarget)
+
 $(document).on 'page:change', -> initializeDataTables()
 $(document).on 'turbolinks:load', -> initializeDataTables()
 $(document).on 'turbolinks:render', -> initializeDataTables()
