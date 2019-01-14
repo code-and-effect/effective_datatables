@@ -118,10 +118,10 @@ beforeEdit = ($action) ->
 afterEdit = ($action) ->
   $tr = $action.closest('tr')
   $table = $tr.closest('table')
-  $tr.data('inline-form-original-html', $tr.html())
 
   html = buildRow($tr.children('td').length, EffectiveForm.remote_form_payload)
 
+  $tr.data('inline-form-original-html', $tr.children().detach())
   $tr.html(html)
   $tr.addClass('effective-datatables-inline-row')
 
