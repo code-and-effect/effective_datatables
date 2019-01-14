@@ -189,7 +189,8 @@ $(document).on 'click', ".dataTables_wrapper a[data-role='inline-form-cancel']",
       $td = $tr.children('.col-actions').first()
       $td.children('svg').remove()
 
-      $td.find('.dropdown-toggle').dropdown('toggle')
+      $toggle = $td.find('.dropdown-toggle')
+      $toggle.dropdown('toggle') if $toggle.parent().hasClass('show')
       $td.children('.btn-group').show()
       $td.children('a').show()
 
