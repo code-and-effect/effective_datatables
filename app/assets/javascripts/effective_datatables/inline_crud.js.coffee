@@ -161,9 +161,8 @@ refreshDatatables = ($source) ->
   $('table.dataTable.initialized').each ->
     $table = $(this)
 
-    if EffectiveForm.remote_form_refresh_datatables.find((id) -> $table.attr('id').startsWith(id) || id == 'all') && $table != $except
-      if $table != $source
-        $table.DataTable().draw()
+    if EffectiveForm.remote_form_refresh_datatables.find((id) -> $table.attr('id').startsWith(id) || id == 'all')
+      $table.DataTable().draw() if $table != $source
 
 # Cancel button clicked. Blow away new tr, or restore edit tr
 # No data will have changed at this point
