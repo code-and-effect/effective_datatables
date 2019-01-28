@@ -8,7 +8,7 @@ $(document).on 'ajax:beforeSend', '.dataTables_wrapper .col-actions', (e, xhr, s
 
   return true if ('' + $action.data('inline')) == 'false'
 
-  $params =  $.param({_datatable_id: $table.attr('id'), _datatable_cookie: $table.data('cookie') })
+  $params =  $.param({_datatable_id: $table.attr('id'), _datatable_cookie: $table.data('cookie'), _datatable_action: true })
   settings.url += (if settings.url.indexOf('?') == -1 then '?' else '&') + $params
 
   if $action.closest('.effective-datatables-inline-row').length > 0
