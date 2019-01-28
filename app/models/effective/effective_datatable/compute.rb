@@ -18,7 +18,10 @@ module Effective
 
         # Apply column searching
         col = column_tool.search(col)
-        @display_records = column_tool.size(col) unless value_tool.searched.present?
+
+        unless value_tool.searched.present? || (column_tool.scoped.blank? && column_tool.searched.blank?)
+          @display_records = column_tool.size(col)
+        end
 
         # Apply column ordering
         col = column_tool.order(col)
