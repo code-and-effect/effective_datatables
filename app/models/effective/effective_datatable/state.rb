@@ -91,6 +91,8 @@ module Effective
         if datatables_ajax_request?
           load_filter_params!
           load_ajax_state!
+        elsif datatables_inline_request?
+          load_cookie_state!
         elsif cookie.present? && cookie[:params] == params.length && EffectiveDatatables.save_state
           load_cookie_state!
         else

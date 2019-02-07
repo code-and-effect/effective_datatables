@@ -14,8 +14,11 @@ module Effective
       def datatables_inline_request?
         return @_datatables_inline_request unless @_datatables_inline_request.nil?
 
-        @_datatables_inline_request =
-          (view && view.params[:_datatable_cookie] && cookie_keys.include?(view.params[:_datatable_cookie])) == true
+        @_datatables_inline_request = (
+          view &&
+          view.params[:_datatable_id].to_s.split('-')[0...-1] == to_param.split('-')[0...-1] &&
+          cookie_keys.include?(view.params[:_datatable_cookie])
+        )
       end
 
       def params

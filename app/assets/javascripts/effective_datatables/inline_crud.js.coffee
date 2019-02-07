@@ -11,7 +11,7 @@ $(document).on 'ajax:beforeSend', '.dataTables_wrapper .col-actions', (e, xhr, s
   $params =  $.param({_datatable_id: $table.attr('id'), _datatable_cookie: $table.data('cookie'), _datatable_action: true })
   settings.url += (if settings.url.indexOf('?') == -1 then '?' else '&') + $params
 
-  if $action.closest('.effective-datatables-inline-row').length > 0
+  if $action.closest('.effective-datatables-inline-row,table.dataTable').hasClass('effective-datatables-inline-row')
     # Nothing.
   else if $action.closest('tr').parent().prop('tagName') == 'THEAD'
     beforeNew($action)
@@ -86,7 +86,8 @@ beforeNew = ($action) ->
   # Append spinner and show Processing
   $th.append($table.data('spinner'))
   $table.DataTable().flash()
-  $table.one 'draw.dt', (event) -> $th.find('a').show().siblings('svg').remove()
+  $table.one 'draw.dt', (event) ->
+    $th.find('a').show().siblings('svg').remove() if event.target == event.currentTarget
 
 afterNew = ($action) ->
   $tr = $action.closest('tr')
@@ -99,7 +100,7 @@ afterNew = ($action) ->
   $table.children('tbody').prepend($tr)
 
   expand($table)
-  $tr.find('form').attr('data-remote', true).trigger('effective-bootstrap:initialize')
+  $tr.find('form').attr('data-remote', true).trigger('turbolinks:load')
   $tr.hide().fadeIn()
 
 beforeEdit = ($action) ->
@@ -126,7 +127,7 @@ afterEdit = ($action) ->
   $tr.addClass('effective-datatables-inline-row')
 
   expand($table)
-  $tr.find('form').attr('data-remote', true).trigger('effective-bootstrap:initialize')
+  $tr.find('form').attr('data-remote', true).trigger('turbolinks:load')
   $tr.hide().fadeIn()
 
 # This is when one of the resource actions completes
@@ -149,11 +150,13 @@ buildRow = (length, payload) ->
 
 expand = ($table) ->
   $wrapper = $table.closest('.dataTables_wrapper').addClass('effective-datatables-inline-expanded')
-  $table.one 'draw.dt', (event) -> $wrapper.removeClass('effective-datatables-inline-expanded')
+  $table.on 'draw.dt', (event) ->
+    $wrapper.removeClass('effective-datatables-inline-expanded') if event.target == event.currentTarget
 
 cancel = ($table) ->
   $wrapper = $table.closest('.dataTables_wrapper')
-  $wrapper.removeClass('effective-datatables-inline-expanded') if $wrapper.find('.effective-datatables-inline-row').length == 0
+  if $wrapper.find('.effective-datatables-inline-row').length == 0
+    $wrapper.removeClass('effective-datatables-inline-expanded')
 
 refreshDatatables = ($source) ->
   return unless EffectiveForm.remote_form_refresh_datatables.length > 0
