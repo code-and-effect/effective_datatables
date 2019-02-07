@@ -43,6 +43,8 @@ table.dataTable > thead {
     tr { opacity: 0.4; }
 
     tr.effective-datatables-inline-row {
+      tr { opacity: 1.0; }
+
       visibility: visible;
       opacity: 1.0;
 
