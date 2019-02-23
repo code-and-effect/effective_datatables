@@ -25,6 +25,8 @@ module Effective
         @datatable = EffectiveDatatables.find(params[:id])
         @datatable.view = view_context
 
+        EffectiveDatatables.authorize!(self, :index, @datatable.collection_class)
+
         @resource = @datatable.collection.find(params[:reorder][:id])
 
         EffectiveDatatables.authorize!(self, :update, @resource)
