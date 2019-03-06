@@ -64,17 +64,19 @@ $(document).on 'effective-form:success', '.dataTables_wrapper .col-inline-form',
   $table = $tr.closest('table')
 
   if $tr.hasClass('effective-datatables-new-resource')
-    $table.DataTable().flash(flash || 'Item created', 'success').draw()
+    $table.DataTable().flash(flash || 'Item created', 'success')
     $tr.fadeOut('slow')
 
     $actions = $table.children('thead').find('th.col-actions')
     $actions.children('svg').remove()
     $actions.children('a').fadeIn()
   else
-    $table.DataTable().flash(flash || 'Item updated', 'success').draw()
+    $table.DataTable().flash(flash || 'Item updated', 'success')
     $tr.fadeOut('slow')
 
-  refreshDatatables($table)
+  unless redirectDatatables($table)
+    $table.DataTable().draw()
+    refreshDatatables($table)
 
 beforeNew = ($action) ->
   $table = $action.closest('table')
@@ -136,11 +138,13 @@ afterAction = ($action) ->
 
   if EffectiveForm.remote_form_flash.length > 0
     flash = EffectiveForm.remote_form_flash[0]
-    $table.DataTable().flash(flash[1], flash[0]).draw()
+    $table.DataTable().flash(flash[1], flash[0])
   else
-    $table.DataTable().flash('Successfully ' + $action.attr('title'), 'success').draw()
+    $table.DataTable().flash('Successfully ' + $action.attr('title'), 'success')
 
-  refreshDatatables($table)
+  unless redirectDatatables($table)
+    $table.DataTable().draw()
+    refreshDatatables($table)
 
 buildRow = (length, payload) ->
   "<td class='col-inline-form' colspan='#{length-1}'><div class='container'>#{payload}</div></td>" +
@@ -157,6 +161,19 @@ cancel = ($table) ->
   $wrapper = $table.closest('.dataTables_wrapper')
   if $wrapper.find('.effective-datatables-inline-row').length == 0
     $wrapper.removeClass('effective-datatables-inline-expanded')
+
+redirectDatatables = ($source) ->
+  return false unless EffectiveForm.remote_form_refresh_datatables.length > 0
+
+  if EffectiveForm.remote_form_refresh_datatables.includes('refresh')
+    if Turbolinks?
+      Turbolinks.visit(window.location.href, { action: 'replace'})
+    else
+      window.location.reload()
+
+    return true
+
+  false
 
 refreshDatatables = ($source) ->
   return unless EffectiveForm.remote_form_refresh_datatables.length > 0
