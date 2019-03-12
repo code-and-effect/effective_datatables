@@ -119,7 +119,7 @@ module Effective
           when Symbol
             opts[:search] = { as: opts[:search] }
           when Array, ActiveRecord::Relation
-            opts[:search] = { collection: opts[:search] }
+            opts[:search] = { as: :select, collection: opts[:search] }
           when Hash
             # Nothing
           else
@@ -146,6 +146,8 @@ module Effective
 
           if array_collection? && opts[:resource].present?
             search.reverse_merge!(resource.search_form_field(name, collection.first[opts[:index]]))
+          elsif search[:as] == :select && search.key?(:collection)
+            # No Action
           elsif search[:as] != :string
             search.reverse_merge!(resource.search_form_field(name, opts[:as]))
           end
