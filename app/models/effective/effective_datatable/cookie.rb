@@ -56,7 +56,7 @@ module Effective
           @dt_cookie.shift((@dt_cookie.length / 3) + 1)
         end
 
-        view.cookies.signed['_effective_dt'] = Base64.encode64(Marshal.dump(@dt_cookie))
+        view.cookies.signed['_effective_dt'] = { value: Base64.encode64(Marshal.dump(@dt_cookie)), domain: :all, tld_length: 2 }
       end
 
       def cookie_payload
