@@ -39,8 +39,10 @@ $(document).on 'ajax:success', '.dataTables_wrapper .col-actions', (event) ->
 # There was an error completing something
 $(document).on 'ajax:error', '.dataTables_wrapper', (event) ->
   $action = $(event.target)
-  $table = $action.closest('table')
-  $table.DataTable().flash('unable to ' + ($action.attr('title') || 'complete action'), 'danger').draw()
+
+  return true if ('' + $action.data('inline')) == 'false'
+
+  afterError($action)
 
   EffectiveForm.remote_form_payload = ''
   EffectiveForm.remote_form_flash = ''
@@ -145,6 +147,22 @@ afterAction = ($action) ->
   unless redirectDatatables($table)
     $table.DataTable().draw()
     refreshDatatables($table)
+
+afterError = ($action) ->
+  $table = $action.closest('table')
+  $td = $action.closest('td')
+
+  # Show dropdown
+  $td.children('.btn-group').show()
+
+  # Hide spinner
+  $td.children('svg').hide()
+
+  # Cancel
+  cancel($table)
+
+  # Don't redraw
+  $table.DataTable().flash('unable to ' + ($action.attr('title') || 'complete action'), 'danger')
 
 buildRow = (length, payload) ->
   "<td class='col-inline-form' colspan='#{length-1}'><div class='container'>#{payload}</div></td>" +
