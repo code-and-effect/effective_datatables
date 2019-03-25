@@ -59,11 +59,16 @@ module Effective
         @dt_cookie ||= []
         @dt_cookie << [cookie_key, cookie_payload]
 
-        while @dt_cookie.to_s.size > EffectiveDatatables.max_cookie_size.to_i
+        while @dt_cookie.to_s.size > EffectiveDatatables.cookie_max_size.to_i
           @dt_cookie.shift((@dt_cookie.length / 3) + 1)
         end
 
-        view.cookies.signed['_effective_dt'] = { value: Base64.encode64(Marshal.dump(@dt_cookie)), domain: :all, tld_length: 2 }
+        # Generate cookie
+        domain = EffectiveDatatables.cookie_domain || :all
+        tld_length = EffectiveDatatables.cookie_tld_length
+        tld_length ||= (view.request.host == 'localhost' ? nil : view.request.host.to_s.split('.').count)
+
+        view.cookies.signed['_effective_dt'] = { value: Base64.encode64(Marshal.dump(@dt_cookie)), domain: domain, tld_length: tld_length }.compact
       end
 
       def cookie_payload

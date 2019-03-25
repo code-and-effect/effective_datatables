@@ -35,7 +35,9 @@ EffectiveDatatables.setup do |config|
   # Irregardless of this setting, effective_datatables still uses a cookie to function
   config.save_state = true
 
-  # String size. Final byte size is about 1.5 times bigger, after rails signs it
-  config.max_cookie_size = 2000
+  # Configure the _effective_dt cookie.
+  config.cookie_max_size = 2000       # String size. Final byte size is about 1.5 times bigger, after rails signs it
+  config.cookie_domain = :all         # Should usually be :all
+  config.cookie_tld_length = nil      # Leave nil to autodetect, or set to probably 2
 
 end

@@ -9,9 +9,15 @@ module EffectiveDatatables
   mattr_accessor :default_length
   mattr_accessor :html_class
   mattr_accessor :save_state
-  mattr_accessor :max_cookie_size
+
+  mattr_accessor :cookie_max_size
+  mattr_accessor :cookie_domain
+  mattr_accessor :cookie_tld_length
 
   mattr_accessor :debug
+
+  alias_method :max_cookie_size, :cookie_max_size
+  alias_method :max_cookie_size=, :cookie_max_size=
 
   def self.setup
     yield self
