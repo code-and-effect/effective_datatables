@@ -48,6 +48,13 @@ module Effective
         end
       end
 
+      def assert_cookie!
+        if datatables_ajax_request? || datatables_inline_request?
+          raise 'expected cookie to be present' unless cookie
+          raise 'expected attributes cookie to be present' unless cookie[:attributes]
+        end
+      end
+
       def save_cookie!
         @dt_cookie ||= []
         @dt_cookie << [cookie_key, cookie_payload]

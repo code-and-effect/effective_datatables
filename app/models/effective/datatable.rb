@@ -55,6 +55,7 @@ module Effective
       raise 'expected view to respond to params' unless @view.respond_to?(:params)
 
       load_cookie!
+      assert_cookie!
       load_attributes!
 
       # We need early access to filter and scope, to define defaults from the model first

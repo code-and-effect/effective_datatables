@@ -11,13 +11,8 @@ module Effective
 
       def load_attributes!
         if datatables_ajax_request? || datatables_inline_request?
-          raise 'expected cookie to be present' unless cookie
-          raise 'expected attributes cookie to be present' unless cookie[:attributes]
-
           @attributes = cookie.delete(:attributes)
-        end
-
-        unless datatables_ajax_request? || datatables_inline_request?
+        else
           @attributes[:_n] ||= view.controller_path.split('/')[0...-1].join('/').presence
         end
       end

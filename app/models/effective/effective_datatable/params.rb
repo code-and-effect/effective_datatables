@@ -7,8 +7,7 @@ module Effective
       def datatables_ajax_request?
         return @_datatables_ajax_request unless @_datatables_ajax_request.nil?
 
-        @_datatables_ajax_request =
-          (view && view.params[:draw] && view.params[:columns] && cookie_keys.include?(view.params[:cookie])) == true
+        @_datatables_ajax_request = (view.present? && view.params.key?(:draw) && view.params.key?(:columns) && view.params.key?(:cookie))
       end
 
       def datatables_inline_request?
