@@ -1,0 +1,10 @@
+---
+en:
+  effective_datatables:
+    apply: Apply
+    reset: Reset
+    reorder: Reorder
+    new: New
+    actions: Actions
+    bulk_actions: Bulk Actions
+    applying: Applying...

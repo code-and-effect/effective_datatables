@@ -2,6 +2,12 @@ module Effective
   class DatatablesController < ApplicationController
     skip_log_page_views quiet: true if defined?(EffectiveLogging)
 
+    LOCALES_PATH = File.join(Gem::Specification.find_by_name("effective_datatables").gem_dir, 'app', 'assets', 'javascripts', 'dataTables', 'locales')
+
+    AVAILABLE_LOCALES = Hash[
+      Dir["#{LOCALES_PATH}/*"].map { |locale| [File.basename(locale), locale] }
+    ]
+
     # This will respond to both a GET and a POST
     def show
       begin
@@ -54,6 +60,10 @@ module Effective
         render(status: :error, body: 'Unexpected Error')
       end
 
+    end
+
+    def i18n
+      render :json => JSON.parse(File.read(AVAILABLE_LOCALES[params[:language]] || AVAILABLE_LOCALES['en']))
     end
 
     private
