@@ -8,3 +8,5 @@ es:
     actions: Acciones
     bulk_actions: Acciones en masa
     applying: Filtrando...
+    'yes': 'Sí'
+    'no': 'No'

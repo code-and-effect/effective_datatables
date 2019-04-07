@@ -8,3 +8,5 @@ en:
     actions: Actions
     bulk_actions: Bulk Actions
     applying: Applying...
+    'yes': 'Yes'
+    'no': 'No'
