@@ -41,6 +41,7 @@ module EffectiveDatatablesHelper
       id: datatable.to_param,
       class: html_class,
       data: {
+        'authenticity-token' => form_authenticity_token,
         'bulk-actions' => datatable_bulk_actions(datatable),
         'columns' => datatable_columns(datatable),
         'cookie' => datatable.cookie_key,
