@@ -15,6 +15,12 @@ This gem includes the jQuery DataTables assets.
 
 Works with postgres, mysql, sqlite3 and arrays.
 
+## Live Demo
+
+Click here for a [Live Demo](https://effective-datatables-demo.herokuapp.com/).
+
+See [effective_datatables_demo](https://github.com/code-and-effect/effective_datatables_demo) for a working rails website example.
+
 ## effective_datatables 4.0
 
 This is the 4.0 series of effective_datatables.
