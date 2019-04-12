@@ -53,7 +53,8 @@ $(document).on 'click', '.dataTables_wrapper .buttons-bulk-actions a', (event) -
 
   url = $bulkAction.attr('href')
   title = $bulkAction.text()
-  token = $bulkAction.parent('li').data('authenticity-token')
+  downloadToken = $bulkAction.parent('li').data('authenticity-token')
+  token = $table.data('authenticity-token')
   values = $.map($selected, (input) -> input.getAttribute('value'))
   method = $bulkAction.data('ajax-method')
 
@@ -72,10 +73,10 @@ $(document).on 'click', '.dataTables_wrapper .buttons-bulk-actions a', (event) -
 
   $table.dataTable().data('bulk-actions-restore-selected-values', values)
 
-  if token # This is a file download
+  if downloadToken # This is a file download
     $.fileDownload(url,
       httpMethod: 'POST',
-      data: { ids: values, authenticity_token: token }
+      data: { ids: values, authenticity_token: downloadToken }
       successCallback: ->
         success = "Successfully completed #{title} bulk action"
         $table.one 'draw.dt', (e) -> $(e.target).DataTable().flash(success, 'success')
@@ -91,7 +92,7 @@ $(document).on 'click', '.dataTables_wrapper .buttons-bulk-actions a', (event) -
     $.ajax(
       method: method,
       url: url,
-      data: { ids: values }
+      data: { ids: values, authenticity_token: token }
     ).done((response) ->
       success = response['message'] || "Successfully completed #{title} bulk action"
       $table.one 'draw.dt', (e) -> $(e.target).DataTable().flash(success, 'success') and restoreSelected($(e.target), values)
