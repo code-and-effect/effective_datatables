@@ -20,6 +20,7 @@ module EffectiveDatatablesHelper
       id: datatable.to_param,
       class: ('effective-datatable ' + Array(datatable.table_html_class).join(' ')),
       data: {
+        'authenticity-token' => form_authenticity_token,
         'effective-form-inputs' => defined?(EffectiveFormInputs),
         'bulk-actions' => datatable_bulk_actions(datatable),
         'columns' => datatable_columns(datatable),
