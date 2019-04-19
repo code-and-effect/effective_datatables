@@ -89,7 +89,7 @@ module Effective
             if opts[:as].kind_of?(Class) && opts[:as].ancestors.include?(ActiveRecord::Base)
               opts[:resource] = Effective::Resource.new(opts[:as], namespace: controller_namespace)
               opts[:as] = :resource
-            elsif opts[:as] == nil
+            elsif opts[:as] == nil && row.present?
               if (value = Array(row[opts[:index]]).first).kind_of?(ActiveRecord::Base)
                 opts[:resource] = Effective::Resource.new(value, namespace: controller_namespace)
                 opts[:as] = :resource

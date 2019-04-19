@@ -1005,9 +1005,11 @@ datatable do
     duration = (hours.to_i * 60) + minutes.to_i
 
     collection.select! { |row| row[index] == duration }  # Must return an Array of Arrays
-  end.sort do |collection, term, column, index|
-    collection.sort! do |x, y|
-      x[index] <=> y[index]
+  end.sort do |collection, direction, column, index|
+    if direction == :asc
+      collection.sort! { |a, b| a[index] <=> b[index] }
+    else
+      collection.sort! { |a, b| b[index] <=> a[index] }
     end
   end
 end
