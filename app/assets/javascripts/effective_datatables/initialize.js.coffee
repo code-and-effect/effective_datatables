@@ -48,7 +48,7 @@ initializeDataTables = (target) ->
       deferRender: true
       displayStart: datatable.data('display-start')
       iDisplayLength: datatable.data('display-length')
-      language: { url: "/datatables/i18n/" + datatable.data('locale') }
+      language: datatable.data('language')
       lengthMenu: [[5, 10, 25, 50, 100, 250, 500, 9999999], ['5', '10', '25', '50', '100', '250', '500', 'All']]
       order: datatable.data('display-order')
       processing: true
