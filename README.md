@@ -750,7 +750,7 @@ parse: -> { |term| term.to_i }  # Parse the incoming term (string) into whatever
 required: true|false            # Passed to form
 ```
 
-Any other option given will be yielded to SimpleForm as `input_html` options.
+Any other option given will be yielded to EffectiveBootstrap as options.
 
 ## bulk_actions
 
