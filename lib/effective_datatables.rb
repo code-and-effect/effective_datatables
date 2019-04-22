@@ -4,6 +4,8 @@ require 'effective_datatables/engine'
 require 'effective_datatables/version'
 
 module EffectiveDatatables
+  AVAILABLE_LOCALES = %w(en es nl)
+
   mattr_accessor :authorization_method
 
   mattr_accessor :default_length
@@ -45,6 +47,19 @@ module EffectiveDatatables
     klass = (id.classify.safe_constantize || id.classify.pluralize.safe_constantize)
 
     klass.try(:new) || raise('unable to find datatable')
+  end
+
+  # Locale is coming from view. I think it can be dynamic.
+  # We currently support: en, es, nl
+  def self.language(locale)
+    @_languages ||= {}
+
+    locale = :en unless AVAILABLE_LOCALES.include?(locale.to_s)
+
+    @_languages[locale] ||= begin
+      path = Gem::Specification.find_by_name('effective_datatables').gem_dir + "/app/assets/javascripts/dataTables/locales/#{locale}.lang"
+      JSON.parse(File.read(path)).to_json
+    end
   end
 
 end

@@ -1,0 +1,12 @@
+---
+es:
+  effective_datatables:
+    apply: Filtrar
+    reset: Reiniciar
+    reorder: Reordenar
+    new: Nuevo
+    actions: Acciones
+    bulk_actions: Acciones en masa
+    applying: Filtrando...
+    boolean_true: 'Sí'
+    boolean_false: 'No'

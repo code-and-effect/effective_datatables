@@ -9,6 +9,6 @@
 
       .form-group.col-auto
         - if datatable._filters_form_required?
-          = form.save 'Apply', 'data-disable-with': 'Applying...'
+          = form.save t('effective_datatables.apply'), 'data-disable-with': t('effective_datatables.applying')
         - else
-          = link_to 'Apply', '#', class: 'btn btn-primary btn-effective-datatables-filters', 'data-apply-effective-datatables-filters': true
+          = link_to t('effective_datatables.apply'), '#', class: 'btn btn-primary btn-effective-datatables-filters', 'data-apply-effective-datatables-filters': true
