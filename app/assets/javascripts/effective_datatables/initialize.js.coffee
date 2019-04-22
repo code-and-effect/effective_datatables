@@ -14,7 +14,6 @@ initializeDataTables = (target) ->
       buttons: [
         {
           extend: 'colvis',
-          text: 'Show / Hide',
           postfixButtons: [
             { extend: 'colvisGroup', text: 'Show all', show: ':hidden', className: 'buttons-colvisGroup-first'},
             { extend: 'colvisGroup', text: 'Show none', hide: ':visible'}
@@ -49,7 +48,7 @@ initializeDataTables = (target) ->
       deferRender: true
       displayStart: datatable.data('display-start')
       iDisplayLength: datatable.data('display-length')
-      language: { 'lengthMenu': '&nbsp;with _MENU_ per page'}
+      language: datatable.data('language')
       lengthMenu: [[5, 10, 25, 50, 100, 250, 500, 9999999], ['5', '10', '25', '50', '100', '250', '500', 'All']]
       order: datatable.data('display-order')
       processing: true

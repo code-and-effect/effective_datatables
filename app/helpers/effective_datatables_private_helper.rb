@@ -30,29 +30,29 @@ module EffectiveDatatablesPrivateHelper
   end
 
   def datatable_reset(datatable)
-    link_to(content_tag(:span, 'Reset'), '#', class: 'btn btn-link btn-sm buttons-reset-search')
+    link_to(content_tag(:span, t('effective_datatables.reset')), '#', class: 'btn btn-link btn-sm buttons-reset-search')
   end
 
   def datatable_reorder(datatable)
     return unless datatable.reorder? && EffectiveDatatables.authorized?(self, :update, datatable.collection_class)
-    link_to(content_tag(:span, 'Reorder'), '#', class: 'btn btn-link btn-sm buttons-reorder', disabled: true)
+    link_to(content_tag(:span, t('effective_datatables.reorder')), '#', class: 'btn btn-link btn-sm buttons-reorder', disabled: true)
   end
 
   def datatable_new_resource_button(datatable, name, column)
     return unless column[:inline] && (column[:actions][:new] != false) && (datatable.resource.actions.include?(:new) rescue false)
 
-    actions = {'New' => { action: :new, class: ['btn', column[:btn_class].presence].compact.join(' '), 'data-remote': true } }
+    actions = {t('effective_datatables.new') => { action: :new, class: ['btn', column[:btn_class].presence].compact.join(' '), 'data-remote': true } }
     render_resource_actions(datatable.resource.klass, actions: actions, effective_resource: datatable.resource) # Will only work if permitted
   end
 
   def datatable_label_tag(datatable, name, opts)
     case opts[:as]
     when :actions
-      content_tag(:span, 'Actions', style: 'display: none;')
+      content_tag(:span, t('effective_datatables.actions'), style: 'display: none;')
     when :bulk_actions
-      content_tag(:span, 'Bulk Actions', style: 'display: none;')
+      content_tag(:span, t('effective_datatables.bulk_actions'), style: 'display: none;')
     when :reorder
-      content_tag(:span, 'Reorder', style: 'display: none;')
+      content_tag(:span, t('effective_datatables.reorder'), style: 'display: none;')
     else
       content_tag(:span, opts[:label].presence)
     end
