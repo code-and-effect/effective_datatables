@@ -1,5 +1,5 @@
 .effective-datatables-filters{'aria-controls': datatable.to_param}
-  = effective_form_with(scope: :filters, url: (datatable._form[:url] || '#'), method: datatable._form[:verb]) do |form|
+  = effective_form_with(scope: :filters, url: (datatable._form[:url] || '#'), method: datatable._form[:verb], id: nil) do |form|
     .form-row.align-items-center
       - if datatable._scopes.present?
         = datatable_scope_tag(form, datatable)

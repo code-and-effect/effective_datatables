@@ -114,44 +114,40 @@ module EffectiveDatatablesPrivateHelper
   end
 
   def datatable_filter_tag(form, datatable, name, opts)
-    placeholder = opts.delete(:label)
-
+    as = opts.delete(:as).to_s.chomp('_field').to_sym
     collection = opts.delete(:collection)
     value = datatable.state[:filter][name]
 
-    options = opts.except(:parse).merge(
+    options = {
       autocomplete: 'off',
       feedback: false,
       label: false,
-      placeholder: placeholder,
+      placeholder: (opts[:label] || name.to_s.titleize),
       value: value,
       wrapper: { class: 'form-group col-auto'}
-    )
+    }.merge(opts.except(:parse))
 
     options[:name] = '' unless datatable._filters_form_required?
 
-    case options.delete(:as)
-    when :date
-      form.date_field name, options
-    when :datetime
-      form.datetime_field name, options
-    when :time
-      form.time_field name, options
-    when :select, :boolean
-      options[:input_js] = (options[:input_js] || {}).reverse_merge(placeholder: placeholder)
-      form.select name, collection, options
+    if collection.present?
+      options.delete(:name) unless as == :select
+      form.public_send(as, name, collection, options) # select, radios, checks
+    elsif form.respond_to?(as)
+      form.public_send(as, name, options) # check_box, text_area
     else
-      form.text_field name, options
+      form.public_send("#{as}_field", name, options) # text_field, number_field, all the rest.
     end
+
   end
 
   def datatable_scope_tag(form, datatable, opts = {})
     collection = datatable._scopes.map { |name, opts| [opts[:label], name] }
+    value = datatable.state[:scope]
 
     options = {
       autocomplete: 'off',
       buttons: true,
-      checked: datatable.state[:scope],
+      checked: value,
       feedback: false,
       label: false,
       required: false,

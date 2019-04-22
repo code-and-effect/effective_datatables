@@ -25,11 +25,11 @@ module Effective
           datatable._filters[name.to_sym] = {
             value: value,
             as: as,
-            label: label || (label == false ? false : name.to_s.titleize),
+            label: label,
             name: name.to_sym,
             parse: parse,
             required: required,
-          }.reverse_merge(input_html)
+          }.compact.reverse_merge(input_html)
         end
 
         def scope(name = nil, *args, default: nil, label: nil)
