@@ -8,5 +8,5 @@ require 'i18n_data'
 
   next if code.nil?
 
-  File.rename(f, code.downcase)
+  File.rename(f, code.downcase + '.lang')
 end

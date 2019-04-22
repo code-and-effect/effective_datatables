@@ -8,5 +8,5 @@ nl:
     actions: Acties
     bulk_actions: Bulkacties
     applying: Toepassen...
-    'yes': 'Ja'
-    'no': 'Nee'
+    boolean_true: 'Ja'
+    boolean_false: 'Nee'

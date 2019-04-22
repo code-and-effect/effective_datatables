@@ -1,11 +1,5 @@
 # These are expected to be called by a developer.  They are part of the datatables DSL.
 module EffectiveDatatablesHelper
-  LOCALES_PATH = File.join(Gem::Specification.find_by_name("effective_datatables").gem_dir, 'app', 'assets', 'javascripts', 'dataTables', 'locales')
-
-  AVAILABLE_LOCALES = Hash[
-    Dir["#{LOCALES_PATH}/*"].map { |locale| [File.basename(locale), locale] }
-  ]
-
   def render_datatable(datatable, input_js: {}, buttons: true, charts: true, entries: true, filters: true, inline: false, pagination: true, search: true, simple: false, sort: true)
     raise 'expected datatable to be present' unless datatable
     raise 'expected input_js to be a Hash' unless input_js.kind_of?(Hash)
@@ -55,6 +49,7 @@ module EffectiveDatatablesHelper
         'display-records' => datatable.to_json[:recordsFiltered],
         'display-start' => datatable.display_start,
         'inline' => inline.to_s,
+        'language' => EffectiveDatatables.language(I18n.locale),
         'options' => input_js.to_json,
         'reset' => (datatable_reset(datatable) if search),
         'reorder' => datatable_reorder(datatable),
@@ -63,7 +58,6 @@ module EffectiveDatatablesHelper
         'spinner' => icon('spinner'), # effective_bootstrap
         'source' => effective_datatables.datatable_path(datatable, {format: 'json'}),
         'total-records' => datatable.to_json[:recordsTotal],
-        'language' => JSON.parse(File.read(AVAILABLE_LOCALES[I18n.locale.to_s] || AVAILABLE_LOCALES['en'])).to_json
       }
     }
 

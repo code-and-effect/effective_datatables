@@ -73,10 +73,7 @@ module Effective
 
           (view.render_resource_actions(value, atts) || '')
         when :boolean
-          case value
-          when true   ; I18n.t('effective_datatables.yes')
-          when false  ; I18n.t('effective_datatables.no')
-          end
+          view.t("effective_datatables.boolean_#{value}")
         when :currency
           view.number_to_currency(value)
         when :date
