@@ -57,7 +57,7 @@ module EffectiveDatatablesHelper
         'simple' => simple.to_s,
         'spinner' => icon('spinner'), # effective_bootstrap
         'source' => effective_datatables.datatable_path(datatable, {format: 'json'}),
-        'total-records' => datatable.to_json[:recordsTotal],
+        'total-records' => datatable.to_json[:recordsTotal]
       }
     }
 
