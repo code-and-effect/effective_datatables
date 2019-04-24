@@ -3,12 +3,13 @@ module Effective
     module Dsl
       module BulkActions
 
-        def bulk_action(*args)
-          datatable._bulk_actions.push(link_to_bulk_action(*args))
+        def bulk_action(title, url, opts = {})
+          datatable._bulk_actions.push(link_to_bulk_action(title, url, opts))
         end
 
-        def bulk_download(body, url, opts = {})
-          datatable._bulk_actions.push(link_to_bulk_action(body, url, opts.merge('data-authenticity-token' => form_authenticity_token, 'data-method' => :post)))
+        def bulk_download(title, url, opts = {})
+          opts = opts.merge('data-authenticity-token' => form_authenticity_token, 'data-method' => :post)
+          datatable._bulk_actions.push(link_to_bulk_action(title, url, opts))
         end
 
         def bulk_action_divider
@@ -22,7 +23,7 @@ module Effective
         private
 
         # We can't let any data-method be applied to the link, or jquery_ujs does the wrong thing with it
-        def link_to_bulk_action(body, url, opts = {})
+        def link_to_bulk_action(title, url, opts = {})
 
           # Transform data: { ... } hash into 'data-' keys
           if (data = opts.delete(:data))
@@ -34,7 +35,7 @@ module Effective
 
           opts[:class] = [opts[:class], 'dropdown-item'].compact.join(' ')
 
-          link_to(body, url, opts)
+          link_to(title, url, opts)
         end
 
       end
