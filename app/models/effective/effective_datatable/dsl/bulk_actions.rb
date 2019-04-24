@@ -8,7 +8,7 @@ module Effective
         end
 
         def bulk_download(title, url, opts = {})
-          opts = opts.merge('data-authenticity-token' => form_authenticity_token, 'data-method' => :post)
+          opts = opts.merge('data-bulk-download' => true, 'data-method' => :post)
           datatable._bulk_actions.push(link_to_bulk_action(title, url, opts))
         end
 
