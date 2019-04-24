@@ -8,8 +8,7 @@ module Effective
         end
 
         def bulk_download(title, url, opts = {})
-          opts = opts.merge('data-bulk-download' => true, 'data-method' => :post)
-          datatable._bulk_actions.push(link_to_bulk_action(title, url, opts))
+          datatable._bulk_actions.push(link_to_bulk_action(title, url, opts.merge('data-bulk-download': true)))
         end
 
         def bulk_action_divider

@@ -53,7 +53,7 @@ $(document).on 'click', '.dataTables_wrapper .buttons-bulk-actions a', (event) -
 
   url = $bulkAction.attr('href')
   title = $bulkAction.text()
-  bulkDownload= $bulkAction.parent('li').data('bulk-download')
+  download = $bulkAction.data('bulk-download')
   token = $table.data('authenticity-token')
   values = $.map($selected, (input) -> input.getAttribute('value'))
   method = $bulkAction.data('ajax-method')
@@ -73,7 +73,7 @@ $(document).on 'click', '.dataTables_wrapper .buttons-bulk-actions a', (event) -
 
   $table.dataTable().data('bulk-actions-restore-selected-values', values)
 
-  if bulkDownload # This is a file download
+  if download # This is a file download
     $.fileDownload(url,
       httpMethod: 'POST',
       data: { ids: values, authenticity_token: token }
