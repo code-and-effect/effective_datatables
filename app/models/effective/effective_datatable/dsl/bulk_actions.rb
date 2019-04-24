@@ -7,8 +7,8 @@ module Effective
           datatable._bulk_actions.push(link_to_bulk_action(*args))
         end
 
-        def bulk_download(*args)
-          datatable._bulk_actions.push(link_to_bulk_action(*args.merge('data-authenticity-token' => form_authenticity_token, 'data-method' => :post)))
+        def bulk_download(body, url, opts = {})
+          datatable._bulk_actions.push(link_to_bulk_action(body, url, opts.merge('data-authenticity-token' => form_authenticity_token, 'data-method' => :post)))
         end
 
         def bulk_action_divider
