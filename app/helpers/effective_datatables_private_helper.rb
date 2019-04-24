@@ -114,8 +114,7 @@ module EffectiveDatatablesPrivateHelper
   end
 
   def datatable_filter_tag(form, datatable, name, opts)
-    as = opts.delete(:as).to_s.chomp('_field').to_sym
-    collection = opts.delete(:collection)
+    as = opts[:as].to_s.chomp('_field').to_sym
     value = datatable.state[:filter][name]
 
     options = {
@@ -125,13 +124,13 @@ module EffectiveDatatablesPrivateHelper
       placeholder: (opts[:label] || name.to_s.titleize),
       value: value,
       wrapper: { class: 'form-group col-auto'}
-    }.merge(opts.except(:parse))
+    }.merge(opts.except(:as, :collection, :parse))
 
     options[:name] = '' unless datatable._filters_form_required?
 
-    if collection.present?
+    if [:select, :radios, :checks].include?(as)
       options.delete(:name) unless as == :select
-      form.public_send(as, name, collection, options) # select, radios, checks
+      form.public_send(as, name, opts[:collection], options) # select, radios, checks
     elsif form.respond_to?(as)
       form.public_send(as, name, options) # check_box, text_area
     else

@@ -5,7 +5,7 @@ module Effective
         def filter(name = nil, value = :_no_value, as: nil, label: nil, parse: nil, required: false, **input_html)
           return datatable.filter if (name == nil && value == :_no_value) # This lets block methods call 'filter' and get the values
 
-          raise 'expected second argument to be a value' if value == :_no_value
+          raise 'expected second argument to be a value. the default value for this filter.' if value == :_no_value
           raise 'parse must be a Proc' if parse.present? && !parse.kind_of?(Proc)
 
           # Merge search
