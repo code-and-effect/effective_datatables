@@ -113,12 +113,30 @@ module Effective
 
       # Takes all default resource actions
       # Applies data-remote to anything that's data-method post or delete
+      # Merges in any extra attributes when passed as a Hash
       def actions_col_actions(column)
-        if column[:inline]
+        actions = if column[:inline]
           resource.resource_actions.transform_values { |opts| opts['data-remote'] = true; opts }
         else
           resource.resource_actions.transform_values { |opts| opts['data-remote'] = true if opts['data-method']; opts }
         end
+
+        # Merge local options. Special behaviour for remote: false
+        if column[:actions].kind_of?(Hash)
+          column[:actions].each do |action, opts|
+            next unless opts.kind_of?(Hash)
+
+            existing = actions.find { |_, v| v[:action] == action }.first
+            next unless existing.present?
+
+            actions[existing]['data-remote'] = opts[:remote] if opts.key?(:remote)
+            actions[existing]['data-remote'] = opts['remote'] if opts.key?('remote')
+
+            actions[existing].merge!(opts.except(:remote, 'remote'))
+          end
+        end
+
+        actions
       end
 
       def resource_col_locals(opts)
