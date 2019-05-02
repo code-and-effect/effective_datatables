@@ -21,10 +21,14 @@ $(document).on 'ajax:beforeSend', '.dataTables_wrapper .col-actions', (e, xhr, s
   true
 
 # We have either completed the resource action, or fetched the inline form to load.
-$(document).on 'ajax:success', '.dataTables_wrapper .col-actions', (event) ->
+$(document).on 'ajax:success', '.dataTables_wrapper .col-actions', (event, data) ->
   $action = $(event.target)
 
   return true if ('' + $action.data('inline')) == 'false'
+
+  if data.length > 0
+    return true if data.indexOf('Turbolinks.clearCache()') == 0 && data.includes("Turbolinks.visit(")
+    return true if data.indexOf('<html') >= 0
 
   if ($action.data('method') || 'get') == 'get'
     if $action.closest('tr').parent().prop('tagName') == 'THEAD' then afterNew($action) else afterEdit($action)
@@ -34,6 +38,7 @@ $(document).on 'ajax:success', '.dataTables_wrapper .col-actions', (event) ->
   EffectiveForm.remote_form_payload = ''
   EffectiveForm.remote_form_flash = ''
   EffectiveForm.remote_form_refresh_datatables = ''
+
   true
 
 # There was an error completing something
