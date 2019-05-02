@@ -185,6 +185,8 @@ initializeDataTables = (target) ->
       table.DataTable().on('row-reorder', (event, diff, edit) -> $(event.target).DataTable().reorder(event, diff, edit))
 
     table.addClass('initialized')
+    table.children('thead').trigger('effective-bootstrap:initialize')
+    true
 
 destroyDataTables = ->
   $('.effective-datatables-inline-expanded').removeClass('effective-datatables-inline-expanded')
