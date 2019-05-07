@@ -17,10 +17,10 @@ module Effective
           as ||= (
             if input_html.key?(:collection)
               :select
-            elsif value.present?
+            elsif value != nil
               Effective::Attribute.new(value).type
             end
-          )
+          ) || :text
 
           datatable._filters[name.to_sym] = {
             value: value,

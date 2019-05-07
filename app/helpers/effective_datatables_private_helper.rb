@@ -116,6 +116,7 @@ module EffectiveDatatablesPrivateHelper
   def datatable_filter_tag(form, datatable, name, opts)
     as = opts[:as].to_s.chomp('_field').to_sym
     value = datatable.state[:filter][name]
+    collection = opts[:collection]
 
     options = {
       autocomplete: 'off',
@@ -130,7 +131,10 @@ module EffectiveDatatablesPrivateHelper
 
     if [:select, :radios, :checks].include?(as)
       options.delete(:name) unless as == :select
-      form.public_send(as, name, opts[:collection], options) # select, radios, checks
+      form.public_send(as, name, collection, options) # select, radios, checks
+    elsif as == :boolean
+      collection ||= [true, false].map { |value| [t("effective_datatables.boolean_#{value}"), value] }
+      form.public_send(:select, name, collection, options) # boolean
     elsif form.respond_to?(as)
       form.public_send(as, name, options) # check_box, text_area
     else
