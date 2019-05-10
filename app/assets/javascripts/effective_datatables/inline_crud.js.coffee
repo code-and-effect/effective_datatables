@@ -109,7 +109,7 @@ afterNew = ($action) ->
   $table.children('tbody').prepend($tr)
 
   expand($table)
-  $tr.find('form').attr('data-remote', true).trigger('turbolinks:load')
+  $tr.trigger('turbolinks:load')
   $tr.hide().fadeIn()
 
 beforeEdit = ($action) ->
@@ -136,7 +136,7 @@ afterEdit = ($action) ->
   $tr.addClass('effective-datatables-inline-row')
 
   expand($table)
-  $tr.find('form').attr('data-remote', true).trigger('turbolinks:load')
+  $tr.trigger('turbolinks:load')
   $tr.hide().fadeIn()
 
 # This is when one of the resource actions completes
