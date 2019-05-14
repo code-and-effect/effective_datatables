@@ -126,7 +126,7 @@ module Effective
           column[:actions].each do |action, opts|
             next unless opts.kind_of?(Hash)
 
-            existing = actions.find { |_, v| v[:action] == action }.first
+            existing = actions.find { |_, v| v[:action] == action }&.first
             next unless existing.present?
 
             actions[existing]['data-remote'] = opts[:remote] if opts.key?(:remote)
