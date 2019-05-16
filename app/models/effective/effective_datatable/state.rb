@@ -152,6 +152,8 @@ module Effective
               :_reorder
             elsif order_index.present?
               columns.keys[order_index]
+            elsif state[:order_name].present?
+              state[:order_name]
             else
               columns.find { |name, opts| opts[:sort] }.first
             end
