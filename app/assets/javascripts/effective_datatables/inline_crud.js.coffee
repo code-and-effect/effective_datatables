@@ -81,9 +81,8 @@ $(document).on 'effective-form:success', '.dataTables_wrapper .col-inline-form',
     $table.DataTable().flash(flash || 'Item updated', 'success')
     $tr.fadeOut('slow')
 
-  unless redirectDatatables($table)
-    $table.DataTable().draw()
-    refreshDatatables($table)
+  $table.DataTable().draw()
+  refreshDatatables($table)
 
 beforeNew = ($action) ->
   $table = $action.closest('table')
