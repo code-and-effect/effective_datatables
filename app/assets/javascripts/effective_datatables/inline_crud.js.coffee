@@ -36,6 +36,7 @@ $(document).on 'ajax:success', '.dataTables_wrapper .col-actions', (event, data)
     afterAction($action)
 
   EffectiveForm.remote_form_payload = ''
+  EffectiveForm.remote_form_commit = ''
   EffectiveForm.remote_form_flash = ''
   EffectiveForm.remote_form_refresh_datatables = ''
 
@@ -50,6 +51,7 @@ $(document).on 'ajax:error', '.dataTables_wrapper', (event) ->
   afterError($action)
 
   EffectiveForm.remote_form_payload = ''
+  EffectiveForm.remote_form_commit = ''
   EffectiveForm.remote_form_flash = ''
   EffectiveForm.remote_form_refresh_datatables = ''
   true
