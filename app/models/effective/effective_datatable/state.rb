@@ -198,6 +198,7 @@ module Effective
       # When we parse an incoming filter term for this filter.
       def parse_filter_value(filter, value)
         return filter[:parse].call(value) if filter[:parse]
+        return nil if value.blank? && !filter[:required]
         Effective::Attribute.new(filter[:value]).parse(value, name: filter[:name])
       end
 
