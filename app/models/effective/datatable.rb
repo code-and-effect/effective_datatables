@@ -27,15 +27,14 @@ module Effective
     include Effective::EffectiveDatatable::Cookie
     include Effective::EffectiveDatatable::Format
     include Effective::EffectiveDatatable::Hooks
-    include Effective::EffectiveDatatable::Inline
     include Effective::EffectiveDatatable::Params
     include Effective::EffectiveDatatable::Resource
     include Effective::EffectiveDatatable::State
 
-    def initialize(view = nil, attributes = {})
+    def initialize(view = nil, attributes = nil) 
       (attributes = view; view = nil) if view.kind_of?(Hash)
 
-      @attributes = initial_attributes(attributes)
+      @attributes = (attributes || {})
       @state = initial_state
 
       @_aggregates = {}
@@ -46,6 +45,7 @@ module Effective
       @_form = {}
       @_scopes = {}
 
+      raise 'expected a hash of arguments' unless @attributes.kind_of?(Hash)
       raise 'collection is defined as a method. Please use the collection do ... end syntax.' unless collection.nil?
       self.view = view if view
     end
@@ -55,14 +55,14 @@ module Effective
       @view = (view.respond_to?(:view_context) ? view.view_context : view)
       raise 'expected view to respond to params' unless @view.respond_to?(:params)
 
-      load_cookie!
-      assert_cookie!
+      assert_attributes!
       load_attributes!
 
       # We need early access to filter and scope, to define defaults from the model first
-      # This means filters do knows about attributes but not about columns.
+      # This means filters do know about attributes but not about columns.
       initialize_filters if respond_to?(:initialize_filters)
       load_filters!
+
       load_state!
 
       # Bulk actions called first so it can add the bulk_actions_col first

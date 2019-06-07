@@ -5,7 +5,6 @@ require 'effective_datatables/version'
 
 module EffectiveDatatables
   AVAILABLE_LOCALES = %w(en es nl)
-  INLINE_PREFIX = '6' # Any number or symbol that can't be the start of a class.
 
   mattr_accessor :authorization_method
 
@@ -43,17 +42,10 @@ module EffectiveDatatables
     raise Effective::AccessDenied.new('Access Denied', action, resource) unless authorized?(controller, action, resource)
   end
 
-  def self.find(id)
-    id = id.to_s
-    attributes = {}
-
-    if id.start_with?(INLINE_PREFIX)
-      attributes = decode_inline_payload(id)
-      id = attributes.delete(:_datatable_id)
-    end
-
+  def self.find(id, attributes = nil)
     id = id.to_s.gsub(/-\d+\z/, '').gsub('-', '/')
     klass = (id.classify.safe_constantize || id.classify.pluralize.safe_constantize)
+    attributes = decode_attributes(attributes)
 
     klass.try(:new, **attributes) || raise('unable to find datatable')
   end
@@ -71,17 +63,17 @@ module EffectiveDatatables
     end
   end
 
-  def self.encode_inline_payload(payload)
-    INLINE_PREFIX + Base64.encode64(Marshal.dump(payload))
+  def self.encode_attributes(attributes)
+    payload = Base64.encode64(Marshal.dump(attributes))
   end
 
-  def self.decode_inline_payload(payload)
-    raise('invalid inline payload') unless payload.to_s.start_with?(INLINE_PREFIX)
+  def self.decode_attributes(payload)
+    return payload if payload.kind_of?(Hash)
 
-    value = Marshal.load(Base64.decode64(payload.sub(INLINE_PREFIX, '')))
-    raise 'invalid decoded inline payload' unless value.kind_of?(Hash)
+    attributes = Marshal.load(Base64.decode64(payload))
+    raise 'invalid decoded inline payload' unless attributes.kind_of?(Hash)
 
-    value
+    attributes
   end
 
 end

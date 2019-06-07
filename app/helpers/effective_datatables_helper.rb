@@ -40,16 +40,15 @@ module EffectiveDatatablesHelper
       id: datatable.to_param,
       class: html_class,
       data: {
+        'attributes' => EffectiveDatatables.encode_attributes(datatable.attributes),
         'authenticity-token' => form_authenticity_token,
         'bulk-actions' => datatable_bulk_actions(datatable),
         'columns' => datatable_columns(datatable),
-        'cookie' => datatable.cookie_key,
         'display-length' => datatable.display_length,
         'display-order' => datatable_display_order(datatable),
         'display-records' => datatable.to_json[:recordsFiltered],
         'display-start' => datatable.display_start,
         'inline' => inline.to_s,
-        'inline-payload' => (datatable.inline_payload if inline),
         'language' => EffectiveDatatables.language(I18n.locale),
         'options' => input_js.to_json,
         'reset' => (datatable_reset(datatable) if search),
@@ -94,14 +93,14 @@ module EffectiveDatatablesHelper
   end
 
   def inline_datatable?
-    params[:_datatable_inline].present?
+    params[:_datatable_id].present? && params[:_datatable_attributes].present?
   end
 
   def inline_datatable
     return nil unless inline_datatable?
     return @_inline_datatable if @_inline_datatable
 
-    datatable = EffectiveDatatables.find(params[:_datatable_inline])
+    datatable = EffectiveDatatables.find(params[:_datatable_id], params[:_datatable_attributes])
     datatable.view = self
 
     EffectiveDatatables.authorize!(self, :index, datatable.collection_class)

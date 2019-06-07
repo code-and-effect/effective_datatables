@@ -55,7 +55,6 @@ module Effective
       # This is called first. Our initial state is set.
       def initial_state
         {
-          attributes: {},
           filter: {},
           length: nil,
           order_name: nil,
@@ -89,17 +88,17 @@ module Effective
 
       def load_state!
         if datatables_ajax_request?
+          load_cookie! # but not state.
           load_filter_params!
           load_ajax_state!
         elsif datatables_inline_request?
-          load_cookie_state!
-        elsif cookie.present? && cookie[:params] == params.length && EffectiveDatatables.save_state
-          load_cookie_state!
+          load_filter_params!
         else
-          # Nothing to do for default state
+          load_cookie!
+          load_cookie_state! if cookie.present? && cookie[:params] == cookie_state_params
+          load_filter_params!
         end
-
-        load_filter_params! unless datatables_ajax_request?
+        
         fill_empty_filters!
       end
 
@@ -134,7 +133,7 @@ module Effective
           state[:filter][name] = parse_filter_value(_filters[name], value)
         end
 
-        state[:params] = cookie[:params]
+        state[:params] = cookie[:params] if cookie.present?
       end
 
       def load_cookie_state!
@@ -187,7 +186,7 @@ module Effective
 
         unless datatables_ajax_request?
           search_params.each { |name, value| state[:search][name] = value }
-          state[:params] = params.length
+          state[:params] = cookie_state_params
         end
 
         state[:visible].delete_if { |name, _| columns.key?(name) == false }
@@ -200,6 +199,10 @@ module Effective
         return filter[:parse].call(value) if filter[:parse]
         return nil if value.blank? && !filter[:required]
         Effective::Attribute.new(filter[:value]).parse(value, name: filter[:name])
+      end
+
+      def cookie_state_params
+        params.hash.abs.to_s.last(12)
       end
 
     end

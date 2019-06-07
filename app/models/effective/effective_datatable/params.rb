@@ -7,17 +7,13 @@ module Effective
       def datatables_ajax_request?
         return @_datatables_ajax_request unless @_datatables_ajax_request.nil?
 
-        @_datatables_ajax_request = (view.present? && view.params.key?(:draw) && view.params.key?(:columns) && view.params.key?(:cookie))
+        @_datatables_ajax_request = (view.present? && view.params.key?(:draw) && view.params.key?(:columns))
       end
 
       def datatables_inline_request?
         return @_datatables_inline_request unless @_datatables_inline_request.nil?
 
-        @_datatables_inline_request = (
-          view &&
-          view.params[:_datatable_id].to_s.split('-')[0...-1] == to_param.split('-')[0...-1] &&
-          cookie_keys.include?(view.params[:_datatable_cookie])
-        )
+        @_datatables_inline_request = (view.present? && view.params[:_datatable_id].to_s.split('-')[0...-1] == to_param.split('-')[0...-1])
       end
 
       def params

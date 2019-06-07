@@ -5,7 +5,7 @@ module Effective
     # This will respond to both a GET and a POST
     def show
       begin
-        @datatable = EffectiveDatatables.find(params[:id])
+        @datatable = EffectiveDatatables.find(params[:id], params[:attributes])
         @datatable.view = view_context
 
         EffectiveDatatables.authorize!(self, :index, @datatable.collection_class)

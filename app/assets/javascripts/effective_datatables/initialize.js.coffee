@@ -60,7 +60,7 @@ initializeDataTables = (target) ->
         $table = $(api.table().node())
         $form = $(".effective-datatables-filters[aria-controls='#{$table.attr('id')}']").first()
 
-        params['cookie'] = $table.data('cookie')
+        params['attributes'] = $table.data('attributes')
         params['authenticity_token'] = $table.data('authenticity-token')
 
         if $form.length > 0
