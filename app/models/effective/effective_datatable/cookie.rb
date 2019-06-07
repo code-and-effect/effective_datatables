@@ -20,7 +20,7 @@ module Effective
           raise 'invalid datatables cookie' unless @dt_cookie.kind_of?(Array)
 
           # Assign individual cookie
-          index = @dt_cookie.rindex { |key, _| key == to_param }
+          index = @dt_cookie.rindex { |key, _| key == cookie_key }
           @cookie = @dt_cookie.delete_at(index) if index
         end
 
@@ -35,7 +35,7 @@ module Effective
         return unless EffectiveDatatables.save_state
 
         @dt_cookie ||= []
-        @dt_cookie << [to_param, cookie_payload]
+        @dt_cookie << [cookie_key, cookie_payload]
 
         while @dt_cookie.to_s.size > EffectiveDatatables.cookie_max_size.to_i
           @dt_cookie.shift((@dt_cookie.length / 3) + 1)
@@ -47,6 +47,10 @@ module Effective
         tld_length ||= (view.request.host == 'localhost' ? nil : view.request.host.to_s.split('.').count)
 
         view.cookies.signed['_effective_dt'] = { value: Base64.encode64(Marshal.dump(@dt_cookie)), domain: domain, tld_length: tld_length }.compact
+      end
+
+      def cookie_key
+        @cookie_key ||= to_param
       end
 
       def cookie_payload

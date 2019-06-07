@@ -148,7 +148,7 @@ module Effective
     end
 
     def to_param
-      @to_param ||= "#{self.class.name.underscore.parameterize}-#{[self.class, attributes].hash.abs.to_s.last(12)}"
+      "#{self.class.name.underscore.parameterize}-#{[self.class, attributes].hash.abs.to_s.last(12)}"
     end
 
     def columns
