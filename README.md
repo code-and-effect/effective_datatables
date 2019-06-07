@@ -348,7 +348,7 @@ When initialized with a Hash, that hash is available throughout the entire datat
 
 You can call the attributes from within the datatable as `attributes` or within a partial/view as `@datatable.attributes`.
 
-These attributes are serialized and stored in an encrypted cookie. Objects won't work. Keep it simple.
+These attributes are serialized and stored in an encrypted data attribute. Objects won't work. Keep it simple.
 
 Attributes cannot be changed by search, filter, or state in any way. They're guaranteed to be the same as when first initialized.
 

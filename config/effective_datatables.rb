@@ -31,8 +31,7 @@ EffectiveDatatables.setup do |config|
   # Log search/sort information to the console
   config.debug = true
 
-  # If a user has previously visited this page and is returning, use the cookie to restore last session
-  # Irregardless of this setting, effective_datatables still uses a cookie to function
+  # Use a cookie to save and restore state from previous page visits.
   config.save_state = true
 
   # Configure the _effective_dt cookie.
