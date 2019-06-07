@@ -45,7 +45,7 @@ module EffectiveDatatables
   def self.find(id, attributes = nil)
     id = id.to_s.gsub(/-\d+\z/, '').gsub('-', '/')
     klass = (id.classify.safe_constantize || id.classify.pluralize.safe_constantize)
-    attributes = decode_attributes(attributes)
+    attributes = decrypt(attributes) || {}
 
     klass.try(:new, **attributes) || raise('unable to find datatable')
   end
@@ -63,17 +63,23 @@ module EffectiveDatatables
     end
   end
 
-  def self.encode_attributes(attributes)
-    payload = Base64.encode64(Marshal.dump(attributes))
+  def self.encrypt(attributes)
+    payload = message_encrypter.encrypt_and_sign(attributes)
   end
 
-  def self.decode_attributes(payload)
+  def self.decrypt(payload)
+    return unless payload.present?
     return payload if payload.kind_of?(Hash)
 
-    attributes = Marshal.load(Base64.decode64(payload))
+    attributes = message_encrypter.decrypt_and_verify(payload)
+
     raise 'invalid decoded inline payload' unless attributes.kind_of?(Hash)
 
     attributes
+  end
+
+  def self.message_encrypter
+    ActiveSupport::MessageEncryptor.new(Rails.application.secret_key_base.to_s.first(32))
   end
 
 end
