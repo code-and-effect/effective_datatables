@@ -27,6 +27,7 @@ module Effective
     include Effective::EffectiveDatatable::Cookie
     include Effective::EffectiveDatatable::Format
     include Effective::EffectiveDatatable::Hooks
+    include Effective::EffectiveDatatable::Inline
     include Effective::EffectiveDatatable::Params
     include Effective::EffectiveDatatable::Resource
     include Effective::EffectiveDatatable::State
@@ -147,7 +148,7 @@ module Effective
     end
 
     def to_param
-      @to_param ||= "#{self.class.name.underscore.parameterize}-#{cookie_param}"
+      "#{self.class.name.underscore.parameterize}-#{[self.class, attributes].hash.abs.to_s.last(12)}" # Not guaranteed to be 12 long
     end
 
     def columns

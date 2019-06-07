@@ -5,6 +5,7 @@ require 'effective_datatables/version'
 
 module EffectiveDatatables
   AVAILABLE_LOCALES = %w(en es nl)
+  INLINE_PREFIX = '6' # Any number or symbol that can't be the start of a class.
 
   mattr_accessor :authorization_method
 
@@ -43,10 +44,18 @@ module EffectiveDatatables
   end
 
   def self.find(id)
+    id = id.to_s
+    attributes = {}
+
+    if id.start_with?(INLINE_PREFIX)
+      attributes = decode_inline_payload(id)
+      id = attributes.delete(:_datatable_id)
+    end
+
     id = id.to_s.gsub(/-\d+\z/, '').gsub('-', '/')
     klass = (id.classify.safe_constantize || id.classify.pluralize.safe_constantize)
 
-    klass.try(:new) || raise('unable to find datatable')
+    klass.try(:new, **attributes) || raise('unable to find datatable')
   end
 
   # Locale is coming from view. I think it can be dynamic.
@@ -60,6 +69,19 @@ module EffectiveDatatables
       path = Gem::Specification.find_by_name('effective_datatables').gem_dir + "/app/assets/javascripts/dataTables/locales/#{locale}.lang"
       JSON.parse(File.read(path)).to_json
     end
+  end
+
+  def self.encode_inline_payload(payload)
+    INLINE_PREFIX + Base64.encode64(Marshal.dump(payload))
+  end
+
+  def self.decode_inline_payload(payload)
+    raise('invalid inline payload') unless payload.to_s.start_with?(INLINE_PREFIX)
+
+    value = Marshal.load(Base64.decode64(payload.sub(INLINE_PREFIX, '')))
+    raise 'invalid decoded inline payload' unless value.kind_of?(Hash)
+
+    value
   end
 
 end

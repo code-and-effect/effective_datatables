@@ -49,6 +49,7 @@ module EffectiveDatatablesHelper
         'display-records' => datatable.to_json[:recordsFiltered],
         'display-start' => datatable.display_start,
         'inline' => inline.to_s,
+        'inline-payload' => (datatable.inline_payload if inline),
         'language' => EffectiveDatatables.language(I18n.locale),
         'options' => input_js.to_json,
         'reset' => (datatable_reset(datatable) if search),
@@ -93,14 +94,14 @@ module EffectiveDatatablesHelper
   end
 
   def inline_datatable?
-    params[:_datatable_id].present?
+    params[:_datatable_inline].present?
   end
 
   def inline_datatable
     return nil unless inline_datatable?
     return @_inline_datatable if @_inline_datatable
 
-    datatable = EffectiveDatatables.find(params[:_datatable_id])
+    datatable = EffectiveDatatables.find(params[:_datatable_inline])
     datatable.view = self
 
     EffectiveDatatables.authorize!(self, :index, datatable.collection_class)
