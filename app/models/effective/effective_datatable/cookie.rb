@@ -20,8 +20,7 @@ module Effective
           raise 'invalid datatables cookie' unless @dt_cookie.kind_of?(Array)
 
           # Assign individual cookie
-          cookie_key = to_param
-          index = @dt_cookie.rindex { |key, _| key == cookie_key }
+          index = @dt_cookie.rindex { |key, _| key == to_param }
           @cookie = @dt_cookie.delete_at(index) if index
         end
 
