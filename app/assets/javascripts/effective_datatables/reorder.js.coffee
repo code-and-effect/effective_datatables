@@ -8,7 +8,7 @@ reorder = (event, diff, edit) ->
   return unless oldNode? && newNode?
 
   url = @context[0].ajax.url.replace('.json', '/reorder.json')
-  data = {'reorder[id]': oldNode.data('reorder-resource'), 'reorder[old]': oldNode.val(), 'reorder[new]': newNode.val(), _datatable_id: $table.attr('id'), _datatable_inline: $table.data('inline-payload') }
+  data = {'reorder[id]': oldNode.data('reorder-resource'), 'reorder[old]': oldNode.val(), 'reorder[new]': newNode.val(), attributes: $table.data('attributes') }
 
   @context[0].rowreorder.c.enable = false
 
