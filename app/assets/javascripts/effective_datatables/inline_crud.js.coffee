@@ -8,7 +8,7 @@ $(document).on 'ajax:beforeSend', '.dataTables_wrapper .col-actions', (e, xhr, s
 
   return true if ('' + $action.data('inline')) == 'false'
 
-  $params =  $.param({_datatable_id: $table.data('id'), _datatable_attributes: $table.data('attributes'), _datatable_action: true })
+  $params = $.param({_datatable_id: $table.attr('id'), _datatable_attributes: $table.data('attributes'), _datatable_action: true })
   settings.url += (if settings.url.indexOf('?') == -1 then '?' else '&') + $params
 
   if $action.closest('.effective-datatables-inline-row,table.dataTable').hasClass('effective-datatables-inline-row')
@@ -60,7 +60,7 @@ $(document).on 'ajax:error', '.dataTables_wrapper', (event) ->
 $(document).on 'ajax:beforeSend', '.dataTables_wrapper .col-inline-form', (e, xhr, settings) ->
   $table = $(e.target).closest('table')
 
-  $params = $.param({_datatable_id: $table.data('id'), _datatable_attributes: $table.data('attributes') })
+  $params = $.param({_datatable_id: $table.attr('id'), _datatable_attributes: $table.data('attributes') })
   settings.url += (if settings.url.indexOf('?') == -1 then '?' else '&') + $params
 
   true
