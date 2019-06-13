@@ -11,7 +11,7 @@ module Effective
       end
 
       def load_attributes!
-        @attributes[:_n] ||= view.controller_path.split('/')[0...-1].join('/').presence
+        @attributes[:namespace] ||= view.controller_path.split('/')[0...-1].join('/')
       end
 
     end
