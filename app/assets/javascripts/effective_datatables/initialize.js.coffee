@@ -16,8 +16,8 @@ initializeDataTables = (target) ->
           extend: 'colvis',
           postfixButtons: [
             { extend: 'colvisGroup', text: 'Show all', show: ':hidden', className: 'buttons-colvisGroup-first'},
-            { extend: 'colvisGroup', text: 'Show none', hide: ':visible'}
-            { extend: 'colvisRestore', text: 'Show default'}
+            { extend: 'colvisGroup', text: 'Show none', hide: ':visible' },
+            { extend: 'colvisGroup', text: 'Show default', hide: ':not(.colvis-default)', show: '.colvis-default' }
           ]
         },
         {

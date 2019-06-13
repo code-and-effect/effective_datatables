@@ -106,7 +106,12 @@ module Effective
             opts[:partial] ||= '/effective/datatables/resource_column'
           end
 
-          opts[:col_class] = "col-#{opts[:as]} col-#{name.to_s.parameterize} #{opts[:col_class]}".strip
+          opts[:col_class] = [
+            "col-#{opts[:as]}",
+            "col-#{name.to_s.parameterize}",
+            ("colvis-default" if opts[:visible]),
+            opts[:col_class].presence
+          ].compact.join(' ')
         end
       end
 
