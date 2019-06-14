@@ -34,7 +34,7 @@ module Effective
           name = name.to_sym unless name.to_s.include?('.')
 
           datatable._columns[name] = Effective::DatatableColumn.new(
-            action: action,  # resource columns only
+            action: action,
             as: as,
             compute: nil,
             col_class: col_class,
@@ -62,7 +62,7 @@ module Effective
           name = name.to_sym unless name.to_s.include?('.')
 
           datatable._columns[name] = Effective::DatatableColumn.new(
-            action: action, # Resource columns only
+            action: action,
             as: as,
             compute: (compute if block_given?),
             col_class: col_class,

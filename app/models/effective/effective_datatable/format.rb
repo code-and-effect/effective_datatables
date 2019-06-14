@@ -143,8 +143,12 @@ module Effective
         return {} unless (resource = opts[:resource]).present?
 
         polymorphic = (opts[:as] == :belongs_to_polymorphic)
+        associated = resource.macros.include?(opts[:as])
 
-        locals = { name: opts[:name], effective_resource: resource, show_action: false, edit_action: false }
+        resource_name = opts[:name] if associated 
+        resource_to_s = opts[:name] unless associated || array_collection?
+
+        locals = { resource_name: resource_name, resource_to_s: resource_to_s, effective_resource: resource, show_action: false, edit_action: false }
 
         case opts[:action]
         when :edit

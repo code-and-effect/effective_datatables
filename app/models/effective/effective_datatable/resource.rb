@@ -102,6 +102,10 @@ module Effective
           opts[:as] ||= :string
           opts[:as] = :email if (opts[:as] == :string && name.to_s.end_with?('email'))
 
+          if opts[:action]
+            opts[:resource] ||= resource
+          end
+
           if opts[:resource] && !opts[:resource_field] && opts[:as] != :effective_addresses
             opts[:partial] ||= '/effective/datatables/resource_column'
           end

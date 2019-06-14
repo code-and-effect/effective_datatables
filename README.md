@@ -466,7 +466,7 @@ It accepts one optional block used to format the value after any search or sorti
 The following options are available:
 
 ```ruby
-action: :show|:edit|false  # :resource and relation columns only. generate links to this action. edit -> show by default
+action: :show|:edit|false  # Render as a link to this action. edit -> show by default
 as: :string|:integer|etc   # Sets the type of column initializing defaults for search, sort and format
 col_class: 'col-green'     # Sets the html class to use on this column's td and th
 label: 'My label'          # The label for this column
