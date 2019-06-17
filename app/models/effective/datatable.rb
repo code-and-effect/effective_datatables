@@ -15,6 +15,8 @@ module Effective
 
     # The collection itself. Only evaluated once.
     attr_accessor :_collection
+    attr_accessor :_collection_apply_belongs_to
+    attr_accessor :_collection_apply_scope
 
     # The view
     attr_reader :view

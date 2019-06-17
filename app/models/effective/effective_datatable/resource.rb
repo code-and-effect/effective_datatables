@@ -180,12 +180,20 @@ module Effective
           next unless columns[associated]
 
           if columns[associated][:as] == :belongs_to
-            @_collection = @_collection.where(attribute => value)
+            if @_collection_apply_belongs_to && !@_collection.where_values_hash.include?(attribute)
+              @_collection = @_collection.where(attribute => value) 
+            end
+
             columns.delete(associated)
           elsif columns[associated][:as] == :belongs_to_polymorphic
             associated_type = attributes["#{associated}_type".to_sym] || raise("Expected #{associated}_type attribute to be present when #{associated}_id is present on a polymorphic belongs to")
 
-            @_collection = @_collection.where(attribute => value).where("#{associated}_type" => associated_type)
+            if @_collection_apply_belongs_to 
+              if !@_collection.where_values_hash.include?(attribute) && !@_collection.where_values_hash.include?("#{associated}_type")
+                @_collection = @_collection.where(attribute => value).where("#{associated}_type" => associated_type)
+              end
+            end
+            
             columns.delete(associated)
           end
 

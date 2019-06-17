@@ -14,7 +14,7 @@ module Effective
         @total_records = (active_record_collection? ? column_tool.size(col) : value_tool.size(col))
 
         # Apply scope
-        col = column_tool.scope(col)
+        col = column_tool.scope(col) if @_collection_apply_scope
 
         # Apply column searching
         col = column_tool.search(col)
