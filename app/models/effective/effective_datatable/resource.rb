@@ -27,8 +27,8 @@ module Effective
       end
 
       def load_effective_resource!
-        @resource = if active_record_array_collection? && collection.present?
-          Effective::Resource.new(collection.first.class, namespace: controller_namespace)
+        @effective_resource = if active_record_array_collection? && collection.present?
+          #Effective::Resource.new('', namespace: controller_namespace)
         else
           Effective::Resource.new(collection_class, namespace: controller_namespace)
         end
@@ -44,8 +44,8 @@ module Effective
 
             (associated, field) = name.split('.').first(2)
 
-            unless resource.macros.include?(resource.sql_type(associated))
-              raise "invalid datatables column '#{name}'. unable to find '#{name.split('.').first}' association on '#{resource}'."
+            unless effective_resource.macros.include?(effective_resource.sql_type(associated))
+              raise "invalid datatables column '#{name}'. unable to find '#{name.split('.').first}' association on '#{effective_resource}'."
             end
 
             joins_values = (collection.joins_values + collection.left_outer_joins_values)
@@ -54,7 +54,7 @@ module Effective
               raise "your datatables collection must .joins(:#{associated}) or .left_outer_joins(:#{associated}) to work with the joined syntax"
             end
 
-            opts[:resource] = Effective::Resource.new(resource.associated(associated), namespace: controller_namespace)
+            opts[:resource] = Effective::Resource.new(effective_resource.associated(associated), namespace: controller_namespace)
 
             if opts[:resource].column(field)
               opts[:as] ||= opts[:resource].sql_type(field)
@@ -71,12 +71,12 @@ module Effective
           end
 
           # Regular fields
-          opts[:as] ||= resource.sql_type(name)
-          opts[:sql_column] = resource.sql_column(name) if opts[:sql_column].nil?
+          opts[:as] ||= effective_resource.sql_type(name)
+          opts[:sql_column] = effective_resource.sql_column(name) if opts[:sql_column].nil?
 
           case opts[:as]
-          when *resource.macros
-            opts[:resource] ||= Effective::Resource.new(resource.associated(name), namespace: controller_namespace)
+          when *effective_resource.macros
+            opts[:resource] ||= Effective::Resource.new(effective_resource.associated(name), namespace: controller_namespace)
             opts[:sql_column] = name if opts[:sql_column].nil?
           when Class
             if opts[:as].ancestors.include?(ActiveRecord::Base)
@@ -85,13 +85,13 @@ module Effective
               opts[:sql_column] = name if opts[:sql_column].nil?
             end
           when :effective_addresses
-            opts[:resource] = Effective::Resource.new(resource.associated(name), namespace: controller_namespace)
+            opts[:resource] = Effective::Resource.new(effective_resource.associated(name), namespace: controller_namespace)
             opts[:sql_column] = :effective_addresses
           when :effective_roles
             opts[:sql_column] = :effective_roles
           when :string  # This is the fallback
             # Anything that doesn't belong to the model or the sql table, we assume is a SELECT SUM|AVG|RANK() as fancy
-            opts[:sql_as_column] = true if (resource.table && resource.column(name).blank?)
+            opts[:sql_as_column] = true if (effective_resource.table && effective_resource.column(name).blank?)
           end
 
           if opts[:sql_column].present? && AGGREGATE_SQL_FUNCTIONS.any? { |str| opts[:sql_column].to_s.start_with?(str) }
@@ -128,7 +128,7 @@ module Effective
           opts[:as] = :email if (opts[:as] == :string && name.to_s.end_with?('email'))
 
           if opts[:action]
-            opts[:resource] ||= resource
+            opts[:resource] ||= effective_resource
           end
 
           if opts[:resource] && !opts[:resource_field] && opts[:as] != :effective_addresses
@@ -178,12 +178,13 @@ module Effective
 
           search[:fuzzy] = true unless search.key?(:fuzzy)
 
-          if array_collection? && opts[:resource].present?
-            search.reverse_merge!(resource.search_form_field(name, collection.first[opts[:index]]))
-          elsif search[:as] == :select && search.key?(:collection)
+          if search[:as] == :select && search.key?(:collection)
             # No Action
+          elsif array_collection? && opts[:resource].present?
+            search.reverse_merge!(opts[:resource].search_form_field(name, collection.first[opts[:index]]))
           elsif search[:as] != :string
-            search.reverse_merge!(resource.search_form_field(name, opts[:as]))
+            search_resource = opts[:resource] || effective_resource || Effective::Resource.new('', namespace: controller_namespace)
+            search.reverse_merge!(search_resource.search_form_field(name, opts[:as]))
           end
 
           # Assign default include_null

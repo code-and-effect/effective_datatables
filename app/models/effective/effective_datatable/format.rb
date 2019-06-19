@@ -33,15 +33,15 @@ module Effective
             atts = {
               actions: actions_col_actions(opts), 
               btn_class: opts[:btn_class] ,
-              effective_resource: resource, 
+              effective_resource: effective_resource, 
               locals: locals, 
               partial: opts[:actions_partial],
-            }.merge(opts[:actions])
+            }.compact.merge(opts[:actions])
 
             if active_record_polymorphic_array_collection?
               rendered[name] = resources.map do |resource| 
-                effective_resource = Effective::Resource.new(resource.class, namespace: controller_namespace)
-                view.render_resource_actions(resource, atts.merge(effective_resource: effective_resource), &opts[:format])
+                resource_effective_resource = Effective::Resource.new(resource.class, namespace: controller_namespace)
+                view.render_resource_actions(resource, atts.merge(effective_resource: resource_effective_resource), &opts[:format])
               end
             else
               rendered[name] = (view.render_resource_actions(resources, atts, &opts[:format]) || '').split(SPACER)
@@ -127,10 +127,12 @@ module Effective
       # Applies data-remote to anything that's data-method post or delete
       # Merges in any extra attributes when passed as a Hash
       def actions_col_actions(column)
+        return unless effective_resource.present?
+
         actions = if column[:inline]
-          resource.resource_actions.transform_values { |opts| opts['data-remote'] = true; opts }
+          effective_resource.resource_actions.transform_values { |opts| opts['data-remote'] = true; opts }
         else
-          resource.resource_actions.transform_values { |opts| opts['data-remote'] = true if opts['data-method']; opts }
+          effective_resource.resource_actions.transform_values { |opts| opts['data-remote'] = true if opts['data-method']; opts }
         end
 
         # Merge local options. Special behaviour for remote: false
@@ -152,26 +154,26 @@ module Effective
       end
 
       def resource_col_locals(opts)
-        return {} unless (resource = opts[:resource]).present?
+        return {} unless (effective_resource = opts[:resource]).present?
 
         polymorphic = (opts[:as] == :belongs_to_polymorphic)
-        associated = resource.macros.include?(opts[:as])
+        associated = effective_resource.macros.include?(opts[:as])
 
         resource_name = opts[:name] if associated 
         resource_to_s = opts[:name] unless associated || array_collection?
 
-        locals = { resource_name: resource_name, resource_to_s: resource_to_s, effective_resource: resource, show_action: false, edit_action: false }
+        locals = { resource_name: resource_name, resource_to_s: resource_to_s, effective_resource: effective_resource, show_action: false, edit_action: false }
 
         case opts[:action]
         when :edit
-          locals[:edit_action] = (resource.routes[:edit].present? || polymorphic)
+          locals[:edit_action] = (effective_resource.routes[:edit].present? || polymorphic)
         when :show
-          locals[:show_action] = (resource.routes[:show].present? || polymorphic)
+          locals[:show_action] = (effective_resource.routes[:show].present? || polymorphic)
         when false
           # Nothing. Already false.
         else
-          locals[:edit_action] = (resource.routes[:edit].present? || polymorphic)
-          locals[:show_action] = (resource.routes[:show].present? || polymorphic)
+          locals[:edit_action] = (effective_resource.routes[:edit].present? || polymorphic)
+          locals[:show_action] = (effective_resource.routes[:show].present? || polymorphic)
         end
 
         locals

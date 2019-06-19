@@ -1,7 +1,7 @@
 module Effective
   class Datatable
     attr_reader :attributes # Anything that we initialize our table with. That's it. Can't be changed by state.
-    attr_reader :resource
+    attr_reader :effective_resource
     attr_reader :state
 
     # Hashes of DSL options
@@ -162,6 +162,10 @@ module Effective
       @dsl_tool ||= DatatableDslTool.new(self)
     end
 
+    def resource
+      raise('depecated. Please use .effective_resource instead')
+    end
+
     private
 
     def column_tool
@@ -174,8 +178,8 @@ module Effective
 
     def validate_datatable!
       if reorder?
-        raise 'cannot use reorder with an Array collection' if array_collection?
-        raise 'cannot use reorder with a non-Integer column' if resource.sql_type(columns[:_reorder][:reorder]) != :integer
+        raise 'cannot use reorder with an Array collection' unless active_record_collection?
+        raise 'cannot use reorder with a non-Integer column' if effective_resource.sql_type(columns[:_reorder][:reorder]) != :integer
       end
     end
 
