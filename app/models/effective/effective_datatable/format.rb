@@ -38,13 +38,13 @@ module Effective
               partial: opts[:actions_partial],
             }.compact.merge(opts[:actions])
 
-            if active_record_polymorphic_array_collection?
-              rendered[name] = resources.map do |resource| 
+            rendered[name] = if active_record_polymorphic_array_collection?
+              resources.map do |resource| 
                 polymorphic_resource = Effective::Resource.new(resource, namespace: controller_namespace)
-                view.render_resource_actions(resource, atts.merge(effective_resource: polymorphic_resource), &opts[:format])
+                (view.render_resource_actions(resource, atts.merge(effective_resource: polymorphic_resource), &opts[:format]) || '')
               end
             else
-              rendered[name] = (view.render_resource_actions(resources, atts, &opts[:format]) || '').split(SPACER)
+              (view.render_resource_actions(resources, atts, &opts[:format]) || '').split(SPACER)
             end
           end
         end
@@ -153,26 +153,32 @@ module Effective
       end
 
       def resource_col_locals(opts)
-        return {} unless (effective_resource = opts[:resource]).present?
+        return {} unless (associated_resource = opts[:resource]).present?
 
+        associated = associated_resource.macros.include?(opts[:as])
         polymorphic = (opts[:as] == :belongs_to_polymorphic)
-        associated = effective_resource.macros.include?(opts[:as])
 
         resource_name = opts[:name] if associated 
         resource_to_s = opts[:name] unless associated || array_collection?
 
-        locals = { resource_name: resource_name, resource_to_s: resource_to_s, effective_resource: effective_resource, show_action: false, edit_action: false }
+        locals = { 
+          resource_name: resource_name, 
+          resource_to_s: resource_to_s, 
+          effective_resource: associated_resource, 
+          show_action: false, 
+          edit_action: false 
+        }
 
         case opts[:action]
         when :edit
-          locals[:edit_action] = (effective_resource.routes[:edit].present? || polymorphic)
+          locals[:edit_action] = (polymorphic || associated_resource.routes[:edit].present?)
         when :show
-          locals[:show_action] = (effective_resource.routes[:show].present? || polymorphic)
+          locals[:show_action] = (polymorphic || associated_resource.routes[:show].present?)
         when false
           # Nothing. Already false.
         else
-          locals[:edit_action] = (effective_resource.routes[:edit].present? || polymorphic)
-          locals[:show_action] = (effective_resource.routes[:show].present? || polymorphic)
+          locals[:edit_action] = (polymorphic || associated_resource.routes[:edit].present?)
+          locals[:show_action] = (polymorphic || associated_resource.routes[:show].present?)
         end
 
         locals
