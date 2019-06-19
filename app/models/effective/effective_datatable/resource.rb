@@ -11,6 +11,10 @@ module Effective
         @attributes[:namespace]
       end
 
+      def associated_resource_macros 
+        [:belongs_to, :belongs_to_polymorphic, :has_many, :has_and_belongs_to_many, :has_one]
+      end
+
       private
 
       # This looks at all the columns and figures out the as:
@@ -44,7 +48,7 @@ module Effective
 
             (associated, field) = name.split('.').first(2)
 
-            unless effective_resource.macros.include?(effective_resource.sql_type(associated))
+            unless associated_resource_macros.include?(effective_resource.sql_type(associated))
               raise "invalid datatables column '#{name}'. unable to find '#{name.split('.').first}' association on '#{effective_resource}'."
             end
 
@@ -75,7 +79,7 @@ module Effective
           opts[:sql_column] = effective_resource.sql_column(name) if opts[:sql_column].nil?
 
           case opts[:as]
-          when *effective_resource.macros
+          when *associated_resource_macros
             opts[:resource] ||= Effective::Resource.new(effective_resource.associated(name), namespace: controller_namespace)
             opts[:sql_column] = name if opts[:sql_column].nil?
           when Class

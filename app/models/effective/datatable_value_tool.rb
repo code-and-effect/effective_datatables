@@ -77,7 +77,6 @@ module Effective
     def search_column(collection, value, column, index)
       Rails.logger.info "VALUE TOOL: search_column #{column.to_s} #{value} #{index}" if EffectiveDatatables.debug
 
-      macros = Effective::Resource.new('').macros
       fuzzy = column[:search][:fuzzy]
 
       term = Effective::Attribute.new(column[:as]).parse(value, name: column[:name])
@@ -134,7 +133,7 @@ module Effective
           else
             obj == term
           end
-        when *macros, :resource
+        when *datatable.associated_resource_macros, :resource
           Array(obj).any? do |resource|
             Array(term).any? do |term|
               matched = false
