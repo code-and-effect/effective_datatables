@@ -16,7 +16,7 @@ module Effective
           next unless state[:visible][name]
 
           if opts[:partial]
-            locals = { datatable: self, column: columns[name] }.merge(resource_col_locals(opts))
+            locals = { datatable: self, column: opts }.merge(resource_col_locals(opts))
 
             rendered[name] = (view.render(
               partial: opts[:partial],
@@ -32,7 +32,7 @@ module Effective
 
             atts = {
               actions: actions_col_actions(opts), 
-              btn_class: opts[:btn_class] ,
+              btn_class: opts[:btn_class],
               effective_resource: effective_resource, 
               locals: locals, 
               partial: opts[:actions_partial],
@@ -47,7 +47,6 @@ module Effective
               rendered[name] = (view.render_resource_actions(resources, atts, &opts[:format]) || '').split(SPACER)
             end
           end
-
         end
 
         collection.each_with_index do |row, row_index|
@@ -127,12 +126,12 @@ module Effective
       # Applies data-remote to anything that's data-method post or delete
       # Merges in any extra attributes when passed as a Hash
       def actions_col_actions(column)
-        return unless effective_resource.present?
+        resource_actions = (effective_resource&.resource_actions || fallback_effective_resource.fallback_resource_actions)
 
         actions = if column[:inline]
-          effective_resource.resource_actions.transform_values { |opts| opts['data-remote'] = true; opts }
+          resource_actions.transform_values { |opts| opts['data-remote'] = true; opts }
         else
-          effective_resource.resource_actions.transform_values { |opts| opts['data-remote'] = true if opts['data-method']; opts }
+          resource_actions.transform_values { |opts| opts['data-remote'] = true if opts['data-method']; opts }
         end
 
         # Merge local options. Special behaviour for remote: false

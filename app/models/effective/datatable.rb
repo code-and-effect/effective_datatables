@@ -168,6 +168,10 @@ module Effective
 
     private
 
+    def fallback_effective_resource
+      @fallback_effective_resource ||= Effective::Resource.new('', namespace: controller_namespace)
+    end
+
     def column_tool
       @column_tool ||= DatatableColumnTool.new(self)
     end

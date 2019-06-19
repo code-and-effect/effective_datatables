@@ -31,9 +31,7 @@ module Effective
       end
 
       def load_effective_resource!
-        @effective_resource = if active_record_array_collection? && collection.present?
-          #Effective::Resource.new('', namespace: controller_namespace)
-        else
+        @effective_resource = if active_record_collection?
           Effective::Resource.new(collection_class, namespace: controller_namespace)
         end
       end
@@ -187,7 +185,7 @@ module Effective
           elsif array_collection? && opts[:resource].present?
             search.reverse_merge!(opts[:resource].search_form_field(name, collection.first[opts[:index]]))
           elsif search[:as] != :string
-            search_resource = opts[:resource] || effective_resource || Effective::Resource.new('', namespace: controller_namespace)
+            search_resource = (opts[:resource] || effective_resource || fallback_effective_resource)
             search.reverse_merge!(search_resource.search_form_field(name, opts[:as]))
           end
 
