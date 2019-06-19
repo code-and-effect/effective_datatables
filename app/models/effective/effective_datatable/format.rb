@@ -40,8 +40,8 @@ module Effective
 
             if active_record_polymorphic_array_collection?
               rendered[name] = resources.map do |resource| 
-                resource_effective_resource = Effective::Resource.new(resource.class, namespace: controller_namespace)
-                view.render_resource_actions(resource, atts.merge(effective_resource: resource_effective_resource), &opts[:format])
+                polymorphic_resource = Effective::Resource.new(resource, namespace: controller_namespace)
+                view.render_resource_actions(resource, atts.merge(effective_resource: polymorphic_resource), &opts[:format])
               end
             else
               rendered[name] = (view.render_resource_actions(resources, atts, &opts[:format]) || '').split(SPACER)
