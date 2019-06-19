@@ -64,11 +64,15 @@ module Effective
             if state[:visible][name] == false && (name != order_name)  # Sort by invisible array column
               BLANK
             elsif opts[:compute]
-              dsl_tool.instance_exec(obj, (active_record_collection? ? collection : obj[opts[:index]]), &opts[:compute])
+              if array_collection?
+                dsl_tool.instance_exec(obj, obj[opts[:index]], &opts[:compute])
+              else
+                dsl_tool.instance_exec(obj, collection, &opts[:compute])
+              end
             elsif (opts[:partial] || opts[:format])
-              active_record_collection? ? obj : obj[opts[:index]]
+              array_collection? ? obj[opts[:index]] : obj
             elsif opts[:resource]
-              resource = active_record_collection? ? obj : obj[opts[:index]]
+              resource = array_collection? ? obj[opts[:index]] : obj
 
               if opts[:resource_field]
                 (associated, field) = name.to_s.split('.').first(2)

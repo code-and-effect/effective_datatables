@@ -29,9 +29,23 @@ module Effective
           elsif opts[:as] == :actions # This is actions_col and actions_col do .. end, but not actions_col partial: 'something'
             resources = collection.map { |row| row[opts[:index]] }
             locals = { datatable: self, column: opts, spacer_template: SPACER_TEMPLATE }
-            atts = { actions: actions_col_actions(opts), effective_resource: resource, locals: locals, partial: opts[:actions_partial], btn_class: opts[:btn_class] }.merge(opts[:actions])
 
-            rendered[name] = (view.render_resource_actions(resources, atts, &opts[:format]) || '').split(SPACER)
+            atts = {
+              actions: actions_col_actions(opts), 
+              btn_class: opts[:btn_class] ,
+              effective_resource: resource, 
+              locals: locals, 
+              partial: opts[:actions_partial],
+            }.merge(opts[:actions])
+
+            if active_record_polymorphic_array_collection?
+              rendered[name] = resources.map do |resource| 
+                effective_resource = Effective::Resource.new(resource.class, namespace: controller_namespace)
+                view.render_resource_actions(resource, atts.merge(effective_resource: effective_resource), &opts[:format])
+              end
+            else
+              rendered[name] = (view.render_resource_actions(resources, atts, &opts[:format]) || '').split(SPACER)
+            end
           end
 
         end
@@ -69,9 +83,7 @@ module Effective
 
         case column[:as]
         when :actions
-          atts = { actions: actions_col_actions(column), effective_resource: resource, partial: column[:actions_partial] }.merge(column[:actions])
-
-          (view.render_resource_actions(value, atts) || '')
+          raise("please use actions_col instead of col(#{name}, as: :actions)")
         when :boolean
           view.t("effective_datatables.boolean_#{value}")
         when :currency

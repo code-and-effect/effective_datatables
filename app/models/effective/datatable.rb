@@ -64,7 +64,6 @@ module Effective
       # This means filters do know about attributes but not about columns.
       initialize_filters if respond_to?(:initialize_filters)
       load_filters!
-
       load_state!
 
       # Bulk actions called first so it can add the bulk_actions_col first
@@ -83,8 +82,6 @@ module Effective
 
       # Figure out the class, and if it's activerecord, do all the resource discovery on it
       load_resource!
-      apply_belongs_to_attributes!
-      load_resource_search!
 
       # Check everything is okay
       validate_datatable!

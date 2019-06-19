@@ -15,89 +15,114 @@ module Effective
 
       # This looks at all the columns and figures out the as:
       def load_resource!
-        @resource = Effective::Resource.new(collection_class, namespace: controller_namespace)
+        load_effective_resource!
 
-        if active_record_collection?
-          columns.each do |name, opts|
+        load_active_record_collection!
+        load_active_record_array_collection!
+        load_array_collection!
 
-            # col 'comments.title'
-            if name.kind_of?(String) && name.include?('.')
-              raise "invalid datatables column '#{name}'. the joined syntax only supports one dot." if name.scan(/\./).count > 1
+        load_resource_columns!
+        load_resource_belongs_tos!
+        load_resource_search!
+      end
 
-              (associated, field) = name.split('.').first(2)
-
-              unless resource.macros.include?(resource.sql_type(associated))
-                raise "invalid datatables column '#{name}'. unable to find '#{name.split('.').first}' association on '#{resource}'."
-              end
-
-              joins_values = (collection.joins_values + collection.left_outer_joins_values)
-
-              unless joins_values.include?(associated.to_sym)
-                raise "your datatables collection must .joins(:#{associated}) or .left_outer_joins(:#{associated}) to work with the joined syntax"
-              end
-
-              opts[:resource] = Effective::Resource.new(resource.associated(associated), namespace: controller_namespace)
-
-              if opts[:resource].column(field)
-                opts[:as] ||= opts[:resource].sql_type(field)
-                opts[:as] = :integer if opts[:resource].sql_type(field) == :belongs_to && field.end_with?('_id')
-                opts[:sql_column] = opts[:resource].sql_column(field) if opts[:sql_column].nil?
-
-                opts[:resource].sort_column = field
-                opts[:resource].search_columns = field
-              end
-
-              opts[:resource_field] = field
-
-              next
-            end
-
-            # Regular fields
-            opts[:as] ||= resource.sql_type(name)
-            opts[:sql_column] = resource.sql_column(name) if opts[:sql_column].nil?
-
-            case opts[:as]
-            when *resource.macros
-              opts[:resource] ||= Effective::Resource.new(resource.associated(name), namespace: controller_namespace)
-              opts[:sql_column] = name if opts[:sql_column].nil?
-            when Class
-              if opts[:as].ancestors.include?(ActiveRecord::Base)
-                opts[:resource] = Effective::Resource.new(opts[:as], namespace: controller_namespace)
-                opts[:as] = :resource
-                opts[:sql_column] = name if opts[:sql_column].nil?
-              end
-            when :effective_addresses
-              opts[:resource] = Effective::Resource.new(resource.associated(name), namespace: controller_namespace)
-              opts[:sql_column] = :effective_addresses
-            when :effective_roles
-              opts[:sql_column] = :effective_roles
-            when :string  # This is the fallback
-              # Anything that doesn't belong to the model or the sql table, we assume is a SELECT SUM|AVG|RANK() as fancy
-              opts[:sql_as_column] = true if (resource.table && resource.column(name).blank?)
-            end
-
-            if opts[:sql_column].present? && AGGREGATE_SQL_FUNCTIONS.any? { |str| opts[:sql_column].to_s.start_with?(str) }
-              opts[:sql_as_column] = true
-            end
-          end
+      def load_effective_resource!
+        @resource = if active_record_array_collection? && collection.present?
+          Effective::Resource.new(collection.first.class, namespace: controller_namespace)
+        else
+          Effective::Resource.new(collection_class, namespace: controller_namespace)
         end
+      end
 
-        if array_collection?
-          row = collection.first
+      def load_active_record_collection!
+        return unless active_record_collection?
 
-          columns.each do |name, opts|
-            if opts[:as].kind_of?(Class) && opts[:as].ancestors.include?(ActiveRecord::Base)
+        columns.each do |name, opts|
+          # col 'comments.title'
+          if name.kind_of?(String) && name.include?('.')
+            raise "invalid datatables column '#{name}'. the joined syntax only supports one dot." if name.scan(/\./).count > 1
+
+            (associated, field) = name.split('.').first(2)
+
+            unless resource.macros.include?(resource.sql_type(associated))
+              raise "invalid datatables column '#{name}'. unable to find '#{name.split('.').first}' association on '#{resource}'."
+            end
+
+            joins_values = (collection.joins_values + collection.left_outer_joins_values)
+
+            unless joins_values.include?(associated.to_sym)
+              raise "your datatables collection must .joins(:#{associated}) or .left_outer_joins(:#{associated}) to work with the joined syntax"
+            end
+
+            opts[:resource] = Effective::Resource.new(resource.associated(associated), namespace: controller_namespace)
+
+            if opts[:resource].column(field)
+              opts[:as] ||= opts[:resource].sql_type(field)
+              opts[:as] = :integer if opts[:resource].sql_type(field) == :belongs_to && field.end_with?('_id')
+              opts[:sql_column] = opts[:resource].sql_column(field) if opts[:sql_column].nil?
+
+              opts[:resource].sort_column = field
+              opts[:resource].search_columns = field
+            end
+
+            opts[:resource_field] = field
+
+            next
+          end
+
+          # Regular fields
+          opts[:as] ||= resource.sql_type(name)
+          opts[:sql_column] = resource.sql_column(name) if opts[:sql_column].nil?
+
+          case opts[:as]
+          when *resource.macros
+            opts[:resource] ||= Effective::Resource.new(resource.associated(name), namespace: controller_namespace)
+            opts[:sql_column] = name if opts[:sql_column].nil?
+          when Class
+            if opts[:as].ancestors.include?(ActiveRecord::Base)
               opts[:resource] = Effective::Resource.new(opts[:as], namespace: controller_namespace)
               opts[:as] = :resource
-            elsif opts[:as] == nil && row.present?
-              if (value = Array(row[opts[:index]]).first).kind_of?(ActiveRecord::Base)
-                opts[:resource] = Effective::Resource.new(value, namespace: controller_namespace)
-                opts[:as] = :resource
-              end
+              opts[:sql_column] = name if opts[:sql_column].nil?
+            end
+          when :effective_addresses
+            opts[:resource] = Effective::Resource.new(resource.associated(name), namespace: controller_namespace)
+            opts[:sql_column] = :effective_addresses
+          when :effective_roles
+            opts[:sql_column] = :effective_roles
+          when :string  # This is the fallback
+            # Anything that doesn't belong to the model or the sql table, we assume is a SELECT SUM|AVG|RANK() as fancy
+            opts[:sql_as_column] = true if (resource.table && resource.column(name).blank?)
+          end
+
+          if opts[:sql_column].present? && AGGREGATE_SQL_FUNCTIONS.any? { |str| opts[:sql_column].to_s.start_with?(str) }
+            opts[:sql_as_column] = true
+          end
+        end
+      end
+
+      def load_active_record_array_collection!
+        return unless active_record_array_collection?
+      end
+
+      def load_array_collection!
+        return unless array_collection?
+
+        row = collection.first
+
+        columns.each do |name, opts|
+          if opts[:as].kind_of?(Class) && opts[:as].ancestors.include?(ActiveRecord::Base)
+            opts[:resource] = Effective::Resource.new(opts[:as], namespace: controller_namespace)
+            opts[:as] = :resource
+          elsif opts[:as] == nil && row.present?
+            if (value = Array(row[opts[:index]]).first).kind_of?(ActiveRecord::Base)
+              opts[:resource] = Effective::Resource.new(value, namespace: controller_namespace)
+              opts[:as] = :resource
             end
           end
         end
+      end
 
+      def load_resource_columns!
         columns.each do |name, opts|
           opts[:as] ||= :string
           opts[:as] = :email if (opts[:as] == :string && name.to_s.end_with?('email'))
@@ -113,7 +138,7 @@ module Effective
           opts[:col_class] = [
             "col-#{opts[:as]}",
             "col-#{name.to_s.parameterize}",
-            ("colvis-default" if opts[:visible]),
+            ('colvis-default' if opts[:visible]),
             opts[:col_class].presence
           ].compact.join(' ')
         end
@@ -168,7 +193,7 @@ module Effective
         end
       end
 
-      def apply_belongs_to_attributes!
+      def load_resource_belongs_tos!
         return unless active_record_collection?
 
         changed = attributes.select do |attribute, value|
