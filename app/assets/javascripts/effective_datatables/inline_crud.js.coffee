@@ -38,7 +38,6 @@ $(document).on 'ajax:success', '.dataTables_wrapper .col-actions', (event, data)
   EffectiveForm.remote_form_payload = ''
   EffectiveForm.remote_form_commit = ''
   EffectiveForm.remote_form_flash = ''
-  EffectiveForm.remote_form_refresh_datatables = ''
 
   true
 
@@ -53,7 +52,6 @@ $(document).on 'ajax:error', '.dataTables_wrapper', (event) ->
   EffectiveForm.remote_form_payload = ''
   EffectiveForm.remote_form_commit = ''
   EffectiveForm.remote_form_flash = ''
-  EffectiveForm.remote_form_refresh_datatables = ''
   true
 
 # Submitting an inline datatables form
@@ -84,7 +82,6 @@ $(document).on 'effective-form:success', '.dataTables_wrapper .col-inline-form',
     $tr.fadeOut('slow')
 
   $table.DataTable().draw()
-  refreshDatatables($table)
 
 beforeNew = ($action) ->
   $table = $action.closest('table')
@@ -150,9 +147,7 @@ afterAction = ($action) ->
   else
     $table.DataTable().flash('Successfully ' + $action.attr('title'), 'success')
 
-  unless redirectDatatables($table)
-    $table.DataTable().draw()
-    refreshDatatables($table)
+  $table.DataTable().draw()
 
 afterError = ($action) ->
   $table = $action.closest('table')
@@ -185,28 +180,6 @@ cancel = ($table) ->
   $wrapper = $table.closest('.dataTables_wrapper')
   if $wrapper.find('.effective-datatables-inline-row').length == 0
     $wrapper.removeClass('effective-datatables-inline-expanded')
-
-redirectDatatables = ($source) ->
-  return false unless EffectiveForm.remote_form_refresh_datatables.length > 0
-
-  if EffectiveForm.remote_form_refresh_datatables.includes('refresh')
-    if Turbolinks?
-      Turbolinks.visit(window.location.href, { action: 'replace'})
-    else
-      window.location.reload()
-
-    return true
-
-  false
-
-refreshDatatables = ($source) ->
-  return unless EffectiveForm.remote_form_refresh_datatables.length > 0
-
-  $('table.dataTable.initialized').each ->
-    $table = $(this)
-
-    if EffectiveForm.remote_form_refresh_datatables.find((id) -> $table.attr('id').startsWith(id) || id == 'all')
-      $table.DataTable().draw() if $table != $source
 
 # Cancel button clicked. Blow away new tr, or restore edit tr
 # No data will have changed at this point
