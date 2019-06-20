@@ -39,12 +39,24 @@ module EffectiveDatatablesPrivateHelper
   end
 
   def datatable_new_resource_button(datatable, name, column)
-    return unless column[:inline] && (column[:actions][:new] != false) 
-    return unless datatable.active_record_collection?
-    return unless (datatable.effective_resource.actions.include?(:new) rescue false)
+    return unless column[:inline] && (column[:actions][:new] != false)
 
-    actions = {t('effective_datatables.new') => { action: :new, class: ['btn', column[:btn_class].presence].compact.join(' '), 'data-remote': true } }
-    render_resource_actions(datatable.effective_resource.klass, actions: actions, effective_resource: datatable.effective_resource) # Will only work if permitted
+    action = { action: :new, class: ['btn', column[:btn_class].presence].compact.join(' '), 'data-remote': true }
+
+    if column[:actions][:new].kind_of?(Hash) # This might be active_record_array_collection?
+      action = action.merge(column[:actions][:new])
+
+      effective_resource = (datatable.effective_resource || datatable.fallback_effective_resource)
+      klass = (column[:actions][:new][:klass] || effective_resource&.klass || datatable.collection_class)
+    elsif Array(datatable.effective_resource&.actions).include?(:new)
+      effective_resource = datatable.effective_resource
+      klass = effective_resource.klass
+    else
+      return
+    end
+
+    # Will only work if permitted
+    render_resource_actions(klass, actions: { t('effective_datatables.new') => action }, effective_resource: effective_resource)
   end
 
   def datatable_label_tag(datatable, name, opts)

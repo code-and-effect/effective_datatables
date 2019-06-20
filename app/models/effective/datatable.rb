@@ -166,11 +166,11 @@ module Effective
       raise('depecated. Please use .effective_resource instead')
     end
 
-    private
-
     def fallback_effective_resource
       @fallback_effective_resource ||= Effective::Resource.new('', namespace: controller_namespace)
     end
+
+    private
 
     def column_tool
       @column_tool ||= DatatableColumnTool.new(self)
