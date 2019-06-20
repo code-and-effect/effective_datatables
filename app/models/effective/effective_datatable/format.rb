@@ -31,15 +31,15 @@ module Effective
             locals = { datatable: self, column: opts, spacer_template: SPACER_TEMPLATE }
 
             atts = {
-              actions: actions_col_actions(opts), 
+              actions: actions_col_actions(opts),
               btn_class: opts[:btn_class],
-              effective_resource: effective_resource, 
-              locals: locals, 
+              effective_resource: effective_resource,
+              locals: locals,
               partial: opts[:actions_partial],
             }.compact.merge(opts[:actions])
 
-            rendered[name] = if active_record_polymorphic_array_collection?
-              resources.map do |resource| 
+            rendered[name] = if effective_resource.blank?
+              resources.map do |resource|
                 polymorphic_resource = Effective::Resource.new(resource, namespace: controller_namespace)
                 (view.render_resource_actions(resource, atts.merge(effective_resource: polymorphic_resource), &opts[:format]) || '')
               end
@@ -158,15 +158,15 @@ module Effective
         associated = associated_resource.macros.include?(opts[:as])
         polymorphic = (opts[:as] == :belongs_to_polymorphic)
 
-        resource_name = opts[:name] if associated 
+        resource_name = opts[:name] if associated
         resource_to_s = opts[:name] unless associated || array_collection?
 
-        locals = { 
-          resource_name: resource_name, 
-          resource_to_s: resource_to_s, 
-          effective_resource: associated_resource, 
-          show_action: false, 
-          edit_action: false 
+        locals = {
+          resource_name: resource_name,
+          resource_to_s: resource_to_s,
+          effective_resource: associated_resource,
+          show_action: false,
+          edit_action: false
         }
 
         case opts[:action]

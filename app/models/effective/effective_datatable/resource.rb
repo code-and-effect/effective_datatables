@@ -11,7 +11,7 @@ module Effective
         @attributes[:namespace]
       end
 
-      def association_macros 
+      def association_macros
         [:belongs_to, :belongs_to_polymorphic, :has_many, :has_and_belongs_to_many, :has_one]
       end
 
@@ -209,19 +209,19 @@ module Effective
 
           if columns[associated][:as] == :belongs_to
             if @_collection_apply_belongs_to && !@_collection.where_values_hash.include?(attribute)
-              @_collection = @_collection.where(attribute => value) 
+              @_collection = @_collection.where(attribute => value)
             end
 
             columns.delete(associated)
           elsif columns[associated][:as] == :belongs_to_polymorphic
             associated_type = attributes["#{associated}_type".to_sym] || raise("Expected #{associated}_type attribute to be present when #{associated}_id is present on a polymorphic belongs to")
 
-            if @_collection_apply_belongs_to 
+            if @_collection_apply_belongs_to
               if !@_collection.where_values_hash.include?(attribute) && !@_collection.where_values_hash.include?("#{associated}_type")
                 @_collection = @_collection.where(attribute => value).where("#{associated}_type" => associated_type)
               end
             end
-            
+
             columns.delete(associated)
           end
 
