@@ -133,7 +133,7 @@ module Effective
           else
             obj == term
           end
-        when *datatable.associated_resource_macros, :resource
+        when *datatable.association_macros, :resource
           Array(obj).any? do |resource|
             Array(term).any? do |term|
               matched = false
