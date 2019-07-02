@@ -164,28 +164,16 @@ module Effective
 
           search = opts[:search]
 
-          if search[:collection].kind_of?(ActiveRecord::Relation)
-            search[:collection] = search[:collection].map { |obj| [obj.to_s, obj.to_param] }
-          elsif search[:collection].kind_of?(Array) && search[:collection].first.kind_of?(ActiveRecord::Base)
-            search[:collection] = search[:collection].map { |obj| [obj.to_s, obj.to_param] }
-          elsif search[:collection].kind_of?(Array)
-            search[:collection].each { |obj| obj[1] = 'nil' if obj[1] == nil }
-          elsif search[:collection].kind_of?(Hash)
-            search[:collection].each { |k, v| search[:collection][k] = 'nil' if v == nil }
-          end
-
+          search[:as] ||= :select if search.key?(:collection)
+          search[:fuzzy] ||= true unless search.key?(:fuzzy)
           search[:value] ||= search.delete(:selected) if search.key?(:selected)
 
-          search[:as] ||= :select if search.key?(:collection)
+          # Merge with defaults
+          search_resource = (opts[:resource] || effective_resource || fallback_effective_resource)
 
-          search[:fuzzy] = true unless search.key?(:fuzzy)
-
-          if search[:as] == :select && search.key?(:collection)
-            # No Action
-          elsif array_collection? && opts[:resource].present?
-            search.reverse_merge!(opts[:resource].search_form_field(name, collection.first[opts[:index]]))
+          if array_collection? && opts[:resource].present?
+            search.reverse_merge!(search_resource.search_form_field(name, collection.first[opts[:index]]))
           elsif search[:as] != :string
-            search_resource = (opts[:resource] || effective_resource || fallback_effective_resource)
             search.reverse_merge!(search_resource.search_form_field(name, opts[:as]))
           end
 
