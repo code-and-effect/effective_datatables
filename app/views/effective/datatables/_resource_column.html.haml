@@ -8,4 +8,4 @@
       - elsif show_action && EffectiveDatatables.authorized?(controller, :show, resource) && (path = effective_resource.action_path(:show, resource)).present?
         = link_to resource_to_s, path, title: resource_to_s
       - else
-        = resource_to_s.html_safe
+        = resource_to_s.to_s.html_safe

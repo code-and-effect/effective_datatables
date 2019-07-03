@@ -169,7 +169,8 @@ module Effective
           search[:value] ||= search.delete(:selected) if search.key?(:selected)
 
           # Merge with defaults
-          search_resource = (opts[:resource] || effective_resource || fallback_effective_resource)
+          search_resource = [opts[:resource], effective_resource, fallback_effective_resource].compact
+          search_resource = search_resource.find { |res| res.klass.present? } || search_resource.first
 
           if array_collection? && opts[:resource].present?
             search.reverse_merge!(search_resource.search_form_field(name, collection.first[opts[:index]]))
