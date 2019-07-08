@@ -147,6 +147,11 @@ module Effective
 
             actions[existing].merge!(opts.except(:remote, 'remote'))
           end
+
+          actions = actions.sort do |(_, a), (_, b)|
+            (column[:actions].keys.index(a[:action]) || 99) <=> (column[:actions].keys.index(b[:action]) || 99)
+          end.to_h
+
         end
 
         actions
