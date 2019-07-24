@@ -164,6 +164,13 @@ module Effective
 
           search = opts[:search]
 
+          # Parameterize collection
+          if search[:collection].kind_of?(ActiveRecord::Relation)
+            search[:collection] = search[:collection].map { |obj| [obj.to_s, obj.to_param] }
+          elsif search[:collection].kind_of?(Array) && search[:collection].first.kind_of?(ActiveRecord::Base)
+            search[:collection] = search[:collection].map { |obj| [obj.to_s, obj.to_param] }
+          end
+
           search[:as] ||= :select if search.key?(:collection)
           search[:fuzzy] ||= true unless search.key?(:fuzzy)
           search[:value] ||= search.delete(:selected) if search.key?(:selected)
