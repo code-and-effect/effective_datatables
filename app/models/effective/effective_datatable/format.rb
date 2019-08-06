@@ -16,7 +16,7 @@ module Effective
           next unless state[:visible][name]
 
           if opts[:partial]
-            locals = { datatable: self, column: columns[name] }.merge(resource_col_locals(opts))
+            locals = { datatable: self, column: opts }.merge(resource_col_locals(opts))
 
             rendered[name] = (view.render(
               partial: opts[:partial],
@@ -29,11 +29,24 @@ module Effective
           elsif opts[:as] == :actions # This is actions_col and actions_col do .. end, but not actions_col partial: 'something'
             resources = collection.map { |row| row[opts[:index]] }
             locals = { datatable: self, column: opts, spacer_template: SPACER_TEMPLATE }
-            atts = { actions: actions_col_actions(opts), effective_resource: resource, locals: locals, partial: opts[:actions_partial] }.merge(opts[:actions])
 
-            rendered[name] = (view.render_resource_actions(resources, atts, &opts[:format]) || '').split(SPACER)
+            atts = {
+              actions: actions_col_actions(opts),
+              btn_class: opts[:btn_class],
+              effective_resource: effective_resource,
+              locals: locals,
+              partial: opts[:actions_partial],
+            }.compact.merge(opts[:actions])
+
+            rendered[name] = if effective_resource.blank?
+              resources.map do |resource|
+                polymorphic_resource = Effective::Resource.new(resource, namespace: controller_namespace)
+                (view.render_resource_actions(resource, atts.merge(effective_resource: polymorphic_resource), &opts[:format]) || '')
+              end
+            else
+              (view.render_resource_actions(resources, atts, &opts[:format]) || '').split(SPACER)
+            end
           end
-
         end
 
         collection.each_with_index do |row, row_index|
@@ -69,13 +82,9 @@ module Effective
 
         case column[:as]
         when :actions
-          atts = { actions: actions_col_actions(column), effective_resource: resource, partial: column[:actions_partial] }.merge(column[:actions])
-          (view.render_resource_actions(value, atts) || '')
+          raise("please use actions_col instead of col(#{name}, as: :actions)")
         when :boolean
-          case value
-          when true   ; 'Yes'
-          when false  ; 'No'
-          end
+          view.t("effective_datatables.boolean_#{value}")
         when :currency
           view.number_to_currency(value)
         when :date
@@ -96,10 +105,10 @@ module Effective
           view.mail_to(value)
         when :integer
           value
-        when :percentage
+        when :percent
           case value
-          when Integer    ; "#{value}%"
-          when Numeric    ; view.number_to_percentage(value * 100, precision: 2)
+          when Integer    ; view.number_to_percentage(value / 1000.0, precision: 3).gsub('.000%', '%')
+          when Numeric    ; view.number_to_percentage(value, precision: 3).gsub('.000%', '%')
           end
         when :price
           case value
@@ -115,29 +124,66 @@ module Effective
 
       # Takes all default resource actions
       # Applies data-remote to anything that's data-method post or delete
+      # Merges in any extra attributes when passed as a Hash
       def actions_col_actions(column)
-        resource.resource_actions
+        resource_actions = (effective_resource&.resource_actions || fallback_effective_resource.fallback_resource_actions)
+
+        actions = if column[:inline]
+          resource_actions.transform_values { |opts| opts['data-remote'] = true; opts }
+        else
+          resource_actions.transform_values { |opts| opts['data-remote'] = true if opts['data-method']; opts }
+        end
+
+        # Merge local options. Special behaviour for remote: false
+        if column[:actions].kind_of?(Hash)
+          column[:actions].each do |action, opts|
+            next unless opts.kind_of?(Hash)
+
+            existing = actions.find { |_, v| v[:action] == action }&.first
+            next unless existing.present?
+
+            actions[existing]['data-remote'] = opts[:remote] if opts.key?(:remote)
+            actions[existing]['data-remote'] = opts['remote'] if opts.key?('remote')
+
+            actions[existing].merge!(opts.except(:remote, 'remote'))
+          end
+
+          actions = actions.sort do |(_, a), (_, b)|
+            (column[:actions].keys.index(a[:action]) || 99) <=> (column[:actions].keys.index(b[:action]) || 99)
+          end.to_h
+
+        end
+
+        actions
       end
 
       def resource_col_locals(opts)
-        return {} unless (resource = opts[:resource]).present?
+        return {} unless (associated_resource = opts[:resource]).present?
 
-        locals = { name: opts[:name], effective_resource: resource, show_action: false, edit_action: false }
+        associated = associated_resource.macros.include?(opts[:as])
+        polymorphic = (opts[:as] == :belongs_to_polymorphic)
+
+        resource_name = opts[:name] if associated
+        resource_to_s = opts[:name] unless associated || array_collection?
+
+        locals = {
+          resource_name: resource_name,
+          resource_to_s: resource_to_s,
+          effective_resource: associated_resource,
+          show_action: false,
+          edit_action: false
+        }
 
         case opts[:action]
         when :edit
-          locals[:edit_action] = (resource.routes[:edit] && EffectiveDatatables.authorized?(view.controller, :edit, resource.klass))
+          locals[:edit_action] = (polymorphic || associated_resource.routes[:edit].present?)
         when :show
-          locals[:show_action] = (resource.routes[:show] && EffectiveDatatables.authorized?(view.controller, :show, resource.klass))
+          locals[:show_action] = (polymorphic || associated_resource.routes[:show].present?)
         when false
-          # Nothing
+          # Nothing. Already false.
         else
-          # Fallback to defaults - check edit then show
-          if resource.routes[:edit] && EffectiveDatatables.authorized?(view.controller, :edit, resource.klass)
-            locals[:edit_action] = true
-          elsif resource.routes[:show] && EffectiveDatatables.authorized?(view.controller, :show, resource.klass)
-            locals[:show_action] = true
-          end
+          locals[:edit_action] = (polymorphic || associated_resource.routes[:edit].present?)
+          locals[:show_action] = (polymorphic || associated_resource.routes[:show].present?)
         end
 
         locals
