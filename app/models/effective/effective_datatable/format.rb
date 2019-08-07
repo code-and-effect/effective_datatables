@@ -99,7 +99,7 @@ module Effective
         when :duration
           view.number_to_duration(value)
         when :effective_addresses
-          value.to_html
+          (value.respond_to?(:to_html) ? value.to_html : value).to_s
         when :effective_obfuscation
           value
         when :effective_roles
