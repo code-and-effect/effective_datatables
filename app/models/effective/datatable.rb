@@ -1,7 +1,7 @@
 module Effective
   class Datatable
     attr_reader :attributes # Anything that we initialize our table with. That's it. Can't be changed by state.
-    attr_reader :resource
+    attr_reader :effective_resource
     attr_reader :state
 
     # Hashes of DSL options
@@ -147,6 +147,14 @@ module Effective
 
     def dsl_tool
       @dsl_tool ||= DatatableDslTool.new(self)
+    end
+
+    def resource
+      @effective_resource
+    end
+
+    def fallback_effective_resource
+      @fallback_effective_resource ||= Effective::Resource.new('', namespace: controller_namespace)
     end
 
     private

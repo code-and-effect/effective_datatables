@@ -13,9 +13,15 @@ module Effective
 
       private
 
+      def load_effective_resource!
+        @effective_resource = if active_record_collection?
+          Effective::Resource.new(collection_class, namespace: controller_namespace)
+        end
+      end
+
       # This looks at all the columns and figures out the as:
       def load_resource!
-        @resource = Effective::Resource.new(collection_class, namespace: controller_namespace)
+        load_effective_resource!
 
         if active_record_collection?
           columns.each do |name, opts|
