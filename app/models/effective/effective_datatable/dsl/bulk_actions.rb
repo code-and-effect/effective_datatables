@@ -34,7 +34,7 @@ module Effective
 
           opts[:class] = [opts[:class], 'dropdown-item'].compact.join(' ')
 
-          link_to(title, url, opts)
+          content_tag(:li, link_to(title, url, opts))
         end
 
       end

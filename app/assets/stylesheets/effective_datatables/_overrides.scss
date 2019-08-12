@@ -216,3 +216,9 @@ table.dataTable.hide-buttons {
 @media screen and (max-width: 767px) {
   div.dataTables_wrapper div.dataTables_entries { text-align: center; }
 }
+
+.dataTables_buttons {
+  .buttons-bulk-actions {
+    button { font-size: inherit !important }
+  }
+}
