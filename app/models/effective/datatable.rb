@@ -15,6 +15,8 @@ module Effective
 
     # The collection itself. Only evaluated once.
     attr_accessor :_collection
+    attr_accessor :_collection_apply_belongs_to
+    attr_accessor :_collection_apply_scope
 
     # The view
     attr_reader :view
@@ -31,10 +33,10 @@ module Effective
     include Effective::EffectiveDatatable::Resource
     include Effective::EffectiveDatatable::State
 
-    def initialize(view = nil, attributes = {})
+    def initialize(view = nil, attributes = nil)
       (attributes = view; view = nil) if view.kind_of?(Hash)
 
-      @attributes = initial_attributes(attributes)
+      @attributes = (attributes || {})
       @state = initial_state
 
       @_aggregates = {}
@@ -45,6 +47,7 @@ module Effective
       @_form = {}
       @_scopes = {}
 
+      raise 'expected a hash of arguments' unless @attributes.kind_of?(Hash)
       raise 'collection is defined as a method. Please use the collection do ... end syntax.' unless collection.nil?
       self.view = view if view
     end
@@ -54,21 +57,23 @@ module Effective
       @view = (view.respond_to?(:view_context) ? view.view_context : view)
       raise 'expected view to respond to params' unless @view.respond_to?(:params)
 
-      load_cookie!
+      assert_attributes!
       load_attributes!
 
       # We need early access to filter and scope, to define defaults from the model first
-      # This means filters do knows about attributes but not about columns.
+      # This means filters do know about attributes but not about columns.
       initialize_filters if respond_to?(:initialize_filters)
       load_filters!
       load_state!
+
+      # Bulk actions called first so it can add the bulk_actions_col first
+      initialize_bulk_actions if respond_to?(:initialize_bulk_actions)
 
       # Now we initialize all the columns. columns knows about attributes and filters and scope
       initialize_datatable if respond_to?(:initialize_datatable)
       load_columns!
 
       # Execute any additional DSL methods
-      initialize_bulk_actions if respond_to?(:initialize_bulk_actions)
       initialize_charts if respond_to?(:initialize_charts)
 
       # Load the collection. This is the first time def collection is called on the Datatable itself
@@ -78,9 +83,10 @@ module Effective
       # Figure out the class, and if it's activerecord, do all the resource discovery on it
       load_resource!
 
-      # If attributes match a belongs_to column, scope the collection and remove the column
-      apply_belongs_to_attributes!
+      # Check everything is okay
+      validate_datatable!
 
+      # Save for next time
       save_cookie!
     end
 
@@ -117,11 +123,18 @@ module Effective
       )
     end
 
-    # When simple only a table will be rendered with
-    # no sorting, no filtering, no export buttons, no pagination, no per page, no colReorder
-    # default sorting only, default visibility only, all records returned, and responsive enabled
-    def simple?
-      attributes[:simple] == true
+    # Inline crud
+    def inline?
+      attributes[:inline] == true
+    end
+
+    # Reordering
+    def reorder?
+      columns.key?(:_reorder)
+    end
+
+    def sortable?
+      !reorder? && attributes[:sortable] != false
     end
 
     # Whether the filters must be rendered as a <form> or we can keep the normal <div> behaviour
@@ -129,12 +142,12 @@ module Effective
       _form[:verb].present?
     end
 
-    def table_html_class
-      attributes[:class] || EffectiveDatatables.html_class
+    def html_class
+      Array(attributes[:class] || EffectiveDatatables.html_class).join(' ').presence
     end
 
     def to_param
-      @to_param ||= "#{self.class.name.underscore.parameterize}-#{cookie_param}"
+      "#{self.class.name.underscore.parameterize}-#{[self.class, attributes].hash.abs.to_s.last(12)}"
     end
 
     def columns
@@ -150,7 +163,7 @@ module Effective
     end
 
     def resource
-      @effective_resource
+      raise('depecated. Please use .effective_resource instead')
     end
 
     def fallback_effective_resource
@@ -165,6 +178,13 @@ module Effective
 
     def value_tool
       @value_tool ||= DatatableValueTool.new(self)
+    end
+
+    def validate_datatable!
+      if reorder?
+        raise 'cannot use reorder with an Array collection' unless active_record_collection?
+        raise 'cannot use reorder with a non-Integer column' if effective_resource.sql_type(columns[:_reorder][:reorder]) != :integer
+      end
     end
 
   end

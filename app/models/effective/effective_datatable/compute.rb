@@ -14,11 +14,14 @@ module Effective
         @total_records = (active_record_collection? ? column_tool.size(col) : value_tool.size(col))
 
         # Apply scope
-        col = column_tool.scope(col)
+        col = column_tool.scope(col) if @_collection_apply_scope
 
         # Apply column searching
         col = column_tool.search(col)
-        @display_records = column_tool.size(col) unless value_tool.searched.present?
+
+        unless value_tool.searched.present? || (column_tool.scoped.blank? && column_tool.searched.blank?)
+          @display_records = column_tool.size(col)
+        end
 
         # Apply column ordering
         col = column_tool.order(col)
@@ -61,11 +64,15 @@ module Effective
             if state[:visible][name] == false && (name != order_name)  # Sort by invisible array column
               BLANK
             elsif opts[:compute]
-              dsl_tool.instance_exec(obj, (active_record_collection? ? collection : obj[opts[:index]]), &opts[:compute])
+              if array_collection?
+                dsl_tool.instance_exec(obj, obj[opts[:index]], &opts[:compute])
+              else
+                dsl_tool.instance_exec(obj, collection, &opts[:compute])
+              end
             elsif (opts[:partial] || opts[:format])
-              active_record_collection? ? obj : obj[opts[:index]]
+              array_collection? ? obj[opts[:index]] : obj
             elsif opts[:resource]
-              resource = active_record_collection? ? obj : obj[opts[:index]]
+              resource = array_collection? ? obj[opts[:index]] : obj
 
               if opts[:resource_field]
                 (associated, field) = name.to_s.split('.').first(2)
@@ -128,9 +135,11 @@ module Effective
         length = values.length
         values = values.reject { |value| value.nil? }
 
+        return BLANK if [:id, :year].include?(column[:name])
+
         case aggregate[:name]
         when :total
-          if [:percentage].include?(column[:as])
+          if [:percent].include?(column[:as])
             BLANK
           elsif values.all? { |value| value.kind_of?(Numeric) }
             values.sum

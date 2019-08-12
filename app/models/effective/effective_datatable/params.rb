@@ -7,8 +7,13 @@ module Effective
       def datatables_ajax_request?
         return @_datatables_ajax_request unless @_datatables_ajax_request.nil?
 
-        @_datatables_ajax_request =
-          (view && view.params[:draw] && view.params[:columns] && cookie_keys.include?(view.params[:cookie])) == true
+        @_datatables_ajax_request = (view.present? && view.params.key?(:draw) && view.params.key?(:columns))
+      end
+
+      def datatables_inline_request?
+        return @_datatables_inline_request unless @_datatables_inline_request.nil?
+
+        @_datatables_inline_request = (view.present? && view.params[:_datatable_id].to_s.split('-')[0...-1] == to_param.split('-')[0...-1])
       end
 
       def params
@@ -20,7 +25,7 @@ module Effective
       end
 
       def filter_params
-        params.select { |name, value| _filters.key?(name.to_sym) }
+        params.select { |name, value| _filters.key?(name.to_sym) && name != 'id' }
       end
 
       def scope_param
@@ -29,7 +34,7 @@ module Effective
 
       def search_params
         params.select do |name, value|
-          columns.key?(name) && (name != :id) && !value.kind_of?(Hash) && value.class.name != 'ActionController::Parameters'.freeze
+          columns.key?(name) && ![:id, :action].include?(name) && !value.kind_of?(Hash) && value.class.name != 'ActionController::Parameters'.freeze
         end
       end
     end

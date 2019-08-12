@@ -26,30 +26,17 @@ EffectiveDatatables.setup do |config|
   config.default_length = 25
 
   # Default class used on the <table> tag
-  config.html_class = 'table table-bordered table-striped'
-
-  # If a user has previously visited this page and is returning, use the cookie to restore last session
-  # Irregardless of this setting, effective_datatables still uses a cookie to function
-  config.save_state = true
-
-  # When using the actions_column DSL method, apply the following behavior
-  # Valid values for each action are:
-  # true - display this action if authorized?(:show, Post)
-  # false - do not display this action
-  # :authorize - display this action if authorized?(:show, Post<3>)  (every instance is checked)
-  #
-  # You can override these defaults on a per-table basis
-  # by calling `actions_column(show: false, edit: true, destroy: :authorize)`
-  config.actions_column = {
-    show: true,
-    edit: true,
-    destroy: true,
-  }
+  config.html_class = 'table table-hover'
 
   # Log search/sort information to the console
   config.debug = true
 
-  # String size. Final byte size is about 1.5 times bigger, after rails signs it
-  config.max_cookie_size = 2000
+  # Use a cookie to save and restore state from previous page visits.
+  config.save_state = true
+
+  # Configure the _effective_dt cookie.
+  config.cookie_max_size = 2000       # String size. Final byte size is about 1.5 times bigger, after rails signs it
+  config.cookie_domain = :all         # Should usually be :all
+  config.cookie_tld_length = nil      # Leave nil to autodetect, or set to probably 2
 
 end

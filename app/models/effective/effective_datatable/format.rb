@@ -84,10 +84,7 @@ module Effective
         when :actions
           raise("please use actions_col instead of col(#{name}, as: :actions)")
         when :boolean
-          case value
-          when true   ; 'Yes'
-          when false  ; 'No'
-          end
+          view.t("effective_datatables.boolean_#{value}")
         when :currency
           view.number_to_currency(value)
         when :date

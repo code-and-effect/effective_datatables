@@ -6,7 +6,10 @@ module EffectiveDatatables
 
     # Include Helpers to base application
     initializer 'effective_datatables.action_controller' do |app|
-      ActiveSupport.on_load :action_controller do
+      ActiveSupport.on_load :action_controller_base do
+        helper EffectiveDatatablesHelper
+        helper EffectiveDatatablesPrivateHelper
+
         ActionController::Base.send :include, ::EffectiveDatatablesControllerHelper
       end
     end
@@ -15,6 +18,5 @@ module EffectiveDatatables
     initializer 'effective_datatables.defaults', before: :load_config_initializers do |app|
       eval File.read("#{config.root}/config/effective_datatables.rb")
     end
-
   end
 end

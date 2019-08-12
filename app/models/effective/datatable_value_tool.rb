@@ -74,13 +74,12 @@ module Effective
       collection
     end
 
-    def search_column(collection, value, column, index)
-      Rails.logger.info "VALUE TOOL: search_column #{column.to_s} #{value} #{index}" if EffectiveDatatables.debug
+    def search_column(collection, original, column, index)
+      Rails.logger.info "VALUE TOOL: search_column #{column.to_s} #{original} #{index}" if EffectiveDatatables.debug
 
-      macros = Effective::Resource.new('').macros
       fuzzy = column[:search][:fuzzy]
 
-      term = Effective::Attribute.new(column[:as]).parse(value, name: column[:name])
+      term = Effective::Attribute.new(column[:as]).parse(original, name: column[:name])
       term_downcased = term.to_s.downcase
 
       # term == 'nil' rescue false is a Rails 4.1 fix, where you can't compare a TimeWithZone to 'nil'
@@ -90,7 +89,8 @@ module Effective
 
       # See effective_resources gem search() method # relation.rb
       collection.select! do |row|
-        obj = obj_to_value(row[index], column, row)
+        obj = row[index]
+        value = obj_to_value(row[index], column, row)
 
         case column[:as]
         when :boolean
@@ -101,7 +101,7 @@ module Effective
           end
         when :datetime, :date
           end_at = (
-            case (value.to_s.scan(/(\d+)/).flatten).length
+            case (original.to_s.scan(/(\d+)/).flatten).length
             when 1 ; term.end_of_year     # Year
             when 2 ; term.end_of_month    # Year-Month
             when 3 ; term.end_of_day      # Year-Month-Day
@@ -111,35 +111,35 @@ module Effective
             else term
             end
           )
-          obj >= term && obj <= end_at
+          value >= term && value <= end_at
         when :time
-          (obj.hour == term.hour) && (term.min == 0 ? true : (obj.min == term.min))
+          (value.hour == term.hour) && (term.min == 0 ? true : (value.min == term.min))
         when :decimal, :currency
-          if fuzzy && (term.round(0) == term) && value.to_s.include?('.') == false
+          if fuzzy && (term.round(0) == term) && original.to_s.include?('.') == false
             if term < 0
-              obj <= term && obj > (term - 1.0)
+              value <= term && value > (term - 1.0)
             else
-              obj >= term && obj < (term + 1.0)
+              value >= term && value < (term + 1.0)
             end
           else
-            obj == term
+            value == term
           end
         when :duration
-          if fuzzy && (term % 60 == 0) && value.to_s.include?('m') == false
+          if fuzzy && (term % 60 == 0) && original.to_s.include?('m') == false
             if term < 0
-              obj <= term && obj > (term - 60)
+              value <= term && value > (term - 60)
             else
-              obj >= term && obj < (term + 60)
+              value >= term && value < (term + 60)
             end
           else
-            obj == term
+            value == term
           end
-        when *macros, :resource
+        when *datatable.association_macros, :resource
           Array(obj).any? do |resource|
             Array(term).any? do |term|
               matched = false
 
-              if term.kind_of?(Integer) && resource.respond_to?(:to_param)
+              if term.kind_of?(Integer) && resource.respond_to?(:id) && resource.respond_to?(:to_param)
                 matched = (resource.id == term || resource.to_param == term)
               end
 
@@ -148,9 +148,9 @@ module Effective
           end
         else  # :string, :text, :email
           if fuzzy
-            obj.to_s.downcase.include?(term_downcased)
+            value.to_s.downcase.include?(term_downcased)
           else
-            obj == term || (obj.to_s == term.to_s)
+            value == term || (value.to_s == term.to_s)
           end
         end
       end || collection

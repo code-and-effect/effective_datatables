@@ -5,7 +5,7 @@ module Effective
     # This will respond to both a GET and a POST
     def show
       begin
-        @datatable = find_datatable(params[:id]).try(:new) || raise('unable to find datatable')
+        @datatable = EffectiveDatatables.find(params[:id], params[:attributes])
         @datatable.view = view_context
 
         EffectiveDatatables.authorize!(self, :index, @datatable.collection_class)
@@ -13,17 +13,50 @@ module Effective
         render json: @datatable.to_json
       rescue => e
         EffectiveDatatables.authorized?(self, :index, @datatable.try(:collection_class))
-
         render json: error_json(e)
+
+        ExceptionNotifier.notify_exception(e) if defined?(ExceptionNotifier)
+        raise e if Rails.env.development?
       end
     end
 
-    private
+    def reorder
+      begin
+        @datatable = EffectiveDatatables.find(params[:id], params[:attributes])
+        @datatable.view = view_context
 
-    def find_datatable(id)
-      id = id.to_s.gsub(/-\d+\z/, '').gsub('-', '/')
-      id.classify.safe_constantize || id.classify.pluralize.safe_constantize
+        EffectiveDatatables.authorize!(self, :index, @datatable.collection_class)
+
+        @resource = @datatable.collection.find(params[:reorder][:id])
+
+        EffectiveDatatables.authorize!(self, :update, @resource)
+
+        attribute = @datatable.columns[:_reorder][:reorder]
+        old_index = params[:reorder][:old].to_i
+        new_index = params[:reorder][:new].to_i
+
+        @resource.class.transaction do
+          if new_index > old_index
+            @datatable.collection.where("#{attribute} > ? AND #{attribute} <= ?", old_index, new_index).update_all("#{attribute} = #{attribute} - 1")
+            @resource.update_column(attribute, new_index)
+          end
+
+          if old_index > new_index
+            @datatable.collection.where("#{attribute} >= ? AND #{attribute} < ?", new_index, old_index).update_all("#{attribute} = #{attribute} + 1")
+            @resource.update_column(attribute, new_index)
+          end
+        end
+
+        render status: :ok, body: :ok
+      rescue Effective::AccessDenied => e
+        render(status: :unauthorized, body: 'Access Denied')
+      rescue => e
+        render(status: :error, body: 'Unexpected Error')
+      end
+
     end
+
+    private
 
     def error_json(e)
       {

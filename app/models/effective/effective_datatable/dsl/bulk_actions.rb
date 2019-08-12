@@ -3,16 +3,16 @@ module Effective
     module Dsl
       module BulkActions
 
-        def bulk_action(*args)
-          datatable._bulk_actions.push(content_tag(:li, link_to_bulk_action(*args)))
+        def bulk_action(title, url, opts = {})
+          datatable._bulk_actions.push(link_to_bulk_action(title, url, opts))
         end
 
-        def bulk_download(*args)
-          datatable._bulk_actions.push(content_tag(:li, link_to_bulk_action(*args), 'data-authenticity-token' => form_authenticity_token))
+        def bulk_download(title, url, opts = {})
+          datatable._bulk_actions.push(link_to_bulk_action(title, url, opts.merge('data-bulk-download': true)))
         end
 
         def bulk_action_divider
-          datatable._bulk_actions.push(content_tag(:li, '', class: 'divider', role: 'separator'))
+          datatable._bulk_actions.push(content_tag(:div, '', class: 'dropdown-divider'))
         end
 
         def bulk_action_content(&block)
@@ -22,26 +22,19 @@ module Effective
         private
 
         # We can't let any data-method be applied to the link, or jquery_ujs does the wrong thing with it
-        def link_to_bulk_action(*args)
-          args.map! do |arg|
-            if arg.kind_of?(Hash)
-              data_method = (
-                arg.delete(:'data-method') ||
-                arg.delete('data-method') ||
-                (arg[:data] || {}).delete('method') ||
-                (arg[:data] || {}).delete(:method)
-              )
+        def link_to_bulk_action(title, url, opts = {})
 
-              # But if the data-method was :get, we add bulk-actions-get-link = true
-              if data_method.to_s == 'get'
-                arg[:data].present? ? arg[:data]['bulk-actions-get'] = true : arg['data-bulk-actions-get'] = true
-              end
-            end
-
-            arg
+          # Transform data: { ... } hash into 'data-' keys
+          if (data = opts.delete(:data))
+            data.each { |k, v| opts["data-#{k}"] ||= v }
           end
 
-          link_to(*args)
+          verbs = {'DELETE' => 'DELETE', 'GET' => 'GET'}
+          opts['data-ajax-method'] = verbs[opts.delete('data-method').to_s.upcase] || 'POST'
+
+          opts[:class] = [opts[:class], 'dropdown-item'].compact.join(' ')
+
+          link_to(title, url, opts)
         end
 
       end

@@ -5,26 +5,16 @@ module Effective
         @cookie
       end
 
-      def cookie_key
-        @cookie_key ||= (datatables_ajax_request? ? view.params[:cookie] : cookie_param)
-      end
-
-      # All possible dt cookie keys.  Used to make sure the datatable has a cookie set for this session.
-      def cookie_keys
-        @cookie_keys ||= Array(@dt_cookie).compact.map(&:first)
-      end
-
-      def cookie_param
-        [self.class, attributes].hash.abs.to_s.last(12) # Not guaranteed to be 12 long
-      end
-
       private
 
       def load_cookie!
+        return unless EffectiveDatatables.save_state
+
         @dt_cookie = view.cookies.signed['_effective_dt']
 
         # Load global datatables cookie
         if @dt_cookie.present?
+
           @dt_cookie = Marshal.load(Base64.decode64(@dt_cookie))
           raise 'invalid datatables cookie' unless @dt_cookie.kind_of?(Array)
 
@@ -37,21 +27,33 @@ module Effective
         if @cookie.kind_of?(Array)
           @cookie = initial_state.keys.zip(@cookie.second).to_h
         end
+
       end
 
       def save_cookie!
+        return unless EffectiveDatatables.save_state
+
         @dt_cookie ||= []
         @dt_cookie << [cookie_key, cookie_payload]
 
-        while @dt_cookie.to_s.size > EffectiveDatatables.max_cookie_size.to_i
+        while @dt_cookie.to_s.size > EffectiveDatatables.cookie_max_size.to_i
           @dt_cookie.shift((@dt_cookie.length / 3) + 1)
         end
 
-        view.cookies.signed['_effective_dt'] = Base64.encode64(Marshal.dump(@dt_cookie))
+        # Generate cookie
+        domain = EffectiveDatatables.cookie_domain || :all
+        tld_length = EffectiveDatatables.cookie_tld_length
+        tld_length ||= (view.request.host == 'localhost' ? nil : view.request.host.to_s.split('.').count)
+
+        view.cookies.signed['_effective_dt'] = { value: Base64.encode64(Marshal.dump(@dt_cookie)), domain: domain, tld_length: tld_length }.compact
+      end
+
+      def cookie_key
+        @cookie_key ||= to_param
       end
 
       def cookie_payload
-        payload = state.except(:attributes, :visible)
+        payload = state.except(:visible)
 
         # Turn visible into a bitmask.  This is undone in load_columns!
         payload[:vismask] = (
@@ -60,8 +62,7 @@ module Effective
           end
         )
 
-        # Just store the values
-        [attributes.delete_if { |k, v| v.nil? }] + payload.values
+        payload.values # Just store the values
       end
 
     end

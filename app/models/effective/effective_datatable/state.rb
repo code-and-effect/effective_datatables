@@ -55,7 +55,6 @@ module Effective
       # This is called first. Our initial state is set.
       def initial_state
         {
-          attributes: {},
           filter: {},
           length: nil,
           order_name: nil,
@@ -89,23 +88,27 @@ module Effective
 
       def load_state!
         if datatables_ajax_request?
+          load_cookie! # but not state.
           load_filter_params!
           load_ajax_state!
-        elsif cookie.present? && cookie[:params] == params.length && EffectiveDatatables.save_state
-          load_cookie_state!
+        elsif datatables_inline_request?
+          load_filter_params!
         else
-          # Nothing to do for default state
+          load_cookie!
+          load_cookie_state! if cookie.present? && cookie[:params] == cookie_state_params
+          load_filter_params!
         end
 
-        load_filter_params! unless datatables_ajax_request?
         fill_empty_filters!
       end
 
       def load_ajax_state!
         state[:length] = params[:length].to_i
 
-        state[:order_dir] = (params[:order]['0'][:dir] == 'desc' ? :desc : :asc)
-        state[:order_index] = params[:order]['0'][:column].to_i
+        if params[:order]
+          state[:order_dir] = (params[:order]['0'][:dir] == 'desc' ? :desc : :asc)
+          state[:order_index] = params[:order]['0'][:column].to_i
+        end
 
         state[:scope] = _scopes.keys.find { |name| params[:scope] == name.to_s }
         state[:start] = params[:start].to_i
@@ -130,7 +133,7 @@ module Effective
           state[:filter][name] = parse_filter_value(_filters[name], value)
         end
 
-        state[:params] = cookie[:params]
+        state[:params] = cookie[:params] if cookie.present?
       end
 
       def load_cookie_state!
@@ -140,14 +143,21 @@ module Effective
       def load_columns!
         state[:length] ||= EffectiveDatatables.default_length
 
+        (columns || {}).each_with_index { |(_, column), index| column[:index] = index }
+
         if columns.present?
-          columns.each_with_index { |(_, column), index| column[:index] = index }
+          state[:order_name] = (
+            if columns.key?(:_reorder)
+              :_reorder
+            elsif order_index.present?
+              columns.keys[order_index]
+            elsif state[:order_name].present?
+              state[:order_name]
+            else
+              columns.find { |name, opts| opts[:sort] }.first
+            end
+          )
 
-          if order_index.present?
-            state[:order_name] = columns.keys[order_index]
-          end
-
-          state[:order_name] ||= columns.find { |name, opts| opts[:sort] }.first
           raise "order column :#{order_name} must exist as a col or val" unless columns[order_name]
 
           state[:order_index] = columns[order_name][:index]
@@ -176,7 +186,7 @@ module Effective
 
         unless datatables_ajax_request?
           search_params.each { |name, value| state[:search][name] = value }
-          state[:params] = params.length
+          state[:params] = cookie_state_params
         end
 
         state[:visible].delete_if { |name, _| columns.key?(name) == false }
@@ -187,7 +197,12 @@ module Effective
       # When we parse an incoming filter term for this filter.
       def parse_filter_value(filter, value)
         return filter[:parse].call(value) if filter[:parse]
+        return nil if value.blank? && !filter[:required]
         Effective::Attribute.new(filter[:value]).parse(value, name: filter[:name])
+      end
+
+      def cookie_state_params
+        params.hash.abs.to_s.last(12)
       end
 
     end
