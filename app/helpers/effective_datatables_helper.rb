@@ -55,7 +55,7 @@ module EffectiveDatatablesHelper
         'reorder' => datatable_reorder(datatable),
         'reorder-index' => (datatable.columns[:_reorder][:index] if datatable.reorder?).to_s,
         'simple' => simple.to_s,
-        'spinner' => icon('spinner'), # effective_bootstrap
+        'spinner' => '', # effective_bootstrap
         'source' => effective_datatables.datatable_path(datatable, {format: 'json'}),
         'total-records' => datatable.to_json[:recordsTotal]
       }

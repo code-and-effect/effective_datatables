@@ -35,6 +35,8 @@ table.dataTable thead {
     border-bottom: none;
     white-space: nowrap;
     padding: 6px;
+
+    span { display: block; }
   }
 
   .form-control, .form-group {
@@ -193,4 +195,24 @@ table.dataTable {
   td {
     p { margin-bottom: 0px; }
   }
+}
+
+// Simple styles
+table.dataTable.hide-sort > thead {
+  .sorting { background-image: none; cursor: default; }
+  .sorting_asc { background-image: none; cursor: default; }
+  .sorting_desc { background-image: none; cursor: default; }
+}
+
+table.dataTable.hide-search > thead {
+  .form-group { display: none; }
+}
+
+table.dataTable.hide-buttons {
+  .col-bulk_actions { display: none; }
+}
+
+// Datatables entries
+@media screen and (max-width: 767px) {
+  div.dataTables_wrapper div.dataTables_entries { text-align: center; }
 }

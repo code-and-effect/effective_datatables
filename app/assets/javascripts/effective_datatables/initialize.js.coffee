@@ -47,7 +47,6 @@ initializeDataTables = (target) ->
       deferLoading: [datatable.data('display-records'), datatable.data('total-records')]
       deferRender: true
       displayStart: datatable.data('display-start')
-      dom: "<'row'<'col-sm-12'B>><'row'<'col-sm-12'tr>><'row'<'col-sm-6 dataTables_entries'il><'col-sm-6'p>>"
       iDisplayLength: datatable.data('display-length')
       language: datatable.data('language')
       lengthMenu: [[5, 10, 25, 50, 100, 250, 500, 9999999], ['5', '10', '25', '50', '100', '250', '500', 'All']]

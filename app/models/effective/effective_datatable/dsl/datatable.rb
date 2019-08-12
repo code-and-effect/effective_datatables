@@ -98,7 +98,7 @@ module Effective
             name: :actions,
             partial: partial,
             partial_as: partial_as,
-            actions_partial: (actions_partial || :dropleft),
+            actions_partial: (actions_partial || :glyphicons),
             responsive: responsive,
             search: false,
             sort: false,
