@@ -174,47 +174,37 @@ module EffectiveDatatablesPrivateHelper
     as = opts[:as].to_s.chomp('_field').to_sym
     value = datatable.state[:filter][name]
     collection = opts[:collection]
+    input_html = opts[:input_html] || {}
 
-    options = {
-      autocomplete: 'off',
-      feedback: false,
-      label: false,
-      placeholder: (opts[:label] || name.to_s.titleize),
+    binding.pry
+
+    form.input name,
       value: value,
-      wrapper: { class: 'form-group col-auto'}
-    }.merge(opts.except(:as, :collection, :parse))
-
-    options[:name] = '' unless datatable._filters_form_required?
-
-    if [:select, :radios, :checks].include?(as)
-      options.delete(:name) unless as == :select
-      form.public_send(as, name, collection, options) # select, radios, checks
-    elsif as == :boolean
-      collection ||= [true, false].map { |value| [t("effective_datatables.boolean_#{value}"), value] }
-      form.public_send(:select, name, collection, options) # boolean
-    elsif form.respond_to?(as)
-      form.public_send(as, name, options) # check_box, text_area
-    else
-      form.public_send("#{as}_field", name, options) # text_field, number_field, all the rest.
-    end
-
+      selected: value,
+      as: as,
+      collection: collection,
+      label: opts[:label],
+      required: input_html.delete(:required),
+      multiple: input_html.delete(:multiple),
+      include_blank: input_html.delete(:include_blank),
+      group_method: input_html.delete(:group_method),
+      group_label_method: input_html.delete(:group_label_method),
+      value_method: input_html.delete(:value_method),
+      label_method: input_html.delete(:label_method),
+      input_html: (({name: ''} unless datatable._filters_form_required?) || {}).merge(input_html),
+      input_js: ({ placeholder: ''} if as == :effective_select),
+      wrapper_html: {class: 'form-group-sm'}
   end
 
   def datatable_scope_tag(form, datatable, opts = {})
     collection = datatable._scopes.map { |name, opts| [opts[:label], name] }
     value = datatable.state[:scope]
 
-    options = {
-      autocomplete: 'off',
+    form.input :scope, label: false, required: false, checked: value,
+      as: (defined?(EffectiveFormInputs) ? :effective_radio_buttons : :radio_buttons),
+      collection: collection,
       buttons: true,
-      checked: value,
-      feedback: false,
-      label: false,
-      required: false,
-      wrapper: { class: 'form-group col-auto'}
-    }.merge(opts)
-
-    form.radios :scope, collection, options
+      wrapper_html: {class: 'btn-group-sm'}
   end
 
   def render_datatable_charts(datatable)
