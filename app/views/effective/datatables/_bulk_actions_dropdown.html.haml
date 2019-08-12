@@ -1,10 +1,8 @@
 .btn-group.buttons-bulk-actions
-  %button.btn.btn-default.dropdown-toggle{'type' => 'button', 'data-toggle' => 'dropdown', 'aria-haspopup' => true, 'aria-expanded' => false, 'disabled' => 'disabled'}
+  %button.btn.btn-link.btn-sm.dropdown-toggle{'type': 'button', 'data-toggle': 'dropdown', 'aria-haspopup': true, 'aria-expanded': false, 'disabled': 'disabled'}
     Bulk Actions
-    %span.caret
-  %ul.dropdown-menu
+  .dropdown-menu
     - if datatable._bulk_actions.present?
       = datatable._bulk_actions.join.html_safe
     - else
-      %li
-        %a{href: '#'} No bulk actions
+      %a.dropdown-item{href: '#'} No bulk actions
