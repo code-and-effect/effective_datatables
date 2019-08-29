@@ -79,7 +79,8 @@ module EffectiveDatatables
   end
 
   def self.message_encrypter
-    ActiveSupport::MessageEncryptor.new(Rails.application.secret_key_base.to_s.first(32))
+    key = (Rails.application.secrets.secret_key_base rescue nil) || self.hash
+    ActiveSupport::MessageEncryptor.new(key.to_s.first(32))
   end
 
 end
