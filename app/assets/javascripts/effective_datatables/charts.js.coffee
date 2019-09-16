@@ -20,7 +20,7 @@ renderCharts = ->
     $chart = $(this)
 
     data = $chart.data('data') || []
-    type = $chart.data('type') || 'BarChart'
+    type = $chart.data('as') || $chart.data('type') || 'BarChart'
     options = $chart.data('options') || {}
 
     chart = new google.visualization[type](document.getElementById($chart.attr('id')))
