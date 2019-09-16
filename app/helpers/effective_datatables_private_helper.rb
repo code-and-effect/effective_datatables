@@ -26,7 +26,7 @@ module EffectiveDatatablesPrivateHelper
   end
 
   def datatable_display_order(datatable)
-    (datatable.sortable? ? [datatable.order_index, datatable.order_direction] : false).to_json.html_safe
+    ((datatable.sortable? && datatable.order_index) ? [datatable.order_index, datatable.order_direction] : false).to_json.html_safe
   end
 
   def datatable_reset(datatable)
