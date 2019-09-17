@@ -176,8 +176,6 @@ module EffectiveDatatablesPrivateHelper
     collection = opts[:collection]
     input_html = opts[:input_html] || {}
 
-    binding.pry
-
     form.input name,
       value: value,
       selected: value,
