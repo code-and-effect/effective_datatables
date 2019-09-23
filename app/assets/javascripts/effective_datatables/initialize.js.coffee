@@ -156,6 +156,7 @@ initializeDataTables = (target) ->
 
         $input.parent().on 'click', (event) -> false # Dont order columns when you click inside the input
         $input.parent().on 'mousedown', (event) -> event.stopPropagation() # Dont order columns when you click inside the input
+        $input.parent().on 'keypress', (event) -> event.stopPropagation() # Don't order columns when you type inside the input
 
         if $input.is('select')
           $input.on 'change', (event) -> dataTableSearch($(event.currentTarget))
