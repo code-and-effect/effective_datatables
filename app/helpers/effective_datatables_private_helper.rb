@@ -90,12 +90,13 @@ module EffectiveDatatablesPrivateHelper
 
     collection = opts[:search].delete(:collection)
     value = datatable.state[:search][name]
-
     input_html = {
       name: nil,
       value: value,
       title: title,
       pattern: pattern,
+      autocomplete: opts[:search][:autocomplete] || SecureRandom.hex(32),
+      class: opts[:search][:class] || 'form-control',
       data: {'column-name' => name, 'column-index' => opts[:index]}
     }.delete_if { |k, v| v.blank? && k != :name }
 
