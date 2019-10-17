@@ -24,14 +24,14 @@ initializeDataTables = (target) ->
           extend: 'copy',
           exportOptions:
             format:
-              header: (str) -> $("<div>#{str}</div>").children('.search-label').first().text()
+              header: (str) -> $("<div>#{str}</div>").children('span').first().text()
             columns: buttons_export_columns
         },
         {
           extend: 'csv',
           exportOptions:
             format:
-              header: (str) -> $("<div>#{str}</div>").children('.search-label').first().text()
+              header: (str) -> $("<div>#{str}</div>").children('span').first().text()
             columns: buttons_export_columns
         },
         {
@@ -39,7 +39,7 @@ initializeDataTables = (target) ->
           footer: true,
           exportOptions:
             format:
-              header: (str) -> $("<div>#{str}</div>").children('.search-label').first().text()
+              header: (str) -> $("<div>#{str}</div>").children('span').first().text()
             columns: ':visible:not(.col-actions)'
         },
       ]
@@ -64,12 +64,23 @@ initializeDataTables = (target) ->
         params['authenticity_token'] = $table.data('authenticity-token')
 
         if $form.length > 0
-          params['scope'] = $form.find("input[id^='filters_scope']:checked").val() || ''
+          params['scope'] = $form.find("input[name='filters[scope]']:checked").val() || ''
           params['filter'] = {}
 
-          $form.find("[id^='filters_']:not(input[id^='filters_scope'])").each ->
+          $form.find("select,textarea,input:not([type=submit])").each ->
             $input = $(this)
-            params['filter'][$input.attr('id').substring(8, $input.attr('id').length)] = $input.val()
+
+            if ['utf8', 'authenticity_token', 'filters[scope]'].includes($input.attr('name'))
+              # Skipped
+            else if $input.attr('type') == 'radio'
+              name = $input.attr('name')
+              filter_name = name.replace('filters[', '').substring(0, name.length-9)
+
+              params['filter'][filter_name] = $form.find("input[name='#{name}']:checked").val()
+
+            else if $input.attr('id')
+              filter_name = $input.attr('id').replace('filters_', '')
+              params['filter'][filter_name] = $input.val()
 
       serverSide: true
       scrollCollapse: true
