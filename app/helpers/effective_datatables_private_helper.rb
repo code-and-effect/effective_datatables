@@ -148,7 +148,7 @@ module EffectiveDatatablesPrivateHelper
         input_html: input_html,
         input_js: { placeholder: placeholder }
     when :bulk_actions
-      input_html[:data]['role'] = 'bulk-actions-all'
+      input_html[:data]['role'] = 'bulk-actions'
 
       form.input name, label: false, required: false, value: nil,
         as: :boolean,
