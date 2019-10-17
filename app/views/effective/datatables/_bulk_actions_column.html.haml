@@ -1,2 +1,2 @@
 - id = (resource.try(:to_param) || resource.try(:id) || resource.object_id)
-= check_box_tag 'bulk_actions_resources[]', id, false, autocomplete: 'off', id: "datatable_bulk_actions_resource_#{id}", data: { role: 'bulk-actions-resource' }, onClick: 'event.stopPropagation();'
+= check_box_tag 'bulk_actions_resources[]', id, false, autocomplete: 'off', id: "datatable_bulk_actions_resource_#{id}", data: { role: 'bulk-action' }, onClick: 'event.stopPropagation();'

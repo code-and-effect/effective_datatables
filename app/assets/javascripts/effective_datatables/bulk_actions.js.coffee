@@ -1,40 +1,55 @@
 #### Checkbox toggling and Bulk Actions dropdown disabling
 
-$(document).on 'change', "input[data-role='bulk-actions-resource']", (event) ->
+$(document).on 'change', ".dataTables_wrapper input[data-role='bulk-action']", (event) ->
   $wrapper = $(event.currentTarget).closest('.dataTables_wrapper')
 
-  $wrapper.find("input[data-role='bulk-actions-all']").prop('checked', false)
-  toggleClosestBulkActionsButton($wrapper)
+  $wrapper.find("input[data-role='bulk-actions']").prop('checked', false)
+  toggleDropdown($wrapper)
 
-$(document).on 'change', "input[data-role='bulk-actions-all']", (event) ->
+$(document).on 'change', ".dataTables_wrapper input[data-role='bulk-actions']", (event) ->
   $wrapper = $(event.currentTarget).closest('.dataTables_wrapper')
-  $resources = $wrapper.find("input[data-role='bulk-actions-resource']")
+  $resources = $wrapper.find("input[data-role='bulk-action']")
 
   if $(event.currentTarget).is(':checked')
     $resources.prop('checked', true)
   else
     $resources.prop('checked', false)
 
-  toggleClosestBulkActionsButton($wrapper)
+  toggleDropdown($wrapper)
 
-toggleClosestBulkActionsButton = ($wrapper) ->
+toggleDropdown = ($wrapper) ->
   $bulkActions = $wrapper.children().first().find('.buttons-bulk-actions').children('button')
 
-  if $wrapper.find("input[data-role='bulk-actions-resource']:checked").length > 0
+  if $wrapper.find("input[data-role='bulk-action']:checked").length > 0
     $bulkActions.removeAttr('disabled')
   else
     $bulkActions.attr('disabled', 'disabled')
 
+restoreSelected = ($table, selected) ->
+  $bulkActions = $table.closest('.dataTables_wrapper').children().first().find('.buttons-bulk-actions').children('button')
+  present = false
+
+  if selected && selected.length > 0
+    $table.find("input[data-role='bulk-action']").each (_, input) ->
+      $input = $(input)
+
+      if selected.indexOf($input.val()) > -1
+        $input.prop('checked', true)
+        present = true
+      else
+        $input.prop('checked', false)
+
+  if present then $bulkActions.removeAttr('disabled') else $bulkActions.attr('disabled', 'disabled')
 
 #### Bulk Action link behaviour
-$(document).on 'click', '.buttons-bulk-actions a', (event) ->
+$(document).on 'click', '.dataTables_wrapper .buttons-bulk-actions a', (event) ->
   event.preventDefault() # prevent the click
 
   $bulkAction = $(event.currentTarget)  # This is a regular <a href=...> tag
   $wrapper = $bulkAction.closest('.dataTables_wrapper')
   $table = $wrapper.find('table.dataTable').first()
   $processing = $table.siblings('.dataTables_processing').first()
-  $selected = $table.find("input[data-role='bulk-actions-resource']:checked")
+  $selected = $table.find("input[data-role='bulk-action']:checked")
 
   url = $bulkAction.attr('href')
   title = $bulkAction.text()
@@ -56,8 +71,7 @@ $(document).on 'click', '.buttons-bulk-actions a', (event) ->
   # Disable the Bulk Actions dropdown, so only one can be run at a time
   $bulkAction.closest('button').attr('disabled', 'disabled')
 
-  # Show Processing...
-  $processing.show().data('bulk-actions-processing', true)
+  $table.dataTable().data('bulk-actions-restore-selected-values', values)
 
   if download # This is a file download
     $.fileDownload(url,
@@ -65,45 +79,28 @@ $(document).on 'click', '.buttons-bulk-actions a', (event) ->
       data: { ids: values, authenticity_token: token }
       successCallback: ->
         success = "Successfully completed #{title} bulk action"
-        $processing.html(success)
-        $table.dataTable().data('bulk-actions-restore-selected-values', values)
+        $table.one 'draw.dt', (e) -> $(e.target).DataTable().flash(success, 'success') and restoreSelected($(e.target), values)
         $table.DataTable().draw()
       failCallback: ->
         error = "An error occured while attempting #{title} bulk action"
-        $processing.html(error)
-        alert(error)
-        $table.dataTable().data('bulk-actions-restore-selected-values', values)
+        $table.one 'draw.dt', (e) -> $(e.target).DataTable().flash(error, 'danger') and restoreSelected($(e.target), values)
         $table.DataTable().draw()
     )
   else # Normal AJAX post
+    $table.dataTable().data('bulk-actions-restore-selected-values', values)
+
     $.ajax(
       method: method,
       url: url,
       data: { ids: values, authenticity_token: token }
     ).done((response) ->
       success = response['message'] || "Successfully completed #{title} bulk action"
-      $processing.html(success)
+      $table.one 'draw.dt', (e) -> $(e.target).DataTable().flash(success, 'success') and restoreSelected($(e.target), values)
+
     ).fail((response) ->
       error = response['message'] || "An error occured while attempting #{title} bulk action: #{response.statusText}"
-      $processing.html(error)
-      alert(error)
+      $table.one 'draw.dt', (e) -> $(e.target).DataTable().flash(error, 'danger') and restoreSelected($(e.target), values)
+
     ).always((response) ->
-      $table.dataTable().data('bulk-actions-restore-selected-values', values)
       $table.DataTable().draw()
     )
-
-# We borrow the Processing div for our bulk action success/error messages
-# This makes sure that the message is displayed for 1500ms
-$(document).on 'processing.dt', (event, settings, visible) ->
-  return if settings.bDestroying
-
-  $processing = $(event.target).siblings('.dataTables_processing').first()
-  return unless $processing.data('bulk-actions-processing')
-
-  timeout = $processing.show().data('timeout')
-  clearTimeout(timeout) if timeout
-  $processing.data('timeout', setTimeout( =>
-      $processing.html('Processing...').hide()
-      $processing.data('bulk-actions-processing', null)
-    , 1500)
-  )
