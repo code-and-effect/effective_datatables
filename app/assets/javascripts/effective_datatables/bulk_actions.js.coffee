@@ -38,13 +38,14 @@ $(document).on 'click', '.buttons-bulk-actions a', (event) ->
 
   url = $bulkAction.attr('href')
   title = $bulkAction.text()
-  token = $bulkAction.parent('li').data('authenticity-token')
+  download = $bulkAction.data('bulk-download')
+  token = $table.data('authenticity-token')
   values = $.map($selected, (input) -> input.getAttribute('value'))
-  get_link = $bulkAction.data('bulk-actions-get')
+  method = $bulkAction.data('ajax-method')
 
   return unless url && values
 
-  if get_link
+  if method == 'GET'
     if url.includes('?')
       window.location.assign(url + '&' + $.param({ids: values}))
     else
@@ -58,7 +59,7 @@ $(document).on 'click', '.buttons-bulk-actions a', (event) ->
   # Show Processing...
   $processing.show().data('bulk-actions-processing', true)
 
-  if token # This is a file download
+  if download # This is a file download
     $.fileDownload(url,
       httpMethod: 'POST',
       data: { ids: values, authenticity_token: token }
@@ -75,8 +76,10 @@ $(document).on 'click', '.buttons-bulk-actions a', (event) ->
         $table.DataTable().draw()
     )
   else # Normal AJAX post
-    $.post(
-      url, { ids: values }
+    $.ajax(
+      method: method,
+      url: url,
+      data: { ids: values, authenticity_token: token }
     ).done((response) ->
       success = response['message'] || "Successfully completed #{title} bulk action"
       $processing.html(success)
