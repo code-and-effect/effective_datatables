@@ -96,7 +96,7 @@ module EffectiveDatatablesPrivateHelper
       title: title,
       pattern: pattern,
       autocomplete: opts[:search][:autocomplete] || SecureRandom.hex(32),
-      class: opts[:search][:class] || 'form-control',
+      class: opts[:search][:class] || 'datatable-form-control',
       data: {'column-name' => name, 'column-index' => opts[:index]}
     }.delete_if { |k, v| v.blank? && k != :name }
 
