@@ -7,8 +7,6 @@ class EffectiveStyleGuideDatatable < Effective::Datatable
     col :bowl, search: { collection: ['Single Bowl', 'Double Bowl', 'Triple Bowl'] }
     col :name
     col :date, as: :date
-
-    actions_col
   end
 
   # Set the permission check to the same as Effective::StyleGuide
