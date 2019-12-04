@@ -126,7 +126,7 @@ module Effective
       # Applies data-remote to anything that's data-method post or delete
       # Merges in any extra attributes when passed as a Hash
       def actions_col_actions(column)
-        resource_actions = (effective_resource&.resource_actions || fallback_effective_resource.fallback_resource_actions)
+        resource_actions = (effective_resource.try(:resource_actions) || fallback_effective_resource.fallback_resource_actions)
 
         actions = if column[:inline]
           resource_actions.transform_values { |opts| opts['data-remote'] = true; opts }
@@ -139,7 +139,7 @@ module Effective
           column[:actions].each do |action, opts|
             next unless opts.kind_of?(Hash)
 
-            existing = actions.find { |_, v| v[:action] == action }&.first
+            existing = actions.find { |_, v| v[:action] == action }.try(:first)
             next unless existing.present?
 
             actions[existing]['data-remote'] = opts[:remote] if opts.key?(:remote)

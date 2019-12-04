@@ -48,8 +48,8 @@ module EffectiveDatatablesPrivateHelper
       action = action.merge(column[:actions][:new])
 
       effective_resource = (datatable.effective_resource || datatable.fallback_effective_resource)
-      klass = (column[:actions][:new][:klass] || effective_resource&.klass || datatable.collection_class)
-    elsif Array(datatable.effective_resource&.actions).include?(:new)
+      klass = (column[:actions][:new][:klass] || effective_resource.try(:klass) || datatable.collection_class)
+    elsif Array(datatable.effective_resource.try(:actions)).include?(:new)
       effective_resource = datatable.effective_resource
       klass = effective_resource.klass
     else
