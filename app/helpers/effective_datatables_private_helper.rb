@@ -176,15 +176,15 @@ module EffectiveDatatablesPrivateHelper
     collection = opts[:collection]
     input_html = opts[:input_html] || {}
 
-    form.input name,
+    attributes = {
       value: value,
       selected: value,
       as: as,
       collection: collection,
       label: opts[:label],
-      required: input_html.delete(:required),
-      multiple: input_html.delete(:multiple),
-      include_blank: input_html.delete(:include_blank),
+      required: input_html.delete(:required) || opts[:required],
+      multiple: input_html.delete(:multiple) || opts[:multiple],
+      include_blank: input_html.delete(:include_blank) || opts[:include_blank],
       group_method: input_html.delete(:group_method),
       group_label_method: input_html.delete(:group_label_method),
       value_method: input_html.delete(:value_method),
@@ -192,6 +192,9 @@ module EffectiveDatatablesPrivateHelper
       input_html: (({name: ''} unless datatable._filters_form_required?) || {}).merge(input_html),
       input_js: ({ placeholder: ''} if as == :effective_select),
       wrapper_html: {class: 'form-group-sm'}
+    }.compact
+
+    form.input name, **attributes
   end
 
   def datatable_scope_tag(form, datatable, opts = {})
