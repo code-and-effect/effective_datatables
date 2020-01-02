@@ -94,10 +94,10 @@ module Effective
 
         case column[:as]
         when :boolean
-          if fuzzy
-            term ? (obj == true) : (obj != true)
+          if term
+            ['Yes', 'yes', true, 'true', '1'].include?(value)
           else
-            obj == term
+            ['No', 'no', false, 'false', '0'].include?(value)
           end
         when :datetime, :date
           end_at = (
