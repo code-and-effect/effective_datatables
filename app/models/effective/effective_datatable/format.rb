@@ -135,7 +135,7 @@ module Effective
         end
 
         # Merge local options. Special behaviour for remote: false
-        if column[:actions].kind_of?(Hash)
+        if column[:actions].kind_of?(Hash) && column[:actions].present?
           column[:actions].each do |action, opts|
             next unless opts.kind_of?(Hash)
 
