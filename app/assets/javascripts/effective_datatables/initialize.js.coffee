@@ -131,7 +131,7 @@ initializeDataTables = (target) ->
       if typeof(google) != 'undefined' && typeof(google.visualization) != 'undefined'
         $.each charts, (name, data) =>
           $(".effective-datatables-chart[data-name='#{name}']").each (_, obj) =>
-            chart = new google.visualization[data['type']](obj)
+            chart = new google.visualization[data['as']](obj)
             chart.draw(google.visualization.arrayToDataTable(data['data']), data['options'])
 
     # Appends the search html, stored in the column definitions, into each column header

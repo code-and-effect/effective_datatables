@@ -36,6 +36,9 @@ module Effective
         # Apply value ordering
         col = value_tool.order(col)
 
+        # Charts too
+        @charts_data = chart(collection, col) if _charts.present?
+
         # Apply pagination
         col = col.kind_of?(Array) ? value_tool.paginate(col) : column_tool.paginate(col)
 
@@ -47,9 +50,6 @@ module Effective
 
         # Compute aggregate data
         @aggregates_data = aggregate(col) if _aggregates.present?
-
-        # Charts too
-        @charts_data = chart(col) if _charts.present?
 
         # Format all results
         format(col)
@@ -161,11 +161,11 @@ module Effective
         end || BLANK
       end
 
-      def chart(collection)
+      def chart(collection, searched_collection)
         _charts.inject({}) do |retval, (name, chart)|
           retval[name] = {
             as: chart[:as],
-            data: dsl_tool.instance_exec(collection, &chart[:compute]),
+            data: dsl_tool.instance_exec(collection, searched_collection, &chart[:compute]),
             name: chart[:name],
             options: chart[:options]
           }

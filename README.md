@@ -879,6 +879,10 @@ Create a [Google Chart](https://developers.google.com/chart/interactive/docs/qui
 
 No javascript required. Just use the `chart do ... end` block and return an Array of Arrays.
 
+The first collection, `collection` is the raw results as returned from the `collection do` block.
+
+The second collection, `searched_collection` is the results after the table's search columns have been applied, but irregardless of pagination.
+
 ```ruby
 charts do
   chart :breakfast, 'BarChart' do |collection|
@@ -894,6 +898,18 @@ charts do
       [date.strftime('%F'), posts.length]
     end
   end
+
+  chart :posts_per_user, 'ColumnChart' do |collection, searched_collection|
+    measured_posts = if search.present?
+      ["Posts with #{search.map { |k, v| k.to_s + ' ' + v.to_s }.join(',')}", searched_collection.length]
+    else
+      ['All Posts', collection.length]
+    end
+
+    [['Posts', 'Count'], measured_posts] +
+    searched_collection.group_by(&:user).map { |user, posts| [user.last_name, posts.length] }
+  end
+
 end
 ```
 
