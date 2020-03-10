@@ -18,7 +18,6 @@
         clearTimeout(timer);
         timer = setTimeout(function() {
           var newVal = element.val();
-          newVal = $.trim(newVal);
           if (element.delayedChange.oldVal != newVal) {
             element.delayedChange.oldVal = newVal;
             o.onChange.call(this, element);

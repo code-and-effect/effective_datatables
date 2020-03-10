@@ -169,7 +169,15 @@ initializeDataTables = (target) ->
       return if $input.is(':invalid')
 
       table = $input.closest('table.dataTable')
-      table.DataTable().column("#{$input.data('column-name')}:name").search($input.val()).draw()
+
+      value = $input.val()
+
+      if value.startsWith('"') && value.endsWith('"')
+        value = value.substring(1, value.length-1)
+      else
+        value = $.trim(value)
+
+      table.DataTable().column("#{$input.data('column-name')}:name").search(value).draw()
 
     if reorder
       init_options['rowReorder'] = { selector: 'td.col-_reorder', snapX: true, dataSrc: datatable.data('reorder-index') }
