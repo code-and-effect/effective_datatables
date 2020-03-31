@@ -33,7 +33,7 @@ module Effective
     include Effective::EffectiveDatatable::Resource
     include Effective::EffectiveDatatable::State
 
-    def initialize(view = nil, attributes = nil) 
+    def initialize(view = nil, attributes = nil)
       (attributes = view; view = nil) if view.kind_of?(Hash)
 
       @attributes = (attributes || {})
@@ -49,6 +49,7 @@ module Effective
 
       raise 'expected a hash of arguments' unless @attributes.kind_of?(Hash)
       raise 'collection is defined as a method. Please use the collection do ... end syntax.' unless collection.nil?
+
       self.view = view if view
     end
 
@@ -168,6 +169,10 @@ module Effective
 
     def fallback_effective_resource
       @fallback_effective_resource ||= Effective::Resource.new('', namespace: controller_namespace)
+    end
+
+    def default_visibility
+      columns.values.inject({}) { |h, col| h[col[:index]] = col[:visible]; h }
     end
 
     private

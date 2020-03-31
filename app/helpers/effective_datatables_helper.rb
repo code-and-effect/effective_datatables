@@ -44,6 +44,7 @@ module EffectiveDatatablesHelper
         'authenticity-token' => form_authenticity_token,
         'bulk-actions' => datatable_bulk_actions(datatable),
         'columns' => datatable_columns(datatable),
+        'default-visibility' => datatable.default_visibility.to_json,
         'display-length' => datatable.display_length,
         'display-order' => datatable_display_order(datatable),
         'display-records' => datatable.to_json[:recordsFiltered],
