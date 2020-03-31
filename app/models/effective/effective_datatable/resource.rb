@@ -91,6 +91,8 @@ module Effective
             opts[:sql_column] = :effective_addresses
           when :effective_roles
             opts[:sql_column] = :effective_roles
+          when :active_storage
+            opts[:sql_column] = :active_storage
           when :string  # This is the fallback
             # Anything that doesn't belong to the model or the sql table, we assume is a SELECT SUM|AVG|RANK() as fancy
             opts[:sql_as_column] = true if (effective_resource.table && effective_resource.column(name).blank?)
@@ -135,6 +137,10 @@ module Effective
 
           if opts[:resource] && !opts[:resource_field] && opts[:as] != :effective_addresses
             opts[:partial] ||= '/effective/datatables/resource_column'
+          end
+
+          if opts[:as] == :active_storage
+            opts[:partial] ||= '/effective/datatables/active_storage_column'
           end
 
           opts[:col_class] = [
