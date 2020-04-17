@@ -149,6 +149,8 @@ module EffectiveDatatablesPrivateHelper
     elsif as == :boolean
       collection ||= [true, false].map { |value| [t("effective_datatables.boolean_#{value}"), value] }
       form.public_send(:select, name, collection, options) # boolean
+    elsif as == :string
+      form.public_send(:text_field, name, options)
     elsif form.respond_to?(as)
       form.public_send(as, name, options) # check_box, text_area
     else

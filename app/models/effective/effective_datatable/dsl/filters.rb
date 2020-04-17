@@ -20,7 +20,7 @@ module Effective
             elsif value != nil
               Effective::Attribute.new(value).type
             end
-          ) || :text
+          ) || :string
 
           datatable._filters[name.to_sym] = {
             value: value,

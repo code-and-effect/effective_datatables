@@ -198,7 +198,7 @@ module Effective
       def parse_filter_value(filter, value)
         return filter[:parse].call(value) if filter[:parse]
         return nil if value.blank? && !filter[:required]
-        Effective::Attribute.new(filter[:value]).parse(value, name: filter[:name])
+        Effective::Attribute.new(filter[:as] || filter[:value] || :string).parse(value, name: filter[:name])
       end
 
       def cookie_state_params
