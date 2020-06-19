@@ -1,4 +1,4 @@
 - Array(resource.public_send(column[:name])).each do |file|
   .col-resource_item
     - title = [file.content_type, number_to_human_size(file.byte_size)].map(&:presence).compact
-    = link_to(file.filename, url_for(file), title: title)
+    = link_to(file.filename, url_for(file), title: title, target: '_blank')
