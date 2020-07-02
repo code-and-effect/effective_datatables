@@ -5,6 +5,9 @@ initializeDataTables = (target) ->
     buttons_export_columns = options['buttons_export_columns'] || ':not(.col-actions)'
     reorder = datatable.data('reorder')
 
+    if datatable.data('inline') && datatable.closest('form').length > 0
+      console.error('inline datatable cannot work inside a form')
+
     if options['buttons'] == false
       options['buttons'] = []
 
