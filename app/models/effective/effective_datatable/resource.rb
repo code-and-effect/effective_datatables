@@ -4,7 +4,7 @@ module Effective
       AGGREGATE_SQL_FUNCTIONS = ['ARRAY_AGG(', 'AVG(', 'COUNT(', 'MAX(', 'MIN(', 'STRING_AGG(', 'SUM(']
 
       def admin_namespace?
-        controller_namespace == 'admin'
+        [:admin, 'admin'].include?(controller_namespace)
       end
 
       def controller_namespace
@@ -200,6 +200,7 @@ module Effective
 
       def load_resource_belongs_tos!
         return unless active_record_collection?
+        return unless @_collection_apply_belongs_to 
 
         changed = attributes.select do |attribute, value|
           attribute = attribute.to_s
@@ -210,7 +211,7 @@ module Effective
           next unless columns[associated]
 
           if columns[associated][:as] == :belongs_to
-            if @_collection_apply_belongs_to && !@_collection.where_values_hash.include?(attribute)
+            unless @_collection.where_values_hash.include?(attribute)
               @_collection = @_collection.where(attribute => value)
             end
 
@@ -218,10 +219,8 @@ module Effective
           elsif columns[associated][:as] == :belongs_to_polymorphic
             associated_type = attributes["#{associated}_type".to_sym] || raise("Expected #{associated}_type attribute to be present when #{associated}_id is present on a polymorphic belongs to")
 
-            if @_collection_apply_belongs_to
-              if !@_collection.where_values_hash.include?(attribute) && !@_collection.where_values_hash.include?("#{associated}_type")
-                @_collection = @_collection.where(attribute => value).where("#{associated}_type" => associated_type)
-              end
+            unless @_collection.where_values_hash.include?(attribute) || @_collection.where_values_hash.include?("#{associated}_type")
+              @_collection = @_collection.where(attribute => value).where("#{associated}_type" => associated_type)
             end
 
             columns.delete(associated)
