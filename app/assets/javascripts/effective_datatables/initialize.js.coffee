@@ -175,7 +175,9 @@ initializeDataTables = (target) ->
 
       value = $input.val()
 
-      if value.startsWith('"') && value.endsWith('"')
+      if Array.isArray(value)
+        # Nothing
+      else if value.startsWith('"') && value.endsWith('"')
         value = value.substring(1, value.length-1)
       else
         value = $.trim(value)
