@@ -11,6 +11,7 @@ module Effective
       end
 
       def load_attributes!
+        return unless view.respond_to?(:controller_path)
         @attributes[:namespace] ||= view.controller_path.split('/')[0...-1].join('/')
       end
 

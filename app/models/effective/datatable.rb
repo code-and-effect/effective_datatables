@@ -53,10 +53,36 @@ module Effective
       self.view = view if view
     end
 
+    def rendered(params = {})
+      raise('expected a hash of params') unless params.kind_of?(Hash)
+
+      view = ApplicationController.renderer.controller.helpers
+
+      view.class_eval do
+        attr_accessor :rendered_params
+
+        def current_user
+          rendered_params[:current_user]
+        end
+      end
+
+      if params[:current_user_id]
+        params[:current_user] = User.find(params[:current_user_id])
+      end
+
+      view.rendered_params = params
+
+      self.view = view
+      self
+    end
+
     # Once the view is assigned, we initialize everything
     def view=(view)
       @view = (view.respond_to?(:view_context) ? view.view_context : view)
-      raise 'expected view to respond to params' unless @view.respond_to?(:params)
+
+      unless @view.respond_to?(:params) || @view.respond_to?(:rendered_params)
+        raise 'expected view to respond to params'
+      end
 
       assert_attributes!
       load_attributes!

@@ -1155,6 +1155,22 @@ def finalize(collection)
 end
 ```
 
+## Render outside of view
+
+You can render a datatable outside the view.
+
+Anything you pass to the `rendered` method is treated as view/request params.
+
+You can test filters and scopes by passing them here.
+
+```
+post = Post.create!
+datatable = PostsDatatable.new.rendered(end_date: Time.zone.now+2.days, current_user_id: 1)
+
+assert_equal 1, datatable.collection.count
+assert_equal [post], datatable.collection
+```
+
 ## Authorization
 
 All authorization checks are handled via the config.authorization_method found in the `config/initializers/effective_datatables.rb` file.

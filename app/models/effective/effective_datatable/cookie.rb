@@ -10,6 +10,7 @@ module Effective
 
       def load_cookie!
         return unless EffectiveDatatables.save_state
+        return unless view.respond_to?(:cookies)
 
         @dt_cookie = view.cookies.signed['_effective_dt']
 
@@ -33,6 +34,7 @@ module Effective
 
       def save_cookie!
         return unless EffectiveDatatables.save_state
+        return unless view.respond_to?(:cookies)
 
         @dt_cookie ||= []
         @dt_cookie << [cookie_key, cookie_payload]
