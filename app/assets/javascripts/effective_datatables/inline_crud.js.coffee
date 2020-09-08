@@ -1,15 +1,34 @@
 # To achieve inline crud, we use rails' data-remote links, and override their behaviour when inside a datatable
 # This works with EffectiveForm.remote_form which is part of the effective_bootstrap gem.
 
-# We click the New/Edit/Action button from the col-actions
-$(document).on 'ajax:beforeSend', '.dataTables_wrapper .col-actions', (e, xhr, settings) ->
-  $action = $(e.target)
-  $table = $(e.target).closest('table')
+# https://github.com/rails/jquery-ujs/wiki/ajax
+# https://edgeguides.rubyonrails.org/working_with_javascript_in_rails.html#rails-ujs-event-handlers
+
+$(document).on 'ajax:before', '.dataTables_wrapper .col-actions', (event) ->
+  $action = $(event.target)
+  $table = $(event.target).closest('table')
 
   return true if ('' + $action.data('inline')) == 'false'
 
-  $params = $.param({_datatable_id: $table.attr('id'), _datatable_attributes: $table.data('attributes'), _datatable_action: true })
-  settings.url += (if settings.url.indexOf('?') == -1 then '?' else '&') + $params
+  $params = $.param(
+    {
+      _datatable_id: $table.attr('id'),
+      _datatable_attributes: $table.data('attributes'),
+      _datatable_action: true
+    }
+  )
+
+  $action.attr('data-params', $params)
+  true
+
+# We click the New/Edit/Action button from the col-actions
+$(document).on 'ajax:beforeSend', '.dataTables_wrapper .col-actions', (event, xhr, settings) ->
+  [xhr, settings] = event.detail if event.detail # rails/ujs
+
+  $action = $(event.target)
+  $table = $(event.target).closest('table')
+
+  return true if ('' + $action.data('inline')) == 'false'
 
   if $action.closest('.effective-datatables-inline-row,table.dataTable').hasClass('effective-datatables-inline-row')
     # Nothing.
@@ -22,6 +41,8 @@ $(document).on 'ajax:beforeSend', '.dataTables_wrapper .col-actions', (e, xhr, s
 
 # We have either completed the resource action, or fetched the inline form to load.
 $(document).on 'ajax:success', '.dataTables_wrapper .col-actions', (event, data) ->
+  [data, status, xhr] = event.detail if event.detail # rails/ujs
+
   $action = $(event.target)
 
   return true if ('' + $action.data('inline')) == 'false'
@@ -54,12 +75,22 @@ $(document).on 'ajax:error', '.dataTables_wrapper', (event) ->
   EffectiveForm.remote_form_flash = ''
   true
 
-# Submitting an inline datatables form
-$(document).on 'ajax:beforeSend', '.dataTables_wrapper .col-inline-form', (e, xhr, settings) ->
-  $table = $(e.target).closest('table')
+## Now for the fetched form. We add the datatables params attributes
 
-  $params = $.param({_datatable_id: $table.attr('id'), _datatable_attributes: $table.data('attributes') })
-  settings.url += (if settings.url.indexOf('?') == -1 then '?' else '&') + $params
+$(document).on 'ajax:before', '.dataTables_wrapper .col-inline-form', (event) ->
+  $action = $(event.target)
+  $form = $action.closest('form')
+  $table = $action.closest('table')
+
+  if $form.find('input[name=_datatable_id]').length == 0
+    $('<input>').attr(
+      {type: 'hidden', name: '_datatable_id', value: $table.attr('id')}
+    ).appendTo($form)
+
+  if $form.find('input[name=_datatable_attributes]').length == 0
+    $('<input>').attr(
+      {type: 'hidden', name: '_datatable_attributes', value: $table.data('attributes')}
+    ).appendTo($form)
 
   true
 
