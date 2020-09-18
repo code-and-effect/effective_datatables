@@ -98,9 +98,11 @@ module Effective
             opts[:sql_as_column] = true if (effective_resource.table && effective_resource.column(name).blank?)
           end
 
-          if opts[:sql_column].present? && AGGREGATE_SQL_FUNCTIONS.any? { |str| opts[:sql_column].to_s.start_with?(str) }
-            opts[:sql_as_column] = true
+          if opts[:sql_column].present?
+            sql_column = opts[:sql_column].to_s
+            opts[:sql_as_column] = true if AGGREGATE_SQL_FUNCTIONS.any? { |str| sql_column.start_with?(str) }
           end
+
         end
       end
 
@@ -200,7 +202,7 @@ module Effective
 
       def load_resource_belongs_tos!
         return unless active_record_collection?
-        return unless @_collection_apply_belongs_to 
+        return unless @_collection_apply_belongs_to
 
         changed = attributes.select do |attribute, value|
           attribute = attribute.to_s

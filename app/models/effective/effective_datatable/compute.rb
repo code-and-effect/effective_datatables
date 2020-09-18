@@ -64,6 +64,7 @@ module Effective
             if state[:visible][name] == false && (name != order_name)  # Sort by invisible array column
               BLANK
             elsif opts[:compute]
+
               if array_collection?
                 dsl_tool.instance_exec(obj, obj[opts[:index]], &opts[:compute])
               else

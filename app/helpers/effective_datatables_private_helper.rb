@@ -44,7 +44,7 @@ module EffectiveDatatablesPrivateHelper
     action = { action: :new, class: ['btn', column[:btn_class].presence].compact.join(' '), 'data-remote': true }
 
     if column[:actions][:new].kind_of?(Hash) # This might be active_record_array_collection?
-      action = action.merge(column[:actions][:new])
+      action.merge!(column[:actions][:new])
 
       effective_resource = (datatable.effective_resource || datatable.fallback_effective_resource)
       klass = (column[:actions][:new][:klass] || effective_resource&.klass || datatable.collection_class)
@@ -84,7 +84,7 @@ module EffectiveDatatablesPrivateHelper
     collection = opts[:search].delete(:collection)
     value = datatable.state[:search][name]
 
-    options = opts[:search].except(:fuzzy).merge!(
+    options = opts[:search].merge!(
       name: nil,
       feedback: false,
       label: false,
@@ -92,24 +92,26 @@ module EffectiveDatatablesPrivateHelper
       data: { 'column-name': name, 'column-index': opts[:index] }
     )
 
+    options.delete(:fuzzy)
+
     case options.delete(:as)
     when :string, :text, :number
       form.text_field name, options
     when :date, :datetime
-      form.date_field name, options.reverse_merge(
+      form.date_field name, options.reverse_merge!(
         date_linked: false, prepend: false, input_js: { useStrict: true, keepInvalid: true }
       )
     when :time
-      form.time_field name, options.reverse_merge(
+      form.time_field name, options.reverse_merge!(
         date_linked: false, prepend: false, input_js: { useStrict: false, keepInvalid: true }
       )
     when :select, :boolean
-      options[:input_js] = (options[:input_js] || {}).reverse_merge(placeholder: '')
+      options[:input_js] = (options[:input_js] || {}).reverse_merge!(placeholder: '')
 
       form.select name, collection, options
     when :bulk_actions
       options[:data]['role'] = 'bulk-actions'
-      form.check_box name, options.merge(label: '&nbsp;')
+      form.check_box name, options.merge!(label: '&nbsp;')
     end
   end
 
@@ -139,7 +141,7 @@ module EffectiveDatatablesPrivateHelper
       placeholder: (opts[:label] || name.to_s.titleize),
       value: value,
       wrapper: { class: 'form-group col-auto'}
-    }.merge(opts.except(:as, :collection, :parse, :value))
+    }.merge!(opts.except(:as, :collection, :parse, :value))
 
     options[:name] = '' unless datatable._filters_form_required?
 
@@ -171,7 +173,7 @@ module EffectiveDatatablesPrivateHelper
       label: false,
       required: false,
       wrapper: { class: 'form-group col-auto'}
-    }.merge(opts.except(:checked, :value))
+    }.merge!(opts.except(:checked, :value))
 
     form.radios :scope, collection, options
   end
