@@ -16,7 +16,7 @@ module Effective
           next unless state[:visible][name]
 
           if opts[:partial]
-            locals = { datatable: self, column: opts }.merge(resource_col_locals(opts))
+            locals = { datatable: self, column: opts }.merge!(resource_col_locals(opts))
 
             rendered[name] = (view.render(
               partial: opts[:partial],
@@ -27,7 +27,6 @@ module Effective
               spacer_template: SPACER_TEMPLATE
             ) || '').split(SPACER)
           elsif opts[:as] == :actions # This is actions_col and actions_col do .. end, but not actions_col partial: 'something'
-            resources = collection.map { |row| row[opts[:index]] }
             locals = { datatable: self, column: opts, spacer_template: SPACER_TEMPLATE }
 
             atts = {
@@ -36,16 +35,17 @@ module Effective
               effective_resource: effective_resource,
               locals: locals,
               partial: opts[:actions_partial],
-            }.compact.merge(opts[:actions])
+            }.merge!(opts[:actions]).tap(&:compact!)
 
             rendered[name] = if effective_resource.blank?
-              resources.map do |resource|
+              collection.map { |row| row[opts[:index]] }.map do |resource|
                 polymorphic_resource = Effective::Resource.new(resource, namespace: controller_namespace)
                 (view.render_resource_actions(resource, atts.merge(effective_resource: polymorphic_resource), &opts[:format]) || '')
               end
             else
-              (view.render_resource_actions(resources, atts, &opts[:format]) || '').split(SPACER)
+              (view.render_resource_actions(collection.map { |row| row[opts[:index]] }, atts, &opts[:format]) || '').split(SPACER)
             end
+
           end
         end
 
@@ -135,7 +135,7 @@ module Effective
         end
 
         # Merge local options. Special behaviour for remote: false
-        if column[:actions].kind_of?(Hash) && column[:actions].present?
+        if column[:actions].present? && column[:actions].kind_of?(Hash)
           column[:actions].each do |action, opts|
             next unless opts.kind_of?(Hash)
 
