@@ -8,7 +8,14 @@ reorder = (event, diff, edit) ->
   return unless oldNode? && newNode?
 
   url = @context[0].ajax.url.replace('.json', '/reorder.json')
-  data = {'reorder[id]': oldNode.data('reorder-resource'), 'reorder[old]': oldNode.val(), 'reorder[new]': newNode.val(), attributes: $table.data('attributes') }
+
+  data = {
+    'authenticity_token': $('head').find("meta[name='csrf-token']").attr('content'),
+    'reorder[id]': oldNode.data('reorder-resource'),
+    'reorder[old]': oldNode.val(),
+    'reorder[new]': newNode.val(),
+    'attributes': $table.data('attributes')
+  }
 
   @context[0].rowreorder.c.enable = false
 
@@ -40,4 +47,3 @@ $(document).on 'click', '.dataTables_wrapper a.buttons-reorder', (event) ->
     $table.addClass('reordering')
 
   column.visible(!column.visible())
-
