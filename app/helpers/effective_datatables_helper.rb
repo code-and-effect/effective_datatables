@@ -40,6 +40,7 @@ module EffectiveDatatablesHelper
       id: datatable.to_param,
       class: html_class,
       data: {
+        'all-label' => I18n.t('effective_datatables.all'),
         'attributes' => EffectiveDatatables.encrypt(datatable.attributes),
         'authenticity-token' => form_authenticity_token,
         'bulk-actions' => datatable_bulk_actions(datatable),

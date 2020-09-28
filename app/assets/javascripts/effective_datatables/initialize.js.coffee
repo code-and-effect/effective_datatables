@@ -52,7 +52,7 @@ initializeDataTables = (target) ->
       displayStart: datatable.data('display-start')
       iDisplayLength: datatable.data('display-length')
       language: datatable.data('language')
-      lengthMenu: [[5, 10, 25, 50, 100, 250, 500, 9999999], ['5', '10', '25', '50', '100', '250', '500', 'All']]
+      lengthMenu: [[5, 10, 25, 50, 100, 250, 500, 9999999], ['5', '10', '25', '50', '100', '250', '500', datatable.data('all-label')]]
       order: datatable.data('display-order')
       processing: true
       responsive: true
@@ -80,7 +80,7 @@ initializeDataTables = (target) ->
               filter_name = name.replace('filters[', '').substring(0, name.length-9)
 
               params['filter'][filter_name] = $form.find("input[name='#{name}']:checked").val()
-              
+
             else if $input.attr('id')
               filter_name = $input.attr('id').replace('filters_', '')
               params['filter'][filter_name] = $input.val()
