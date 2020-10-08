@@ -88,9 +88,9 @@ module Effective
         when :currency
           view.number_to_currency(value)
         when :date
-          (value.strftime('%F') rescue BLANK)
+          value.respond_to?(:strftime) ? value.strftime(EffectiveDatatables.format_date) : BLANK
         when :datetime
-          (value.strftime('%F %H:%M') rescue BLANK)
+          value.respond_to?(:strftime) ? value.strftime(EffectiveDatatables.format_datetime) : BLANK
         when :decimal
           value
         when :duration
@@ -116,7 +116,7 @@ module Effective
           when Numeric    ; view.number_to_currency(value)
           end
         when :time
-          (value.strftime('%H:%M') rescue BLANK)
+          value.respond_to?(:strftime) ? value.strftime(EffectiveDatatables.format_time) : BLANK
         else
           value.to_s
         end
