@@ -16,6 +16,10 @@ module EffectiveDatatables
   mattr_accessor :cookie_domain
   mattr_accessor :cookie_tld_length
 
+  mattr_accessor :format_datetime
+  mattr_accessor :format_date
+  mattr_accessor :format_time
+
   mattr_accessor :debug
 
   alias_method :max_cookie_size, :cookie_max_size
