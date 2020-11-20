@@ -1,8 +1,8 @@
 module Effective
   class Datatable
     attr_reader :attributes # Anything that we initialize our table with. That's it. Can't be changed by state.
-    attr_reader :effective_resource
     attr_reader :state
+    attr_accessor :effective_resource
 
     # Hashes of DSL options
     attr_reader :_aggregates

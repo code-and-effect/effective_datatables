@@ -31,7 +31,7 @@ module Effective
       end
 
       def load_effective_resource!
-        @effective_resource = if active_record_collection?
+        @effective_resource ||= if active_record_collection?
           Effective::Resource.new(collection_class, namespace: controller_namespace)
         end
       end
