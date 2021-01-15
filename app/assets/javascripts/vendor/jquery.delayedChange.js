@@ -14,7 +14,7 @@
 
     return this.each(function() {
       var element = $(this);
-      element.keyup(function() {
+      element.on('keyup paste', function() {
         clearTimeout(timer);
         timer = setTimeout(function() {
           var newVal = element.val();
