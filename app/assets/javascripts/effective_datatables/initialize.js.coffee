@@ -165,7 +165,6 @@ initializeDataTables = (target) ->
           $input.on 'change', (event) -> dataTableSearch($(event.currentTarget))
         else if $input.is('input')
           $input.delayedChange ($input) -> dataTableSearch($input)
-          $input.on('paste', -> dataTableSearch($input))
 
     # Do the actual search
     dataTableSearch = ($input) ->   # This is the function called by a select or input to run the search
