@@ -1025,7 +1025,7 @@ This file is what rails uses when you call `render(thing)` and what datatables u
 
 The `effective_form_with` comes from [effective_bootstrap](https://github.com/code-and-effect/effective_bootstrap) gem and is a drop-in replacement for the newer `form_with` syntax. It's really good, you should use it, but an ordinary `form_with` will work here just fine.
 
-This `_form.html` is an effective gems convention. This file shoudl exist for each of your resources.
+This `_form.html` is an effective gems convention. This file must exist for your resource.
 
 - A resources entry in `config/routes.rb`:
 
