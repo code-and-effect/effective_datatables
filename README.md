@@ -937,14 +937,10 @@ Any datatable can be used as an inline datatable, to create, update and destroy 
 
 If your datatable is already working with `actions_col` and being rendered from an `Effective::CrudController` controller, all you need to do is change your view from `render_datatable(@datatable)` to `render_datatable(@datatable, inline: true)`.
 
-Click here for a [Inline Live Demo](https://effective-datatables-demo.herokuapp.com/things).
+Click here for a [Inline Live Demo](https://effective-datatables-demo.herokuapp.com/things) and here for an [Inline Code Example](https://github.com/code-and-effect/effective_datatables_demo)
+(only the `thing` data model and `things_datatable` are being used inline)
 
-And check out the [Inline Code Example](https://github.com/code-and-effect/effective_datatables_demo)
-(Only the `thing` data model and `things_datatable` are being used inline)
-
-To use effective_datatables as an inline CRUD builder, you will be relying heavily on [effective_resources](https://github.com/code-and-effect/effective_resources) which is a dependency of this gem.
-
-I would also recommend you install [effective_developer](https://github.com/code-and-effect/effective_developer) to get access to some scaffolds and generators. It's not required.
+To use effective_datatables as an inline CRUD builder, you will be relying heavily on [effective_resources](https://github.com/code-and-effect/effective_resources) which is a dependency of this gem. I would also recommend you install [effective_developer](https://github.com/code-and-effect/effective_developer) to get access to some scaffolds and generators. It's not required but I'm gonna use them in this example.
 
 Here is how I build rails models for inline datatable CRUD operations:
 
@@ -1029,6 +1025,7 @@ This file is what rails uses when you call `render(thing)` and what datatables u
 
 The `effective_form_with` comes from [effective_bootstrap](https://github.com/code-and-effect/effective_bootstrap) gem and is a drop-in replacement for the newer `form_with` syntax. It's really good, you should use it, but an ordinary `form_with` will work here just fine.
 
+This `_form.html` is an effective gems convention. This file shoudl exist for each of your resources.
 
 - A resources entry in `config/routes.rb`:
 
@@ -1087,9 +1084,9 @@ We use good old `rails_ujs` for all inline actions.
 
 When inline, any of the actions_col actions, as well as the New button, will be changed into `data-remote: true` actions.
 
-The (inline_crud javascript)[https://github.com/code-and-effect/effective_datatables/blob/master/app/assets/javascripts/effective_datatables/inline_crud.js.coffee] handles fetching the form, or view partial and expanding/collapsing the appropriate row of the datatable.
+The [inline_crud javascript](https://github.com/code-and-effect/effective_datatables/blob/master/app/assets/javascripts/effective_datatables/inline_crud.js.coffee) handles fetching the form, or view partial and expanding/collapsing the appropriate row of the datatable.
 
-When an inline action is clicked, effective_datatables will make an AJAX request to the server, which could be received by an `Effective::CrudController` that will handle the `.js` format, and respond_with the appropriate (rails_ujs .js.erb views)(https://github.com/code-and-effect/effective_resources/tree/master/app/views/application).
+When an inline action is clicked, effective_datatables will make an AJAX request to the server, which could be received by an `Effective::CrudController` that will handle the `.js` format, and respond_with the appropriate [rails_ujs .js.erb views](https://github.com/code-and-effect/effective_resources/tree/master/app/views/application).
 
 
 # Extras
