@@ -8,7 +8,7 @@ Does the right thing with searching sql columns as well as computed values from 
 
 Displays links to associated edit/show/destroy actions based on `current_user` authorized actions.
 
-Other features include aggregate (total/average) footer rows, bulk actions, show/hide columns, responsive collapsing columns and Google charts.
+Other features include aggregate (total/average) footer rows, bulk actions, show/hide columns, responsive collapsing columns, google charts, and inline crud.
 
 This gem includes the jQuery DataTables assets.
 
@@ -54,7 +54,8 @@ Please check out [Effective Datatables 3.x](https://github.com/code-and-effect/e
     * [bulk_action](#bulk_action_divider)
     * [bulk_download](#bulk_download)
     * [bulk_action_content](#bulk_action_content)
-  * [charts](#charts)
+  * [Charts](#charts)
+  * [Inline](#inline)
   * [Extras](#extras)
   * [Advanced Search and Sort](#advanced-search-and-sort)
 * [Addtional Functionality](#additional-functionality)
@@ -453,7 +454,7 @@ The `datatable do ... end` block configures a table of data.
 
 Initialize the datatable in your controller or view, `@datatable = PostsDatatable.new(self)`, and render it in your view `<%= render_datatable(@datatable) %>`
 
-### col
+## col
 
 This is the main DSL method that you will interact with.
 
@@ -526,7 +527,7 @@ You can also use the joined syntax, `col 'user.email'` to create a column for ju
 
 This feature is only working with `belongs_to` and you need to add the `.joins(:user)` to the collection do ... end block yourself.
 
-### val
+## val
 
 Shorthand for value, this command also creates a column on the datatable.
 
@@ -548,7 +549,7 @@ This is implemented as a full Array search/sort and is much slower for large dat
 
 The `.format do ... end` block can then be used to apply custom formatting.
 
-### bulk_actions_col
+## bulk_actions_col
 
 Creates a column of checkboxes for use with the `bulk_actions` section.
 
@@ -558,7 +559,7 @@ Use these checkboxes to select all / none / one or more rows for the `bulk_actio
 
 You can only have one `bulk_actions_col` per datatable.
 
-### actions_col
+## actions_col
 
 When working with an ActiveRecord based collection, this column will consider the `current_user`'s authorization, and generate links to edit, show and destroy actions for any collection class.
 
@@ -596,7 +597,7 @@ Any `data-remote` actions will be hijacked and performed as inline ajax by datat
 
 If you'd like to opt-out of this behavior, use `actions_col(inline: false)` or add `data-inline: false` to your action link.
 
-### length
+## length
 
 Sets the default number of rows per page. Valid lengths are `5`, `10`, `25`, `50`, `100`, `250`, `500`, `:all`
 
@@ -606,7 +607,7 @@ When not specified, effective_datatables uses the default as per the `config/ini
 length 100
 ```
 
-### order
+## order
 
 Sets the default order of table rows. The first argument is the column, the second the direction.
 
@@ -618,7 +619,7 @@ When not specified, effective_datatables will sort by the first defined column.
 order :created_at, :asc|:desc
 ```
 
-### reorder
+## reorder
 
 Enables drag-and-drop row re-ordering.
 
@@ -636,7 +637,7 @@ reorder :position
 
 Using `reorder` will sort the collection by this field and disable all other column sorting.
 
-### aggregate
+## aggregate
 
 The `aggregate` command inserts a row in the table's `tfoot`.
 
@@ -681,7 +682,7 @@ The form is submitted by an AJAX POST action, or, in some advanced circumstances
 
 Initialize the datatable in your controller or view, `@datatable = PostsDatatable.new(self)`, and render its filters anywhere with `<%= render_datatable_filters(@datatable) %>`.
 
-### scope
+## scope
 
 All defined scopes are rendered as a single radio button form field. Works great with the [effective_form_inputs](https://github.com/code-and-effect/effective_form_inputs) gem.
 
@@ -705,7 +706,7 @@ class Post < ApplicationRecord | ActiveRecord::Base
 end
 ```
 
-### filter
+## filter
 
 Each filter has a name and a default/fallback value. If the form is submitted blank, the default values are used.
 
@@ -758,7 +759,7 @@ Creates a single dropdown menu with a link to each action, download or content.
 
 Along with this section, you must put a `bulk_actions_col` somewhere in your `datatable do ... end` section.
 
-### bulk_action
+## bulk_action
 
 Creates a link that becomes clickable when one or more checkbox/rows are selected as per the `bulk_actions_col` column.
 
@@ -814,11 +815,11 @@ def approve!
 end
 ```
 
-### bulk_action_divider
+## bulk_action_divider
 
 Inserts a menu divider `<li class='divider' role='separator'></li>`
 
-### bulk_download
+## bulk_download
 
 So it turns out there are some http issues with using an AJAX action to download a file.
 
@@ -859,7 +860,7 @@ def bulk_export_report
 end
 ```
 
-### bulk_action_content
+## bulk_action_content
 
 Blindly inserts content into the dropdown.
 
@@ -873,7 +874,7 @@ end
 
 Don't actually use this.
 
-## charts
+# Charts
 
 Create a [Google Chart](https://developers.google.com/chart/interactive/docs/quick_start) based on your searched collection, filters and attributes.
 
@@ -930,11 +931,172 @@ All options passed to `chart` are used to initialize the chart javascript.
 
 By default, the only package that is loaded is `corechart`, see the `config/initializers/effective_datatables.rb` file to add more packages.
 
-## Extras
+# Inline
+
+Any datatable can be used as an inline datatable, to create, update and destroy resources without leaving the current page.
+
+If your datatable is already working with `actions_col` and being rendered from an `Effective::CrudController` controller, all you need to do is change your view from `render_datatable(@datatable)` to `render_datatable(@datatable, inline: true)`.
+
+Click here for a [Inline Live Demo](https://effective-datatables-demo.herokuapp.com/things).
+
+And check out the [Inline Code Example](https://github.com/code-and-effect/effective_datatables_demo)
+(Only the `thing` data model and `things_datatable` are being used inline)
+
+To use effective_datatables as an inline CRUD builder, you will be relying heavily on [effective_resources](https://github.com/code-and-effect/effective_resources) which is a dependency of this gem.
+
+I would also recommend you install [effective_developer](https://github.com/code-and-effect/effective_developer) to get access to some scaffolds and generators. It's not required.
+
+Here is how I build rails models for inline datatable CRUD operations:
+
+1. Create a new model file `app/models/thing.rb`:
+
+```ruby
+class Thing < ApplicationRecord
+  belongs_to :user
+
+  effective_resource do
+    title           :string
+    description     :text
+    timestamps
+  end
+
+  scope :deep, -> { includes(:user) }
+  scope :sorted, -> { order(:title) }
+
+  def to_s
+    title
+  end
+end
+```
+
+The `effective_resource do` block comes from the [effective_resources](https://github.com/code-and-effect/effective_resources) gem and is used to build any permitted_params.
+
+2. Generate a migration. Run `rails generate effective:migration things` to create a migration based off the model file then `rails db:migrate`.
+
+3. Scaffold the rest. Run `rails generate effective:scaffold_controller things` which will create:
+
+- A controller `app/controllers/things_controller.rb`:
+
+```ruby
+class ThingsController < ApplicationController
+  include Effective::CrudController
+end
+```
+
+The Effective::CrudController comes from [effective_resources](https://github.com/code-and-effect/effective_resources) gem and handles the standard 7 CRUD actions and member and collection actions. It is opinionated code that follows rails conventions. It considers the `routes.rb` and `ability.rb` or other authorization, to find all available actions.
+
+- A datatable `app/datatables/things_datatable.rb`:
+
+```ruby
+class ThingsDatatable < Effective::Datatable
+  datatable do
+    col :title
+    col :description
+    actions_col
+  end
+
+  collection do
+    Thing.deep.all
+  end
+end
+```
+
+This is an ordinary datatable. As long as it's an ActiveRecord collection, inline crud will work.
+
+- A view partial `app/views/things/_thing.html.haml`:
+
+```ruby
+%table.table
+  %tbody
+    %tr
+      %th Title
+      %td= thing.title
+    %tr
+      %th Description
+      %td= thing.description
+```
+
+This file is what rails uses when you call `render(thing)` and what datatables uses for the inline `show` action. It's important that its called `_thing.html`.
+
+- A form partial `app/views/things/_form.html.haml`:
+
+```ruby
+= effective_form_with(model: thing) do |f|
+  = f.text_field :title
+  = f.text_area :description
+  = f.submit
+```
+
+The `effective_form_with` comes from [effective_bootstrap](https://github.com/code-and-effect/effective_bootstrap) gem and is a drop-in replacement for the newer `form_with` syntax. It's really good, you should use it, but an ordinary `form_with` will work here just fine.
+
+
+- A resources entry in `config/routes.rb`:
+
+```ruby
+Rails.application.routes.draw do
+  resources :things do
+    post :approve, on: :member
+    post :reject, on: :member
+  end
+end
+```
+
+Above we have `resources :things` for the 7 crud actions. And we add two more member actions, which datatables will call `approve!` or `reject!` on thing.
+
+
+4. Render in the view. Create an `app/views/things/index.html.haml` and call `render_datatable(@datatable, inline: true)` or `render_inline_datatable(@datatable).
+
+```ruby
+= render_datatable(@datatable, inline: true)
+```
+
+Your datatable should now have New, Show, Edit, Approve and Reject buttons. Click them for inline functionality.
+
+## Troubleshooting Inline
+
+If things aren't working, try the following:
+
+- Double check your javascripts:
+
+```ruby
+//= require jquery3
+//= require popper
+//= require bootstrap
+//= require effective_bootstrap
+//= require effective_datatables
+//= require jquery_ujs
+```
+
+The inline functionality requires one of sprockets jquery_ujs, sprockets rails_ujs or webpack @rails/ujs libraries.
+
+- Double check your stylesheets:
+
+```ruby
+@import 'bootstrap';
+@import 'effective_bootstrap';
+@import 'effective_datatables';
+```
+
+- Make sure your datatable is not being rendered inside a `<form>...</form>` tag. It will display a javascript console error and won't work.
+
+- Double check your `resources :things` are in `routes.rb` in the same namespace as the controller, and that you have authorization for those actions in `ability.rb` or whatever your `config/initializers/effective_datatables.rb` `config.authorization_method` returns.
+
+## A note on how it works
+
+We use good old `rails_ujs` for all inline actions.
+
+When inline, any of the actions_col actions, as well as the New button, will be changed into `data-remote: true` actions.
+
+The (inline_crud javascript)[https://github.com/code-and-effect/effective_datatables/blob/master/app/assets/javascripts/effective_datatables/inline_crud.js.coffee] handles fetching the form, or view partial and expanding/collapsing the appropriate row of the datatable.
+
+When an inline action is clicked, effective_datatables will make an AJAX request to the server, which could be received by an `Effective::CrudController` that will handle the `.js` format, and respond_with the appropriate (rails_ujs .js.erb views)(https://github.com/code-and-effect/effective_resources/tree/master/app/views/application).
+
+
+# Extras
 
 The following commands don't quite fit into the DSL, but are present nonetheless.
 
-### simple
+## simple
 
 To render a simple table, without pagination, sorting, filtering, export buttons, per page, and default visibility:
 
@@ -942,7 +1104,7 @@ To render a simple table, without pagination, sorting, filtering, export buttons
 <%= render_datatable(@datatable, simple: true) %>
 ```
 
-### index
+## index
 
 If you just want to render a datatable and nothing else, there is a quick way to skip creating a view:
 
@@ -956,13 +1118,13 @@ end
 
 will render `views/effective/datatables/index` with the assigned datatable.
 
-## Advanced Search and Sort
+# Advanced Search and Sort
 
 The built-in search and ordering can be overridden on a per-column basis.
 
 The only gotcha here is that you must be aware of the type of collection.
 
-### With ActiveRecord collection
+## With ActiveRecord collection
 
 In the case of a `col` and an ActiveRecord collection:
 
@@ -994,7 +1156,7 @@ If `column[:sql_column].blank?` then this `col` has fallen back to being a `val`
 
 Try adding `col :post_category, sql_column: 'post_categories.title'`
 
-### With Array collection
+## With Array collection
 
 And in the case of a `col` with an Array collection, or any `val`:
 
@@ -1033,7 +1195,7 @@ end
 
 The search and sort for each column will be merged together to form the final results.
 
-### Default search collection
+## Default search collection
 
 When using a `col :comments` type belongs_to or has_many column, a search collection for that class will be loaded.
 
