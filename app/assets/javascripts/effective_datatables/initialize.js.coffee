@@ -200,6 +200,7 @@ initializeDataTables = (target) ->
 
     table.addClass('initialized')
     table.children('thead').trigger('effective-bootstrap:initialize')
+    $('input[autofocus]').first().focus()
     true
 
 destroyDataTables = ->
