@@ -7,6 +7,7 @@ es:
     new: Nuevo
     actions: Acciones
     bulk_actions: Acciones en masa
+    no_bulk_actions: Sin acciones en masa
     applying: Filtrando...
     boolean_true: 'Sí'
     boolean_false: 'No'
