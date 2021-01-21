@@ -1,8 +1,9 @@
 .btn-group.buttons-bulk-actions
   %button.btn.btn-link.btn-sm.dropdown-toggle{'type': 'button', 'data-toggle': 'dropdown', 'aria-haspopup': true, 'aria-expanded': false, 'disabled': 'disabled'}
-    Bulk Actions
+    = t('effective_datatables.bulk_actions')
   .dropdown-menu
     - if datatable._bulk_actions.present?
       = datatable._bulk_actions.join.html_safe
     - else
-      %a.dropdown-item{href: '#'} No bulk actions
+      %a.dropdown-item{href: '#'}
+        = t('effective_datatables.no_bulk_actions')

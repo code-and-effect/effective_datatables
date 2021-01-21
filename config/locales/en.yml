@@ -7,6 +7,7 @@ en:
     new: New
     actions: Actions
     bulk_actions: Bulk Actions
+    no_bulk_actions: No bulk actions
     applying: Applying...
     boolean_true: 'Yes'
     boolean_false: 'No'
