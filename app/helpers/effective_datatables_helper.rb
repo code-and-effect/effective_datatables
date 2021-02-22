@@ -1,6 +1,6 @@
 # These are expected to be called by a developer.  They are part of the datatables DSL.
 module EffectiveDatatablesHelper
-  def render_datatable(datatable, input_js: {}, buttons: true, charts: true, entries: true, filters: true, inline: false, pagination: true, search: true, simple: false, sort: true)
+  def render_datatable(datatable, input_js: {}, buttons: true, charts: true, entries: true, filters: true, inline: false, namespace: nil, pagination: true, search: true, simple: false, sort: true)
     raise 'expected datatable to be present' unless datatable
     raise 'expected input_js to be a Hash' unless input_js.kind_of?(Hash)
 
@@ -10,6 +10,7 @@ module EffectiveDatatablesHelper
 
     datatable.attributes[:inline] = true if inline
     datatable.attributes[:sortable] = false unless sort
+    datatable.attributes[:namespace] = namespace if namespace
 
     datatable.view ||= self
 
