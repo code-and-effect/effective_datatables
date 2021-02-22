@@ -123,7 +123,6 @@ beforeNew = ($action) ->
 
   # Append spinner and show Processing
   $th.append($table.data('spinner'))
-  $table.DataTable().flash()
   $table.one 'draw.dt', (event) ->
     $th.find('a').show().siblings('svg').remove() if event.target == event.currentTarget
 
@@ -152,7 +151,6 @@ beforeEdit = ($action) ->
 
   # Append spinner and show Processing
   $td.append($table.data('spinner'))
-  $table.DataTable().flash()
 
 afterEdit = ($action) ->
   $tr = $action.closest('tr')
