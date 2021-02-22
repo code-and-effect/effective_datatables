@@ -187,9 +187,3 @@ module Effective
 
   end
 end
-
-# [
-#   [1, 'title 1'],
-#   [2, 'title 2'],
-#   [3, 'title 3']
-# ]
