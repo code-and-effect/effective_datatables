@@ -20,5 +20,5 @@ Gem::Specification.new do |s|
   s.add_dependency 'coffee-rails'
   s.add_dependency 'effective_bootstrap'
   s.add_dependency 'effective_resources'
-  s.add_dependency 'sass'
+  s.add_dependency 'sassc'
 end
