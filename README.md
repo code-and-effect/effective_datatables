@@ -197,6 +197,13 @@ class PostsDatatable < Effective::Datatable
     # POSTs to the given url with params[:ids], an Array of ids for all selected rows
     # These actions are assumed to change the underlying collection
     bulk_action 'Approve all', bulk_approve_posts_path, data: { confirm: 'Approve all selected posts?' }
+    # GETs to the given url. Pass the ids via cookie, encoded in url, or LocalStorage.
+    # These actions are assumed to redirect the user to some other page.
+    bulk_action 'Action 1 | ids encoded in params', action_1_posts_path, data: { method: :get }
+
+    bulk_action 'Action 2 | ids stored in _ids_ field in local storage', action_2_posts_path, data: { 'payload-mode' => 'local-storage', method: :get }
+
+    bulk_action 'Action 3 | ids stored in _ids_ field in a cookie', action_3_posts_path, data: { 'payload-mode' => 'cookie', method: :get }
     bulk_action_divider
     bulk_action 'Destroy all', bulk_destroy_posts_path, data: { confirm: 'Destroy all selected posts?' }
   end
@@ -772,6 +779,12 @@ You can also specify `data-method: :get` to instead make a `GET` request with th
 ```ruby
 bulk_actions do
   bulk_action 'Approve all', bulk_approve_posts_path, data: { confirm: 'Approve all selected posts?' }
+
+  bulk_action 'Action 1 | ids encoded in params', action_1_posts_path, data: { method: :get }
+
+  bulk_action 'Action 2 | ids stored in _ids_ field in local storage', action_2_posts_path, data: { 'payload-mode' => 'local-storage', method: :get }
+
+  bulk_action 'Action 3 | ids stored in _ids_ field in a cookie', action_3_posts_path, data: { 'payload-mode' => 'cookie', method: :get }
 end
 ```
 
@@ -781,6 +794,9 @@ In your `routes` file:
 resources :posts do
   collection do
     post :bulk_approve
+    get :action_1
+    get :action_2
+    get :action_3
   end
 end
 ```
@@ -798,6 +814,22 @@ def bulk_approve
   rescue => e
     render json: { status: 500, message: 'An error occured while approving a post.' }
   end
+end
+
+def action_1
+  @posts = Post.where(id: params[:ids])
+
+  render :some_partial
+end
+
+def action_2
+  @posts = Post.where(id: cookies[:ids].split(','))
+
+  render :some_partial
+end
+
+def action_3
+  render :some_partial # and get ids via JS:  localStorage.getItem('ids');
 end
 ```
 
