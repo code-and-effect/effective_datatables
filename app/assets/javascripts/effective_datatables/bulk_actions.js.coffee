@@ -44,6 +44,8 @@ restoreSelected = ($table, selected) ->
 #### Bulk Action link behaviour
 $(document).on 'click', '.dataTables_wrapper .buttons-bulk-actions a', (event) ->
   event.preventDefault() # prevent the click
+  document.cookie = 'ids=; expires = Thu, 01 Jan 1970 00:00:00 GMT'
+  localStorage.removeItem('ids')
 
   $bulkAction = $(event.currentTarget)  # This is a regular <a href=...> tag
   $wrapper = $bulkAction.closest('.dataTables_wrapper')
@@ -54,6 +56,7 @@ $(document).on 'click', '.dataTables_wrapper .buttons-bulk-actions a', (event) -
   url = $bulkAction.attr('href')
   title = $bulkAction.text()
   download = $bulkAction.data('bulk-download')
+  payload_mode = $bulkAction.data('payload-mode')
   token = $table.data('authenticity-token')
   values = $.map($selected, (input) -> input.getAttribute('value'))
   method = $bulkAction.data('ajax-method')
@@ -61,10 +64,17 @@ $(document).on 'click', '.dataTables_wrapper .buttons-bulk-actions a', (event) -
   return unless url && values
 
   if method == 'GET'
-    if url.includes('?')
-      window.location.assign(url + '&' + $.param({ids: values}))
+    if payload_mode == 'cookie'
+      document.cookie = "ids=#{values}";
+      window.location.assign(url)
+    else if payload_mode == 'local-storage'
+      localStorage.setItem('ids', values);
+      window.location.assign(url)
     else
-      window.location.assign(url + '?' + $.param({ids: values}))
+      if url.includes('?')
+        window.location.assign(url + '&' + $.param({ids: values}))
+      else
+        window.location.assign(url + '?' + $.param({ids: values}))
 
     return
 
