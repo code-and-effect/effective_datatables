@@ -131,7 +131,7 @@ module EffectiveDatatablesPrivateHelper
       label: false,
       placeholder: (opts[:label] || name.to_s.titleize),
       value: value,
-      wrapper: { class: 'form-group col-auto'}
+      wrapper: { class: 'col-auto'}
     }.merge(opts.except(:as, :collection, :parse, :value))
 
     options[:name] = '' unless datatable._filters_form_required?
@@ -163,7 +163,7 @@ module EffectiveDatatablesPrivateHelper
       feedback: false,
       label: false,
       required: false,
-      wrapper: { class: 'form-group col-auto'}
+      wrapper: { class: 'col-auto'}
     }.merge(opts.except(:checked, :value))
 
     form.radios :scope, collection, options

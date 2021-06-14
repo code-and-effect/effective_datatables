@@ -1,5 +1,5 @@
 .btn-group.buttons-bulk-actions
-  %button.btn.btn-link.btn-sm.dropdown-toggle{'type': 'button', 'data-toggle': 'dropdown', 'aria-haspopup': true, 'aria-expanded': false, 'disabled': 'disabled'}
+  %button.btn.btn-link.btn-sm.dropdown-toggle{'type': 'button', 'data-toggle': 'dropdown', 'data-bs-toggle': 'dropdown', 'aria-haspopup': true, 'aria-expanded': false, 'disabled': 'disabled'}
     = t('effective_datatables.bulk_actions')
   .dropdown-menu
     - if datatable._bulk_actions.present?

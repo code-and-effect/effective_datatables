@@ -1,13 +1,13 @@
 .effective-datatables-filters{'aria-controls': datatable.to_param}
   = effective_form_with(scope: :filters, url: (datatable._form[:url] || '#'), method: datatable._form[:verb], id: nil) do |form|
-    .form-row.align-items-center
+    .row.g-3
       - if datatable._scopes.present?
         = datatable_scope_tag(form, datatable)
 
       - datatable._filters.each do |name, opts|
         = datatable_filter_tag(form, datatable, name, opts)
 
-      .form-group.col-auto
+      .col-auto
         - if datatable._filters_form_required?
           = form.save t('effective_datatables.apply'), 'data-disable-with': t('effective_datatables.applying')
         - else
