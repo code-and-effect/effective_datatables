@@ -21,6 +21,9 @@ module Effective
     # The view
     attr_reader :view
 
+    # Set by DSL so we can track where this datatable is coming from
+    attr_accessor :source_location
+
     extend Effective::EffectiveDatatable::Dsl
 
     include Effective::EffectiveDatatable::Attributes

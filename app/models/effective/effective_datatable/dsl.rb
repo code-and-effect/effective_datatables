@@ -24,6 +24,8 @@ module Effective
           dsl_tool.in_datatables_do_block = true
           dsl_tool.instance_exec(&block)
           dsl_tool.in_datatables_do_block = false
+
+          self.source_location = block.source_location.first if block.respond_to?(:source_location)
         end
       end
 

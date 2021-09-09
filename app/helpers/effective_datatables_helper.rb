@@ -64,7 +64,7 @@ module EffectiveDatatablesHelper
       }
     }
 
-    if (charts || filters)
+    retval = if (charts || filters)
       output = ''.html_safe
 
       if charts
@@ -85,6 +85,10 @@ module EffectiveDatatablesHelper
         locals: { datatable: datatable, effective_datatable_params: effective_datatable_params }
       )
     end
+
+    Rails.logger.info("  Rendered datatable #{datatable.class} #{datatable.source_location}")
+
+    retval
   end
 
   def render_inline_datatable(datatable)
