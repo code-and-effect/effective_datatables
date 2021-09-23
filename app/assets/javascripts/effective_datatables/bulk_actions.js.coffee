@@ -41,13 +41,25 @@ restoreSelected = ($table, selected) ->
 
   if present then $bulkActions.removeAttr('disabled') else $bulkActions.attr('disabled', 'disabled')
 
-#### Bulk Action link behaviour
+# rails_ujs data-confirm requires special attention
+# https://github.com/rails/rails/blob/main/actionview/app/assets/javascripts/rails-ujs/features/confirm.coffee
+$(document).on 'confirm:complete', '.dataTables_wrapper .buttons-bulk-actions a', (event) ->
+  if event.originalEvent.detail && event.originalEvent.detail[0] == true
+    doBulkActionPost(event)
+    (window.Rails || $.rails).stopEverything(event)
+    return false
+
 $(document).on 'click', '.dataTables_wrapper .buttons-bulk-actions a', (event) ->
-  event.preventDefault() # prevent the click
-  document.cookie = 'ids=; expires = Thu, 01 Jan 1970 00:00:00 GMT'
+  unless $(event.currentTarget).data('confirm')
+    doBulkActionPost(event)
+    event.preventDefault()
+
+doBulkActionPost = (event) ->
+  $bulkAction = $(event.currentTarget)  # This is the regular <a href=...> tag maybe with data-confirm
+
+  document.cookie = 'ids=; expires=Thu, 01 Jan 1970 00:00:00 GMT'
   localStorage.removeItem('ids')
 
-  $bulkAction = $(event.currentTarget)  # This is a regular <a href=...> tag
   $wrapper = $bulkAction.closest('.dataTables_wrapper')
   $table = $wrapper.find('table.dataTable').first()
   $processing = $table.siblings('.dataTables_processing').first()
