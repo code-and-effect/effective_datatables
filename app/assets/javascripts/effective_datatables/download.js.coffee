@@ -5,4 +5,6 @@ $(document).on 'click', '.dataTables_wrapper a.buttons-download', (event) ->
   url = $table.data('source').replace('.json', '/download.csv')
   attributes = 'attributes=' + encodeURIComponent($table.data('attributes'))
 
-  $(event.currentTarget).attr('href', url + '?' + attributes)
+  $button.attr('href', url + '?' + attributes)
+
+  setTimeout (=> $button.attr('href', 'download.csv')), 0
