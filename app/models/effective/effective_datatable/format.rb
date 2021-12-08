@@ -8,14 +8,16 @@ module Effective
 
       private
 
-      def format(collection)
+      def format(collection, csv: false)
         # We want to use the render :collection for each column that renders partials
         rendered = {}
 
         columns.each do |name, opts|
-          next unless state[:visible][name]
-
-          if opts[:partial]
+          if state[:visible][name] == false && !csv
+            # Nothing to do
+          elsif csv && !opts[:csv]
+            # Nothing to do
+          elsif opts[:partial]
             locals = { datatable: self, column: opts }.merge!(resource_col_locals(opts))
 
             rendered[name] = (view.render(
@@ -26,6 +28,7 @@ module Effective
               locals: locals,
               spacer_template: SPACER_TEMPLATE
             ) || '').split(SPACER)
+
           elsif opts[:as] == :actions # This is actions_col and actions_col do .. end, but not actions_col partial: 'something'
             locals = { datatable: self, column: opts, spacer_template: SPACER_TEMPLATE }
 
@@ -45,7 +48,6 @@ module Effective
             else
               (view.render_resource_actions(collection.map { |row| row[opts[:index]] }, atts, &opts[:format]) || '').split(SPACER)
             end
-
           end
         end
 
@@ -54,9 +56,11 @@ module Effective
             index = opts[:index]
             value = row[index]
 
-            row[index] = (
-              if state[:visible][name] == false
+            formatted = (
+              if state[:visible][name] == false && !csv
                 NONVISIBLE
+              elsif csv && !opts[:csv]
+                BLANK
               elsif opts[:as] == :actions
                 rendered[name][row_index]
               elsif opts[:format] && rendered.key?(name)
@@ -66,14 +70,23 @@ module Effective
               elsif opts[:partial]
                 rendered[name][row_index]
               else
-                format_column(value, opts)
+                format_column(value, opts, csv: csv)
               end
             )
+
+            if csv && (opts[:format] || opts[:partial])
+              formatted = view.strip_tags(formatted)
+
+              formatted.gsub!("\n\n", ' ') unless formatted.frozen?
+              formatted.gsub!("\n", '')  unless formatted.frozen?
+            end
+
+            row[index] = formatted
           end
         end
       end
 
-      def format_column(value, column)
+      def format_column(value, column, csv: false)
         return if value.nil? || (column[:resource] && value.blank?)
 
         unless column[:as] == :email
@@ -90,7 +103,11 @@ module Effective
         when :date
           value.respond_to?(:strftime) ? value.strftime(EffectiveDatatables.format_date) : BLANK
         when :datetime
-          value.respond_to?(:strftime) ? value.strftime(EffectiveDatatables.format_datetime) : BLANK
+          if csv
+            value
+          else
+            value.respond_to?(:strftime) ? value.strftime(EffectiveDatatables.format_datetime) : BLANK
+          end
         when :decimal
           value
         when :duration
@@ -102,7 +119,7 @@ module Effective
         when :effective_roles
           value.join(', ')
         when :email
-          view.mail_to(value)
+          csv ? value : view.mail_to(value)
         when :integer
           value
         when :percent
