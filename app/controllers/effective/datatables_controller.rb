@@ -30,31 +30,24 @@ module Effective
 
       respond_to do |format|
         format.csv do
-          # headers.delete('Content-Length')
+          headers.delete('Content-Length')
 
-          # headers['X-Accel-Buffering'] = 'no'
-          # headers['Cache-Control'] = 'no-cache'
-          # headers["Content-Type"] = 'text/csv; charset=utf-8'
-          # headers["Content-Disposition"] = %(attachment; filename="#{@datatable.csv_filename}")
-          # headers['Last-Modified'] = Time.zone.now.ctime.to_s
+          headers['X-Accel-Buffering'] = 'no'
+          headers['Cache-Control'] = 'no-cache'
+          headers["Content-Type"] = @datatable.csv_content_type
+          headers["Content-Disposition"] = %(attachment; filename="#{@datatable.csv_filename}")
+          headers['Last-Modified'] = Time.zone.now.ctime.to_s
 
-          # self.response_body = @datatable.csv_stream
-          # response.status = 200
-
-          send_data(@datatable.to_csv, filename: @datatable.csv_filename, type: @datatable.csv_content_type, disposition: 'attachment')
+          self.response_body = @datatable.csv_stream
+          response.status = 200
         end
+
+        # format.csv do
+        #   send_data(@datatable.csv_file, filename: @datatable.csv_filename, type: @datatable.csv_content_type, disposition: 'attachment')
+        # end
 
         format.all do
           render(status: :unauthorized, body: 'Access Denied')
-        end
-      end
-    end
-
-    def something
-      Enumerator.new do |yielder|
-        20.times do |num|
-          sleep 0.05
-          yielder << CSV.generate_line([num, "yay"])
         end
       end
     end

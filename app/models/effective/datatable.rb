@@ -1,5 +1,3 @@
-require 'csv'
-
 module Effective
   class Datatable
     attr_reader :attributes # Anything that we initialize our table with. That's it. Can't be changed by state.
@@ -144,7 +142,7 @@ module Effective
     end
 
     def to_csv
-      to_csv_file()
+      csv_file()
     end
 
     def to_json
@@ -176,6 +174,10 @@ module Effective
 
     def searchable?
       attributes[:searchable] != false
+    end
+
+    def downloadable?
+      attributes[:downloadable] != false
     end
 
     # Whether the filters must be rendered as a <form> or we can keep the normal <div> behaviour

@@ -1,3 +1,5 @@
+require 'csv'
+
 module Effective
   module EffectiveDatatable
     module Csv
@@ -10,13 +12,15 @@ module Effective
         'text/csv; charset=utf-8'
       end
 
-      def to_csv_file
-        header = columns.map { |_, opts| opts[:label] || '' }
+      def csv_header
+        columns.map { |_, opts| opts[:label] || '' }
+      end
 
+      def csv_file
         CSV.generate do |csv|
-          csv << header
+          csv << csv_header()
 
-          collection.find_in_batches do |resources|
+          collection.send(csv_collection_method) do |resources|
             resources = arrayize(resources, csv: true)
             format(resources, csv: true)
             finalize(resources)
@@ -26,32 +30,25 @@ module Effective
         end
       end
 
+      def csv_stream
+        EffectiveResources.with_resource_enumerator do |lines|
+          lines << CSV.generate_line(csv_header)
 
-      # def to_csv_file
-      #   header = csv_columns().map { |_, opts| opts[:label] }
+          collection.public_send(csv_collection_method) do |resources|
+            resources = arrayize(resources, csv: true)
+            format(resources, csv: true)
+            finalize(resources)
 
-      #   CSV.generate do |csv|
-      #     csv << header
+            resources.each { |resource| lines << CSV.generate_line(resource) }
+          end
+        end
+      end
 
-      #     collection.find_in_batches do |resources|
-      #       arrayize(resources, csv_columns).each do |row|
-      #         csv << row
-      #       end
-      #     end
-      #   end
-      # end
+      private
 
-      # def csv_stream
-      #   Enumerator.new do |lines|
-      #     Tenant.as(:acpo) do
-      #       collection.find_each do |resources|
-      #         arrayize(resources).each do |resource|
-      #           lines << resource
-      #         end
-      #       end
-      #     end
-      #   end
-      # end
+      def csv_collection_method
+        (active_record_collection? ? :find_in_batches : :to_a)
+      end
 
     end
   end

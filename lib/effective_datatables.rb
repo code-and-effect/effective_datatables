@@ -21,6 +21,7 @@ module EffectiveDatatables
   mattr_accessor :format_time
 
   mattr_accessor :debug
+  mattr_accessor :download
 
   alias_method :max_cookie_size, :cookie_max_size
   alias_method :max_cookie_size=, :cookie_max_size=

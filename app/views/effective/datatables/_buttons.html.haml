@@ -9,5 +9,6 @@
   = link_to '#', class: 'btn btn-link btn-sm buttons-reorder' do
     %span= t('effective_datatables.reorder')
 
-= link_to 'download.csv', class: 'btn btn-link btn-sm buttons-download', 'aria-controls': datatable.to_param do
-  %span= t('effective_datatables.download')
+- if datatable.downloadable?
+  = link_to 'download.csv', class: 'btn btn-link btn-sm buttons-download', 'aria-controls': datatable.to_param do
+    %span= t('effective_datatables.download')
