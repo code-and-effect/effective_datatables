@@ -1,0 +1,14 @@
+- if datatable._bulk_actions.present?
+  = render('/effective/datatables/bulk_actions_dropdown', datatable: datatable)
+
+- if datatable.searchable?
+  = link_to '#', class: 'btn btn-link btn-sm buttons-reset-search' do
+    %span= t('effective_datatables.reset')
+
+- if datatable.reorder? && EffectiveDatatables.authorized?(self, :update, datatable.collection_class)
+  = link_to '#', class: 'btn btn-link btn-sm buttons-reorder' do
+    %span= t('effective_datatables.reorder')
+
+- if datatable.downloadable?
+  = link_to 'download.csv', class: 'btn btn-link btn-sm buttons-download', 'aria-controls': datatable.to_param do
+    %span= t('effective_datatables.download')

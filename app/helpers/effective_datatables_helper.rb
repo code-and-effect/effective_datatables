@@ -1,15 +1,21 @@
 # These are expected to be called by a developer.  They are part of the datatables DSL.
 module EffectiveDatatablesHelper
-  def render_datatable(datatable, input_js: {}, buttons: true, charts: true, entries: true, filters: true, inline: false, namespace: nil, pagination: true, search: true, simple: false, sort: true)
+  def render_datatable(datatable, input_js: {}, buttons: true, charts: true, download: nil, entries: true, filters: true, inline: false, namespace: nil, pagination: true, search: true, simple: false, sort: true)
     raise 'expected datatable to be present' unless datatable
     raise 'expected input_js to be a Hash' unless input_js.kind_of?(Hash)
 
+    if download.nil?
+      download = (buttons && EffectiveDatatables.download)
+    end
+
     if simple
-      buttons = charts = entries = filters = pagination = search = sort = false
+      buttons = charts = download = entries = filters = pagination = search = sort = false
     end
 
     datatable.attributes[:inline] = true if inline
     datatable.attributes[:sortable] = false unless sort
+    datatable.attributes[:searchable] = false unless search
+    datatable.attributes[:downloadable] = false unless download
     datatable.attributes[:namespace] = namespace if namespace
 
     datatable.view ||= self
@@ -44,7 +50,7 @@ module EffectiveDatatablesHelper
         'all-label' => I18n.t('effective_datatables.all'),
         'attributes' => EffectiveDatatables.encrypt(datatable.attributes),
         'authenticity-token' => form_authenticity_token,
-        'bulk-actions' => datatable_bulk_actions(datatable),
+        'buttons-html' => datatable_buttons(datatable),
         'columns' => datatable_columns(datatable),
         'default-visibility' => datatable.default_visibility.to_json,
         'display-length' => datatable.display_length,
@@ -54,8 +60,6 @@ module EffectiveDatatablesHelper
         'inline' => inline.to_s,
         'language' => EffectiveDatatables.language(I18n.locale),
         'options' => input_js.to_json,
-        'reset' => (datatable_reset(datatable) if search),
-        'reorder' => datatable_reorder(datatable),
         'reorder-index' => (datatable.columns[:_reorder][:index] if datatable.reorder?).to_s,
         'simple' => simple.to_s,
         'spinner' => icon('spinner'), # effective_bootstrap

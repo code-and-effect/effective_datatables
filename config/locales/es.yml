@@ -2,6 +2,7 @@
 es:
   effective_datatables:
     apply: Filtrar
+    download: Download
     reset: Reiniciar
     reorder: Reordenar
     new: Nuevo

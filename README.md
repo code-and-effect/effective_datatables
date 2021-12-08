@@ -46,6 +46,7 @@ Please check out [Effective Datatables 3.x](https://github.com/code-and-effect/e
     * [order](#order)
     * [reorder](#reorder)
     * [aggregate](#aggregate)
+    * [download](#download)
   * [filters](#filters)
     * [scope](#scope)
     * [filter](#filter)
@@ -680,6 +681,30 @@ end.aggregate { |values, column| distance_of_time_in_words(values.min, values.ma
 ```
 
 In the above example, `values` is an Array containing all row's values for one column at a time.
+
+## download
+
+Add a Download button which streams a CSV file containing all rows and columns in the table's collection, ignoring any search, sort or filtering.
+
+This is an opt-in feature.
+
+To enable, please set `config.download = true` in your `config/initializers/effective_datatables.rb` file.
+
+Once enabled, you can disable it on an individual table by:
+
+```ruby
+datatable do
+  download false
+end
+```
+
+and you can exclude individual columns from being rendered on the CSV export
+
+```ruby
+col :first_name, csv: false
+```
+
+The column will still appear in the export, but the contents will be blank.
 
 ## filters
 

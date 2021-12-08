@@ -43,4 +43,7 @@ EffectiveDatatables.setup do |config|
   config.format_datetime = '%F %H:%M'
   config.format_date = '%F'
   config.format_time = '%H:%M'
+
+  # Enable the Download button which serves a CSV of your collection
+  config.download = false
 end

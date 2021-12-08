@@ -112,14 +112,8 @@ initializeDataTables = (target) ->
       $table = $(api.table().node())
       $buttons = $table.closest('.dataTables_wrapper').children().first().find('.dt-buttons')
 
-      if $table.data('reset')
-        $buttons.prepend($table.data('reset'))
-
-      if $table.data('reorder')
-        $buttons.prepend($table.data('reorder'))
-
-      if $table.data('bulk-actions')
-        $buttons.prepend($table.data('bulk-actions'))
+      if $table.data('buttons-html')
+        $buttons.prepend($table.data('buttons-html'))
 
     drawAggregates = ($table, aggregates) ->
       $tfoot = $table.find('tfoot').first()

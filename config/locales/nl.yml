@@ -2,6 +2,7 @@
 nl:
   effective_datatables:
     apply: Toepassen
+    download: Download
     reset: Reset
     reorder: Opnieuw ordenen
     new: Nieuwe

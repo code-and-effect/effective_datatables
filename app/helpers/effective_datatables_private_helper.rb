@@ -19,23 +19,12 @@ module EffectiveDatatablesPrivateHelper
     end.to_json.html_safe
   end
 
-  def datatable_bulk_actions(datatable)
-    if datatable._bulk_actions.present?
-      render(partial: '/effective/datatables/bulk_actions_dropdown', locals: { datatable: datatable }).gsub("'", '"').html_safe
-    end
-  end
-
   def datatable_display_order(datatable)
     ((datatable.sortable? && datatable.order_index) ? [datatable.order_index, datatable.order_direction] : false).to_json.html_safe
   end
 
-  def datatable_reset(datatable)
-    link_to(content_tag(:span, t('effective_datatables.reset')), '#', class: 'btn btn-link btn-sm buttons-reset-search')
-  end
-
-  def datatable_reorder(datatable)
-    return unless datatable.reorder? && EffectiveDatatables.authorized?(self, :update, datatable.collection_class)
-    link_to(content_tag(:span, t('effective_datatables.reorder')), '#', class: 'btn btn-link btn-sm buttons-reorder', disabled: true)
+  def datatable_buttons(datatable, search: true)
+    render('/effective/datatables/buttons', datatable: datatable, search: search).gsub("'", '"').html_safe
   end
 
   def datatable_new_resource_button(datatable, name, column)

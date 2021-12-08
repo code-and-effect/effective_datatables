@@ -24,11 +24,15 @@ module Effective
           reorder_col(name)
         end
 
+        def download(bool)
+          datatable.attributes[:downloadable] = bool
+        end
+
         # A col has its internal values sorted/searched before the block is run
         # Anything done in the block, is purely a format on the after sorted/ordered value
         # the original object == the computed value, which is yielded to the format block
         # You can't do compute with .col
-        def col(name, action: nil, as: nil, col_class: nil, label: nil, partial: nil, partial_as: nil, responsive: 10000, search: {}, sort: true, sql_column: nil, th: nil, th_append: nil, visible: true, &format)
+        def col(name, action: nil, as: nil, col_class: nil, csv: true, label: nil, partial: nil, partial_as: nil, responsive: 10000, search: {}, sort: true, sql_column: nil, th: nil, th_append: nil, visible: true, &format)
           raise 'You cannot use partial: ... with the block syntax' if partial && block_given?
 
           name = name.to_sym unless name.to_s.include?('.')
@@ -38,6 +42,7 @@ module Effective
             as: as,
             compute: nil,
             col_class: col_class,
+            csv: csv,
             format: (format if block_given?),
             index: nil,
             label: (label.nil? ? name.to_s.split('.').last.titleize : label),
@@ -56,7 +61,7 @@ module Effective
 
         # A val is a computed value that is then sorted/searched after the block is run
         # You can have another block by calling .format afterwards to work on the computed value itself
-        def val(name, action: nil, as: nil, col_class: nil, label: nil, partial: nil, partial_as: nil, responsive: 10000, search: {}, sort: true, sql_column: false, th: nil, th_append: nil, visible: true, &compute)
+        def val(name, action: nil, as: nil, col_class: nil, csv: true, label: nil, partial: nil, partial_as: nil, responsive: 10000, search: {}, sort: true, sql_column: false, th: nil, th_append: nil, visible: true, &compute)
           raise 'You cannot use partial: ... with the block syntax' if partial && block_given?
 
           name = name.to_sym unless name.to_s.include?('.')
@@ -66,6 +71,7 @@ module Effective
             as: as,
             compute: (compute if block_given?),
             col_class: col_class,
+            csv: csv,
             format: nil,
             index: nil,
             label: (label.nil? ? name.to_s.split('.').last.titleize : label),
@@ -91,6 +97,7 @@ module Effective
             compute: nil,
             btn_class: (btn_class || 'btn-sm btn-outline-primary'),
             col_class: col_class,
+            csv: false,
             format: (format if block_given?),
             index: nil,
             inline: (inline.nil? ? datatable.inline? : inline),
@@ -130,6 +137,7 @@ module Effective
             as: :bulk_actions,
             compute: nil,
             col_class: col_class,
+            csv: false,
             format: nil,
             index: nil,
             input_name: (input_name || 'bulk_actions_resources'),
@@ -157,6 +165,7 @@ module Effective
             as: :reorder,
             compute: nil,
             col_class: col_class,
+            csv: false,
             format: nil,
             index: nil,
             label: false,

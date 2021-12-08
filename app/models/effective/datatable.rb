@@ -30,6 +30,7 @@ module Effective
     include Effective::EffectiveDatatable::Collection
     include Effective::EffectiveDatatable::Compute
     include Effective::EffectiveDatatable::Cookie
+    include Effective::EffectiveDatatable::Csv
     include Effective::EffectiveDatatable::Format
     include Effective::EffectiveDatatable::Hooks
     include Effective::EffectiveDatatable::Params
@@ -140,6 +141,10 @@ module Effective
       to_json[:recordsTotal] == 0
     end
 
+    def to_csv
+      csv_file()
+    end
+
     def to_json
       @json ||= (
         {
@@ -165,6 +170,14 @@ module Effective
 
     def sortable?
       !reorder? && attributes[:sortable] != false
+    end
+
+    def searchable?
+      attributes[:searchable] != false
+    end
+
+    def downloadable?
+      attributes[:downloadable] != false
     end
 
     # Whether the filters must be rendered as a <form> or we can keep the normal <div> behaviour

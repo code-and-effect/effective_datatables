@@ -1,3 +1,5 @@
+require 'csv'
+
 module Effective
   class DatatablesController < ApplicationController
     skip_log_page_views quiet: true if defined?(EffectiveLogging)
@@ -17,6 +19,36 @@ module Effective
 
         ExceptionNotifier.notify_exception(e) if defined?(ExceptionNotifier)
         raise e if Rails.env.development?
+      end
+    end
+
+    def download
+      @datatable = EffectiveDatatables.find(params[:id], params[:attributes])
+      @datatable.view = view_context
+
+      EffectiveDatatables.authorize!(self, :index, @datatable.collection_class)
+
+      respond_to do |format|
+        format.csv do
+          headers.delete('Content-Length')
+
+          headers['X-Accel-Buffering'] = 'no'
+          headers['Cache-Control'] = 'no-cache'
+          headers["Content-Type"] = @datatable.csv_content_type
+          headers["Content-Disposition"] = %(attachment; filename="#{@datatable.csv_filename}")
+          headers['Last-Modified'] = Time.zone.now.ctime.to_s
+
+          self.response_body = @datatable.csv_stream
+          response.status = 200
+        end
+
+        # format.csv do
+        #   send_data(@datatable.csv_file, filename: @datatable.csv_filename, type: @datatable.csv_content_type, disposition: 'attachment')
+        # end
+
+        format.all do
+          render(status: :unauthorized, body: 'Access Denied')
+        end
       end
     end
 
