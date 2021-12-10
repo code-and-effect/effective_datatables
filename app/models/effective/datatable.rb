@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Effective
   class Datatable
     attr_reader :attributes # Anything that we initialize our table with. That's it. Can't be changed by state.

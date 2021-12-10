@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # These are expected to be called by a developer.  They are part of the datatables DSL.
 module EffectiveDatatablesControllerHelper
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # In practice this is just a regular hash with the aggregate, format, search, sort do syntax that saves a block
 module Effective
   class DatatableColumn

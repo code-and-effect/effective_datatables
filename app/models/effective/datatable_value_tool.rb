@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Effective
   # The collection is an Array of Arrays
   class DatatableValueTool

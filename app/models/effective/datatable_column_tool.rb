@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Effective
   class DatatableColumnTool
     attr_reader :datatable

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Effective
   module EffectiveDatatable
     module Dsl
@@ -11,11 +13,11 @@ module Effective
       end
 
       def collection(apply_belongs_to: true, apply_scope: true, &block)
-        define_method('initialize_collection') { 
+        define_method('initialize_collection') {
           self._collection_apply_belongs_to = apply_belongs_to
           self._collection_apply_scope = apply_scope
-          
-          self._collection = dsl_tool.instance_exec(&block) 
+
+          self._collection = dsl_tool.instance_exec(&block)
         }
       end
 

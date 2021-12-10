@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # These are expected to be called by a developer.  They are part of the datatables DSL.
 module EffectiveDatatablesHelper
   def render_datatable(datatable, input_js: {}, buttons: true, charts: true, download: nil, entries: true, filters: true, inline: false, namespace: nil, pagination: true, search: true, simple: false, sort: true)

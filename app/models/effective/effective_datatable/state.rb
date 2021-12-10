@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Effective
   module EffectiveDatatable
     module State
@@ -98,7 +100,7 @@ module Effective
           load_cookie_state! if cookie.present? && cookie[:params] == cookie_state_params
           load_filter_params!
         end
-        
+
         fill_empty_filters!
       end
 

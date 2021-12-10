@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Effective
   module EffectiveDatatable
     module Collection
@@ -34,7 +36,7 @@ module Effective
         raise 'No collection defined. Please add a collection with collection do ... end' if collection.nil?
 
         @collection_class = (collection.respond_to?(:klass) ? collection.klass : self.class)
-        
+
         @active_record_collection = (collection.ancestors.include?(ActiveRecord::Base) rescue false)
         @active_record_array_collection = collection.kind_of?(Array) && collection.present? && collection.first.kind_of?(ActiveRecord::Base)
         @array_collection = collection.kind_of?(Array) && (collection.blank? || collection.first.kind_of?(Array))
