@@ -42,7 +42,7 @@ module Effective
     def initialize(view = nil, attributes = nil)
       (attributes = view; view = nil) if view.kind_of?(Hash)
 
-      @attributes = (attributes || {})
+      @attributes = initial_attributes(attributes)
       @state = initial_state
 
       @_aggregates = {}
