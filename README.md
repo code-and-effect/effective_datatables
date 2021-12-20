@@ -605,6 +605,12 @@ Any `data-remote` actions will be hijacked and performed as inline ajax by datat
 
 If you'd like to opt-out of this behavior, use `actions_col(inline: false)` or add `data-inline: false` to your action link.
 
+If the automatic actions_col aren't being displayed, try setting the namespace directly when calling the table
+
+```
+MyApp::UsersTable.new(namespace: :my_app)
+```
+
 ## length
 
 Sets the default number of rows per page. Valid lengths are `5`, `10`, `25`, `50`, `100`, `250`, `500`, `:all`
