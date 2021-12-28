@@ -95,6 +95,10 @@ module Effective
           return value if value.kind_of?(String)
         end
 
+        if value.kind_of?(Array) && column[:as] == :string
+          return value.map { |v| view.content_tag(:div, format_column(v, column, csv: csv), class: 'col-resource_item') }.join.html_safe
+        end
+
         case column[:as]
         when :actions
           raise("please use actions_col instead of col(#{name}, as: :actions)")
