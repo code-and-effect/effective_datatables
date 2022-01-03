@@ -62,6 +62,7 @@ module EffectiveDatatablesHelper
         'inline' => inline.to_s,
         'language' => EffectiveDatatables.language(I18n.locale),
         'options' => input_js.to_json,
+        'reorder' => datatable.reorder?.to_s,
         'reorder-index' => (datatable.columns[:_reorder][:index] if datatable.reorder?).to_s,
         'simple' => simple.to_s,
         'spinner' => icon('spinner'), # effective_bootstrap
