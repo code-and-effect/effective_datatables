@@ -176,6 +176,8 @@ module Effective
 
       if column[:format]
         datatable.dsl_tool.instance_exec(obj, row, &column[:format])
+      elsif column[:as] == :belongs_to_polymorphic
+        obj.send(column[:name]).to_s
       elsif column[:partial]
         obj.to_s
       elsif obj.respond_to?(column[:name])

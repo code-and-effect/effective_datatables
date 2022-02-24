@@ -96,7 +96,11 @@ module Effective
         end
 
         if value.kind_of?(Array) && column[:as] == :string
-          return value.map { |v| view.content_tag(:div, format_column(v, column, csv: csv), class: 'col-resource_item') }.join.html_safe
+          if csv
+            return value.map { |v| format_column(v, column, csv: csv) }.join("\n")
+          else
+            return value.map { |v| view.content_tag(:div, format_column(v, column, csv: csv), class: 'col-resource_item') }.join.html_safe
+          end
         end
 
         case column[:as]
@@ -119,7 +123,7 @@ module Effective
         when :duration
           view.number_to_duration(value)
         when :effective_addresses
-          value.to_html
+          csv ? value.to_html.gsub('<br>', "\n") : value.to_html
         when :effective_obfuscation
           value
         when :effective_roles
