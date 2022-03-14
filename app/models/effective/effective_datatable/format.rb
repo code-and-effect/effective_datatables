@@ -155,7 +155,7 @@ module Effective
       def actions_col_actions(column)
         resource_actions = (effective_resource&.resource_actions || fallback_effective_resource.fallback_resource_actions)
 
-        actions = if column[:inline]
+        actions = if inline?
           resource_actions.transform_values { |opts| opts['data-remote'] = true; opts }
         else
           resource_actions.transform_values { |opts| opts['data-remote'] = true if opts['data-method']; opts }

@@ -30,7 +30,7 @@ module EffectiveDatatablesPrivateHelper
   end
 
   def datatable_new_resource_button(datatable, name, column)
-    return unless column[:inline] && (column[:actions][:new] != false)
+    return unless datatable.inline? && (column[:actions][:new] != false)
 
     action = { action: :new, class: ['btn', column[:btn_class].presence].compact.join(' '), 'data-remote': true }
 
