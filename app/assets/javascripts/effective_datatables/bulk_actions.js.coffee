@@ -90,39 +90,46 @@ doBulkActionPost = (event) ->
 
     return
 
-  # Disable the Bulk Actions dropdown, so only one can be run at a time
-  $bulkAction.closest('button').attr('disabled', 'disabled')
+  if method == 'POST'
+    if payload_mode == 'form'
+      form = '<input type="hidden" name="ids" value="' + values + '">';
+      form += '<input type="hidden" name="authenticity_token" value="' + token + '">';
+      $('<form action="' + url + '" method="POST">' + form + '</form>').
+        appendTo('body').submit();
+    else
+      # Disable the Bulk Actions dropdown, so only one can be run at a time
+      $bulkAction.closest('button').attr('disabled', 'disabled')
 
-  $table.dataTable().data('bulk-actions-restore-selected-values', values)
+      $table.dataTable().data('bulk-actions-restore-selected-values', values)
 
-  if download # This is a file download
-    $.fileDownload(url,
-      httpMethod: 'POST',
-      data: { ids: values, authenticity_token: token }
-      successCallback: ->
-        success = "Successfully completed #{title} bulk action"
-        $table.one 'draw.dt', (e) -> $(e.target).DataTable().flash(success, 'success')
-        $table.DataTable().draw()
-      failCallback: ->
-        error = "An error occured while attempting #{title} bulk action"
-        $table.one 'draw.dt', (e) -> $(e.target).DataTable().flash(error, 'danger')
-        $table.DataTable().draw()
-    )
-  else # Normal AJAX post
-    $table.dataTable().data('bulk-actions-restore-selected-values', values)
+      if download # This is a file download
+        $.fileDownload(url,
+          httpMethod: 'POST',
+          data: { ids: values, authenticity_token: token }
+          successCallback: ->
+            success = "Successfully completed #{title} bulk action"
+            $table.one 'draw.dt', (e) -> $(e.target).DataTable().flash(success, 'success')
+            $table.DataTable().draw()
+          failCallback: ->
+            error = "An error occured while attempting #{title} bulk action"
+            $table.one 'draw.dt', (e) -> $(e.target).DataTable().flash(error, 'danger')
+            $table.DataTable().draw()
+        )
+      else # Normal AJAX post
+        $table.dataTable().data('bulk-actions-restore-selected-values', values)
 
-    $.ajax(
-      method: method,
-      url: url,
-      data: { ids: values, authenticity_token: token }
-    ).done((response) ->
-      success = response['message'] || "Successfully completed #{title} bulk action"
-      $table.one 'draw.dt', (e) -> $(e.target).DataTable().flash(success, 'success') and restoreSelected($(e.target), values)
+        $.ajax(
+          method: method,
+          url: url,
+          data: { ids: values, authenticity_token: token }
+        ).done((response) ->
+          success = response['message'] || "Successfully completed #{title} bulk action"
+          $table.one 'draw.dt', (e) -> $(e.target).DataTable().flash(success, 'success') and restoreSelected($(e.target), values)
 
-    ).fail((response) ->
-      error = response['message'] || "An error occured while attempting #{title} bulk action: #{response.statusText}"
-      $table.one 'draw.dt', (e) -> $(e.target).DataTable().flash(error, 'danger') and restoreSelected($(e.target), values)
+        ).fail((response) ->
+          error = response['message'] || "An error occured while attempting #{title} bulk action: #{response.statusText}"
+          $table.one 'draw.dt', (e) -> $(e.target).DataTable().flash(error, 'danger') and restoreSelected($(e.target), values)
 
-    ).always((response) ->
-      $table.DataTable().draw()
-    )
+        ).always((response) ->
+          $table.DataTable().draw()
+        )

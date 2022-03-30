@@ -805,7 +805,7 @@ A controller action must be created to accept a POST with an array of selected i
 
 This is a pass-through to `link_to` and accepts all the same options, except that the method `POST` is used by default.
 
-You can also specify `data-method: :get` to instead make a `GET` request with the selected ids and redirect the browser link a normal link.
+You can also specify `data-method: :get` to instead make a `GET` request with the selected ids and redirect the browser link a normal link. Or use `data-method: :post` and 'payload-mode' => 'form' to redirect the user via a POST form submission instead.
 
 ```ruby
 bulk_actions do
@@ -816,6 +816,8 @@ bulk_actions do
   bulk_action 'Action 2 | ids stored in _ids_ field in local storage', action_2_posts_path, data: { 'payload-mode' => 'local-storage', method: :get }
 
   bulk_action 'Action 3 | ids stored in _ids_ field in a cookie', action_3_posts_path, data: { 'payload-mode' => 'cookie', method: :get }
+
+  bulk_action 'Action 4 | ids encoded in _ids_ field in a dynamically created form', action_4_posts_path, data: { 'payload-mode' => 'form', method: :post }
 end
 ```
 
