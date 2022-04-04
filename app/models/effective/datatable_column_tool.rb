@@ -45,7 +45,7 @@ module Effective
       Rails.logger.info "COLUMN TOOL: order_column #{column.to_s} #{direction} #{sql_column}" if EffectiveDatatables.debug
 
       if column[:sql_as_column]
-        collection.order("#{sql_column} #{datatable.effective_resource.sql_direction(direction)}")
+        collection.order(Arel.sql("#{sql_column} #{datatable.effective_resource.sql_direction(direction)}"))
       else
         Effective::Resource.new(collection)
           .order(column[:name], direction, as: column[:as], sort: column[:sort], sql_column: column[:sql_column], limit: datatable.limit)
