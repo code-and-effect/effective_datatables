@@ -6,11 +6,13 @@ module EffectiveDatatables
 
     # Include Helpers to base application
     initializer 'effective_datatables.action_controller' do |app|
-      ActiveSupport.on_load :action_controller_base do
-        helper EffectiveDatatablesHelper
-        helper EffectiveDatatablesPrivateHelper
+      app.config.to_prepare do
+        ActiveSupport.on_load :action_controller_base do
+          helper EffectiveDatatablesHelper
+          helper EffectiveDatatablesPrivateHelper
 
-        ActionController::Base.send :include, ::EffectiveDatatablesControllerHelper
+          ActionController::Base.send :include, ::EffectiveDatatablesControllerHelper
+        end
       end
     end
 
