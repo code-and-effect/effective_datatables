@@ -18,7 +18,7 @@ module Effective
       @view = datatable.view
     end
 
-    def method_missing(method, *args, &block)
+    def method_missing(method, *args, **kwargs, &block)
       # Catch a common error
       if [:bulk_actions, :charts, :collection, :filters].include?(method) && in_datatables_do_block
         raise "#{method} block must be declared outside the datatable do ... end block"
@@ -26,15 +26,15 @@ module Effective
 
       if datatable.respond_to?(method)
         if block_given?
-          datatable.send(method, *args) { yield }
+          datatable.send(method, *args, **kwargs) { yield }
         else
-          datatable.send(method, *args)
+          datatable.send(method, *args, **kwargs)
         end
       elsif view.respond_to?(method)
         if block_given?
-          view.send(method, *args) { yield }
+          view.send(method, *args, **kwargs) { yield }
         else
-          view.send(method, *args)
+          view.send(method, *args, **kwargs)
         end
       else
         super
