@@ -19,11 +19,12 @@ $(document).on 'change', ".dataTables_wrapper input[data-role='bulk-actions']", 
 
 toggleDropdown = ($wrapper) ->
   $bulkActions = $wrapper.children().first().find('.buttons-bulk-actions').children('button')
+  selected = $wrapper.find("input[data-role='bulk-action']:checked").length
 
-  if $wrapper.find("input[data-role='bulk-action']:checked").length > 0
-    $bulkActions.removeAttr('disabled')
+  if selected > 0
+    $bulkActions.removeAttr('disabled').text("Bulk Actions (#{selected} items)")
   else
-    $bulkActions.attr('disabled', 'disabled')
+    $bulkActions.attr('disabled', 'disabled').text('Bulk Actions')
 
 restoreSelected = ($table, selected) ->
   $bulkActions = $table.closest('.dataTables_wrapper').children().first().find('.buttons-bulk-actions').children('button')
