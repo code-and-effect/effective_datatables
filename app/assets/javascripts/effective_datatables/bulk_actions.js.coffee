@@ -6,25 +6,6 @@ $(document).on 'change', ".dataTables_wrapper input[data-role='bulk-action']", (
   $wrapper.find("input[data-role='bulk-actions']").prop('checked', false)
   toggleDropdown($wrapper)
 
-$(document).on 'mousedown', ".dataTables_wrapper .buttons-bulk-actions [data-confirm]", (event) ->
-  $obj = $(event.currentTarget)
-  return if $obj.data('confirmed')
-
-  $wrapper = $obj.closest('.dataTables_wrapper')
-  selected = $wrapper.find("input[data-role='bulk-action']:checked").length
-
-  unless $obj.data('bulk-action-original-confirm')
-    $obj.data('bulk-action-original-confirm', $obj.data('confirm'))
-
-  newConfirm = $obj.data('bulk-action-original-confirm') + "\n\n"
-
-  if selected == 1
-    newConfirm += "This action will affect #{selected} item."
-  else
-    newConfirm += "This action will affect #{selected} items."
-
-  $obj.attr('data-confirm', newConfirm)
-
 $(document).on 'change', ".dataTables_wrapper input[data-role='bulk-actions']", (event) ->
   $wrapper = $(event.currentTarget).closest('.dataTables_wrapper')
   $resources = $wrapper.find("input[data-role='bulk-action']")
