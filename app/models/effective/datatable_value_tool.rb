@@ -93,6 +93,7 @@ module Effective
       collection.select! do |row|
         obj = row[index]
         value = obj_to_value(row[index], column, row)
+        next if value.blank?
 
         case column[:as]
         when :boolean
