@@ -10,14 +10,14 @@ module Effective
         return @_datatables_ajax_request unless @_datatables_ajax_request.nil?
         return unless view.respond_to?(:params)
 
-        @_datatables_ajax_request = (view.present? && view.params.key?(:draw) && view.params.key?(:columns))
+        @_datatables_ajax_request = (view.params.key?(:draw) && view.params.key?(:columns))
       end
 
       def datatables_inline_request?
         return @_datatables_inline_request unless @_datatables_inline_request.nil?
         return unless view.respond_to?(:params)
 
-        @_datatables_inline_request = (view.present? && view.params[:_datatable_id].to_s.split('-')[0...-1] == to_param.split('-')[0...-1])
+        @_datatables_inline_request = (view.params[:_datatable_id].to_s.split('-')[0...-1] == to_param.split('-')[0...-1])
       end
 
       def params
