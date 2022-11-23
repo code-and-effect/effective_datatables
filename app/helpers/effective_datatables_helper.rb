@@ -22,6 +22,8 @@ module EffectiveDatatablesHelper
 
     datatable.view ||= self
 
+    datatable.state[:length] = 9999999 if simple
+
     unless EffectiveDatatables.authorized?(controller, :index, datatable.collection_class)
       return content_tag(:p, "You are not authorized to view this datatable. (cannot :index, #{datatable.collection_class})")
     end
