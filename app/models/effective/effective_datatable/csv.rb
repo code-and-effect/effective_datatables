@@ -36,20 +36,24 @@ module Effective
         EffectiveResources.with_resource_enumerator do |lines|
           lines << CSV.generate_line(csv_header)
 
-          collection.public_send(csv_collection_method) do |resources|
-            resources = arrayize(resources, csv: true)
+          if active_record_collection?
+            collection.find_in_batches do |resources|
+              resources = arrayize(resources, csv: true)
+              format(resources, csv: true)
+              finalize(resources)
+
+              resources.each { |resource| lines << CSV.generate_line(resource) }
+            end
+          else
+            resources = collection
+
             format(resources, csv: true)
             finalize(resources)
 
             resources.each { |resource| lines << CSV.generate_line(resource) }
           end
+
         end
-      end
-
-      private
-
-      def csv_collection_method
-        (active_record_collection? ? :find_in_batches : :to_a)
       end
 
     end
