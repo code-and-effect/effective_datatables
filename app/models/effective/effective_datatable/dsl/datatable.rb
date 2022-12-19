@@ -30,6 +30,10 @@ module Effective
           datatable.attributes[:downloadable] = bool
         end
 
+        def skip_save_state!
+          datatable.attributes[:skip_save_state] = true
+        end
+
         # A col has its internal values sorted/searched before the block is run
         # Anything done in the block, is purely a format on the after sorted/ordered value
         # the original object == the computed value, which is yielded to the format block

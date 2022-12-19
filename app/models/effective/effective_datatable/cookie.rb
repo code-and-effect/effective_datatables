@@ -12,6 +12,7 @@ module Effective
 
       def load_cookie!
         return unless EffectiveDatatables.save_state
+        return if skip_save_state?
         return unless (view.cookies rescue false) # Rails 6.1 view doesn't respond_to?(:cookies)
 
         @dt_cookie = view.cookies.signed['_effective_dt']
@@ -36,6 +37,7 @@ module Effective
 
       def save_cookie!
         return unless EffectiveDatatables.save_state
+        return if skip_save_state?
         return unless (view.cookies rescue false)
 
         @dt_cookie ||= []

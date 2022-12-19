@@ -182,6 +182,10 @@ module Effective
       attributes[:downloadable] != false
     end
 
+    def skip_save_state?
+      attributes[:skip_save_state] == true
+    end
+
     # Whether the filters must be rendered as a <form> or we can keep the normal <div> behaviour
     def _filters_form_required?
       _form[:verb].present?
