@@ -68,7 +68,7 @@ module Effective
               elsif opts[:format] && rendered.key?(name)
                 dsl_tool.instance_exec(value, row, rendered[name][row_index], &opts[:format])
               elsif opts[:format]
-                dsl_tool.instance_exec(value, row, &opts[:format])
+                dsl_tool.instance_exec(value, row, &opts[:format]).to_s
               elsif opts[:partial]
                 rendered[name][row_index]
               else
@@ -88,6 +88,7 @@ module Effective
         end
       end
 
+      # Must return a string
       def format_column(value, column, csv: false)
         return if value.nil? || (column[:resource] && value.blank?)
 
@@ -114,24 +115,24 @@ module Effective
           value.respond_to?(:strftime) ? value.strftime(EffectiveDatatables.format_date) : BLANK
         when :datetime
           if csv
-            value
+            value.to_s
           else
             value.respond_to?(:strftime) ? value.strftime(EffectiveDatatables.format_datetime) : BLANK
           end
         when :decimal
-          value
+          value.to_s
         when :duration
           view.number_to_duration(value)
         when :effective_addresses
           csv ? value.to_html.gsub('<br>', "\n") : value.to_html
         when :effective_obfuscation
-          value
+          value.to_s
         when :effective_roles
           value.join(', ')
         when :email
           csv ? value : view.mail_to(value)
         when :integer
-          value
+          value.to_s
         when :percent
           case value
           when Integer    ; view.number_to_percentage(value / 1000.0, precision: 3).gsub('.000%', '%')

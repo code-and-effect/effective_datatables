@@ -22,7 +22,7 @@ module Effective
         CSV.generate do |csv|
           csv << csv_header()
 
-          collection.send(csv_collection_method) do |resources|
+          collection.find_in_batches do |resources|
             resources = arrayize(resources, csv: true)
             format(resources, csv: true)
             finalize(resources)
