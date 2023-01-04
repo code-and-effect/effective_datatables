@@ -195,8 +195,8 @@ module Effective
 
           # Assign default search operation
           search[:operation] ||= search.delete(:op)
-          search[:operation] ||= :eq if search[:as] == :select
           search[:operation] ||= :matches if search[:fuzzy]
+          search[:operation] ||= :eq if search[:as] == :select
           search[:operation] ||= search_resource.sql_operation(name, as: opts[:as])
 
           # Assign default include_null
