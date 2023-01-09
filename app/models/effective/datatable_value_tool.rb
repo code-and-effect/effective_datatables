@@ -79,7 +79,7 @@ module Effective
     def search_column(collection, original, column, index)
       Rails.logger.info "VALUE TOOL: search_column #{column.to_s} #{original} #{index}" if EffectiveDatatables.debug
 
-      fuzzy = column[:search][:fuzzy]
+      fuzzy = (column[:search][:operation] == :matches)
 
       term = Effective::Attribute.new(column[:as]).parse(original, name: column[:name])
       term_downcased = term.to_s.downcase
