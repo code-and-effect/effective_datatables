@@ -59,7 +59,16 @@ module EffectiveDatatablesPrivateHelper
     when :reorder
       content_tag(:span, t('effective_datatables.reorder'), style: 'display: none;')
     else
-      content_tag(:span, opts[:label].presence)
+      label = opts[:label].presence || datatable_human_attribute_name(datatable, name)
+      content_tag(:span, label)
+    end
+  end
+
+  def datatable_human_attribute_name(datatable, name)
+    if datatable.active_record_collection?
+      datatable.collection_class.human_attribute_name(name)
+    else
+      (name.to_s.split('.').last || '')
     end
   end
 

@@ -15,7 +15,17 @@ module Effective
       end
 
       def csv_header
-        columns.map { |_, opts| opts[:label] || '' }
+        columns.map do |name, opts|
+          opts[:label].presence || csv_human_attribute_name(name)
+        end
+      end
+
+      def csv_human_attribute_name(name)
+        if active_record_collection?
+          collection_class.human_attribute_name(name)
+        else
+          (name.to_s.split('.').last || '')
+        end
       end
 
       def csv_file
