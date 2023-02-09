@@ -70,6 +70,8 @@ module EffectiveDatatablesPrivateHelper
     case opts[:as]
     when :belongs_to
       opts[:resource].human_name
+    when :has_many
+      opts[:resource].human_plural_name
     else
       datatable.collection_class.human_attribute_name(name)
     end
