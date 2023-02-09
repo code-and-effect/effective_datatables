@@ -68,7 +68,7 @@ module EffectiveDatatablesPrivateHelper
     if datatable.active_record_collection?
       datatable.collection_class.human_attribute_name(name)
     else
-      (name.to_s.split('.').last || '')
+      (name.to_s.split('.').last || '').titleize
     end
   end
 
