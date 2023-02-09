@@ -59,8 +59,23 @@ module EffectiveDatatablesPrivateHelper
     when :reorder
       content_tag(:span, t('effective_datatables.reorder'), style: 'display: none;')
     else
-      content_tag(:span, opts[:label].presence)
+      label = opts[:label].presence || datatable_human_attribute_name(datatable, name, opts)
+      content_tag(:span, label)
     end
+  end
+
+  def datatable_human_attribute_name(datatable, name, opts)
+    return (name.to_s.split('.').last || '').titleize unless datatable.active_record_collection?
+
+    case opts[:as]
+    when :belongs_to
+      opts[:resource].human_name
+    when :has_many
+      opts[:resource].human_plural_name
+    else
+      datatable.collection_class.human_attribute_name(name)
+    end
+
   end
 
   def datatable_search_tag(datatable, name, opts)
