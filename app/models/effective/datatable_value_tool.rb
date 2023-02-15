@@ -95,7 +95,9 @@ module Effective
         value = obj_to_value(row[index], column, row)
         next if value.nil? || value == ''
 
-        case column[:as]
+        obj_equals = obj.respond_to?(column[:name]) && obj.send(column[:name]).to_s.downcase == term_downcased
+
+        obj_equals || case column[:as]
         when :boolean
           if fuzzy
             term ? (obj == true) : (obj != true)
