@@ -204,9 +204,9 @@ table.dataTable.hide-buttons {
 
 // Column specific adjustments
 table.dataTable {
-  td.col-price { text-align: right; }
-  td.col-decimal { text-align: right; }
-  td.col-right { text-align: right; }
+  th.col-price, td.col-price { text-align: right; }
+  th.col-decimal, td.col-decimal { text-align: right; }
+  th.col-right, td.col-right { text-align: right; }
 
   td.col-bulk_actions {
     label {
@@ -232,5 +232,3 @@ table.dataTable {
 
   td.col-resource_item { word-break: keep-all; }
 }
-
-
