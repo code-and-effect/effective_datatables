@@ -6,15 +6,12 @@ module Effective
       module Filters
 
         DATE_RANGES = [
-          ['Current month', :current_month],
-          ['Last month', :last_month],
-          ['Custom month', :custom_month],
-
-          ['Current year', :current_year],
-          ['Last year', :last_year],
-          ['Custom year', :custom_year],
-
+          ['Current Month', :current_month],
+          ['Current Year', :current_year],
+          ['Month', :month],
+          ['Year', :year],
           ['Custom', :custom],
+          ['All Time', :all]
         ]
 
         # This sets up the select field with start_on and end_on
