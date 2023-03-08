@@ -1,0 +1,29 @@
+- name = '' unless datatable._filters_form_required?
+- now = Time.zone.now
+
+= f.select :date_range, opts[:collection], autocomplete: 'off', feedback: false
+
+.mx-2
+
+= f.show_if :date_range, :current_month do
+  = f.static_field :dates do
+    #{now.beginning_of_month.strftime('%F')} to #{now.strftime('%F')} (today)
+
+= f.show_if :date_range, :current_year do
+  = f.static_field :dates do
+    #{now.beginning_of_year.strftime('%F')} to #{now.strftime('%F')} (today)
+
+= f.show_if :date_range, :last_month do
+  = f.static_field :dates do
+    #{(now - 1.month).beginning_of_month.strftime('%F')} to #{(now - 1.month).end_of_month.strftime('%F')}
+
+= f.show_if :date_range, :last_year do
+  = f.static_field :dates do
+    #{(now - 1.year).beginning_of_year.strftime('%F')} to #{(now - 1.year).end_of_year.strftime('%F')}
+
+= f.show_if :date_range, :custom do
+  .row
+    .col
+      = f.date_field :start_date, name: name, autocomplete: 'off', feedback: false
+    .col
+      = f.date_field :end_date, name: name, autocomplete: 'off', feedback: false
