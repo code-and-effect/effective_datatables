@@ -1,7 +1,7 @@
 - name = '' unless datatable._filters_form_required?
 - now = Time.zone.now.beginning_of_day
 
-= f.select :date_range, opts[:collection], autocomplete: 'off', feedback: false
+= f.select :date_range, opts[:collection], autocomplete: 'off', feedback: false, placeholder: 'All available dates'
 
 .mx-2
 

@@ -10,8 +10,7 @@ module Effective
           ['Current Year', :current_year],
           ['Month', :month],
           ['Year', :year],
-          ['Custom', :custom],
-          ['All Time', :all]
+          ['Custom', :custom]
         ]
 
         # This sets up the select field with start_on and end_on
