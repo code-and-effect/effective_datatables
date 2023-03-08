@@ -70,7 +70,7 @@ initializeDataTables = (target) ->
           params['scope'] = $form.find("input[name='filters[scope]']:checked").val() || ''
           params['filter'] = {}
 
-          $form.find("select,textarea,input:not([type=submit])").each ->
+          $form.find("select,textarea,input:enabled:not([type=submit])").each ->
             $input = $(this)
 
             if ['utf8', 'authenticity_token', 'filters[scope]'].includes($input.attr('name'))

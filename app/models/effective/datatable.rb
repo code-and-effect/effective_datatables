@@ -199,6 +199,33 @@ module Effective
       "#{self.class.name.underscore.parameterize}-#{[self.class, attributes].hash.abs.to_s.last(12)}"
     end
 
+    def date_range(value = nil)
+      now = Time.zone.now
+
+      value ||= filters[:date_range]
+      start_date ||= filters[:start_date]
+      end_date ||= filters[:end_date]
+
+      return (nil..nil) if value.blank?
+
+      case value.to_sym
+      when :current_month
+        (now.beginning_of_month..now.end_of_day)
+      when :current_year
+        (now.beginning_of_year..now.end_of_day)
+      when :month
+        (start_date || now).all_month
+      when :year
+        (start_date || now).all_year
+      when :custom
+        (start_date&.beginning_of_day..end_date&.end_of_day)
+      when :all
+        (nil..nil)
+      else
+        raise('unexpected date range value')
+      end
+    end
+
     def columns
       @_columns
     end
@@ -221,6 +248,10 @@ module Effective
 
     def default_visibility
       columns.values.inject({}) { |h, col| h[col[:index]] = col[:visible]; h }
+    end
+
+    def filters_form
+      DatatableFiltersForm.new(datatable: self)
     end
 
     private

@@ -4,6 +4,29 @@ module Effective
   module EffectiveDatatable
     module Dsl
       module Filters
+
+        DATE_RANGES = [
+          ['Current Month', :current_month],
+          ['Current Year', :current_year],
+          ['Month', :month],
+          ['Year', :year],
+          ['Custom', :custom]
+        ]
+
+        # This sets up the select field with start_on and end_on
+        def filter_date_range(default = nil)
+          if default.present?
+            valid = DATE_RANGES.map(&:last)
+            raise("unexpected value #{default}. Try one of #{valid.to_sentence}") unless valid.include?(default)
+          end
+
+          date_range = datatable.date_range(default)
+
+          filter :date_range, default, collection: DATE_RANGES, partial: 'effective/datatables/filter_date_range'
+          filter :start_date, date_range&.begin, as: :date, visible: false
+          filter :end_date, date_range&.end, as: :date, visible: false
+        end
+
         def filter(name = nil, value = :_no_value, as: nil, label: nil, parse: nil, required: false, **input_html)
           return datatable.filter if (name == nil && value == :_no_value) # This lets block methods call 'filter' and get the values
 

@@ -50,6 +50,7 @@ Please check out [Effective Datatables 3.x](https://github.com/code-and-effect/e
   * [filters](#filters)
     * [scope](#scope)
     * [filter](#filter)
+    * [filter_date_range](#filter_date_range)
   * [bulk_actions](#bulk_actions)
     * [bulk_action](#bulk_action)
     * [bulk_action](#bulk_action_divider)
@@ -790,6 +791,24 @@ required: true|false            # Passed to form
 ```
 
 Any other option given will be yielded to EffectiveBootstrap as options.
+
+## filter_date_range
+
+There is also a special date range filter built in. To use:
+
+```ruby
+filters do
+  filter_date_range
+end
+
+collection do
+  Things.where(updated_at: date_range)
+end
+```
+
+This method creates 3 filters, `filters[:date_range]`, `filters[:start_date]` and `filters[:end_date]` and presents a rough Prev/Next month and year navigation. Do not have any columns named the same as these.
+
+You can pass a default into `filter_date_range`, one of `:current_month`, `:current_year`, `:month`, `:year` and `:custom`.
 
 ## bulk_actions
 

@@ -128,14 +128,16 @@ module EffectiveDatatablesPrivateHelper
     return unless datatable._scopes.present? || datatable._filters.present?
 
     if datatable._filters_form_required?
-      render partial: 'effective/datatables/filters', locals: { datatable: datatable }
+      render('effective/datatables/filters', datatable: datatable)
     else
-      render(partial: 'effective/datatables/filters', locals: { datatable: datatable }).gsub('<form', '<div').gsub('/form>', '/div>').html_safe
+      render('effective/datatables/filters', datatable: datatable).gsub('<form', '<div').gsub('/form>', '/div>').html_safe
     end
 
   end
 
   def datatable_filter_tag(form, datatable, name, opts)
+    return if opts[:visible] == false
+
     as = opts[:as].to_s.chomp('_field').to_sym
     value = datatable.state[:filter][name]
     collection = opts[:collection]
