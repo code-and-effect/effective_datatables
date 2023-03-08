@@ -8,8 +8,12 @@ module Effective
         DATE_RANGES = [
           ['Current month', :current_month],
           ['Last month', :last_month],
+          ['Custom month', :custom_month],
+
           ['Current year', :current_year],
           ['Last year', :last_year],
+          ['Custom year', :custom_year],
+
           ['Custom', :custom],
         ]
 
@@ -20,11 +24,11 @@ module Effective
             raise("unexpected value #{default}. Try one of #{valid.to_sentence}") unless valid.include?(default)
           end
 
-          (default_start_date, default_end_date) = datatable.date_range(default)
+          date_range = datatable.date_range(default)
 
           filter :date_range, default, collection: DATE_RANGES, partial: 'effective/datatables/filter_date_range'
-          filter :start_date, default_start_date, as: :date, visible: false
-          filter :end_date, default_end_date, as: :date, visible: false
+          filter :start_date, date_range&.begin, as: :date, visible: false
+          filter :end_date, date_range&.end, as: :date, visible: false
         end
 
         def filter(name = nil, value = :_no_value, as: nil, label: nil, parse: nil, required: false, **input_html)

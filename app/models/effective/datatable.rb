@@ -210,10 +210,15 @@ module Effective
 
       case value.to_sym
       when :current_month then (now.beginning_of_month..now.end_of_day)
-      when :current_year then (now.beginning_of_year..now.end_of_day)
       when :last_month then (now - 1.month).all_month
+      when :custom_month then (start_date || now).all_month
+
+      when :current_year then (now.beginning_of_year..now.end_of_day)
       when :last_year then (now - 1.year).all_year
+      when :custom_year then (start_date || now).all_year
+
       when :custom then (start_date&.beginning_of_day..end_date&.end_of_day)
+
       else
         raise('unexpected date range value')
       end

@@ -1,25 +1,72 @@
 - name = '' unless datatable._filters_form_required?
-- now = Time.zone.now
+- now = Time.zone.now.beginning_of_day
 
 = f.select :date_range, opts[:collection], autocomplete: 'off', feedback: false
 
 .mx-2
 
+- date = (f.object.start_date || now)
+- raise('expected a date') unless date.respond_to?(:strftime)
+
+- path = effective_datatables.datatable_path(datatable)
+
+- prev_month = (date - 1.month).beginning_of_month
+- next_month = (date + 1.month).beginning_of_month
+- prev_year = (date - 1.year).beginning_of_year
+- next_year = (date + 1.year).beginning_of_year
+
+- prev_month_path = effective_datatables.datatable_path(datatable, date_range: :custom_month, start_date: prev_month.strftime('%F'), end_date: prev_month.end_of_month.strftime('%F'))
+- next_month_path = effective_datatables.datatable_path(datatable, date_range: :custom_month, start_date: next_month.strftime('%F'), end_date: next_month.end_of_month.strftime('%F'))
+- prev_year_path = effective_datatables.datatable_path(datatable, date_range: :custom_year, start_date: prev_year.strftime('%F'), end_date: prev_year.end_of_year.strftime('%F'))
+- next_year_path = effective_datatables.datatable_path(datatable, date_range: :custom_year, start_date: next_year.strftime('%F'), end_date: next_year.end_of_month.strftime('%F'))
+
 = f.show_if :date_range, :current_month do
+  = f.static_field :month do
+    = link_to((prev_month.strftime('%b') + icon('arrow-left-circle')).html_safe, prev_month_path.sub(path, request.path))
+    = link_to((icon('arrow-right-circle') + next_month.strftime('%b')).html_safe, next_month_path.sub(path, request.path))
+
   = f.static_field :dates do
     #{now.beginning_of_month.strftime('%F')} to #{now.strftime('%F')} (today)
 
 = f.show_if :date_range, :current_year do
+  = f.static_field :year do
+    = link_to((prev_year.strftime('%Y') + icon('arrow-left-circle')).html_safe, prev_year_path.sub(path, request.path))
+    = link_to((icon('arrow-right-circle') + next_year.strftime('%Y')).html_safe, next_year_path.sub(path, request.path))
+
   = f.static_field :dates do
     #{now.beginning_of_year.strftime('%F')} to #{now.strftime('%F')} (today)
 
 = f.show_if :date_range, :last_month do
+  = f.static_field :month do
+    = link_to((prev_month.strftime('%b') + icon('arrow-left-circle')).html_safe, prev_month_path.sub(path, request.path))
+    = link_to((icon('arrow-right-circle') + next_month.strftime('%b')).html_safe, next_month_path.sub(path, request.path))
+
   = f.static_field :dates do
     #{(now - 1.month).beginning_of_month.strftime('%F')} to #{(now - 1.month).end_of_month.strftime('%F')}
 
 = f.show_if :date_range, :last_year do
+  = f.static_field :year do
+    = link_to((prev_year.strftime('%Y') + icon('arrow-left-circle')).html_safe, prev_year_path.sub(path, request.path))
+    = link_to((icon('arrow-right-circle') + next_year.strftime('%Y')).html_safe, next_year_path.sub(path, request.path))
+
   = f.static_field :dates do
     #{(now - 1.year).beginning_of_year.strftime('%F')} to #{(now - 1.year).end_of_year.strftime('%F')}
+
+= f.show_if :date_range, :custom_year do
+  = f.static_field :year do
+    = link_to((prev_year.strftime('%Y') + icon('arrow-left-circle')).html_safe, prev_year_path.sub(path, request.path))
+    = link_to((icon('arrow-right-circle') + next_year.strftime('%Y')).html_safe, next_year_path.sub(path, request.path))
+
+  = f.static_field :dates do
+    #{date.beginning_of_year.strftime('%F')} to #{date.end_of_year.strftime('%F')}
+
+= f.show_if :date_range, :custom_month do
+  = f.static_field :month do
+    = link_to((prev_month.strftime('%Y') + icon('arrow-left-circle')).html_safe, prev_month_path.sub(path, request.path))
+    = link_to((icon('arrow-right-circle') + next_month.strftime('%Y')).html_safe, next_month_path.sub(path, request.path))
+
+  = f.static_field :dates do
+    #{date.beginning_of_month.strftime('%F')} to #{date.end_of_month.strftime('%F')}
 
 = f.show_if :date_range, :custom do
   .row
