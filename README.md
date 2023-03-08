@@ -802,7 +802,7 @@ filters do
 end
 
 collection do
-  Things.where(updated_at: date_range)
+  Thing.where(updated_at: date_range)
 end
 ```
 
