@@ -59,6 +59,16 @@ module Effective
       self.view = view if view
     end
 
+    # Checks en.datatables.admin/my_datatable
+    def self.datatable_name
+      value = I18n.t("datatables.#{name.underscore}").to_s
+      value.start_with?('translation missing:') ? name.titleize.split('/').last.chomp(' Datatable') : value
+    end
+
+    def datatable_name
+      self.class.datatable_name
+    end
+
     def rendered(params = {})
       raise('expected a hash of params') unless params.kind_of?(Hash)
 
