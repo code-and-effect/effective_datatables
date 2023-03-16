@@ -24,7 +24,7 @@ module Effective
         if active_record_collection?
           collection_class.human_attribute_name(name)
         else
-          (name.to_s.split('.').last || '')
+          (name.to_s.split('.').last.titleize|| '')
         end
       end
 
@@ -32,8 +32,17 @@ module Effective
         CSV.generate do |csv|
           csv << csv_header()
 
-          collection.find_in_batches do |resources|
-            resources = arrayize(resources, csv: true)
+          if active_record_collection?
+            collection.find_in_batches do |resources|
+              resources = arrayize(resources, csv: true)
+              format(resources, csv: true)
+              finalize(resources)
+
+              resources.each { |resource| csv << resource }
+            end
+          else
+            resources = collection
+
             format(resources, csv: true)
             finalize(resources)
 
