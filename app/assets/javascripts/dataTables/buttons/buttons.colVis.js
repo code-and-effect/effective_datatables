@@ -62,9 +62,15 @@ $.extend( DataTable.ext.buttons, {
 				columns: idx,
 				columnText: conf.columnText
 			};
-		} ).toArray();
+		})
 
-		return columns;
+    var sorted = columns.sort(function (a, b) {
+      var a = dt.settings()[0].aoColumns[a.columns].sTitle;
+      var b = dt.settings()[0].aoColumns[b.columns].sTitle;
+      return a.localeCompare(b)
+    }).toArray();
+
+    return sorted;
 	},
 
 	// Single button to toggle column visibility
