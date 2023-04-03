@@ -4,3 +4,4 @@ Gemfile.lock
 log/*.log
 pkg/
 tmp/
+.rubocop-*
