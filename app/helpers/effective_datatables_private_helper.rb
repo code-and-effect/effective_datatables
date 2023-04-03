@@ -69,13 +69,19 @@ module EffectiveDatatablesPrivateHelper
 
     case opts[:as]
     when :belongs_to
-      opts[:resource].human_name
+      foreign_key = opts[:resource].initialized_name.try(:foreign_key).to_s.downcase
+      klass_name = opts[:resource].initialized_name.try(:class_name).to_s.downcase
+
+      if foreign_key.starts_with?(klass_name)
+        opts[:resource].human_name
+      else
+        datatable.collection_class.human_attribute_name(name)
+      end
     when :has_many
       opts[:resource].human_plural_name
     else
       datatable.collection_class.human_attribute_name(name)
     end
-
   end
 
   def datatable_search_tag(datatable, name, opts)
