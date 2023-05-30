@@ -178,6 +178,8 @@ module Effective
             search[:collection] = search[:collection].map { |obj| [obj.to_s, obj.id] }
           elsif search[:collection].kind_of?(Array) && search[:collection].first.kind_of?(ActiveRecord::Base)
             search[:collection] = search[:collection].map { |obj| [obj.to_s, obj.id] }
+          elsif search[:collection].kind_of?(Array)
+            search[:collection] = search[:collection]
           end
 
           search[:as] ||= :select if search.key?(:collection)
@@ -189,6 +191,8 @@ module Effective
 
           if array_collection? && opts[:resource].present?
             search.reverse_merge!(search_resource.search_form_field(name, collection.first[opts[:index]]))
+          elsif search[:as] == :select && search[:collection].kind_of?(Array)
+            # Nothing to do
           elsif search[:as] != :string
             search.reverse_merge!(search_resource.search_form_field(name, opts[:as]))
           end
