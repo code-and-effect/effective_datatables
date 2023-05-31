@@ -75,8 +75,10 @@ module Effective
     def search_column(collection, value, column, sql_column)
       Rails.logger.info "COLUMN TOOL: search_column #{column.to_s} #{value} #{sql_column}" if EffectiveDatatables.debug
 
+      operation = (column[:search][:fuzzy] && column[:as] == :string) ? :matches : :eq
+
       Effective::Resource.new(collection)
-        .search(column[:name], value, as: column[:as], operation: (column[:search][:fuzzy] ? :matches : :eq), column: sql_column)
+        .search(column[:name], value, as: column[:as], operation: operation, column: sql_column)
     end
 
     def paginate(collection)
