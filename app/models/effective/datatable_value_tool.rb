@@ -12,7 +12,7 @@ module Effective
       if datatable.array_collection?
         @columns = datatable.columns
       else
-        @columns = datatable.columns.select { |_, col| col[:sql_column].blank? }
+        @columns = datatable.columns.reject { |_, col| col[:sql_column].present? || (col[:search_method].present? && col[:sql_column] != false) }
       end
     end
 

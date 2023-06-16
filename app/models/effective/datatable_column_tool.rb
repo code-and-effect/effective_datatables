@@ -9,7 +9,7 @@ module Effective
       @datatable = datatable
 
       if datatable.active_record_collection?
-        @columns = datatable.columns.select { |_, col| col[:sql_column].present? }
+        @columns = datatable.columns.select { |_, col| col[:sql_column].present? || (col[:search_method].present? && col[:sql_column] != false) }
       else
         @columns = {}
       end
