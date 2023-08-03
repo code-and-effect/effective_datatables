@@ -61,8 +61,14 @@ module Effective
 
     # Checks en.datatables.admin/my_datatable
     def self.datatable_name
-      value = I18n.t("datatables.#{name.underscore}").to_s
-      value.start_with?('translation missing:') ? name.titleize.split('/').last.chomp(' Datatable') : value
+      key = "datatables.#{name.underscore}"
+      value = ::I18n.t(key)
+
+      if value.include?(key) # missing translation
+        name.titleize.split('/').last.chomp(' Datatable')
+      else
+        value
+      end
     end
 
     def datatable_name
