@@ -1,35 +1,85 @@
 // Override dataTables.bootstrap4.css defaults
 table.dataTable { border-collapse: collapse !important; }
 
-// Override default padding
-table.dataTable thead > tr > th.sorting_asc, table.dataTable thead > tr > th.sorting_desc, table.dataTable thead > tr > th.sorting,
+// Override default hover effect
+table.dataTable.table-striped > tbody > tr.odd > *,
+table.dataTable.table-striped > tbody > tr.odd.selected > *,
+table.dataTable.table-hover > tbody > tr:hover > *,
+table.dataTable.table-hover > tbody > tr.selected:hover > * { 
+  box-shadow: unset; 
+}
+
+// Override default sorting
+table.dataTable thead > tr > th.sorting:before, 
+table.dataTable thead > tr > th.sorting_asc:before, 
+table.dataTable thead > tr > th.sorting_desc:before,
+table.dataTable thead > tr > th.sorting_asc_disabled:before,
+table.dataTable thead > tr > th.sorting_desc_disabled:before,
+table.dataTable thead > tr > td.sorting:before,
+table.dataTable thead > tr > td.sorting_asc:before,
+table.dataTable thead > tr > td.sorting_desc:before,
+table.dataTable thead > tr > td.sorting_asc_disabled:before,
+table.dataTable thead > tr > td.sorting_desc_disabled:before {
+  content: '';
+}
+
+table.dataTable thead > tr > th.sorting:after,
+table.dataTable thead > tr > th.sorting_asc:after,
+table.dataTable thead > tr > th.sorting_desc:after,
+table.dataTable thead > tr > th.sorting_asc_disabled:after,
+table.dataTable thead > tr > th.sorting_desc_disabled:after,
+table.dataTable thead > tr > td.sorting:after,
+table.dataTable thead > tr > td.sorting_asc:after,
+table.dataTable thead > tr > td.sorting_desc:after,
+table.dataTable thead > tr > td.sorting_asc_disabled:after,
+table.dataTable thead > tr > td.sorting_desc_disabled:after {
+  content: '';
+}
+
+table.dataTable thead > tr > th.sorting, table.dataTable thead > tr > th.sorting_asc, table.dataTable thead > tr > th.sorting_desc, table.dataTable thead > tr > th.sorting_asc_disabled, table.dataTable thead > tr > th.sorting_desc_disabled,
+table.dataTable thead > tr > td.sorting,
 table.dataTable thead > tr > td.sorting_asc,
 table.dataTable thead > tr > td.sorting_desc,
-table.dataTable thead > tr > td.sorting { padding: 0.5em 0.5em 0.5em 0.5em; }
+table.dataTable thead > tr > td.sorting_asc_disabled,
+table.dataTable thead > tr > td.sorting_desc_disabled {
+  padding: 0.5em 0.5em 0.5em 0.5em;
+}
 
-// Override default sort icons
-table.dataTable thead .sorting:before,
-table.dataTable thead .sorting_asc:before,
-table.dataTable thead .sorting_desc:before,
-table.dataTable thead .sorting_asc_disabled:before,
-table.dataTable thead .sorting_desc_disabled:before,
-table.dataTable thead .sorting:after,
-table.dataTable thead .sorting_asc:after,
-table.dataTable thead .sorting_desc:after,
-table.dataTable thead .sorting_asc_disabled:after,
-table.dataTable thead .sorting_desc_disabled:after { content: ''; }
+table.dataTable.table-sm > thead > tr > th:not(.sorting_disabled) { padding-right: 0.5em; }
+table.dataTable thead > tr > th.sorting_disabled { padding-bottom: 8px; }
 
-table.dataTable > thead {
+table.dataTable > thead th {
+  background-repeat: no-repeat;
+  > span { padding-right: 1rem; }
+}
+
+table.dataTable > thead .sorting {
+  background-image: asset-data-url('dataTables/sort.svg');
+  background-position: right 0.25rem top 0.25rem;
+}
+
+table.dataTable > thead .sorting_asc {
+  background-image: asset-data-url('dataTables/sort-up.svg');
+  background-position: right 0.25rem top 0.25rem;
+}
+
+table.dataTable > thead .sorting_desc {
+  background-image: asset-data-url('dataTables/sort-down.svg');
+  background-position: right 0.25rem top 0.25rem;
+}
+
+// The New button
+table.dataTable thead {
   th.col-actions {
     text-align: right;
-
     span { display: block; height: 1.25em; }
   }
 }
 
+// Turbolinks destroy fix
 .dataTables_wrapper {
   table.dataTable {
-    tr.effective-datatables-inline-row { visibility: collapse; }  // Turbolinks destroy fix
+    tr.effective-datatables-inline-row { visibility: collapse; }
   }
 }
 
@@ -53,26 +103,6 @@ table.dataTable > thead {
   }
 }
 
-table.dataTable > thead th {
-  background-repeat: no-repeat;
-
-  > span { padding-right: 1rem; }
-}
-
-table.dataTable > thead .sorting {
-  background-image: asset-data-url('dataTables/sort.svg');
-  background-position: right 0.25rem top 0.25rem;
-}
-
-table.dataTable > thead .sorting_asc {
-  background-image: asset-data-url('dataTables/sort-up.svg');
-  background-position: right 0.25rem top 0.25rem;
-}
-
-table.dataTable > thead .sorting_desc {
-  background-image: asset-data-url('dataTables/sort-down.svg');
-  background-position: right 0.25rem top 0.25rem;
-}
 
 // Collapsed Responsive View
 table.dataTable > tbody > tr.child {
@@ -88,6 +118,10 @@ table.dataTable > tbody > tr.child {
     span.dtr-data { white-space: nowrap; }
     .col-resource_item { margin-bottom: 0.25em; }
   }
+}
+
+table.dataTable.collapsed  {
+  th.col-bulk_actions:first-child { div { margin-left: 18px; } }
 }
 
 // Buttons
@@ -122,10 +156,6 @@ table.dataTable > thead {
       }
     }
   }
-}
-
-table.dataTable.collapsed  {
-  th.col-bulk_actions:first-child { div { margin-left: 18px; } }
 }
 
 // Processing div

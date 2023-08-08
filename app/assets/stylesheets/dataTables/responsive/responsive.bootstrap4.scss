@@ -8,82 +8,54 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > th.child:before,
 table.dataTable.dtr-inline.collapsed > tbody > tr > td.dataTables_empty:before {
   display: none !important;
 }
-table.dataTable.dtr-inline.collapsed > tbody > tr[role="row"] > td:first-child,
-table.dataTable.dtr-inline.collapsed > tbody > tr[role="row"] > th:first-child {
-  position: relative;
-  padding-left: 30px;
+table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control,
+table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control {
   cursor: pointer;
 }
-table.dataTable.dtr-inline.collapsed:not(.reordering) > tbody > tr[role="row"] > td:first-child:before,
-table.dataTable.dtr-inline.collapsed:not(.reordering) > tbody > tr[role="row"] > th:first-child:before {
-  top: 12px;
-  left: 4px;
-  height: 14px;
-  width: 14px;
-  display: block;
-  position: absolute;
-  color: white;
-  border: 2px solid white;
-  border-radius: 14px;
-  box-shadow: 0 0 3px #444;
-  box-sizing: content-box;
-  text-align: center;
-  text-indent: 0 !important;
-  font-family: 'Courier New', Courier, monospace;
-  line-height: 14px;
-  content: '+';
-  background-color: #0275d8;
+table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control:before,
+table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control:before {
+  margin-right: 0.5em;
+  display: inline-block;
+  color: rgba(0, 0, 0, 0.5);
+  content: "►";
 }
-table.dataTable.dtr-inline.collapsed > tbody > tr.parent > td:first-child:before,
-table.dataTable.dtr-inline.collapsed > tbody > tr.parent > th:first-child:before {
-  content: '-';
-  background-color: #d33333;
+table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control.arrow-right::before,
+table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control.arrow-right::before {
+  content: "◄";
 }
-table.dataTable.dtr-inline.collapsed.compact > tbody > tr > td:first-child,
-table.dataTable.dtr-inline.collapsed.compact > tbody > tr > th:first-child {
-  padding-left: 27px;
+table.dataTable.dtr-inline.collapsed > tbody > tr.parent > td.dtr-control:before,
+table.dataTable.dtr-inline.collapsed > tbody > tr.parent > th.dtr-control:before {
+  content: "▼";
 }
-table.dataTable.dtr-inline.collapsed.compact > tbody > tr > td:first-child:before,
-table.dataTable.dtr-inline.collapsed.compact > tbody > tr > th:first-child:before {
-  top: 5px;
-  left: 4px;
-  height: 14px;
-  width: 14px;
-  border-radius: 14px;
-  line-height: 14px;
-  text-indent: 3px;
+table.dataTable.dtr-inline.collapsed.compact > tbody > tr > td.dtr-control,
+table.dataTable.dtr-inline.collapsed.compact > tbody > tr > th.dtr-control {
+  padding-left: 0.333em;
 }
+table.dataTable.dtr-column > tbody > tr > td.dtr-control,
+table.dataTable.dtr-column > tbody > tr > th.dtr-control,
 table.dataTable.dtr-column > tbody > tr > td.control,
 table.dataTable.dtr-column > tbody > tr > th.control {
-  position: relative;
   cursor: pointer;
 }
+table.dataTable.dtr-column > tbody > tr > td.dtr-control:before,
+table.dataTable.dtr-column > tbody > tr > th.dtr-control:before,
 table.dataTable.dtr-column > tbody > tr > td.control:before,
 table.dataTable.dtr-column > tbody > tr > th.control:before {
-  top: 50%;
-  left: 50%;
-  height: 16px;
-  width: 16px;
-  margin-top: -10px;
-  margin-left: -10px;
-  display: block;
-  position: absolute;
-  color: white;
-  border: 2px solid white;
-  border-radius: 14px;
-  box-shadow: 0 0 3px #444;
-  box-sizing: content-box;
-  text-align: center;
-  text-indent: 0 !important;
-  font-family: 'Courier New', Courier, monospace;
-  line-height: 14px;
-  content: '+';
-  background-color: #0275d8;
+  display: inline-block;
+  color: rgba(0, 0, 0, 0.5);
+  content: "►";
 }
+table.dataTable.dtr-column > tbody > tr > td.dtr-control.arrow-right::before,
+table.dataTable.dtr-column > tbody > tr > th.dtr-control.arrow-right::before,
+table.dataTable.dtr-column > tbody > tr > td.control.arrow-right::before,
+table.dataTable.dtr-column > tbody > tr > th.control.arrow-right::before {
+  content: "◄";
+}
+table.dataTable.dtr-column > tbody > tr.parent td.dtr-control:before,
+table.dataTable.dtr-column > tbody > tr.parent th.dtr-control:before,
 table.dataTable.dtr-column > tbody > tr.parent td.control:before,
 table.dataTable.dtr-column > tbody > tr.parent th.control:before {
-  content: '-';
-  background-color: #d33333;
+  content: "▼";
 }
 table.dataTable > tbody > tr.child {
   padding: 0.5em 1em;
@@ -105,6 +77,7 @@ table.dataTable > tbody > tr.child ul.dtr-details > li:first-child {
   padding-top: 0;
 }
 table.dataTable > tbody > tr.child ul.dtr-details > li:last-child {
+  padding-bottom: 0;
   border-bottom: none;
 }
 table.dataTable > tbody > tr.child span.dtr-title {
@@ -130,7 +103,8 @@ div.dtr-modal div.dtr-modal-display {
   bottom: 0;
   right: 0;
   width: 50%;
-  height: 50%;
+  height: fit-content;
+  max-height: 75%;
   overflow: auto;
   margin: auto;
   z-index: 102;
@@ -142,7 +116,10 @@ div.dtr-modal div.dtr-modal-display {
 }
 div.dtr-modal div.dtr-modal-content {
   position: relative;
-  padding: 1em;
+  padding: 2.5em;
+}
+div.dtr-modal div.dtr-modal-content h2 {
+  margin-top: 0;
 }
 div.dtr-modal div.dtr-modal-close {
   position: absolute;
@@ -150,15 +127,10 @@ div.dtr-modal div.dtr-modal-close {
   right: 6px;
   width: 22px;
   height: 22px;
-  border: 1px solid #eaeaea;
-  background-color: #f9f9f9;
   text-align: center;
   border-radius: 3px;
   cursor: pointer;
   z-index: 12;
-}
-div.dtr-modal div.dtr-modal-close:hover {
-  background-color: #eaeaea;
 }
 div.dtr-modal div.dtr-modal-background {
   position: fixed;
@@ -175,6 +147,17 @@ div.dtr-modal div.dtr-modal-background {
     width: 95%;
   }
 }
+html.dark table.dataTable > tbody > tr > td.dtr-control:before {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+html.dark table.dataTable > tbody > tr.child ul.dtr-details > li {
+  border-bottom-color: rgb(64, 67, 70);
+}
+html.dark div.dtr-modal div.dtr-modal-display {
+  background-color: rgb(33, 37, 41);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
 div.dtr-bs-modal table.table tr:first-child td {
   border-top: none;
 }
