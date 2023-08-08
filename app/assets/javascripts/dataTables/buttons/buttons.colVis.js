@@ -1,6 +1,6 @@
 /*!
  * Column visibility buttons for Buttons and DataTables.
- * 2016 SpryMedia Ltd - datatables.net/license
+ * © SpryMedia Ltd - datatables.net/license
  */
 
 (function( factory ){
@@ -12,21 +12,37 @@
 	}
 	else if ( typeof exports === 'object' ) {
 		// CommonJS
-		module.exports = function (root, $) {
-			if ( ! root ) {
-				root = window;
-			}
-
-			if ( ! $ || ! $.fn.dataTable ) {
-				$ = require('datatables.net')(root, $).$;
+		var jq = require('jquery');
+		var cjsRequires = function (root, $) {
+			if ( ! $.fn.dataTable ) {
+				require('datatables.net')(root, $);
 			}
 
 			if ( ! $.fn.dataTable.Buttons ) {
 				require('datatables.net-buttons')(root, $);
 			}
-
-			return factory( $, root, root.document );
 		};
+
+		if (typeof window === 'undefined') {
+			module.exports = function (root, $) {
+				if ( ! root ) {
+					// CommonJS environments without a window global must pass a
+					// root. This will give an error otherwise
+					root = window;
+				}
+
+				if ( ! $ ) {
+					$ = jq( root );
+				}
+
+				cjsRequires( root, $ );
+				return factory( $, root, root.document );
+			};
+		}
+		else {
+			cjsRequires( window, jq );
+			module.exports = factory( jq, window, window.document );
+		}
 	}
 	else {
 		// Browser
@@ -37,44 +53,68 @@
 var DataTable = $.fn.dataTable;
 
 
-$.extend( DataTable.ext.buttons, {
+
+$.extend(DataTable.ext.buttons, {
 	// A collection of column visibility buttons
-	colvis: function ( dt, conf ) {
-		return {
+	colvis: function (dt, conf) {
+		var node = null;
+		var buttonConf = {
 			extend: 'collection',
-			text: function ( dt ) {
-				return dt.i18n( 'buttons.colvis', 'Column visibility' );
+			init: function (dt, n) {
+				node = n;
+			},
+			text: function (dt) {
+				return dt.i18n('buttons.colvis', 'Column visibility');
 			},
 			className: 'buttons-colvis',
-			buttons: [ {
-				extend: 'columnsToggle',
-				columns: conf.columns,
-				columnText: conf.columnText
-			} ]
+			closeButton: false,
+			buttons: [
+				{
+					extend: 'columnsToggle',
+					columns: conf.columns,
+					columnText: conf.columnText
+				}
+			]
 		};
+
+		// Rebuild the collection with the new column structure if columns are reordered
+		dt.on('column-reorder.dt' + conf.namespace, function (e, settings, details) {
+			dt.button(null, dt.button(null, node).node()).collectionRebuild([
+				{
+					extend: 'columnsToggle',
+					columns: conf.columns,
+					columnText: conf.columnText
+				}
+			]);
+		});
+
+		return buttonConf;
 	},
 
 	// Selected columns with individual buttons - toggle column visibility
-	columnsToggle: function ( dt, conf ) {
-		var columns = dt.columns( conf.columns ).indexes().map( function ( idx ) {
-			return {
-				extend: 'columnToggle',
-				columns: idx,
-				columnText: conf.columnText
-			};
-		})
+	columnsToggle: function (dt, conf) {
+		var columns = dt
+			.columns(conf.columns)
+			.indexes()
+			.map(function (idx) {
+				return {
+					extend: 'columnToggle',
+					columns: idx,
+					columnText: conf.columnText
+				};
+			})
 
-    var sorted = columns.sort(function (a, b) {
-      var a = dt.settings()[0].aoColumns[a.columns].sTitle;
-      var b = dt.settings()[0].aoColumns[b.columns].sTitle;
-      return a.localeCompare(b)
-    }).toArray();
-
-    return sorted;
+		var sorted = columns.sort(function (a, b) {
+			var a = dt.settings()[0].aoColumns[a.columns].sTitle;
+			var b = dt.settings()[0].aoColumns[b.columns].sTitle;
+			return a.localeCompare(b)
+		}).toArray();
+	
+		return sorted;
 	},
 
 	// Single button to toggle column visibility
-	columnToggle: function ( dt, conf ) {
+	columnToggle: function (dt, conf) {
 		return {
 			extend: 'columnVisibility',
 			columns: conf.columns,
@@ -83,15 +123,19 @@ $.extend( DataTable.ext.buttons, {
 	},
 
 	// Selected columns with individual buttons - set column visibility
-	columnsVisibility: function ( dt, conf ) {
-		var columns = dt.columns( conf.columns ).indexes().map( function ( idx ) {
-			return {
-				extend: 'columnVisibility',
-				columns: idx,
-				visibility: conf.visibility,
-				columnText: conf.columnText
-			};
-		} ).toArray();
+	columnsVisibility: function (dt, conf) {
+		var columns = dt
+			.columns(conf.columns)
+			.indexes()
+			.map(function (idx) {
+				return {
+					extend: 'columnVisibility',
+					columns: idx,
+					visibility: conf.visibility,
+					columnText: conf.columnText
+				};
+			})
+			.toArray();
 
 		return columns;
 	},
@@ -99,111 +143,113 @@ $.extend( DataTable.ext.buttons, {
 	// Single button to set column visibility
 	columnVisibility: {
 		columns: undefined, // column selector
-		text: function ( dt, button, conf ) {
-			return conf._columnText( dt, conf );
+		text: function (dt, button, conf) {
+			return conf._columnText(dt, conf);
 		},
 		className: 'buttons-columnVisibility',
-		action: function ( e, dt, button, conf ) {
-			var col = dt.columns( conf.columns );
+		action: function (e, dt, button, conf) {
+			var col = dt.columns(conf.columns);
 			var curr = col.visible();
 
-			col.visible( conf.visibility !== undefined ?
-				conf.visibility :
-				! (curr.length ? curr[0] : false )
+			col.visible(
+				conf.visibility !== undefined ? conf.visibility : !(curr.length ? curr[0] : false)
 			);
 		},
-		init: function ( dt, button, conf ) {
+		init: function (dt, button, conf) {
 			var that = this;
-			button.attr( 'data-cv-idx', conf.columns );
+			button.attr('data-cv-idx', conf.columns);
 
-			dt
-				.on( 'column-visibility.dt'+conf.namespace, function (e, settings) {
-					if ( ! settings.bDestroying && settings.nTable == dt.settings()[0].nTable ) {
-						that.active( dt.column( conf.columns ).visible() );
-					}
-				} )
-				.on( 'column-reorder.dt'+conf.namespace, function (e, settings, details) {
-					// Don't rename buttons based on column name if the button
-					// controls more than one column!
-					if ( dt.columns( conf.columns ).count() !== 1 ) {
-						return;
-					}
+			dt.on('column-visibility.dt' + conf.namespace, function (e, settings) {
+				if (!settings.bDestroying && settings.nTable == dt.settings()[0].nTable) {
+					that.active(dt.column(conf.columns).visible());
+				}
+			}).on('column-reorder.dt' + conf.namespace, function (e, settings, details) {
+				// Button has been removed from the DOM
+				if (conf.destroying) {
+					return;
+				}
 
-					conf.columns = $.inArray( conf.columns, details.mapping );
-					button.attr( 'data-cv-idx', conf.columns );
+				if (dt.columns(conf.columns).count() !== 1) {
+					return;
+				}
 
-					// Reorder buttons for new table order
-					button
-						.parent()
-						.children('[data-cv-idx]')
-						.sort( function (a, b) {
-							return (a.getAttribute('data-cv-idx')*1) - (b.getAttribute('data-cv-idx')*1);
-						} )
-						.appendTo(button.parent());
-				} );
+				// This button controls the same column index but the text for the column has
+				// changed
+				that.text(conf._columnText(dt, conf));
 
-			this.active( dt.column( conf.columns ).visible() );
+				// Since its a different column, we need to check its visibility
+				that.active(dt.column(conf.columns).visible());
+			});
+
+			this.active(dt.column(conf.columns).visible());
 		},
-		destroy: function ( dt, button, conf ) {
-			dt
-				.off( 'column-visibility.dt'+conf.namespace )
-				.off( 'column-reorder.dt'+conf.namespace );
+		destroy: function (dt, button, conf) {
+			dt.off('column-visibility.dt' + conf.namespace).off(
+				'column-reorder.dt' + conf.namespace
+			);
 		},
 
-		_columnText: function ( dt, conf ) {
+		_columnText: function (dt, conf) {
 			// Use DataTables' internal data structure until this is presented
 			// is a public API. The other option is to use
 			// `$( column(col).node() ).text()` but the node might not have been
 			// populated when Buttons is constructed.
-			var idx = dt.column( conf.columns ).index();
-			var title = dt.settings()[0].aoColumns[ idx ].sTitle
-				.replace(/\n/g," ")        // remove new lines
-				.replace(/<br\s*\/?>/gi, " ")  // replace line breaks with spaces
-				.replace(/<select(.*?)<\/select>/g, "") // remove select tags, including options text
-				.replace(/<!\-\-.*?\-\->/g, "") // strip HTML comments
-				.replace(/<.*?>/g, "")   // strip HTML
-				.replace(/^\s+|\s+$/g,""); // trim
+			var idx = dt.column(conf.columns).index();
+			var title = dt.settings()[0].aoColumns[idx].sTitle;
 
-			return conf.columnText ?
-				conf.columnText( dt, idx, title ) :
-				title;
+			if (!title) {
+				title = dt.column(idx).header().innerHTML;
+			}
+
+			title = title
+				.replace(/\n/g, ' ') // remove new lines
+				.replace(/<br\s*\/?>/gi, ' ') // replace line breaks with spaces
+				.replace(/<select(.*?)<\/select>/g, '') // remove select tags, including options text
+				.replace(/<!\-\-.*?\-\->/g, '') // strip HTML comments
+				.replace(/<.*?>/g, '') // strip HTML
+				.replace(/^\s+|\s+$/g, ''); // trim
+
+			return conf.columnText ? conf.columnText(dt, idx, title) : title;
 		}
 	},
-
 
 	colvisRestore: {
 		className: 'buttons-colvisRestore',
 
-		text: function ( dt ) {
-			return dt.i18n( 'buttons.colvisRestore', 'Restore visibility' );
+		text: function (dt) {
+			return dt.i18n('buttons.colvisRestore', 'Restore visibility');
 		},
 
-		init: function ( dt, button, conf ) {
-			conf._visOriginal = dt.columns().indexes().map( function ( idx ) {
-				return dt.column( idx ).visible();
-			} ).toArray();
+		init: function (dt, button, conf) {
+			conf._visOriginal = dt
+				.columns()
+				.indexes()
+				.map(function (idx) {
+					return dt.column(idx).visible();
+				})
+				.toArray();
 		},
 
-		action: function ( e, dt, button, conf ) {
-			dt.columns().every( function ( i ) {
+		action: function (e, dt, button, conf) {
+			dt.columns().every(function (i) {
 				// Take into account that ColReorder might have disrupted our
 				// indexes
-				var idx = dt.colReorder && dt.colReorder.transpose ?
-					dt.colReorder.transpose( i, 'toOriginal' ) :
-					i;
+				var idx =
+					dt.colReorder && dt.colReorder.transpose
+						? dt.colReorder.transpose(i, 'toOriginal')
+						: i;
 
-				this.visible( conf._visOriginal[ idx ] );
-			} );
+				this.visible(conf._visOriginal[idx]);
+			});
 		}
 	},
-
 
 	colvisGroup: {
 		className: 'buttons-colvisGroup',
 
-		action: function ( e, dt, button, conf ) {
-			dt.columns( conf.show ).visible( true, false );
-			dt.columns( conf.hide ).visible( false, false );
+		action: function (e, dt, button, conf) {
+			dt.columns(conf.show).visible(true, false);
+			dt.columns(conf.hide).visible(false, false);
 
 			dt.columns.adjust();
 		},
@@ -212,8 +258,8 @@ $.extend( DataTable.ext.buttons, {
 
 		hide: []
 	}
-} );
+});
 
 
-return DataTable.Buttons;
+return DataTable;
 }));
