@@ -1131,6 +1131,28 @@ Above we have `resources :things` for the 7 crud actions. And we add two more me
 
 Your datatable should now have New, Show, Edit, Approve and Reject buttons. Click them for inline functionality.
 
+## Adding an Ajax member action
+
+To render a member action with an inline datatable:
+
+- Create a "cool_things.html" template and a "_cool_things.html" partial file. Need both.
+
+- The links must be inside an `actions_col` or a `col(:thing col_class: 'col-actions')` for the javascript to work.
+
+- The action itself just needs to be `data-remote=true`. Try `link_to('Show Cool Things', thing_cool_things_path(thing), 'data-remote': true)
+`
+
+Make sure the route and permissions are working:
+
+```
+resources :things do
+  get :cool_things, on: :member
+```
+
+and `can?(:cool_things, Thing)`
+
+Good luck.
+
 ## Troubleshooting Inline
 
 If things aren't working, try the following:
