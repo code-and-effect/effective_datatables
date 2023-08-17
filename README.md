@@ -1137,10 +1137,9 @@ To render a member action with an inline datatable:
 
 - Create a "cool_things.html" template and a "_cool_things.html" partial file. Need both.
 
-- The links must be inside an `actions_col` or a `col(:thing col_class: 'col-actions')` for the javascript to work.
+- The links must be inside an `actions_col` or a `col(:thing, col_class: 'col-actions')` for the javascript to work.
 
-- The action itself just needs to be `data-remote=true`. Try `link_to('Show Cool Things', thing_cool_things_path(thing), 'data-remote': true)
-`
+- The action itself just needs to be `data-remote=true`. Try `link_to('Show Cool Things', thing_cool_things_path(thing), 'data-remote': true)`
 
 Make sure the route and permissions are working:
 
