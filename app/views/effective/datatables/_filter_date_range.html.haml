@@ -31,17 +31,45 @@
   = f.static_field :year do
     #{now.beginning_of_year.strftime('%F')} to #{now.strftime('%F')} (today)
 
-= f.show_if :date_range, :month do
-  = f.static_field :month do
-    = link_to((prev_month.strftime('%b %Y') + ' ' + icon('arrow-left-circle')).html_safe, prev_month_path.sub(path, request.path))
-    #{start_date.beginning_of_month.strftime('%F')} to #{start_date.end_of_month.strftime('%F')}
-    = link_to((icon('arrow-right-circle') + ' ' + next_month.strftime('%b %Y')).html_safe, next_month_path.sub(path, request.path))
-
 = f.show_if :date_range, :year do
-  = f.static_field :year do
-    = link_to((prev_year.strftime('%Y') + ' ' + icon('arrow-left-circle')).html_safe, prev_year_path.sub(path, request.path))
-    #{start_date.beginning_of_year.strftime('%F')} to #{start_date.end_of_year.strftime('%F')}
-    = link_to((icon('arrow-right-circle') + ' ' + next_year.strftime('%Y')).html_safe, next_year_path.sub(path, request.path))
+  = f.static_field :year, wrapper: { class: 'effective-datatables-filter' } do
+    - date = f.object.start_date.beginning_of_year
+
+    = link_to '#', 'data-effective-datatables-filter-prev-year': date.advance(years: -1).strftime('%F') do
+      = icon('arrow-left-circle')
+      %span.prev-year= date.advance(years: -1).strftime('%Y')
+
+    %span.start-date= f.object.start_date.strftime('%F')
+    to
+    %span.end-date= f.object.end_date.strftime('%F')
+
+    = link_to '#', 'data-effective-datatables-filter-next-year': date.advance(years: 1).strftime('%F') do
+      = icon('arrow-right-circle')
+      %span.next-year= date.advance(years: 1).strftime('%Y')
+
+    %div{style: 'display: none;'}
+      = f.date_field :start_date, name: name, autocomplete: 'off', feedback: false
+      = f.date_field :end_date, name: name, autocomplete: 'off', feedback: false
+
+= f.show_if :date_range, :month do
+  = f.static_field :month, wrapper: { class: 'effective-datatables-filter' } do
+    - date = f.object.start_date.beginning_of_month
+
+    = link_to '#', 'data-effective-datatables-filter-prev-month': date.advance(months: -1).strftime('%F') do
+      = icon('arrow-left-circle')
+      %span.prev-month= date.advance(months: -1).strftime('%b')
+
+    %span.start-date= f.object.start_date.strftime('%F')
+    to
+    %span.end-date= f.object.end_date.strftime('%F')
+
+    = link_to '#', 'data-effective-datatables-filter-next-month': date.advance(months: 1).strftime('%F') do
+      = icon('arrow-right-circle')
+      %span.next-month= date.advance(months: 1).strftime('%b')
+
+    %div{style: 'display: none;'}
+      = f.date_field :start_date, name: name, autocomplete: 'off', feedback: false
+      = f.date_field :end_date, name: name, autocomplete: 'off', feedback: false
 
 = f.show_if :date_range, :custom do
   .row
