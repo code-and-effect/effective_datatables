@@ -24,20 +24,16 @@ module Effective
         raise "#{method} block must be declared outside the datatable do ... end block"
       end
 
-      if datatable.respond_to?(method)
-        if block_given?
-          datatable.send(method, *args, **kwargs) { yield }
-        else
-          datatable.send(method, *args, **kwargs)
-        end
-      elsif view.respond_to?(method)
-        if block_given?
-          view.send(method, *args, **kwargs) { yield }
-        else
-          view.send(method, *args, **kwargs)
-        end
+      subject = datatable if datatable.respond_to?(method)
+      subject ||= view if view.respond_to?(method)
+      subject ||= Tenant.helpers if defined?(Tenant) && Tenant.helpers.respond_to?(method)
+
+      return super unless subject
+
+      if block_given?
+        subject.send(method, *args, **kwargs) { yield }
       else
-        super
+        subject.send(method, *args, **kwargs)
       end
     end
 
