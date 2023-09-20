@@ -15,7 +15,7 @@ module Effective
         EffectiveDatatables.authorize!(self, :index, @datatable.collection_class)
 
         render json: @datatable.to_json
-      rescue => e
+      rescue Exception => e
         EffectiveDatatables.authorized?(self, :index, @datatable.try(:collection_class))
         render json: error_json(e)
 
@@ -84,7 +84,7 @@ module Effective
         render status: :ok, body: :ok
       rescue Effective::AccessDenied => e
         render(status: :unauthorized, body: 'Access Denied')
-      rescue => e
+      rescue Exception => e
         render(status: :error, body: 'Unexpected Error')
       end
 
