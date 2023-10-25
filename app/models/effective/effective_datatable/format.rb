@@ -141,8 +141,18 @@ module Effective
           end
         when :time
           value.respond_to?(:strftime) ? value.strftime(EffectiveDatatables.format_time) : BLANK
-        else
+        when :text
+          if csv
+            value
+          elsif value.to_s.starts_with?('<') && value.ends_with?('>')
+            view.sanitize(value.to_s)
+          else
+            view.simple_format(value.to_s)
+          end
+        when :string
           csv ? value : view.escape_once(value.to_s)
+        else
+          value.to_s
         end
       end
 
