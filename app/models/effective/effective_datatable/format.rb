@@ -92,10 +92,6 @@ module Effective
       def format_column(value, column, csv: false)
         return if value.nil? || (column[:resource] && value.blank?)
 
-        unless column[:as] == :email
-          return value if value.kind_of?(String)
-        end
-
         if value.kind_of?(Array) && column[:as] == :string
           if csv
             return value.map { |v| format_column(v, column, csv: csv) }.join("\n")
@@ -145,6 +141,16 @@ module Effective
           end
         when :time
           value.respond_to?(:strftime) ? value.strftime(EffectiveDatatables.format_time) : BLANK
+        when :text
+          if csv
+            value
+          elsif value.to_s.starts_with?('<') && value.ends_with?('>')
+            view.sanitize(value.to_s)
+          else
+            view.simple_format(value.to_s)
+          end
+        when :string
+          csv ? value : view.escape_once(value.to_s)
         else
           value.to_s
         end
