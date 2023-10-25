@@ -142,20 +142,24 @@ module Effective
         when :time
           value.respond_to?(:strftime) ? value.strftime(EffectiveDatatables.format_time) : BLANK
         when :text
+          value_to_s = value.to_s
+
           if csv
-            value
-          elsif value.to_s.starts_with?('<') && value.to_s.ends_with?('>')
-            view.sanitize(value.to_s)
+            value_to_s
+          elsif value_to_s.starts_with?('<') && value_to_s.ends_with?('>')
+            view.sanitize(value_to_s)
           else
-            view.simple_format(value.to_s)
+            view.simple_format(value_to_s)
           end
         when :string
+          value_to_s = value.to_s
+
           if csv
-            value
-          elsif value.to_s.starts_with?('<') && value.to_s.ends_with?('>')
-            view.sanitize(value.to_s)
+            value_to_s
+          elsif value_to_s.starts_with?('<') && value_to_s.ends_with?('>')
+            view.sanitize(value_to_s)
           else
-            view.escape_once(value.to_s)
+            view.escape_once(value_to_s)
           end
         else
           value.to_s
