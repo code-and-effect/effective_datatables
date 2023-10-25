@@ -144,13 +144,19 @@ module Effective
         when :text
           if csv
             value
-          elsif value.to_s.starts_with?('<') && value.ends_with?('>')
+          elsif value.to_s.starts_with?('<') && value.to_s.ends_with?('>')
             view.sanitize(value.to_s)
           else
             view.simple_format(value.to_s)
           end
         when :string
-          csv ? value : view.escape_once(value.to_s)
+          if csv
+            value
+          elsif value.to_s.starts_with?('<') && value.to_s.ends_with?('>')
+            view.sanitize(value.to_s)
+          else
+            view.escape_once(value.to_s)
+          end
         else
           value.to_s
         end
