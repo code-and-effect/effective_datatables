@@ -146,7 +146,7 @@ module Effective
 
           if csv
             value_to_s
-          elsif value_to_s.starts_with?('<') && value_to_s.ends_with?('>')
+          elsif value_to_s.include?('<') && value_to_s.include?('>')
             view.sanitize(value_to_s)
           else
             view.simple_format(value_to_s)
@@ -156,7 +156,7 @@ module Effective
 
           if csv
             value_to_s
-          elsif value_to_s.starts_with?('<') && value_to_s.ends_with?('>')
+          elsif value_to_s.include?('<') && value_to_s.include?('>')
             view.sanitize(value_to_s)
           else
             view.escape_once(value_to_s)
