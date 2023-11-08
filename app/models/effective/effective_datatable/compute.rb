@@ -127,9 +127,12 @@ module Effective
             else
               if values.all? { |v| v.kind_of?(ActiveRecord::Base) && v.respond_to?(name) }
                 values = values.map { |v| (v[name] if opts[:sql_as_column]) || v.public_send(name) }
+                format_column(aggregate_column(values, opts, aggregate), opts)
+              elsif values.all? { |v| (v == true || v == false) }
+                aggregate_column(values, opts, aggregate)
+              else
+                format_column(aggregate_column(values, opts, aggregate), opts)
               end
-
-              format_column(aggregate_column(values, opts, aggregate), opts)
             end || BLANK
           end.compact
         end
