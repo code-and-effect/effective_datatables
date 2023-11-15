@@ -158,6 +158,8 @@ module Effective
 
       def load_resource_search!
         columns.each do |name, opts|
+          # Normalize the given opts[:search] into a Hash
+          # Take special note of the opts[:search] as we need to collapse it when an ActiveRecord::Relation
           case opts[:search]
           when false
             opts[:search] = { as: :null }; next
@@ -171,6 +173,7 @@ module Effective
             raise "column #{name} unexpected search value"
           end
 
+          # Now lets deal with the opts[:search] hash itself
           search = opts[:search]
 
           # Parameterize collection
@@ -189,11 +192,15 @@ module Effective
           search_resource = [opts[:resource], effective_resource, fallback_effective_resource].compact
           search_resource = search_resource.find { |res| res.klass.present? } || search_resource.first
 
+          # Assign search collections from effective_resources
           if array_collection? && opts[:resource].present?
             search.reverse_merge!(search_resource.search_form_field(name, collection.first[opts[:index]]))
           elsif search[:as] == :select && search[:collection].kind_of?(Array)
             # Nothing to do
+            # We already loaded the custom parameterized collection above
           elsif search[:as] != :string
+            # Load the defaults from effective_resources
+            # This assigns the :collection and as: :select
             search.reverse_merge!(search_resource.search_form_field(name, opts[:as]))
           end
 
