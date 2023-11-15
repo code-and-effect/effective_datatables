@@ -193,14 +193,16 @@ module Effective
           search_resource = search_resource.find { |res| res.klass.present? } || search_resource.first
 
           # Assign search collections from effective_resources
-          if array_collection? && opts[:resource].present?
-            search.reverse_merge!(search_resource.search_form_field(name, collection.first[opts[:index]]))
+          if search[:as] == :string
+            # Nothing to do. We're just a string search.
           elsif search[:as] == :select && search[:collection].kind_of?(Array)
-            # Nothing to do
-            # We already loaded the custom parameterized collection above
-          elsif search[:as] != :string
+            # Nothing to do. We already loaded the custom parameterized collection above.
+          elsif array_collection? && opts[:resource].present?
+            # Assigns { as: :select, collection: [...] }
+            search.reverse_merge!(search_resource.search_form_field(name, collection.first[opts[:index]]))
+          else
             # Load the defaults from effective_resources
-            # This assigns the :collection and as: :select
+            # Assigns { as: :string } or { as: :select, collection: [...] }
             search.reverse_merge!(search_resource.search_form_field(name, opts[:as]))
           end
 
