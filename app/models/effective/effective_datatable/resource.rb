@@ -177,7 +177,9 @@ module Effective
           search = opts[:search]
 
           # Parameterize collection
-          if search[:collection].kind_of?(ActiveRecord::Relation)
+          if attributes[:searchable] == false
+            # Nothing to do
+          elsif search[:collection].kind_of?(ActiveRecord::Relation)
             search[:collection] = search[:collection].map { |obj| [obj.to_s, obj.id] }
           elsif search[:collection].kind_of?(Array) && search[:collection].first.kind_of?(ActiveRecord::Base)
             search[:collection] = search[:collection].map { |obj| [obj.to_s, obj.id] }
@@ -193,7 +195,9 @@ module Effective
           search_resource = search_resource.find { |res| res.klass.present? } || search_resource.first
 
           # Assign search collections from effective_resources
-          if search[:as] == :string
+          if attributes[:searchable] == false
+            # Nothing to do
+          elsif search[:as] == :string
             # Nothing to do. We're just a string search.
           elsif search[:as] == :select && search[:collection].kind_of?(Array)
             # Nothing to do. We already loaded the custom parameterized collection above.
