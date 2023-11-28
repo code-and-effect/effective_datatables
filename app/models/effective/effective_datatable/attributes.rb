@@ -28,8 +28,8 @@ module Effective
         retval = attributes.except(*resources.keys)
 
         resources.each do |k, resource|
-          retval["#{k}_id".to_sym] = resource.id
           retval["#{k}_type".to_sym] = resource.class.name
+          retval["#{k}_id".to_sym] = resource.id
         end
 
         retval

@@ -80,12 +80,13 @@ module EffectiveDatatables
 
     raise 'invalid decoded inline payload' unless attributes.kind_of?(Hash)
 
-    attributes
+    attributes.symbolize_keys
   end
 
   def self.message_encrypter
-    key = (Rails.application.secrets.secret_key_base.presence rescue nil)
-    key ||= (Rails.application.secret_key_base.presence rescue nil)
+    key = (Rails.application.secret_key_base.presence rescue nil)
+    key ||= (Rails.application.try(:credentials).try(:secret_key_base).presence rescue nil)
+    key ||= (Rails.application.try(:secrets).try(:secret_key_base).presence rescue nil)
     key ||= 10.times.map { "".hash.to_s }.join
 
     ActiveSupport::MessageEncryptor.new(key.to_s.first(32))
