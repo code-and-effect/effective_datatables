@@ -17,7 +17,7 @@ module Effective
 
         # Apply jit_preloader if present
         if active_record_collection? && defined?(JitPreloader) && EffectiveDatatables.use_jit_preloader
-          col.includes_values.reject! { true } # Removes any previously defined .includes()
+          col.includes_values = [] # Removes any previously defined .includes()
           col = col.jit_preload
         end
 
