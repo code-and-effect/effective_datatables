@@ -15,6 +15,12 @@ module Effective
         # Assign total records
         @total_records = (active_record_collection? ? column_tool.size(col) : value_tool.size(col))
 
+        # Apply jit_preloader if present
+        if active_record_collection? && defined?(JitPreloader) && EffectiveDatatables.use_jit_preloader
+          col.includes_values.reject! { true } # Removes any previously defined .includes()
+          col = col.jit_preload
+        end
+
         # Apply scope
         col = column_tool.scope(col) if @_collection_apply_scope
 
