@@ -46,4 +46,8 @@ EffectiveDatatables.setup do |config|
 
   # Enable the Download button which serves a CSV of your collection
   config.download = false
+
+  # Call jit_preloader on ActiveRecord collections automatically. Must have jit_preloader gem installed.
+  # https://github.com/clio/jit_preloader
+  config.use_jit_preloader = false
 end

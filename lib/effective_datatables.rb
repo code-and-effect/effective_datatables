@@ -23,6 +23,8 @@ module EffectiveDatatables
   mattr_accessor :debug
   mattr_accessor :download
 
+  mattr_accessor :use_jit_preloader
+
   alias_method :max_cookie_size, :cookie_max_size
   alias_method :max_cookie_size=, :cookie_max_size=
 
