@@ -12,11 +12,6 @@ module Effective
         end
       end
 
-      def load_attributes!
-        return unless view.respond_to?(:controller_path)
-        @attributes[:namespace] ||= view.controller_path.split('/')[0...-1].join('/')
-      end
-
       # Polymorphic shorthand attributes.
       # If you pass resource: User(1), it sets resource_id: 1, resource_type: 'User'
       def initial_attributes(attributes)
@@ -33,6 +28,29 @@ module Effective
         end
 
         retval
+      end
+
+      def load_attributes!
+        return unless view.respond_to?(:controller_path)
+
+        # Assign namespace based off controller path unless given
+        @attributes[:namespace] ||= view.controller_path.split('/')[0...-1].join('/')
+
+        # If there are attributes[:user_type] and attributes[:user_id] type attributes load them into attributes[:user]
+        resource_attributes = @attributes.select do |key, value|
+          name = key.to_s
+          base = name.sub('_type', '')
+
+          name.ends_with?('_type') && @attributes.key?("#{base}_id".to_sym) && value.safe_constantize.present?
+        end
+
+        resource_attributes.each do |key, value|
+          name = key.to_s
+          base = name.sub('_type', '')
+
+          klass = value.constantize
+          @attributes[base.to_sym] ||= klass.find(attributes["#{base}_id".to_sym])
+        end
       end
 
     end
