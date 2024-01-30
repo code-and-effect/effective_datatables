@@ -49,7 +49,7 @@ module Effective
           base = name.sub('_type', '')
 
           klass = value.constantize
-          @attributes[base.to_sym] ||= klass.find(attributes["#{base}_id".to_sym])
+          @attributes[base.to_sym] ||= klass.find_by_id(attributes["#{base}_id".to_sym])
         end
       end
 
