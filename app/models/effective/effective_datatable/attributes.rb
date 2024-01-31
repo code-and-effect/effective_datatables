@@ -35,22 +35,6 @@ module Effective
 
         # Assign namespace based off controller path unless given
         @attributes[:namespace] ||= view.controller_path.split('/')[0...-1].join('/')
-
-        # If there are attributes[:user_type] and attributes[:user_id] type attributes load them into attributes[:user]
-        resource_attributes = @attributes.select do |key, value|
-          name = key.to_s
-          base = name.sub('_type', '')
-
-          name.ends_with?('_type') && @attributes.key?("#{base}_id".to_sym) && value.safe_constantize.present?
-        end
-
-        resource_attributes.each do |key, value|
-          name = key.to_s
-          base = name.sub('_type', '')
-
-          klass = value.constantize
-          @attributes[base.to_sym] ||= klass.find_by_id(attributes["#{base}_id".to_sym])
-        end
       end
 
     end
