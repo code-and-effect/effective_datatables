@@ -1,4 +1,3 @@
-//= require vendor/jquery.delayedChange
 //= require vendor/jquery.fileDownload
 
 //= require dataTables/jquery.dataTables

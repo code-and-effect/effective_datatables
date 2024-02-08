@@ -158,7 +158,8 @@ initializeDataTables = (target) ->
         if $input.is('select')
           $input.on 'change', (event) -> dataTableSearch($(event.currentTarget))
         else if $input.is('input')
-          $input.delayedChange ($input) -> dataTableSearch($input)
+          $input.keyup(delayChange((-> dataTableSearch($input)), 500))
+          $input.on 'paste', (event) -> delayChange((-> dataTableSearch($(event.currentTarget))), 100)
 
     # Do the actual search
     dataTableSearch = ($input) ->   # This is the function called by a select or input to run the search
@@ -200,6 +201,15 @@ initializeDataTables = (target) ->
 destroyDataTables = ->
   $('.effective-datatables-inline-expanded').removeClass('effective-datatables-inline-expanded')
   $('table.effective-datatable').each -> try $(this).removeClass('initialized').DataTable().destroy()
+
+# https://stackoverflow.com/questions/1909441/how-to-delay-the-keyup-handler-until-the-user-stops-typing
+delayChange = (callback, ms) ->
+  timer = 0
+  ->
+    context = this
+    args = arguments
+    clearTimeout(timer)
+    timer = setTimeout((-> callback.apply(context, args)), ms)
 
 $ -> initializeDataTables()
 $(document).on 'effective-datatables:initialize', (event) -> initializeDataTables(event.currentTarget)
