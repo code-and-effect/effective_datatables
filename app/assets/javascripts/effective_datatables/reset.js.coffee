@@ -11,12 +11,6 @@ $(document).on 'click', '.dataTables_wrapper a.buttons-reset-search', (event) ->
   $inputs = $thead.find('input')
   $inputs.val('').removeAttr('checked').removeAttr('selected')
 
-  # Reset delayedChange
-  $.each $inputs, (input) =>
-    $input = $(input)
-    if ($input.delayedChange.oldVal)
-      $input.delayedChange.oldVal = undefined
-
   # Reset the datatable
   datatable = $table.DataTable()
 
