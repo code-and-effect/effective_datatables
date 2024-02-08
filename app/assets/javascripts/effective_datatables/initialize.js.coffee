@@ -158,7 +158,7 @@ initializeDataTables = (target) ->
         if $input.is('select')
           $input.on 'change', (event) -> dataTableSearch($(event.currentTarget))
         else if $input.is('input')
-          $input.keyup(delayChange((-> dataTableSearch($input)), 500))
+          $input.keyup(delayChange((-> dataTableSearch($input)), 700))
           $input.on 'paste', (event) -> delayChange((-> dataTableSearch($(event.currentTarget))), 100)
 
     # Do the actual search
