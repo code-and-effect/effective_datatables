@@ -45,8 +45,10 @@ module Effective
           raise "Unsupported collection. Expecting an ActiveRecord relation, an Array of ActiveRecord objects, or an Array of Arrays [[1, 'foo'], [2, 'bar']]"
         end
 
-        _scopes.each do |scope, _|
-          raise "invalid scope: :#{scope}. The collection must respond to :#{scope}" unless collection.respond_to?(scope)
+        if _collection_apply_scope
+          _scopes.each do |scope, _|
+            raise "invalid scope: :#{scope}. The collection must respond to :#{scope}" unless collection.respond_to?(scope)
+          end
         end
       end
 
