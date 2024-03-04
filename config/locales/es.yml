@@ -13,3 +13,4 @@ es:
     boolean_true: 'Sí'
     boolean_false: 'No'
     all: Todo
+    display: Display

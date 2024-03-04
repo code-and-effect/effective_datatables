@@ -184,7 +184,7 @@ module EffectiveDatatablesPrivateHelper
       buttons: true,
       checked: value,
       feedback: false,
-      label: false,
+      label: (datatable._filters.present? ? t("effective_datatables.display") : false),
       required: false,
       wrapper: { class: 'form-group col-auto'}
     }.merge(opts.except(:checked, :value))
