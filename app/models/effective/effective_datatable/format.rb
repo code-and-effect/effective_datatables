@@ -96,7 +96,7 @@ module Effective
           if csv
             return value.map { |v| format_column(v, column, csv: csv) }.join("\n")
           else
-            return value.map { |v| view.content_tag(:div, format_column(v, column, csv: csv), class: 'col-resource_item') }.join.html_safe
+            return value.map { |v| view.content_tag(:div, format_column(v, column, csv: csv).html_safe, class: 'col-resource_item') }.join.html_safe
           end
         end
 
