@@ -89,18 +89,18 @@ module Effective
       end
 
       # Must return a string
-      def format_column(value, column, csv: false)
+      def format_column(value, column, as: nil, csv: false)
         return if value.nil? || (column[:resource] && value.blank?)
 
-        if value.kind_of?(Array) && column[:as] == :string
+        if value.kind_of?(Array) && [:string, :text].include?(column[:as])
           if csv
             return value.map { |v| format_column(v, column, csv: csv) }.join("\n")
           else
-            return value.map { |v| view.content_tag(:div, format_column(v, column, csv: csv).html_safe, class: 'col-resource_item') }.join.html_safe
+            return value.map { |v| view.content_tag(:div, format_column(v, column, as: :string, csv: csv).html_safe, class: 'col-resource_item') }.join.html_safe
           end
         end
 
-        case column[:as]
+        case (as || column[:as])
         when :actions
           raise("please use actions_col instead of col(#{name}, as: :actions)")
         when :boolean
