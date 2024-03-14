@@ -76,11 +76,21 @@ module Effective
               end
             )
 
-            if csv && (opts[:format] || opts[:partial])
-              formatted = view.strip_tags(formatted)
+            if csv && (opts[:format] || opts[:partial]) && !formatted.frozen?
+              formatted.gsub!("<br>\n", ' ')
+              formatted.gsub!("<br> ", ' ')
+              formatted.gsub!("<br>", ' ')
+              formatted.gsub!("<br/>", ' ')
+              formatted.gsub!("<br />", ' ')
+              formatted.gsub!("\n\n", ' ')
+              formatted.gsub!("\n", ' ') unless formatted.include?('<')
 
-              formatted.gsub!("\n\n", ' ') unless formatted.frozen?
-              formatted.gsub!("\n", '')  unless formatted.frozen?
+              if formatted.include?('<')
+                formatted.gsub!("\n", '') 
+                formatted.gsub!("<div class='col-resource_item'>", ' ')
+
+                formatted = view.strip_tags(formatted).strip
+              end
             end
 
             row[index] = formatted
