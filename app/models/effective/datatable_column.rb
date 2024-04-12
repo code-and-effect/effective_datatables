@@ -23,6 +23,10 @@ module Effective
       @attributes[:format] = block; self
     end
 
+    def format_each(&block)
+      @attributes[:format_each] = block; self
+    end
+
     def search(&block)
       @attributes[:search_method] = block; self
     end

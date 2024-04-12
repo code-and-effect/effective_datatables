@@ -134,7 +134,7 @@ module Effective
         when :effective_obfuscation
           value.to_s
         when :effective_roles
-          value.join(', ')
+          csv ? value.join(', ') : view.roles_badges(value)
         when :email
           csv ? value : view.mail_to(value)
         when :integer
@@ -224,6 +224,7 @@ module Effective
           resource_name: resource_name,
           resource_to_s: resource_to_s,
           effective_resource: associated_resource,
+          format_each: opts[:format_each],
           show_action: false,
           edit_action: false
         }

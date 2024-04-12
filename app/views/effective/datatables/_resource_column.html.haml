@@ -1,5 +1,7 @@
 - Array(local_assigns[:resource_name] ? resource.public_send(resource_name) : resource).each do |resource|
-  - resource_to_s = ((local_assigns[:resource_to_s] && resource) ? resource.public_send(resource_to_s) : resource.to_s)
+  - resource_to_s = (resource.public_send(resource_to_s) if local_assigns[:resource_to_s])
+  - resource_to_s ||= (instance_exec(resource, datatable, &format_each).html_safe if local_assigns[:format_each])
+  - resource_to_s ||= resource.to_s
 
   - if resource_to_s.present?
     .col-resource_item
