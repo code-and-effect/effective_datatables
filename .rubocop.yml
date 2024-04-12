@@ -1,2 +1,0 @@
-inherit_from:
-  - https://raw.githubusercontent.com/code-and-effect/effective_developer/master/rubocop.yml
