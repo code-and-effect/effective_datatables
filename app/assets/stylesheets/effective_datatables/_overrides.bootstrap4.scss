@@ -170,6 +170,11 @@ table.dataTable > thead {
   }
 }
 
+// Filters
+.effective-datatables-filter { 
+  p { margin-bottom: 0; }
+}
+
 // Processing div
 div.dataTables_wrapper div.dataTables_processing {
   margin: -26px 25% 0px 25%;

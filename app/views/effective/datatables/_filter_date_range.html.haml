@@ -33,15 +33,15 @@
 
 = f.show_if :date_range, :year do
   = f.static_field :year, wrapper: { class: 'effective-datatables-filter' } do
-    - date = f.object.start_date.beginning_of_year
+    - date = start_date.beginning_of_year
 
     = link_to '#', 'data-effective-datatables-filter-prev-year': date.advance(years: -1).strftime('%F') do
       = icon('arrow-left-circle')
       %span.prev-year= date.advance(years: -1).strftime('%Y')
 
-    %span.start-date= f.object.start_date.strftime('%F')
+    %span.start-date= start_date.strftime('%F')
     to
-    %span.end-date= f.object.end_date.strftime('%F')
+    %span.end-date= end_date.strftime('%F')
 
     = link_to '#', 'data-effective-datatables-filter-next-year': date.advance(years: 1).strftime('%F') do
       = icon('arrow-right-circle')
@@ -53,15 +53,15 @@
 
 = f.show_if :date_range, :month do
   = f.static_field :month, wrapper: { class: 'effective-datatables-filter' } do
-    - date = f.object.start_date.beginning_of_month
+    - date = start_date.beginning_of_month
 
     = link_to '#', 'data-effective-datatables-filter-prev-month': date.advance(months: -1).strftime('%F') do
       = icon('arrow-left-circle')
       %span.prev-month= date.advance(months: -1).strftime('%b')
 
-    %span.start-date= f.object.start_date.strftime('%F')
+    %span.start-date= start_date.strftime('%F')
     to
-    %span.end-date= f.object.end_date.strftime('%F')
+    %span.end-date= end_date.strftime('%F')
 
     = link_to '#', 'data-effective-datatables-filter-next-month': date.advance(months: 1).strftime('%F') do
       = icon('arrow-right-circle')
