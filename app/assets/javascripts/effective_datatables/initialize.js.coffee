@@ -16,35 +16,37 @@ initializeDataTables = (target) ->
       autoWidth: false
       buttons: [
         {
+          extend: 'csv',
+          text: 'Snapshot',
+          exportOptions:
+            format:
+              header: (str) -> $("<div>#{str}</div>").children('span').first().text()
+            columns: buttons_export_columns
+        },
+        {
           extend: 'colvis',
           postfixButtons: [
             { extend: 'colvisGroup', text: 'Show all', show: ':hidden', className: 'buttons-colvisGroup-first'},
             { extend: 'colvisGroup', text: 'Show none', hide: ':visible' },
             { extend: 'colvisGroup', text: 'Show default', hide: ':not(.colvis-default)', show: '.colvis-default' }
           ]
-        },
-        {
-          extend: 'copy',
-          exportOptions:
-            format:
-              header: (str) -> $("<div>#{str}</div>").children('span').first().text()
-            columns: buttons_export_columns
-        },
-        {
-          extend: 'csv',
-          exportOptions:
-            format:
-              header: (str) -> $("<div>#{str}</div>").children('span').first().text()
-            columns: buttons_export_columns
-        },
-        {
-          extend: 'print',
-          footer: true,
-          exportOptions:
-            format:
-              header: (str) -> $("<div>#{str}</div>").children('span').first().text()
-            columns: ':visible:not(.col-actions)'
-        },
+        }
+        # {
+        #   extend: 'copy',
+        #   exportOptions:
+        #     format:
+        #       header: (str) -> $("<div>#{str}</div>").children('span').first().text()
+        #     columns: buttons_export_columns
+        # },
+
+        # {
+        #   extend: 'print',
+        #   footer: true,
+        #   exportOptions:
+        #     format:
+        #       header: (str) -> $("<div>#{str}</div>").children('span').first().text()
+        #     columns: ':visible:not(.col-actions)'
+        # },
       ]
       columns: datatable.data('columns')
       deferLoading: [datatable.data('display-records'), datatable.data('total-records')]
@@ -61,29 +63,13 @@ initializeDataTables = (target) ->
         api.columns().flatten().each (index) => params['columns'][index]['visible'] = api.column(index).visible()
 
         $table = $(api.table().node())
-        $form = $(".effective-datatables-filters[aria-controls='#{$table.attr('id')}']").first()
-
         params['attributes'] = $table.data('attributes')
         params['authenticity_token'] = $table.data('authenticity-token')
 
-        if $form.length > 0
-          params['scope'] = $form.find("input[name='filters[scope]']:checked").val() || ''
-          params['filter'] = {}
-
-          $form.find("select,textarea,input:enabled:not([type=submit])").each ->
-            $input = $(this)
-
-            if ['utf8', 'authenticity_token', 'filters[scope]'].includes($input.attr('name'))
-              # Skipped
-            else if $input.attr('type') == 'radio'
-              name = $input.attr('name')
-              filter_name = name.replace('filters[', '').substring(0, name.length-9)
-
-              params['filter'][filter_name] = $form.find("input[name='#{name}']:checked").val()
-
-            else if $input.attr('id')
-              filter_name = $input.attr('id').replace('filters_', '')
-              params['filter'][filter_name] = $input.val()
+        filterParams = api.getFilterParams()
+        params['scope'] = filterParams['scope'] if filterParams['scope']
+        params['filter'] = filterParams['filter'] if filterParams['filter']
+        params
 
       serverSide: true
       scrollCollapse: true

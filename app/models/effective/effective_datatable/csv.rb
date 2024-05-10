@@ -51,12 +51,20 @@ module Effective
         end
       end
 
+      def csv_collection
+        value = if active_record_collection? && @_collection_apply_scope
+          column_tool.scope(collection)
+        else
+          collection
+        end
+      end
+
       def csv_stream
         EffectiveResources.with_resource_enumerator do |lines|
           lines << CSV.generate_line(csv_header)
 
           if active_record_collection?
-            collection.find_in_batches do |resources|
+            csv_collection().find_in_batches do |resources|
               resources = arrayize(resources, csv: true)
               format(resources, csv: true)
               finalize(resources)
@@ -64,7 +72,7 @@ module Effective
               resources.each { |resource| lines << CSV.generate_line(resource) }
             end
           else
-            resources = collection
+            resources = csv_collection()
 
             format(resources, csv: true)
             finalize(resources)
