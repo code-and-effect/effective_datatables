@@ -36,7 +36,11 @@ module Effective
       end
 
       def scope_param
-        params[:scope].to_sym if params.key?(:scope)
+        if params.key?(:scope)
+          params[:scope].to_sym 
+        elsif params.key?(:filters) && params[:filters].key?(:scope)
+          params[:filters][:scope].to_sym 
+        end
       end
 
       def search_params
