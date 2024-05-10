@@ -5,11 +5,13 @@ $(document).on 'click', '.dataTables_wrapper a.buttons-download', (event) ->
   url = $table.data('source').replace('.json', '/download.csv')
   attributes = 'attributes=' + encodeURIComponent($table.data('attributes'))
 
-  $form = $(".effective-datatables-filters[aria-controls='#{$table.attr('id')}']").first()
-  filters = $form.find("input,select,option,textarea").serialize()
+  # Parse filters and flatten
+  filterParams = $table.DataTable().getFilterParams() || {}
+  params = filterParams['filter'] || {}
+  params['scope'] = filterParams['scope'] if filterParams['scope']
 
-  console.log("FILTERS IS: #{filters}")
+  filters = '&' + $.param(params)
 
-  $button.attr('href', url + '?' + attributes + '&' + filters)
+  $button.attr('href', url + '?' + attributes + filters)
 
   setTimeout (=> $button.attr('href', 'download.csv')), 0

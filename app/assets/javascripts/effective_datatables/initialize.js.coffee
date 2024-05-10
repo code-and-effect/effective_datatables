@@ -66,7 +66,7 @@ initializeDataTables = (target) ->
         params['attributes'] = $table.data('attributes')
         params['authenticity_token'] = $table.data('authenticity-token')
 
-        filterParams = getFilterParams($table)
+        filterParams = api.getFilterParams()
         params['scope'] = filterParams['scope'] if filterParams['scope']
         params['filter'] = filterParams['filter'] if filterParams['filter']
         params
@@ -100,33 +100,6 @@ initializeDataTables = (target) ->
 
       if $table.data('buttons-html')
         $buttons.prepend($table.data('buttons-html'))
-
-    getFilterParams = ($table) ->
-      $form = $(".effective-datatables-filters[aria-controls='#{$table.attr('id')}']").first()
-
-      # Parse params
-      params = {}
-
-      if $form.length > 0
-        params['scope'] = $form.find("input[name='filters[scope]']:checked").val() || ''
-        params['filter'] = {}
-
-        $form.find("select,textarea,input:enabled:not([type=submit])").each ->
-          $input = $(this)
-
-          if ['utf8', 'authenticity_token', 'filters[scope]'].includes($input.attr('name'))
-            # Skipped
-          else if $input.attr('type') == 'radio'
-            name = $input.attr('name')
-            filter_name = name.replace('filters[', '').substring(0, name.length-9)
-
-            params['filter'][filter_name] = $form.find("input[name='#{name}']:checked").val()
-
-          else if $input.attr('id')
-            filter_name = $input.attr('id').replace('filters_', '')
-            params['filter'][filter_name] = $input.val()
-
-      params
 
     drawAggregates = ($table, aggregates) ->
       $tfoot = $table.find('tfoot').first()

@@ -52,7 +52,11 @@ module Effective
       end
 
       def csv_collection
-        collection
+        value = if active_record_collection? && @_collection_apply_scope
+          column_tool.scope(collection)
+        else
+          collection
+        end
       end
 
       def csv_stream
