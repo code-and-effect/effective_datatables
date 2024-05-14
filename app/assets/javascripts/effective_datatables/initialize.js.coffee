@@ -16,6 +16,13 @@ initializeDataTables = (target) ->
       autoWidth: false
       buttons: [
         {
+          extend: 'copy',
+          exportOptions:
+            format:
+              header: (str) -> $("<div>#{str}</div>").children('span').first().text()
+            columns: buttons_export_columns
+        },
+        {
           extend: 'csv',
           text: 'Snapshot',
           exportOptions:
@@ -31,14 +38,6 @@ initializeDataTables = (target) ->
             { extend: 'colvisGroup', text: 'Show default', hide: ':not(.colvis-default)', show: '.colvis-default' }
           ]
         }
-        # {
-        #   extend: 'copy',
-        #   exportOptions:
-        #     format:
-        #       header: (str) -> $("<div>#{str}</div>").children('span').first().text()
-        #     columns: buttons_export_columns
-        # },
-
         # {
         #   extend: 'print',
         #   footer: true,
