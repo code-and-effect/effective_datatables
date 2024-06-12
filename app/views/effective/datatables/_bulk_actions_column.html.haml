@@ -1,4 +1,4 @@
-- id = (resource.try(:to_param) || resource.try(:id) || resource.object_id)
+- id = (resource.try(:id) || resource.try(:to_param) || resource.object_id)
 
 .form-group.custom-control.custom-checkbox
   %input{value: 0, type: 'hidden'}
