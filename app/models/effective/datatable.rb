@@ -211,6 +211,11 @@ module Effective
       Array(attributes[:class] || EffectiveDatatables.html_class).join(' ').presence
     end
 
+    # An array of integers [5, 10, 25, 50, 100, 250, 500]
+    def length_menu
+      EffectiveDatatables.length_menu
+    end
+
     def to_param
       "#{self.class.name.underscore.parameterize}-#{[self.class, attributes].hash.abs.to_s.last(12)}"
     end

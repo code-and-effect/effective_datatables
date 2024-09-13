@@ -29,6 +29,18 @@ module EffectiveDatatablesPrivateHelper
     render('/effective/datatables/buttons', datatable: datatable, search: search).gsub("'", '"').html_safe
   end
 
+  def datatable_length_menu(datatable)
+    length_menu = datatable.length_menu
+
+    if length_menu.present? 
+      raise('expected datatable length_menu to be an Array of Integers') unless length_menu.kind_of?(Array) && length_menu.all? { |i| i.kind_of?(Integer) }
+    end
+    
+    length_menu ||= [5, 10, 25, 50, 100, 250, 500]
+
+    [length_menu.map(&:to_i), length_menu.map(&:to_s)]
+  end
+
   def datatable_new_resource_button(datatable, name, column)
     return unless datatable.inline? && (column[:actions][:new] != false)
 

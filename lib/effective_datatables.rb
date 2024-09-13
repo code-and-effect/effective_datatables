@@ -9,6 +9,8 @@ module EffectiveDatatables
   mattr_accessor :authorization_method
 
   mattr_accessor :default_length
+  mattr_accessor :length_menu
+
   mattr_accessor :html_class
   mattr_accessor :save_state
 

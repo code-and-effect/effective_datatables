@@ -43,6 +43,7 @@ Please check out [Effective Datatables 3.x](https://github.com/code-and-effect/e
     * [bulk_actions_col](#bulk_actions_col)
     * [actions_col](#actions_col)
     * [length](#length)
+    * [length_menu](#length_menu)
     * [order](#order)
     * [reorder](#reorder)
     * [aggregate](#aggregate)
@@ -228,7 +229,7 @@ class PostsDatatable < Effective::Datatable
   # The user's selected filters, search, sort, length, column visibility and pagination settings are saved between visits
   # on a per-table basis and can be Reset with a button
   datatable do
-    length 25  # 5, 10, 25, 50, 100, 500, :all
+    length 25  # 5, 10, 25, 50, 100, 500
     order :updated_at, :desc
 
     # Renders a column of checkboxes to select items for any bulk_actions
@@ -614,12 +615,24 @@ MyApp::UsersTable.new(namespace: :my_app)
 
 ## length
 
-Sets the default number of rows per page. Valid lengths are `5`, `10`, `25`, `50`, `100`, `250`, `500`, `:all`
+Sets the default number of rows per page.
 
 When not specified, effective_datatables uses the default as per the `config/initializers/effective_datatables.rb` or 25.
 
 ```ruby
 length 100
+```
+
+## length_menu
+
+You can specify the length menu values in `config/initializers/effective_datatables.rb` or per datatable.
+
+To override the default, add the method to your datatable
+
+```
+def length_menu
+  [5, 10, 25, 50]
+end
 ```
 
 ## order
@@ -1332,7 +1345,7 @@ class TimeEntriesPerClientReport < Effective::Datatable
   end
 
   datatable do
-    length :all
+    length 50
 
     col :client
 
