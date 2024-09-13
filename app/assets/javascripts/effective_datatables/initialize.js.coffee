@@ -53,7 +53,7 @@ initializeDataTables = (target) ->
       displayStart: datatable.data('display-start')
       iDisplayLength: datatable.data('display-length')
       language: datatable.data('language')
-      lengthMenu: [[5, 10, 25, 50, 100, 250, 500], ['5', '10', '25', '50', '100', '250', '500']]
+      lengthMenu: datatable.data('length-menu')
       order: datatable.data('display-order')
       processing: true
       responsive: true

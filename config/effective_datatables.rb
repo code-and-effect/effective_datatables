@@ -21,8 +21,10 @@ EffectiveDatatables.setup do |config|
   # end
   config.authorization_method = Proc.new { |controller, action, resource| authorize!(action, resource) }
 
-  # Default number of entries shown per page
-  # Valid options are: 5, 10, 25, 50, 100, 250, 500, :all
+  # Display x per page options
+  config.length_menu = [5, 10, 25, 50, 100, 250, 500]
+
+  # Default number of entries shown per page. Must be in the length_menu.
   config.default_length = 25
 
   # Default class used on the <table> tag

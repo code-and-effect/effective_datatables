@@ -67,6 +67,7 @@ module EffectiveDatatablesHelper
         'display-start' => datatable.display_start,
         'inline' => inline.to_s,
         'language' => EffectiveDatatables.language(I18n.locale),
+        'length-menu' => datatable_length_menu(datatable),
         'options' => input_js.to_json,
         'reorder' => datatable.reorder?.to_s,
         'reorder-index' => (datatable.columns[:_reorder][:index] if datatable.reorder?).to_s,
