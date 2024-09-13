@@ -38,7 +38,7 @@ module EffectiveDatatablesPrivateHelper
     
     length_menu ||= [5, 10, 25, 50, 100, 250, 500]
 
-    [length_menu.map(&:to_i), length_menu.map(&:to_s)]
+    [length_menu, length_menu.map(&:to_s)]
   end
 
   def datatable_new_resource_button(datatable, name, column)
