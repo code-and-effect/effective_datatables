@@ -255,6 +255,15 @@ table.dataTable {
   th.col-decimal, td.col-decimal { text-align: right; }
   th.col-right, td.col-right { text-align: right; }
 
+  th.col-th-left { text-align: left !important; }
+  td.col-td-left { text-align: left !important; }
+
+  th.col-th-center { text-align: center !important; }
+  td.col-td-center { text-align: center !important; }
+
+  th.col-th-right { text-align: right !important; }
+  td.col-td-right { text-align: right !important; }
+
   td.col-bulk_actions {
     label {
       cursor: pointer;
