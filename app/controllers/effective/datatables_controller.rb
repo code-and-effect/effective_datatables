@@ -73,11 +73,13 @@ module Effective
           if new_index > old_index
             @datatable.collection.where("#{attribute} > ? AND #{attribute} <= ?", old_index, new_index).update_all("#{attribute} = #{attribute} - 1")
             @resource.update_column(attribute, new_index)
+            @resource.touch
           end
 
           if old_index > new_index
             @datatable.collection.where("#{attribute} >= ? AND #{attribute} < ?", new_index, old_index).update_all("#{attribute} = #{attribute} + 1")
             @resource.update_column(attribute, new_index)
+            @resource.touch
           end
         end
 
