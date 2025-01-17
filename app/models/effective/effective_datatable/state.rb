@@ -73,7 +73,11 @@ module Effective
 
       def load_filters!
         state[:filter] = _filters.inject({}) { |h, (name, opts)| h[name] = opts[:value]; h }
-        state[:scope] = _scopes.find { |_, opts| opts[:default] }.try(:first) || _scopes.keys.first
+        state[:scope] = initial_scope()
+      end
+
+      def initial_scope
+        _scopes.find { |_, opts| opts[:default] }.try(:first) || _scopes.keys.first
       end
 
       def load_filter_params!
@@ -112,7 +116,7 @@ module Effective
           state[:order_index] = params[:order]['0'][:column].to_i
         end
 
-        state[:scope] = _scopes.keys.find { |name| params[:scope] == name.to_s }
+        state[:scope] = _scopes.keys.find { |name| params[:scope] == name.to_s } || initial_scope()
         state[:start] = params[:start].to_i
 
         state[:search] = {}
