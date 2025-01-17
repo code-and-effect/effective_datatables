@@ -6,7 +6,10 @@ getFilterParams = ->
   params = {}
 
   if $form.length > 0
-    params['scope'] = $form.find("input[name='filters[scope]']:checked").val() || ''
+    params['scope'] = $form.find("input[name='filters[scope]']:checked").val()
+    params['scope'] ||= $form.find("input[name='filters[scope]']:not([type='hidden'])").first().val()
+    params['scope'] ||= 'effective_datatables_empty_scope'
+
     params['filter'] = {}
 
     $form.find("select,textarea,input:enabled:not([type=submit])").each ->
