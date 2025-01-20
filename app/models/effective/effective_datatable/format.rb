@@ -88,7 +88,7 @@ module Effective
               formatted.gsub!("\n", ' ')
 
               if html_content
-                formatted.gsub!(/<span[^>]*\bclass=["']?badge\b[^>]*>.*?<\/span>/, '') # strip badges
+                # formatted.gsub!(/<span[^>]*\bclass=["']?badge\b[^>]*>.*?<\/span>/, '')
                 formatted.gsub!('</div>', "</div>\n") if formatted.include?('col-resource_item')
                 formatted = view.strip_tags(formatted).strip
               end
