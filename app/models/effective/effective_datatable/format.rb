@@ -77,20 +77,23 @@ module Effective
             )
 
             if csv && (opts[:format] || opts[:partial]) && !formatted.frozen?
+              html_content = formatted.include?('<') && formatted.include?('>')
+
+              formatted.gsub!("&nbsp;", ' ')
               formatted.gsub!("<br>\n", ' ')
               formatted.gsub!("<br> ", ' ')
               formatted.gsub!("<br>", ' ')
               formatted.gsub!("<br/>", ' ')
               formatted.gsub!("<br />", ' ')
-              formatted.gsub!("\n\n", ' ')
-              formatted.gsub!("\n", ' ') unless formatted.include?('<')
+              formatted.gsub!("\n", ' ')
 
-              if formatted.include?('<')
-                formatted.gsub!("\n", '') 
-                formatted.gsub!("<div class='col-resource_item'>", ' ')
-
+              if html_content
+                formatted.gsub!(/<span[^>]*\bclass=["']?badge\b[^>]*>.*?<\/span>/, '') # strip badges
+                formatted.gsub!('</div>', "</div>\n") if formatted.include?('col-resource_item')
                 formatted = view.strip_tags(formatted).strip
               end
+
+              formatted.gsub!('  ', ' ')
             end
 
             row[index] = formatted
@@ -130,7 +133,7 @@ module Effective
         when :duration
           view.number_to_duration(value)
         when :effective_addresses
-          csv ? value.to_html.gsub('<br>', "\n") : value.to_html
+          csv ? value.to_html.gsub('<br>', '').gsub("&nbsp;", ' ') : value.to_html
         when :effective_obfuscation
           value.to_s
         when :effective_roles
@@ -139,7 +142,7 @@ module Effective
           csv ? value : view.mail_to(value)
         when :integer
           value.to_s
-        when :percent
+        when :percent, :percentage
           case value
           when Integer    ; view.number_to_percentage(value / 1000.0, precision: 3).gsub('.000%', '%')
           when Numeric    ; view.number_to_percentage(value, precision: 3).gsub('.000%', '%')
