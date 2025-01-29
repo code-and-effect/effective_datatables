@@ -99,11 +99,7 @@ module Effective
 
         obj_equals || case column[:as]
         when :boolean
-          if fuzzy
-            term ? (obj == true) : (obj != true)
-          else
-            obj == term
-          end
+            term ? (obj == true || EffectiveResources.truthy?(value)) : (obj == false || EffectiveResources.falsey?(value))
         when :datetime, :date
           end_at = (
             case (original.to_s.scan(/(\d+)/).flatten).length
