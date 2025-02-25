@@ -68,7 +68,7 @@ $.extend(true, DataTable.Buttons.defaults, {
 			},
 			container: {
 				tag: 'div',
-				className: 'dropdown-menu dt-button-collection'
+				className: 'dropdown-menu dropdown-menu-right dt-button-collection'
 			},
 			closeButton: false,
 			button: {

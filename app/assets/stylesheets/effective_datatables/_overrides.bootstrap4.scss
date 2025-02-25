@@ -288,3 +288,27 @@ table.dataTable {
 
   td.col-resource_item { word-break: keep-all; }
 }
+
+// show/hide adjustments
+.dropdown-menu-right {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+.dt-button.dropdown-item {
+  padding: 0.25rem 0 0.25rem 1.5rem;
+  font-size: 12px !important;
+}
+
+div.dt-button.dropdown-item::after {
+  margin-top: -9px;
+}
+
+div.dt-button-collection .dt-button-active {
+  padding-right: 0;
+}
+
+div.dt-button-collection .dt-button-active:after {
+  right: auto;
+  left: 0.5rem;
+}
