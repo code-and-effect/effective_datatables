@@ -81,7 +81,7 @@ module Effective
 
       fuzzy = (column[:search][:operation] == :matches)
 
-      term = Effective::Attribute.new(column[:as]).parse(original, name: column[:name])
+      term = Effective::Attribute.new(column[:as]).parse(original, name: column[:name]).presence || original
       term_downcased = term.to_s.downcase
 
       # term == 'nil' rescue false is a Rails 4.1 fix, where you can't compare a TimeWithZone to 'nil'
