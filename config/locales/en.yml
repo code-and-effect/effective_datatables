@@ -1,7 +1,7 @@
 ---
 en:
   effective_datatables:
-    apply: Apply
+    apply: Apply Filter
     download: Download
     reset: Reset
     reorder: Reorder
