@@ -44,7 +44,8 @@ module EffectiveDatatablesPrivateHelper
   def datatable_new_resource_button(datatable, name, column)
     return unless datatable.inline? && (column[:actions][:new] != false)
 
-    action = { action: :new, class: ['btn', column[:btn_class].presence].compact.join(' '), 'data-remote': true }
+    # Override the default btn_class and use this one
+    action = { action: :new, class: 'btn btn-sm btn-success', 'data-remote': true }
 
     if column[:actions][:new].kind_of?(Hash) # This might be active_record_array_collection?
       actions = action.merge(column[:actions][:new])
