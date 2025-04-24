@@ -201,9 +201,16 @@ module Effective
             # Nothing to do. We're just a string search.
           elsif search[:as] == :select && search[:collection].kind_of?(Array)
             # Nothing to do. We already loaded the custom parameterized collection above.
-          elsif array_collection? && opts[:resource].present?
+          elsif search[:as] == :select && search[:collection].blank? && array_collection? && opts[:resource].present?
             # Assigns { as: :select, collection: [...] }
             search.reverse_merge!(search_resource.search_form_field(name, collection.first[opts[:index]]))
+          elsif search[:as] == :select && search[:collection].blank?
+            # Load the defaults from effective_resources
+            # Assigns { as: :string } or { as: :select, collection: [...] }
+            search.reverse_merge!(search_resource.search_form_field(name, opts[:as]))
+          elsif [:belongs_to, :belongs_to_polymorphic, :has_and_belongs_to_many, :has_many, :has_one].include?(opts[:as])
+            # Do not eager load the collection. Treat this as a string search.
+            search.reverse_merge!({ as: :string })
           else
             # Load the defaults from effective_resources
             # Assigns { as: :string } or { as: :select, collection: [...] }
