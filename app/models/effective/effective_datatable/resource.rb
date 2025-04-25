@@ -160,9 +160,12 @@ module Effective
         columns.each do |name, opts|
           # Normalize the given opts[:search] into a Hash
           # Take special note of the opts[:search] as we need to collapse it when an ActiveRecord::Relation
-          case opts[:search]
-          when false
+
+          if opts[:search] == false || attributes[:searchable] == false
             opts[:search] = { as: :null }; next
+          end
+
+          case opts[:search]
           when Symbol
             opts[:search] = { as: opts[:search] }
           when Array, ActiveRecord::Relation
@@ -176,10 +179,12 @@ module Effective
           # Now lets deal with the opts[:search] hash itself
           search = opts[:search]
 
+          # Adjust based on shorthand search: :select syntax
+          search[:as] ||= :select if search.key?(:collection)
+          search[:value] ||= search.delete(:selected) if search.key?(:selected)
+
           # Parameterize collection
-          if attributes[:searchable] == false
-            # Nothing to do
-          elsif search[:collection].kind_of?(ActiveRecord::Relation)
+          if search[:collection].kind_of?(ActiveRecord::Relation)
             search[:collection] = search[:collection].map { |obj| [obj.to_s, obj.id] }
           elsif search[:collection].kind_of?(Array) && search[:collection].first.kind_of?(ActiveRecord::Base)
             search[:collection] = search[:collection].map { |obj| [obj.to_s, obj.id] }
@@ -187,17 +192,11 @@ module Effective
             search[:collection] = search[:collection]
           end
 
-          search[:as] ||= :select if search.key?(:collection)
-          search[:value] ||= search.delete(:selected) if search.key?(:selected)
-
           # Merge with defaults
           search_resource = [opts[:resource], effective_resource, fallback_effective_resource].compact
           search_resource = search_resource.find { |res| res.klass.present? } || search_resource.first
 
-          # Assign search collections from effective_resources
-          if attributes[:searchable] == false
-            # Nothing to do
-          elsif search[:as] == :string
+          if search[:as] == :string
             # Nothing to do. We're just a string search.
           elsif search[:as] == :select && search[:collection].kind_of?(Array)
             # Nothing to do. We already loaded the custom parameterized collection above.
