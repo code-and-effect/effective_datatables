@@ -46,6 +46,10 @@ EffectiveDatatables.setup do |config|
   config.format_date = '%F'
   config.format_time = '%H:%M'
 
+  # Boolean formatting. When present will render booleans as badges with this bootstrap color
+  config.format_true = 'success'
+  config.format_false = 'danger'
+
   # Enable the Download button which serves a CSV of your collection
   config.download = false
 

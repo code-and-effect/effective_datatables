@@ -22,6 +22,9 @@ module EffectiveDatatables
   mattr_accessor :format_date
   mattr_accessor :format_time
 
+  mattr_accessor :format_true
+  mattr_accessor :format_false
+
   mattr_accessor :debug
   mattr_accessor :download
 

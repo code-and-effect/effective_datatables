@@ -117,7 +117,9 @@ module Effective
         when :actions
           raise("please use actions_col instead of col(#{name}, as: :actions)")
         when :boolean
-          view.t("effective_datatables.boolean_#{value}")
+          label = view.t("effective_datatables.boolean_#{value}")
+          color = value ? EffectiveDatatables.format_true : EffectiveDatatables.format_false
+          color.present? ? view.badge(label, color) : label
         when :currency
           view.number_to_currency(value)
         when :date
