@@ -103,6 +103,15 @@ table.dataTable thead {
   }
 }
 
+// When Inline Expanded with Nested
+.dataTables_wrapper.effective-datatables-inline-expanded {
+  .dataTables_wrapper_nested {
+    .dt-buttons { opacity: inherit; }
+    .dataTables_entries { opacity: inherit; }
+    .dataTables_paginate { opacity: inherit; }
+  }
+}
+
 table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control:before,
 table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control:before {
   color: #0275d8;

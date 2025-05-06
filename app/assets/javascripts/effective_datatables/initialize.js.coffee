@@ -3,6 +3,7 @@ initializeDataTables = (target) ->
     datatable = $(this)
     options = datatable.data('options') || {}
     buttons_export_columns = options['buttons_export_columns'] || ':not(.col-actions)'
+    nested = datatable.data('nested')
     reorder = datatable.data('reorder')
 
     if datatable.data('inline') && datatable.closest('form').length > 0
@@ -177,6 +178,9 @@ initializeDataTables = (target) ->
 
     if reorder
       table.DataTable().on('row-reorder', (event, diff, edit) -> $(event.target).DataTable().reorder(event, diff, edit))
+
+    if nested
+      table.closest('.dataTables_wrapper').addClass('dataTables_wrapper_nested')
 
     table.addClass('initialized')
     table.children('thead').trigger('effective-bootstrap:initialize')

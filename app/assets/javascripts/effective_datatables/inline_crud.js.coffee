@@ -9,6 +9,7 @@ $(document).on 'ajax:before', '.dataTables_wrapper .col-actions', (event) ->
   $table = $(event.target).closest('table')
 
   return true if ('' + $action.data('inline')) == 'false'
+  return true if ('' + $action.data('nested-datatable-action')) == 'true'
 
   $params = $.param(
     {

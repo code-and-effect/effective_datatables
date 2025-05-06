@@ -5,7 +5,10 @@ module Effective
     module Dsl
 
       def bulk_actions(&block)
-        define_method('initialize_bulk_actions') { dsl_tool.instance_exec(&block); dsl_tool.bulk_actions_col }
+        define_method('initialize_bulk_actions') do 
+          actions = dsl_tool.instance_exec(&block)
+          dsl_tool.bulk_actions_col if actions.present?
+        end
       end
 
       def charts(&block)

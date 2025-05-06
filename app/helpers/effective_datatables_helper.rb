@@ -2,7 +2,7 @@
 
 # These are expected to be called by a developer.  They are part of the datatables DSL.
 module EffectiveDatatablesHelper
-  def render_datatable(datatable, input_js: {}, buttons: true, charts: true, download: nil, entries: true, filters: true, inline: false, namespace: nil, pagination: true, search: true, simple: false, short: false, sort: true)
+  def render_datatable(datatable, input_js: {}, buttons: true, charts: true, download: nil, entries: true, filters: true, inline: false, namespace: nil, nested: false, pagination: true, search: true, simple: false, short: false, sort: true)
     raise 'expected datatable to be present' unless datatable
     raise 'expected input_js to be a Hash' unless input_js.kind_of?(Hash)
 
@@ -19,6 +19,7 @@ module EffectiveDatatablesHelper
     end
 
     datatable.attributes[:inline] = true if inline
+    datatable.attributes[:nested] = true if nested
     datatable.attributes[:sortable] = false unless sort
     datatable.attributes[:searchable] = false unless search
     datatable.attributes[:downloadable] = false unless download
@@ -68,6 +69,7 @@ module EffectiveDatatablesHelper
         'inline' => inline.to_s,
         'language' => EffectiveDatatables.language(I18n.locale),
         'length-menu' => datatable_length_menu(datatable),
+        'nested' => nested.to_s,
         'options' => input_js.to_json,
         'reorder' => datatable.reorder?.to_s,
         'reorder-index' => (datatable.columns[:_reorder][:index] if datatable.reorder?).to_s,
@@ -133,4 +135,11 @@ module EffectiveDatatablesHelper
     @_inline_datatable ||= datatable
   end
 
+  def nested_datatable_link_to(title, path, options = {})
+    options[:class] ||= 'btn btn-sm btn-link'
+    options['data-remote'] = true
+    options['data-nested-datatable-action'] = true
+
+    link_to(title, path, options)
+  end
 end
