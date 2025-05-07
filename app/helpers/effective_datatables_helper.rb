@@ -138,7 +138,7 @@ module EffectiveDatatablesHelper
   def nested_datatable_link_to(title, path, options = {})
     options[:class] ||= 'btn btn-sm btn-link'
     options['data-remote'] = true
-    options['data-nested-datatable-action'] = true
+    options['data-nested-datatable'] = true
 
     link_to(title, path, options)
   end

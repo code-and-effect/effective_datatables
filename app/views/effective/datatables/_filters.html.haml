@@ -11,7 +11,7 @@
         - else
           = datatable_filter_tag(form, datatable, name, opts)
 
-      .form-group.col-auto
+      .form-group.col-auto{class: (datatable._filters.present? ? 'datatables-filters-present' : 'datatables-filters-blank')}
         - if datatable._filters_form_required?
           = form.save t('effective_datatables.apply'), 'data-disable-with': t('effective_datatables.applying'), class: 'btn btn-sm btn-secondary'
         - else
