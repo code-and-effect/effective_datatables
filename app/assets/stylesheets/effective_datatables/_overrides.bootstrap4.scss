@@ -72,7 +72,7 @@ table.dataTable > thead .sorting_desc {
 table.dataTable thead {
   th.col-actions {
     text-align: right;
-    span { display: block; height: 1.25em; }
+    span { display: block; }
   }
 }
 
@@ -182,6 +182,10 @@ table.dataTable > thead {
 // Filters
 .effective-datatables-filter { 
   p { margin-bottom: 0; }
+}
+
+.form-group.datatables-filters-present {
+  margin-top: 1.75em;
 }
 
 // Processing div
@@ -320,4 +324,15 @@ div.dt-button-collection .dt-button-active {
 div.dt-button-collection .dt-button-active:after {
   right: auto;
   left: 0.5rem;
+}
+
+// Nested Datatables
+.nested-datatable-container-parent {
+  padding-left: 0.25em;
+  padding-right: 0.25em;
+  container-type: inline-size;
+}
+
+.nested-datatable-container {
+  width: 100%;
 }

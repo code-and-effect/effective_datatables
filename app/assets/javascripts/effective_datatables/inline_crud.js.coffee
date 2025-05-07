@@ -9,7 +9,7 @@ $(document).on 'ajax:before', '.dataTables_wrapper .col-actions', (event) ->
   $table = $(event.target).closest('table')
 
   return true if ('' + $action.data('inline')) == 'false'
-  return true if ('' + $action.data('nested-datatable-action')) == 'true'
+  return true if ('' + $action.data('nested')) == 'true'
 
   $params = $.param(
     {
@@ -156,8 +156,12 @@ beforeEdit = ($action) ->
 afterEdit = ($action) ->
   $tr = $action.closest('tr')
   $table = $tr.closest('table')
+  nested = $tr.find('a').data('nested')
 
-  html = buildRow($tr.children('td').length, EffectiveForm.remote_form_payload)
+  html = if nested
+    buildNestedDatatableRow($tr.children('td').length, EffectiveForm.remote_form_payload)
+  else 
+    buildRow($tr.children('td').length, EffectiveForm.remote_form_payload)
 
   $tr.data('inline-form-original-html', $tr.children().detach())
   $tr.html(html)
@@ -197,6 +201,12 @@ afterError = ($action) ->
 
 buildRow = (length, payload) ->
   "<td class='col-inline-form' colspan='#{length-1}'><div class='container'>#{payload}</div></td>" +
+  "<td class='col-actions col-actions-inline-form'>" +
+    "<a href='#' class='btn btn-sm btn-outline-primary' title='Cancel' data-role='inline-form-cancel'>Cancel</a>" +
+  "</td>"
+
+buildNestedDatatableRow = (length, payload) ->
+  "<td class='col-inline-form' colspan='#{length-1}'><div class='nested-datatable-container-parent'><div class='nested-datatable-container'>#{payload}</div></div></td>" +
   "<td class='col-actions col-actions-inline-form'>" +
     "<a href='#' class='btn btn-sm btn-outline-primary' title='Cancel' data-role='inline-form-cancel'>Cancel</a>" +
   "</td>"
