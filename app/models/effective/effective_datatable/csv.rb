@@ -16,7 +16,7 @@ module Effective
 
       def csv_header
         columns.map do |name, opts|
-          opts[:label].presence || csv_human_attribute_name(name)
+          view.strip_tags(opts[:label].presence || csv_human_attribute_name(name))
         end
       end
 
