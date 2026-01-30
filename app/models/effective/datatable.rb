@@ -235,9 +235,9 @@ module Effective
       when :current_year
         (now.beginning_of_year..now.end_of_day)
       when :month
-        (start_date || now).all_month
+        (start_date || now).in_time_zone.all_month
       when :year
-        (start_date || now).all_year
+        (start_date || now).in_time_zone.all_year
       when :custom
         (start_date&.beginning_of_day..end_date&.end_of_day)
       when :all
