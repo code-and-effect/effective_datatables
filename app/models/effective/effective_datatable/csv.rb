@@ -29,6 +29,8 @@ module Effective
       end
 
       def csv_file
+        view.lookup_context.formats = [:html]
+
         CSV.generate do |csv|
           csv << csv_header()
 
@@ -60,6 +62,8 @@ module Effective
       end
 
       def csv_stream
+        view.lookup_context.formats = [:html]
+
         EffectiveResources.with_resource_enumerator do |lines|
           lines << CSV.generate_line(csv_header)
 
