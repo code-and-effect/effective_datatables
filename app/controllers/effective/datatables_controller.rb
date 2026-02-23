@@ -27,6 +27,7 @@ module Effective
     def download
       @datatable = EffectiveDatatables.find(params[:id], params[:attributes])
       @datatable.view = view_context
+      @datatable.csv = true
 
       EffectiveDatatables.authorize!(self, :index, @datatable.collection_class)
 

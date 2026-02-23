@@ -26,6 +26,9 @@ module Effective
     # Set by DSL so we can track where this datatable is coming from
     attr_accessor :source_location
 
+    # Set to true when CSV download
+    attr_accessor :csv
+
     extend Effective::EffectiveDatatable::Dsl
 
     include Effective::EffectiveDatatable::Attributes
@@ -273,6 +276,10 @@ module Effective
 
     def filters_form
       DatatableFiltersForm.new(datatable: self)
+    end
+
+    def csv?
+      csv == true
     end
 
     private
