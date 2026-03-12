@@ -160,6 +160,8 @@ module Effective
             "#{values.count { |val| val == true }} &bull; #{values.count { |val| val == false}}"
           elsif aggregate[:labeled] == false
             aggregate[:labeled] = aggregate[:label]
+          elsif values.all? { |value| value.kind_of?(Array) }
+            values.flatten.count
           end
         when :average
           if values.all? { |value| value.kind_of?(Numeric) }
