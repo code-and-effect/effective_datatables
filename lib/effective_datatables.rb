@@ -12,6 +12,8 @@ module EffectiveDatatables
   mattr_accessor :length_menu
 
   mattr_accessor :html_class
+  mattr_accessor :default_button_class
+  mattr_accessor :new_action_button_class
   mattr_accessor :save_state
 
   mattr_accessor :cookie_max_size
