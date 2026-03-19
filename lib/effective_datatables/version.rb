@@ -1,3 +1,3 @@
 module EffectiveDatatables
-  VERSION = '4.36.1'.freeze
+  VERSION = '4.37.0'.freeze
 end
