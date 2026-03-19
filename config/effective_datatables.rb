@@ -30,6 +30,10 @@ EffectiveDatatables.setup do |config|
   # Default class used on the <table> tag
   config.html_class = 'table table-hover'
 
+  # These are the button classes
+  # config.default_button_class = 'btn-outline-primary' # default class when btn_class option is unspecified
+  # config.new_action_button_class = 'btn-success' # overriding class on new action
+
   # Log search/sort information to the console
   config.debug = true
 
