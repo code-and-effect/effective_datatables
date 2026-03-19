@@ -101,7 +101,7 @@ module Effective
             action: false,
             as: :actions,
             compute: nil,
-            btn_class: (btn_class || EffectiveDatatables.default_button_class || 'btn-outline-primary'),
+            btn_class: (btn_class || EffectiveDatatables.default_button_class || 'btn-sm btn-outline-primary'),
             col_class: col_class,
             csv: false,
             format: (format if block_given?),
