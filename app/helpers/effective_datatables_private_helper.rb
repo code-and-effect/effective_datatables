@@ -48,7 +48,7 @@ module EffectiveDatatablesPrivateHelper
     action = { action: :new, class: "btn #{btn_class}", 'data-remote': true }
 
     if column[:actions][:new].kind_of?(Hash) # This might be active_record_array_collection?
-      actions = action.merge(column[:actions][:new])
+      action = action.merge(column[:actions][:new])
 
       effective_resource = (datatable.effective_resource || datatable.fallback_effective_resource)
       klass = (column[:actions][:new][:klass] || effective_resource&.klass || datatable.collection_class)
