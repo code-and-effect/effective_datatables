@@ -11,3 +11,7 @@
         = link_to resource_to_s, path, title: resource_to_s
       - else
         = resource_to_s.to_s.html_safe
+
+      -# Automatically badge any acts_as_statused resource. Opt out with col(..., badge: false)
+      - if resource.class.try(:acts_as_statused?) && resource.status.present? && (local_assigns[:column].blank? || column[:badge] != false)
+        = badge(resource.status)
