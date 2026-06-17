@@ -38,7 +38,7 @@ module Effective
         # Anything done in the block, is purely a format on the after sorted/ordered value
         # the original object == the computed value, which is yielded to the format block
         # You can't do compute with .col
-        def col(name, action: nil, as: nil, col_class: nil, csv: true, label: nil, partial: nil, partial_as: nil, responsive: 10000, search: {}, sort: true, sql_column: nil, th: nil, th_append: nil, visible: true, &format)
+        def col(name, action: nil, as: nil, badge: true, col_class: nil, csv: true, label: nil, partial: nil, partial_as: nil, responsive: 10000, search: {}, sort: true, sql_column: nil, th: nil, th_append: nil, visible: true, &format)
           raise 'You cannot use partial: ... with the block syntax' if partial && block_given?
 
           name = name.to_sym unless name.to_s.include?('.')
@@ -46,6 +46,7 @@ module Effective
           datatable._columns[name] = Effective::DatatableColumn.new(
             action: action,
             as: as,
+            badge: badge,
             compute: nil,
             col_class: col_class,
             csv: csv,
@@ -67,7 +68,7 @@ module Effective
 
         # A val is a computed value that is then sorted/searched after the block is run
         # You can have another block by calling .format afterwards to work on the computed value itself
-        def val(name, action: nil, as: nil, col_class: nil, csv: true, label: nil, partial: nil, partial_as: nil, responsive: 10000, search: {}, sort: true, sql_column: false, th: nil, th_append: nil, visible: true, &compute)
+        def val(name, action: nil, as: nil, badge: true, col_class: nil, csv: true, label: nil, partial: nil, partial_as: nil, responsive: 10000, search: {}, sort: true, sql_column: false, th: nil, th_append: nil, visible: true, &compute)
           raise 'You cannot use partial: ... with the block syntax' if partial && block_given?
 
           name = name.to_sym unless name.to_s.include?('.')
@@ -75,6 +76,7 @@ module Effective
           datatable._columns[name] = Effective::DatatableColumn.new(
             action: action,
             as: as,
+            badge: badge,
             compute: (compute if block_given?),
             col_class: col_class,
             csv: csv,
