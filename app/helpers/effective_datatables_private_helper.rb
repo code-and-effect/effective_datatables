@@ -47,11 +47,16 @@ module EffectiveDatatablesPrivateHelper
     btn_class = EffectiveDatatables.new_action_button_class || 'btn-sm btn-success'
     action = { action: :new, class: "btn #{btn_class}", 'data-remote': true }
 
+    # Pass actions_col(new: { label: 'New Thing' }) to override the button label on one datatable.
+    label = t('effective_datatables.new')
+
     if column[:actions][:new].kind_of?(Hash) # This might be active_record_array_collection?
-      action = action.merge(column[:actions][:new])
+      new_opts = column[:actions][:new]
+      label = new_opts[:label] if new_opts[:label].present?
+      action = action.merge(new_opts.except(:label, :klass))
 
       effective_resource = (datatable.effective_resource || datatable.fallback_effective_resource)
-      klass = (column[:actions][:new][:klass] || effective_resource&.klass || datatable.collection_class)
+      klass = (new_opts[:klass] || effective_resource&.klass || datatable.collection_class)
     elsif Array(datatable.effective_resource&.actions).include?(:new)
       effective_resource = datatable.effective_resource
       klass = effective_resource.klass
@@ -60,7 +65,7 @@ module EffectiveDatatablesPrivateHelper
     end
 
     # Will only work if permitted
-    render_resource_actions(klass, actions: { t('effective_datatables.new') => action }, effective_resource: effective_resource)
+    render_resource_actions(klass, actions: { label => action }, effective_resource: effective_resource)
   end
 
   def datatable_label_tag(datatable, name, opts)
