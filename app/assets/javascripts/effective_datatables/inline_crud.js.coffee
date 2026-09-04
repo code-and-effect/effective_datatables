@@ -49,7 +49,9 @@ $(document).on 'ajax:success', '.dataTables_wrapper .col-actions', (event, data)
   return true if ('' + $action.data('inline')) == 'false'
 
   if data.length > 0
-    return true if data.indexOf('Turbolinks.clearCache()') == 0 && data.includes("Turbolinks.visit(")
+    turbolinks_redirect = data.indexOf('Turbolinks.clearCache()') == 0 && data.includes("Turbolinks.visit(")
+    turbo_redirect = data.indexOf('Turbo.cache.clear()') == 0 && data.includes("Turbo.visit(")
+    return true if turbolinks_redirect || turbo_redirect
     return true if data.indexOf('<html') >= 0
 
   if ($action.data('method') || 'get') == 'get'
@@ -138,7 +140,7 @@ afterNew = ($action) ->
   $table.children('tbody').prepend($tr)
 
   expand($table)
-  $tr.trigger('turbolinks:load')
+  $tr.trigger('effective-bootstrap:initialize')
   $tr.hide().fadeIn()
 
 beforeEdit = ($action) ->
@@ -169,7 +171,7 @@ afterEdit = ($action) ->
   $tr.addClass('effective-datatables-inline-row')
 
   expand($table)
-  $tr.trigger('turbolinks:load')
+  $tr.trigger('effective-bootstrap:initialize')
   $tr.hide().fadeIn()
 
 # This is when one of the resource actions completes
