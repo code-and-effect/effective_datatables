@@ -1,3 +1,5 @@
+- dom_id ||= datatable.to_param
+
 - if datatable._bulk_actions.present?
   = render('/effective/datatables/bulk_actions_dropdown', datatable: datatable)
 
@@ -10,5 +12,5 @@
     %span= t('effective_datatables.reorder')
 
 - if datatable.downloadable?
-  = link_to 'download.csv', class: 'btn btn-link btn-sm buttons-download', 'aria-controls': datatable.to_param do
+  = link_to 'download.csv', class: 'btn btn-link btn-sm buttons-download', 'aria-controls': dom_id do
     %span= t('effective_datatables.download')

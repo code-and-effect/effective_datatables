@@ -42,6 +42,11 @@ module EffectiveDatatablesHelper
       buttons = true; input_js[:buttons] = false
     end
 
+    datatable_id = datatable.to_param
+    @_effective_datatable_ids ||= Hash.new(0)
+    @_effective_datatable_ids[datatable_id] += 1
+    dom_id = [datatable_id, (@_effective_datatable_ids[datatable_id] if @_effective_datatable_ids[datatable_id] > 1)].compact.join('-')
+
     # Build the datatables DOM option
     input_js[:dom] ||= [
       ("<'row'<'col-sm-12 dataTables_buttons'B>>" if buttons),
@@ -53,13 +58,14 @@ module EffectiveDatatablesHelper
     ].compact.join
 
     effective_datatable_params = {
-      id: datatable.to_param,
+      id: dom_id,
       class: html_class,
       data: {
+        'datatable-id' => datatable_id,
         'all-label' => I18n.t('effective_datatables.all'),
         'attributes' => EffectiveDatatables.encrypt(datatable.attributes),
         'authenticity-token' => form_authenticity_token,
-        'buttons-html' => datatable_buttons(datatable),
+        'buttons-html' => datatable_buttons(datatable, dom_id: dom_id),
         'columns' => datatable_columns(datatable),
         'default-visibility' => datatable.default_visibility.to_json,
         'display-length' => datatable.display_length,
@@ -88,7 +94,7 @@ module EffectiveDatatablesHelper
       end
 
       if filters
-        output << render_datatable_filters(datatable)
+        output << render_datatable_filters(datatable, dom_id: dom_id)
       end
 
       output << render(partial: 'effective/datatables/datatable',

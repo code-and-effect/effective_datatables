@@ -1,4 +1,5 @@
-.effective-datatables-filters{'aria-controls': datatable.to_param}
+- dom_id ||= datatable.to_param
+.effective-datatables-filters{'aria-controls': dom_id}
 
   = effective_form_with(model: datatable.filters_form, scope: :filters, url: (datatable._form[:url] || '#'), method: datatable._form[:verb], id: nil, authenticity_token: datatable._filters_form_required?) do |form|
     .form-row.align-items-center

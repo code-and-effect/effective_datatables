@@ -13,7 +13,7 @@ $(document).on 'ajax:before', '.dataTables_wrapper .col-actions', (event) ->
 
   $params = $.param(
     {
-      _datatable_id: $table.attr('id'),
+      _datatable_id: $table.data('datatable-id'),
       _datatable_attributes: $table.data('attributes'),
       _datatable_action: true
     }
@@ -85,7 +85,7 @@ $(document).on 'ajax:before', '.dataTables_wrapper .col-inline-form', (event) ->
 
   if $form.find('input[name=_datatable_id]').length == 0
     $('<input>').attr(
-      {type: 'hidden', name: '_datatable_id', value: $table.attr('id')}
+      {type: 'hidden', name: '_datatable_id', value: $table.data('datatable-id')}
     ).appendTo($form)
 
   if $form.find('input[name=_datatable_attributes]').length == 0

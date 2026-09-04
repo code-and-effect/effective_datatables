@@ -25,8 +25,8 @@ module EffectiveDatatablesPrivateHelper
     ((datatable.sortable? && datatable.order_index) ? [datatable.order_index, datatable.order_direction] : false).to_json.html_safe
   end
 
-  def datatable_buttons(datatable, search: true)
-    render('/effective/datatables/buttons', datatable: datatable, search: search).gsub("'", '"').html_safe
+  def datatable_buttons(datatable, search: true, dom_id: datatable.to_param)
+    render('/effective/datatables/buttons', datatable: datatable, search: search, dom_id: dom_id).gsub("'", '"').html_safe
   end
 
   def datatable_length_menu(datatable)
@@ -145,16 +145,16 @@ module EffectiveDatatablesPrivateHelper
     end
   end
 
-  def render_datatable_filters(datatable)
+  def render_datatable_filters(datatable, dom_id: datatable.to_param)
     raise 'expected datatable to be present' unless datatable
 
     datatable.view ||= self
     return unless datatable._scopes.present? || datatable._filters.present?
 
     if datatable._filters_form_required?
-      render('effective/datatables/filters', datatable: datatable)
+      render('effective/datatables/filters', datatable: datatable, dom_id: dom_id)
     else
-      render('effective/datatables/filters', datatable: datatable).gsub('<form', '<div').gsub('/form>', '/div>').html_safe
+      render('effective/datatables/filters', datatable: datatable, dom_id: dom_id).gsub('<form', '<div').gsub('/form>', '/div>').html_safe
     end
 
   end
