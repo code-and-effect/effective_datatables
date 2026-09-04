@@ -28,4 +28,4 @@ renderCharts = ->
 
 $ -> initializeCharts()
 $(document).on 'page:change', -> initializeCharts()
-$(document).on 'turbolinks:load', -> initializeCharts()
+$(document).on 'turbolinks:load turbo:load', -> initializeCharts()
