@@ -140,7 +140,7 @@ afterNew = ($action) ->
   $table.children('tbody').prepend($tr)
 
   expand($table)
-  $tr.trigger('effective-bootstrap:initialize')
+  $tr.trigger(if window.Turbo then 'turbo:load' else 'turbolinks:load')
   $tr.hide().fadeIn()
 
 beforeEdit = ($action) ->
@@ -171,7 +171,7 @@ afterEdit = ($action) ->
   $tr.addClass('effective-datatables-inline-row')
 
   expand($table)
-  $tr.trigger('effective-bootstrap:initialize')
+  $tr.trigger(if window.Turbo then 'turbo:load' else 'turbolinks:load')
   $tr.hide().fadeIn()
 
 # This is when one of the resource actions completes
