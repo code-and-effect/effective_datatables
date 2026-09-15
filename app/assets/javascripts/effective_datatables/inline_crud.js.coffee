@@ -41,10 +41,17 @@ $(document).on 'ajax:beforeSend', '.dataTables_wrapper .col-actions', (event, xh
   true
 
 # We have either completed the resource action, or fetched the inline form to load.
-$(document).on 'ajax:success', '.dataTables_wrapper .col-actions', (event, data) ->
+$(document).on 'ajax:success', '.dataTables_wrapper .col-actions', (event, data, status, xhr) ->
   [data, status, xhr] = event.detail if event.detail # rails/ujs
 
   $action = $(event.target)
+
+  # Rails UJS follows HTTP redirects inside XHR; navigate after a redirected action.
+  if typeof Turbo != 'undefined' && xhr?.responseURL && ($action.data('method') || 'get').toLowerCase() != 'get'
+    if xhr.responseURL != $action.prop('href') && (xhr.getResponseHeader('Content-Type') || '').includes('text/html')
+      Turbo.cache.clear()
+      Turbo.visit(xhr.responseURL, { action: 'replace' })
+      return true
 
   return true if ('' + $action.data('inline')) == 'false'
 
