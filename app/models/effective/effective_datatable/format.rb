@@ -103,7 +103,7 @@ module Effective
 
       # Must return a string
       def format_column(value, column, as: nil, csv: false)
-        return if value.nil? || (column[:resource] && value.blank?)
+        return if value.nil? || (column[:resource] && value != false && value.blank?)
 
         if value.kind_of?(Array) && [:string, :text].include?(column[:as])
           if csv
