@@ -44,8 +44,12 @@ module Effective
     def order_column(collection, direction, column, sql_column)
       Rails.logger.info "COLUMN TOOL: order_column #{column.to_s} #{direction} #{sql_column}" if EffectiveDatatables.debug
 
-      if column[:sql_as_column]
-        collection.order(Arel.sql("#{sql_column} #{datatable.effective_resource.sql_direction(direction)}"))
+      if column[:as] == :reorder && sql_column == column[:reorder]
+        attribute = collection.arel_table[column[:reorder]]
+        collection.order(direction.to_s.downcase == 'desc' ? attribute.desc : attribute.asc)
+      elsif column[:sql_as_column]
+        expression = Arel.sql(sql_column.to_s)
+        collection.order(direction.to_s.downcase == 'desc' ? expression.desc : expression.asc)
       else
         Effective::Resource.new(collection)
           .order(column[:name], direction, as: column[:as], sort: column[:sort], sql_column: column[:sql_column], limit: datatable.limit)
@@ -99,12 +103,7 @@ module Effective
       when Hash
         count.size  # This represents the number of displayed datatable rows, not the sum all groups (which might be more)
       else
-        if collection.klass.connection.respond_to?(:unprepared_statement)
-          collection_sql = collection.klass.connection.unprepared_statement { collection.to_sql }
-          (collection.klass.connection.exec_query("SELECT COUNT(*) FROM (#{collection_sql}) AS datatables_total_count").rows[0][0] rescue 1)
-        else
-          (collection.klass.connection.exec_query("SELECT COUNT(*) FROM (#{collection.to_sql}) AS datatables_total_count").rows[0][0] rescue 1)
-        end.to_i
+        (collection.klass.unscoped.from(collection, :datatables_total_count).count(:all) rescue 1).to_i
       end
     end
 
