@@ -67,18 +67,19 @@ module Effective
         EffectiveDatatables.authorize!(self, :update, @resource)
 
         attribute = @datatable.columns[:_reorder][:reorder]
+        column = @resource.class.arel_table[attribute]
         old_index = params[:reorder][:old].to_i
         new_index = params[:reorder][:new].to_i
 
         @resource.class.transaction do
           if new_index > old_index
-            @datatable.collection.where("#{attribute} > ? AND #{attribute} <= ?", old_index, new_index).update_all("#{attribute} = #{attribute} - 1")
+            @datatable.collection.where(column.gt(old_index).and(column.lteq(new_index))).update_all(attribute => column - 1)
             @resource.update_column(attribute, new_index)
             @resource.touch
           end
 
           if old_index > new_index
-            @datatable.collection.where("#{attribute} >= ? AND #{attribute} < ?", new_index, old_index).update_all("#{attribute} = #{attribute} + 1")
+            @datatable.collection.where(column.gteq(new_index).and(column.lt(old_index))).update_all(attribute => column + 1)
             @resource.update_column(attribute, new_index)
             @resource.touch
           end
@@ -88,7 +89,7 @@ module Effective
       rescue Effective::AccessDenied => e
         render(status: :unauthorized, body: 'Access Denied')
       rescue Exception => e
-        render(status: :error, body: 'Unexpected Error')
+        render(status: :internal_server_error, body: 'Unexpected Error')
       end
 
     end
